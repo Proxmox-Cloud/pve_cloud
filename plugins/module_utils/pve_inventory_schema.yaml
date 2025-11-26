@@ -28,12 +28,13 @@ patternProperties:
                 properties:
                   wol_iface:
                     type: string
-                    description: Inteface wol should be enabled using ethtool
+                    description: Inteface wol should be enabled using ethtool.
                   tso_gso_fix:
                     type: array
-                    description: Will turn of network optimizations on old network cards, this assures they can run indefinetly
+                    description: Will turn of network optimizations on old network cards, this assures they can run indefinetly.
                   mac_iface_mapping:
                     type: array
+                    description: Will setup the pve hosts networkdevices with a fixed name mapped for specified mac addresses.
                     items:
                       type: object
                       additionalProperties: false

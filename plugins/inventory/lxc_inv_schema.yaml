@@ -56,7 +56,6 @@ properties:
               description: "Configuration for primary network interface."
               examples:
                 - "name=eth0,bridge=vmbr0,tag=120,firewall=1,ip=dhcp"
-        
   include_stacks:
     type: array
     description: "Include other cloud stacks into the ansible inventory, from any PVE cluster within the cloud you like."
@@ -98,8 +97,9 @@ properties:
     description: "Public key that will be installed for the root user of all lxcs in the stack."
   pve_cloud_pytest:
     type: object
+    description: Variables object used only in e2e tests.
   plugin:
     type: string
-    description: Id of ansible inventory plugin
+    description: Id of ansible inventory plugin.
     enum:
       - pve.cloud.lxc_inv

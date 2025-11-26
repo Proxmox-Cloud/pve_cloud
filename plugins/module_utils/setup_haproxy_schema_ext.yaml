@@ -8,7 +8,7 @@ properties:
     properties:
       postgres_stack:
         type: string
-        description: Stack fqdn for postgres patroni stack
+        description: Stack fqdn for postgres patroni stack.
   lxcs:
     items:
       required:
@@ -18,5 +18,6 @@ properties:
           required:
             - keepalived_master
           properties:
+            description: One LXC should have this set to true the other to false.
             keepalived_master:
               type: boolean

@@ -1,33 +1,34 @@
 # Kubespray K8S
 
-Our main platform for running workloads is kubernetes. For this the collection contains and integrates with the official kubespray collection.
+The collection contains and integrates with the official kubespray collection.
+
+It is recommended to create a seperate repository per kubernetes cluster, or aleast put the cluster inventory file into a seperate folder.
 
 ## Deploying a cluster
 
 Again create custom inventory yaml file following this [cluster schema](schemas/kubespray_inv_schema.md).
 
-Afterwards run the `pve.cloud.sync_kubespray` playbook.
+Afterwards run the `pve.cloud.sync_kubespray` playbook, this will fully create VMs, setup kubespray, initialize TLS Certificates and deploy core kubernetes helm charts (Ceph CSI, Ingress).
 
-* `config` - for changes to the pve cloud infrastructure (proxy, dns, dhcp)
-* `kubespray` - for only triggering the kubespray playbook that sets up the k8s cluster
-* `acme` -  for only generating / updating letsencrypt certificates
-* `deployments` -  for only installing / upgrading helm core deployments
-
-to temporarily download the kubeconf after creation of the cluster (with expiring access) use:
+To get kubeconf after creation of the cluster for cli/ide access (expiring) use:
 
 `pvcli print-kubeconfig --inventory YOUR-KUBESPRAY-INV.yaml`
 
 ## Upgrading a cluster
 
-Based on the compatibility table on the starting page, upgrade step by step based on k8s minor versions. You can skip patch versions.
+Upgrading the cluster is as simple as updating the version tag reference of this collection.
 
-To upgrade simply increment the version of this ansible collection based on the table in your `requirements.yaml`, run `ansible-galaxy install -r requirements.yaml` again and then execute the upgrade playbook `ansible-playbook -i YOUR-KUBESPRAY-INV.yaml pve.cloud.upgrade_kubespray`.
+You can skip to the latest patch version, but shouldn't skip minor versions as they are tied to kubespray updates. After updating the cloud collection version in your requirements.yaml,
+
+you have to run `ansible-galaxy install -r requirements.yaml` and `pip install -r ~/.ansible/collections/ansible_collections/pve/cloud/meta/ee-requirements.txt` again.
+
+Then run the upgrade playbook `ansible-playbook -i YOUR-KUBESPRAY-INV.yaml pve.cloud.upgrade_kubespray`.
 
 ## Custom kubespray vars
 
-to define your own kubespray vars just create `group_vars/all` and `group_vars/k8s_cluster` directories alongside your inventory file.
+To define your own kubespray vars just create `group_vars/all` and `group_vars/k8s_cluster` directories alongside your inventory file.
 
-here are some interesting kubespray settings you might want to set (k8s_cluster vars):
+Here are some interesting kubespray settings you might want to set (k8s_cluster vars):
 
 * increase amount of schedulable pods per node (if you have big nodes)
 ```yaml
@@ -49,14 +50,21 @@ system_memory_reserved: 1024Mi
 eviction_hard:
   memory.available: 1000Mi
 ```
-=> this, in addition to the `adjust_networkd_oom_score` role, will allow k8s nodes to run even if we got memory hungry, ram unlimited deployments. eviction hard and reservations alone are not enough, in oom scenarios it will cause the networkd service to stop working.
+=> this, in addition to the `adjust_networkd_oom_score` role, will allow k8s nodes to run even if we got memory hungry, ram hogging deployments. eviction hard and reservations alone are not enough, in oom scenarios it will cause the networkd service to stop working.
 
+## TLS ACME Certificates
 
-## Tls acme certificates
+This collection doesn't use kubernetes certmanager for TLS certificates, but instead comes with an external centralised solution. 
 
-if you set the route53 option in the inventory yaml, you also need to manually create the corresponding tls secrets on one of the pve cluster hosts.
+Initially certificates are generated via ansible roles, integrated into the collection. The update process afterwards is handled via [AWX cron jobs](https://github.com/Proxmox-Cloud/pve-cloud-awx-cron). Use the awx helm chart via terraform to deploy your own instance.
 
-* for aws route53 create `/etc/pve/cloud/secrets/aws-route53-global.json`, this should contain rw access to your route53:
+### DNS Provider Secrets
+
+At the moment the collection supports ionos and aws route53 for dynamically solving dns01 challenges and obtaining certificates.
+
+You need to create secret files inside the clouds secret folder on your proxmox cluster:
+
+* for aws route53 create `/etc/pve/cloud/secrets/aws-route53-global.json`, this should contain read / write access to your route53:
 ```json
 {
   "AWS_ACCESS_KEY_ID": "ACCESS_ID_HERE",
@@ -75,20 +83,16 @@ if you set the route53 option in the inventory yaml, you also need to manually c
 
 afterwards you need to sync those secrets to all hosts in the cloud, you can do that by rerunning the `setup_pve_clusters` playbook - `ansible-playbook -i YOUR-CLOUD-INV.yaml pve.cloud.setup_pve_clusters --tags rsync`. This needs to be done only once! There is no support for multiple dns providers / multiple accounts yet.
 
-## Custom Api SANS
+## Exposing K8S Controlplane API
 
-Set the `extra_control_plane_sans` variable to a list of extra sans that you want included in kubeapi certificates. This is needed primarily if you want to expose your cluster to the www to be accessed for example by ArgoCD or Vault under a different hostname than your internal cloud domain. 
+If you want to expose your kubenetes clusters controlplane to integrate with external running services, you can set additional SANs that will be generated and inserted by kubespray into the kubeapi certificates, by listing them in your kubespray inventory file under `extra_control_plane_sans` as simple strings. See the [cluster schema](schemas/kubespray_inv_schema.md).
 
-This will also cause the haproxy frontend thats dedicated for external control planes to route traffic based on sni.
+Adding SANs there will also configure the pve cloud haproxy to route traffic to the respecive clusters controlplane hitting its external floating ip.
 
-You will have to create internal and external dns records by yourself, the terraform dns/route53 provider is a good option.
+DNS Records for these SANs have to be created manually (for internal and external DNS servers), for that use terraforms dns, route53 and ionos provider.
 
 ## Terraform
 
-To configure the kubernetes cluster you should create a terraform folder next to your kubespray inventory yaml. 
+After you deployed your first kubernetes cluster, further deployments and configuration is handled almost exclusively via terraform.
 
-Also checkout the `pve-cloud-tf` repository for modules to install into your cluster, there you will find samples for easy auth with ssh for terraform into k8s.
-
-## AWX
-
-The playbooks for tls create the initial certificates but do not renew them. Setup the `pve-cloud-awx-cron` repository inside your awx instance as a project and follow the README.md to setup the cron job.
+Checkout the [pve-cloud-tf repository](https://github.com/Proxmox-Cloud/pve-cloud-tf), for examples on how to connect and some core deployment ideas.

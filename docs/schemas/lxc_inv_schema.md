@@ -22,8 +22,8 @@
 | - [lxc_base_parameters](#lxc_base_parameters ) | No      | object           | No         | -          | PVE pct cli parameters that will be used for all lxcs.                                                                   |
 | - [lxc_os_template](#lxc_os_template )         | No      | string           | No         | -          | \`pveam available --section system\` / run \`pveam update\` for newest, PVE available LXC template (will be downloaded). |
 | + [root_ssh_pub_key](#root_ssh_pub_key )       | No      | string           | No         | -          | Public key that will be installed for the root user of all lxcs in the stack.                                            |
-| - [pve_cloud_pytest](#pve_cloud_pytest )       | No      | object           | No         | -          | -                                                                                                                        |
-| - [plugin](#plugin )                           | No      | enum (of string) | No         | -          | Id of ansible inventory plugin                                                                                           |
+| - [pve_cloud_pytest](#pve_cloud_pytest )       | No      | object           | No         | -          | Variables object used only in e2e tests.                                                                                 |
+| - [plugin](#plugin )                           | No      | enum (of string) | No         | -          | Id of ansible inventory plugin.                                                                                          |
 
 ## <a name="target_pve"></a>1. Property `LXC Inventory > target_pve`
 
@@ -315,6 +315,8 @@
 | **Required**              | No               |
 | **Additional properties** | Any type allowed |
 
+**Description:** Variables object used only in e2e tests.
+
 ## <a name="plugin"></a>12. Property `LXC Inventory > plugin`
 
 |              |                    |
@@ -322,10 +324,10 @@
 | **Type**     | `enum (of string)` |
 | **Required** | No                 |
 
-**Description:** Id of ansible inventory plugin
+**Description:** Id of ansible inventory plugin.
 
 Must be one of:
 * "pve.cloud.lxc_inv"
 
 ----------------------------------------------------------------------------------------------------------------------------
-Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2025-11-26 at 10:24:36 +0000
+Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2025-11-26 at 12:56:40 +0000

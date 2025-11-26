@@ -13,7 +13,7 @@
 | Property                                         | Pattern | Type             | Deprecated | Definition | Title/Description                                                                                                                     |
 | ------------------------------------------------ | ------- | ---------------- | ---------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------- |
 | + [stack_name](#stack_name )                     | No      | string           | No         | -          | Your stack name, needs to be unique within the parent_domain. Will create its own sub zone.                                           |
-| + [target_pve](#target_pve )                     | No      | string           | No         | -          | The pve cluster this stack should reside in, defined in ~/.pve-inventory.yaml                                                         |
+| + [target_pve](#target_pve )                     | No      | string           | No         | -          | The pve cluster this stack should reside in, defined in ~/.pve-cloud-dyn-inv.yaml via \`pvcli connect-cluster\`                       |
 | + [qemus](#qemus )                               | No      | array of object  | No         | -          | Nodes for the cluster in form of qemu vms.                                                                                            |
 | - [include_stacks](#include_stacks )             | No      | array of object  | No         | -          | -                                                                                                                                     |
 | - [static_includes](#static_includes )           | No      | object           | No         | -          | -                                                                                                                                     |
@@ -25,7 +25,7 @@
 | - [qemu_image_url](#qemu_image_url )             | No      | string           | No         | -          | http(s) download link to the cinit image you want to use.                                                                             |
 | - [qemu_keyboard_layout](#qemu_keyboard_layout ) | No      | string           | No         | -          | The keyboard layout, can be and of de, en ....                                                                                        |
 | - [qemu_global_vars](#qemu_global_vars )         | No      | object           | No         | -          | Variables that will be applied to all lxc hosts                                                                                       |
-| - [pve_cloud_pytest](#pve_cloud_pytest )         | No      | object           | No         | -          | -                                                                                                                                     |
+| - [pve_cloud_pytest](#pve_cloud_pytest )         | No      | object           | No         | -          | Variables object used only in e2e tests.                                                                                              |
 | - [plugin](#plugin )                             | No      | enum (of string) | No         | -          | Id of ansible inventory plugin                                                                                                        |
 
 ## <a name="stack_name"></a>1. Property `VM Inventory > stack_name`
@@ -44,7 +44,7 @@
 | **Type**     | `string` |
 | **Required** | Yes      |
 
-**Description:** The pve cluster this stack should reside in, defined in ~/.pve-inventory.yaml
+**Description:** The pve cluster this stack should reside in, defined in ~/.pve-cloud-dyn-inv.yaml via `pvcli connect-cluster`
 
 ## <a name="qemus"></a>3. Property `VM Inventory > qemus`
 
@@ -284,6 +284,8 @@
 | **Required**              | No               |
 | **Additional properties** | Any type allowed |
 
+**Description:** Variables object used only in e2e tests.
+
 ## <a name="plugin"></a>15. Property `VM Inventory > plugin`
 
 |              |                    |
@@ -297,4 +299,4 @@ Must be one of:
 * "pve.cloud.qemu_inv"
 
 ----------------------------------------------------------------------------------------------------------------------------
-Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2025-11-26 at 10:24:36 +0000
+Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2025-11-26 at 12:56:40 +0000

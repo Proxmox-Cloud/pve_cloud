@@ -14,13 +14,15 @@ required:
 properties:
   target_pve:
     type: string
-    description: "The pve cluster this stack should reside in, defined in ~/.pve-inventory.yaml"
+    description: "The pve cluster this stack should reside in, defined in ~/.pve-cloud-dyn-inv.yaml via `pvcli connect-cluster`"
   stack_name:
     type: string
-    description: "Your stack name, needs to be unique within the parent_domain. Will create its own sub zone."
+    description: "Your stack name, needs to be unique within the cloud domain. Will create its own sub zone."
   extra_control_plane_sans:
     type: array
-    description: "Extra sans that kubespray will put in kubeapi generated certificates. Original kubespray variable is named supplementary_addresses_in_ssl_keys, but is set via kubespray custom inventory. Read kubernetes page in pve cloud docs for more details."
+    description: |
+      Extra sans that kubespray will put in kubeapi generated certificates. Original kubespray variable is named supplementary_addresses_in_ssl_keys, 
+      but is set via kubespray custom inventory. Read kubernetes page in pve cloud docs for more details.
     items:
       type: string
   external_domains:
@@ -220,7 +222,7 @@ properties:
     description: http(s) download link for cloud init image.
   qemu_keyboard_layout:
     type: string
-    description: Keyboard layout for cloudinit
+    description: Keyboard layout for cloudinit.
   qemu_network_config:
     type: string
     description: Optional qemu network config as a yaml string that is merged into the cloudinit network config of all qemus.
@@ -229,11 +231,12 @@ properties:
     description: "If set to true will use acme staging directory for issueing certs."
   plugin:
     type: string
-    description: Id of ansible inventory plugin
+    description: Id of ansible inventory plugin.
     enum:
       - pve.cloud.kubespray_inv
   pve_cloud_pytest:
     type: object
+    description: Variables object used only in e2e tests.
   qemu_global_vars:
     type: object
-    description: "Variables that will be applied to all lxc hosts"
+    description: "Variables that will be applied to all lxc hosts."

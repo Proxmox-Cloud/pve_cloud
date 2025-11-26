@@ -8,11 +8,11 @@
 | **Required**              | No          |
 | **Additional properties** | Not allowed |
 
-| Property                         | Pattern | Type             | Deprecated | Definition | Title/Description                                                                                                                    |
-| -------------------------------- | ------- | ---------------- | ---------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| + [target_pve](#target_pve )     | No      | string           | No         | -          | -                                                                                                                                    |
-| + [plugin](#plugin )             | No      | enum (of string) | No         | -          | Id of ansible inventory plugin                                                                                                       |
-| + [pve_clusters](#pve_clusters ) | No      | object           | No         | -          | Inventory file located in user home directory ~/.pve-inventory.yaml, containing all the pve clusters the user has access to via ssh. |
+| Property                         | Pattern | Type             | Deprecated | Definition | Title/Description                                                                                                                                    |
+| -------------------------------- | ------- | ---------------- | ---------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| + [target_pve](#target_pve )     | No      | string           | No         | -          | -                                                                                                                                                    |
+| + [plugin](#plugin )             | No      | enum (of string) | No         | -          | Id of ansible inventory plugin.                                                                                                                      |
+| + [pve_clusters](#pve_clusters ) | No      | object           | No         | -          | Copy of the inventory file located in user home directory ~/.pve-cloud-dyn-inv.yaml, containing all the pve clusters the user has access to via ssh. |
 
 ## <a name="target_pve"></a>1. Property `AWX Cron Inventory > target_pve`
 
@@ -28,7 +28,7 @@
 | **Type**     | `enum (of string)` |
 | **Required** | Yes                |
 
-**Description:** Id of ansible inventory plugin
+**Description:** Id of ansible inventory plugin.
 
 Must be one of:
 * "pve.cloud.awx_cloud_inv"
@@ -41,15 +41,15 @@ Must be one of:
 | **Required**              | Yes         |
 | **Additional properties** | Not allowed |
 
-**Description:** Inventory file located in user home directory ~/.pve-inventory.yaml, containing all the pve clusters the user has access to via ssh.
+**Description:** Copy of the inventory file located in user home directory ~/.pve-cloud-dyn-inv.yaml, containing all the pve clusters the user has access to via ssh.
 
-| Property                                                                                                  | Pattern | Type   | Deprecated | Definition | Title/Description |
-| --------------------------------------------------------------------------------------------------------- | ------- | ------ | ---------- | ---------- | ----------------- |
-| - [^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]$](#pve_clusters_pattern1 ) | Yes     | object | No         | -          | PVE cluster fqdn  |
+| Property                          | Pattern | Type   | Deprecated | Definition | Title/Description |
+| --------------------------------- | ------- | ------ | ---------- | ---------- | ----------------- |
+| - [^.*$](#pve_clusters_pattern1 ) | Yes     | object | No         | -          | PVE cluster fqdn  |
 
 ### <a name="pve_clusters_pattern1"></a>3.1. Pattern Property `AWX Cron Inventory > pve_clusters > PVE cluster fqdn`
 > All properties whose name matches the regular expression
-```^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]$``` ([Test](https://regex101.com/?regex=%5E%28%3F%3A%5Ba-z0-9%5D%28%3F%3A%5Ba-z0-9-%5D%7B0%2C61%7D%5Ba-z0-9%5D%29%3F%5C.%29%2B%5Ba-z0-9%5D%5Ba-z0-9-%5D%7B0%2C61%7D%5Ba-z0-9%5D%24))
+```^.*$``` ([Test](https://regex101.com/?regex=%5E.%2A%24))
 must respect the following conditions
 
 **Title:** PVE cluster fqdn
@@ -62,13 +62,13 @@ must respect the following conditions
 
 **Description:** The identifying cluster domain. Synonymous with target_pve. Will be appended to stack_name(s).
 
-| Property                                                                | Pattern | Type   | Deprecated | Definition | Title/Description |
-| ----------------------------------------------------------------------- | ------- | ------ | ---------- | ---------- | ----------------- |
-| - [^[a-z0-9][a-z0-9-]{0,61}[a-z0-9]$](#pve_clusters_pattern1_pattern4 ) | Yes     | object | No         | -          | PVE Node Hostname |
+| Property                                   | Pattern | Type   | Deprecated | Definition | Title/Description |
+| ------------------------------------------ | ------- | ------ | ---------- | ---------- | ----------------- |
+| - [^.*$](#pve_clusters_pattern1_pattern4 ) | Yes     | object | No         | -          | PVE Node Hostname |
 
 #### <a name="pve_clusters_pattern1_pattern4"></a>3.1.1. Pattern Property `AWX Cron Inventory > pve_clusters > PVE cluster fqdn > PVE Node Hostname`
 > All properties whose name matches the regular expression
-```^[a-z0-9][a-z0-9-]{0,61}[a-z0-9]$``` ([Test](https://regex101.com/?regex=%5E%5Ba-z0-9%5D%5Ba-z0-9-%5D%7B0%2C61%7D%5Ba-z0-9%5D%24))
+```^.*$``` ([Test](https://regex101.com/?regex=%5E.%2A%24))
 must respect the following conditions
 
 **Title:** PVE Node Hostname
@@ -101,4 +101,4 @@ must respect the following conditions
 | **Required** | Yes      |
 
 ----------------------------------------------------------------------------------------------------------------------------
-Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2025-11-26 at 10:24:36 +0000
+Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2025-11-26 at 12:56:40 +0000

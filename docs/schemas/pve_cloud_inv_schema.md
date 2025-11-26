@@ -13,7 +13,7 @@
 | Property                                                           | Pattern | Type             | Deprecated | Definition | Title/Description                                                                                                                         |
 | ------------------------------------------------------------------ | ------- | ---------------- | ---------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
 | + [pve_vm_subnet](#pve_vm_subnet )                                 | No      | string           | No         | -          | Subnet this PVE cluster uses for its VMs.                                                                                                 |
-| + [pve_cloud_domain](#pve_cloud_domain )                           | No      | string           | No         | -          | The overarching domain for the cloud. Will also be used for ddns                                                                          |
+| + [pve_cloud_domain](#pve_cloud_domain )                           | No      | string           | No         | -          | The overarching domain for the cloud. Will also be used for ddns.                                                                         |
 | + [pve_clusters](#pve_clusters )                                   | No      | object           | No         | -          | Definitions for specific Proxmox clusters that will be part of the cloud. Keys are hostnames.                                             |
 | + [bind_master_ip](#bind_master_ip )                               | No      | string           | No         | -          | IP of the primary bind dns for this cluster, will be statically assigned.                                                                 |
 | + [bind_slave_ip](#bind_slave_ip )                                 | No      | string           | No         | -          | IP of the slave bind dns for this cluster.                                                                                                |
@@ -30,7 +30,7 @@
 | - [kea_dhcp_ceph_frontend_pool](#kea_dhcp_ceph_frontend_pool )     | No      | string           | No         | -          | Pool kea definition for ceph frontend ip allocations, this way monitors can have their static block.                                      |
 | - [acme_contact](#acme_contact )                                   | No      | string           | No         | -          | Email address to use for acme account creation.                                                                                           |
 | - [acme_method](#acme_method )                                     | No      | enum (of string) | No         | -          | PVE Cloud included method for solving dns01 challenges.                                                                                   |
-| - [pve_cloud_pytest](#pve_cloud_pytest )                           | No      | object           | No         | -          | -                                                                                                                                         |
+| - [pve_cloud_pytest](#pve_cloud_pytest )                           | No      | object           | No         | -          | Variables object used only in e2e tests.                                                                                                  |
 | - [plugin](#plugin )                                               | No      | enum (of string) | No         | -          | Id of ansible inventory plugin, needs to be set exactly.                                                                                  |
 
 ## <a name="pve_vm_subnet"></a>1. Property `Cloud Inventory > pve_vm_subnet`
@@ -49,7 +49,7 @@
 | **Type**     | `string` |
 | **Required** | Yes      |
 
-**Description:** The overarching domain for the cloud. Will also be used for ddns
+**Description:** The overarching domain for the cloud. Will also be used for ddns.
 
 ## <a name="pve_clusters"></a>3. Property `Cloud Inventory > pve_clusters`
 
@@ -502,6 +502,8 @@ Must be one of:
 | **Required**              | No               |
 | **Additional properties** | Any type allowed |
 
+**Description:** Variables object used only in e2e tests.
+
 ## <a name="plugin"></a>20. Property `Cloud Inventory > plugin`
 
 |              |                    |
@@ -515,4 +517,4 @@ Must be one of:
 * "pve.cloud.pve_cloud_inv"
 
 ----------------------------------------------------------------------------------------------------------------------------
-Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2025-11-26 at 10:24:36 +0000
+Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2025-11-26 at 12:56:40 +0000

@@ -1,26 +1,45 @@
 # Setup/Bootstrap
 
-You only need the developer machine as described in the main READMEs Quickstart section.
+You need a development machine with the following tools/packages installed:
+
+* python3 + virtual env 
+* docker
+* terraform
+* kubectl / helm
+* yq (mikefarah)
+* (nfs-common) if you want to use caching
+
+Aswell as a proxmox cluster you have root access via ssh to the hosts.
 
 ## Bootstrap
 
-If you only have your proxmox cluster up and running and no further infrastructure services like a gitlab you need to install from local repositories + from the artifacts on docker hub / pypi.
+Create a repository for your cloud instance for example company-xyz-cloud and setup your environment:
 
-It also assumes you have your ssh keys installed for the root user of your proxmox clusters.
+* create venv: `python3 -m venv ~/.pve-cloud-venv` and activate `source ~/.pve-cloud-venv/bin/activate`
+* install `pip install ansible==9.13.0 distlib==0.3.9`
+* create `requirements.yaml` in your repository like this:
+```yaml
+---
+collections:
+  - name: git@github.com:Proxmox-Cloud/pve_cloud.git
+    type: git
+    version: $LATEST_TAG_VERSION
+```
+* run `ansible-galaxy install -r requirements.yaml`, then install the python requirements from `pip install -r ~/.ansible/collections/ansible_collections/pve/cloud/meta/ee-requirements.txt`.
 
-1. Create a venv for working with the collection and activate it `python3 -m venv ~/.pve-cloud-venv && source ~/.pve-cloud-venv/bin/activate` 
-2. From the root of the repository run `pip install -r meta/ee-requirements.txt` => this gives you access to the `pvcli` command (via the `py-pve-cloud` package).
-3. Build local dynamic inventory of your pve cloud environments `pvcli connect-cluster --pve-host PROXMOX_HOST`. If the pve host / cluster is not already assigned to a cloud environment it will ask you for the domain name.
+### Cloud domain selection
 
-## Cloud domain selection
+* connect to your proxmox clusters `pvcli connect-cluster --pve-host $PROXMOX_HOST` (run once per cluster, same domain)
 
-the cloud domain should be a unique domain that can be used for the hostnames. it should not overlap with a domain you host generic https services under, we need unambiguousness for our ddns hostname records. domains for services like for example gitlab.example.com can be added later in our cluster definition file. the cloud domain should be something like your-cloud.example.com.
+The cloud domain should be a unique domain that can be used for the hostnames and services of the cloud. It should not overlap with a domain you host generic services under, we need unambiguousness for our ddns hostname records.
 
-## Your first cloud repository
+Domains for services like for example `gitlab.example.com` can be added later in our cluster definition file. The cloud domain should be something like `your-cloud.example.com`.
+
+### Repository setup
 
 One pve cloud can have multiple proxmox clusters, but one proxmox cluster may only be member of a single pve cloud.
 
-You should create a repository for each of your pve cloud instances. 
+You should create a seperate repository for each of your pve cloud instances. 
 
 This repository should contain:
 
@@ -29,9 +48,7 @@ This repository should contain:
   * inventory for two kea lxcs => for use with `pve.cloud.setup_kea` playbook
   * inventory for two bind lxcs => `pve.cloud.setup_bind` playbook
   * two haproxy lxcs => `pve.cloud.setup_haproxy` playbook
-  * three lxcs for patroni postgres (no special schema) => `pve.cloud.setup_postgres` playbook
-
-the specific playbooks contain extra schema validations, for specific fields that need to be set extending the default lxc schema.
+  * three lxcs for patroni postgres => `pve.cloud.setup_postgres` playbook
 
 From here you can start deploying your first kubernetes cluster, which will serve as the basis for most deployments/services.
 

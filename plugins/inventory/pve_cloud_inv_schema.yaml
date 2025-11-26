@@ -22,7 +22,7 @@ properties:
     description: "Subnet this PVE cluster uses for its VMs."
   pve_cloud_domain:
     type: string
-    description: "The overarching domain for the cloud. Will also be used for ddns"
+    description: "The overarching domain for the cloud. Will also be used for ddns."
   pve_clusters:
     type: object
     additionalProperties: false
@@ -154,6 +154,7 @@ properties:
     description: "PVE Cloud included method for solving dns01 challenges."
   pve_cloud_pytest:
     type: object
+    description: Variables object used only in e2e tests.
   plugin:
     type: string
     description: "Id of ansible inventory plugin, needs to be set exactly."

@@ -10,29 +10,29 @@
 
 **Description:** Inventory for deploying k8s clusters via kubespray on PVE.
 
-| Property                                                 | Pattern | Type             | Deprecated | Definition | Title/Description                                                                                                                                                                                                                                   |
-| -------------------------------------------------------- | ------- | ---------------- | ---------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| + [target_pve](#target_pve )                             | No      | string           | No         | -          | The pve cluster this stack should reside in, defined in ~/.pve-inventory.yaml                                                                                                                                                                       |
-| + [stack_name](#stack_name )                             | No      | string           | No         | -          | Your stack name, needs to be unique within the parent_domain. Will create its own sub zone.                                                                                                                                                         |
-| - [extra_control_plane_sans](#extra_control_plane_sans ) | No      | array of string  | No         | -          | Extra sans that kubespray will put in kubeapi generated certificates. Original kubespray variable is named supplementary_addresses_in_ssl_keys, but is set via kubespray custom inventory. Read kubernetes page in pve cloud docs for more details. |
-| - [external_domains](#external_domains )                 | No      | array of object  | No         | -          | Domains that will be exposed to the public proxies floating ip via haproxy routing rules.                                                                                                                                                           |
-| + [cluster_cert_entries](#cluster_cert_entries )         | No      | array of object  | No         | -          | Content for the clusters certificate. Internal routing is handled by ingress dns!                                                                                                                                                                   |
-| + [tcp_proxies](#tcp_proxies )                           | No      | array of object  | No         | -          | TCP forwards to this cluster on the pve cluster proxy.                                                                                                                                                                                              |
-| + [static_includes](#static_includes )                   | No      | object           | No         | -          | -                                                                                                                                                                                                                                                   |
-| - [include_stacks](#include_stacks )                     | No      | array of object  | No         | -          | Include other stacks into the ansible inventory, from any PVE cluster you like.                                                                                                                                                                     |
-| + [qemus](#qemus )                                       | No      | array of object  | No         | -          | Nodes for the cluster in form of qemu vms.                                                                                                                                                                                                          |
-| + [ceph_csi_sc_pools](#ceph_csi_sc_pools )               | No      | array of object  | No         | -          | Ceph pools that will be made available to the cluster CSI driver.                                                                                                                                                                                   |
-| + [root_ssh_pub_key](#root_ssh_pub_key )                 | No      | string           | No         | -          | trusted root key for the cloud init image.                                                                                                                                                                                                          |
-| - [pve_ha_group](#pve_ha_group )                         | No      | string           | No         | -          | PVE HA group this vm should be assigned to (optional).                                                                                                                                                                                              |
-| - [qemu_hashed_pw](#qemu_hashed_pw )                     | No      | string           | No         | -          | Pw for default user defaults to hashed 'password' for debian cloud init image.                                                                                                                                                                      |
-| - [qemu_base_parameters](#qemu_base_parameters )         | No      | object           | No         | -          | Base parameters passed to the proxmox qm cli tool for creating vm                                                                                                                                                                                   |
-| - [qemu_image_url](#qemu_image_url )                     | No      | string           | No         | -          | http(s) download link for cloud init image.                                                                                                                                                                                                         |
-| - [qemu_keyboard_layout](#qemu_keyboard_layout )         | No      | string           | No         | -          | Keyboard layout for cloudinit                                                                                                                                                                                                                       |
-| - [qemu_network_config](#qemu_network_config )           | No      | string           | No         | -          | Optional qemu network config as a yaml string that is merged into the cloudinit network config of all qemus.                                                                                                                                        |
-| - [acme_staging](#acme_staging )                         | No      | boolean          | No         | -          | If set to true will use acme staging directory for issueing certs.                                                                                                                                                                                  |
-| - [plugin](#plugin )                                     | No      | enum (of string) | No         | -          | Id of ansible inventory plugin                                                                                                                                                                                                                      |
-| - [pve_cloud_pytest](#pve_cloud_pytest )                 | No      | object           | No         | -          | -                                                                                                                                                                                                                                                   |
-| - [qemu_global_vars](#qemu_global_vars )                 | No      | object           | No         | -          | Variables that will be applied to all lxc hosts                                                                                                                                                                                                     |
+| Property                                                 | Pattern | Type             | Deprecated | Definition | Title/Description                                                                                                                                                                                                                                               |
+| -------------------------------------------------------- | ------- | ---------------- | ---------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| + [target_pve](#target_pve )                             | No      | string           | No         | -          | The pve cluster this stack should reside in, defined in ~/.pve-cloud-dyn-inv.yaml via \`pvcli connect-cluster\`                                                                                                                                                 |
+| + [stack_name](#stack_name )                             | No      | string           | No         | -          | Your stack name, needs to be unique within the cloud domain. Will create its own sub zone.                                                                                                                                                                      |
+| - [extra_control_plane_sans](#extra_control_plane_sans ) | No      | array of string  | No         | -          | Extra sans that kubespray will put in kubeapi generated certificates. Original kubespray variable is named supplementary_addresses_in_ssl_keys, <br />but is set via kubespray custom inventory. Read kubernetes page in pve cloud docs for more details.<br /> |
+| - [external_domains](#external_domains )                 | No      | array of object  | No         | -          | Domains that will be exposed to the public proxies floating ip via haproxy routing rules.                                                                                                                                                                       |
+| + [cluster_cert_entries](#cluster_cert_entries )         | No      | array of object  | No         | -          | Content for the clusters certificate. Internal routing is handled by ingress dns!                                                                                                                                                                               |
+| + [tcp_proxies](#tcp_proxies )                           | No      | array of object  | No         | -          | TCP forwards to this cluster on the pve cluster proxy.                                                                                                                                                                                                          |
+| + [static_includes](#static_includes )                   | No      | object           | No         | -          | -                                                                                                                                                                                                                                                               |
+| - [include_stacks](#include_stacks )                     | No      | array of object  | No         | -          | Include other stacks into the ansible inventory, from any PVE cluster you like.                                                                                                                                                                                 |
+| + [qemus](#qemus )                                       | No      | array of object  | No         | -          | Nodes for the cluster in form of qemu vms.                                                                                                                                                                                                                      |
+| + [ceph_csi_sc_pools](#ceph_csi_sc_pools )               | No      | array of object  | No         | -          | Ceph pools that will be made available to the cluster CSI driver.                                                                                                                                                                                               |
+| + [root_ssh_pub_key](#root_ssh_pub_key )                 | No      | string           | No         | -          | trusted root key for the cloud init image.                                                                                                                                                                                                                      |
+| - [pve_ha_group](#pve_ha_group )                         | No      | string           | No         | -          | PVE HA group this vm should be assigned to (optional).                                                                                                                                                                                                          |
+| - [qemu_hashed_pw](#qemu_hashed_pw )                     | No      | string           | No         | -          | Pw for default user defaults to hashed 'password' for debian cloud init image.                                                                                                                                                                                  |
+| - [qemu_base_parameters](#qemu_base_parameters )         | No      | object           | No         | -          | Base parameters passed to the proxmox qm cli tool for creating vm                                                                                                                                                                                               |
+| - [qemu_image_url](#qemu_image_url )                     | No      | string           | No         | -          | http(s) download link for cloud init image.                                                                                                                                                                                                                     |
+| - [qemu_keyboard_layout](#qemu_keyboard_layout )         | No      | string           | No         | -          | Keyboard layout for cloudinit.                                                                                                                                                                                                                                  |
+| - [qemu_network_config](#qemu_network_config )           | No      | string           | No         | -          | Optional qemu network config as a yaml string that is merged into the cloudinit network config of all qemus.                                                                                                                                                    |
+| - [acme_staging](#acme_staging )                         | No      | boolean          | No         | -          | If set to true will use acme staging directory for issueing certs.                                                                                                                                                                                              |
+| - [plugin](#plugin )                                     | No      | enum (of string) | No         | -          | Id of ansible inventory plugin.                                                                                                                                                                                                                                 |
+| - [pve_cloud_pytest](#pve_cloud_pytest )                 | No      | object           | No         | -          | Variables object used only in e2e tests.                                                                                                                                                                                                                        |
+| - [qemu_global_vars](#qemu_global_vars )                 | No      | object           | No         | -          | Variables that will be applied to all lxc hosts.                                                                                                                                                                                                                |
 
 ## <a name="target_pve"></a>1. Property `K8S Kubespray Inv. > target_pve`
 
@@ -41,7 +41,7 @@
 | **Type**     | `string` |
 | **Required** | Yes      |
 
-**Description:** The pve cluster this stack should reside in, defined in ~/.pve-inventory.yaml
+**Description:** The pve cluster this stack should reside in, defined in ~/.pve-cloud-dyn-inv.yaml via `pvcli connect-cluster`
 
 ## <a name="stack_name"></a>2. Property `K8S Kubespray Inv. > stack_name`
 
@@ -50,7 +50,7 @@
 | **Type**     | `string` |
 | **Required** | Yes      |
 
-**Description:** Your stack name, needs to be unique within the parent_domain. Will create its own sub zone.
+**Description:** Your stack name, needs to be unique within the cloud domain. Will create its own sub zone.
 
 ## <a name="extra_control_plane_sans"></a>3. Property `K8S Kubespray Inv. > extra_control_plane_sans`
 
@@ -59,7 +59,8 @@
 | **Type**     | `array of string` |
 | **Required** | No                |
 
-**Description:** Extra sans that kubespray will put in kubeapi generated certificates. Original kubespray variable is named supplementary_addresses_in_ssl_keys, but is set via kubespray custom inventory. Read kubernetes page in pve cloud docs for more details.
+**Description:** Extra sans that kubespray will put in kubeapi generated certificates. Original kubespray variable is named supplementary_addresses_in_ssl_keys, 
+but is set via kubespray custom inventory. Read kubernetes page in pve cloud docs for more details.
 
 |                      | Array restrictions |
 | -------------------- | ------------------ |
@@ -725,7 +726,7 @@
 | **Type**     | `string` |
 | **Required** | No       |
 
-**Description:** Keyboard layout for cloudinit
+**Description:** Keyboard layout for cloudinit.
 
 ## <a name="qemu_network_config"></a>17. Property `K8S Kubespray Inv. > qemu_network_config`
 
@@ -752,7 +753,7 @@
 | **Type**     | `enum (of string)` |
 | **Required** | No                 |
 
-**Description:** Id of ansible inventory plugin
+**Description:** Id of ansible inventory plugin.
 
 Must be one of:
 * "pve.cloud.kubespray_inv"
@@ -765,6 +766,8 @@ Must be one of:
 | **Required**              | No               |
 | **Additional properties** | Any type allowed |
 
+**Description:** Variables object used only in e2e tests.
+
 ## <a name="qemu_global_vars"></a>21. Property `K8S Kubespray Inv. > qemu_global_vars`
 
 |                           |                  |
@@ -773,7 +776,7 @@ Must be one of:
 | **Required**              | No               |
 | **Additional properties** | Any type allowed |
 
-**Description:** Variables that will be applied to all lxc hosts
+**Description:** Variables that will be applied to all lxc hosts.
 
 ----------------------------------------------------------------------------------------------------------------------------
-Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2025-11-26 at 10:24:36 +0000
+Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2025-11-26 at 12:56:40 +0000

@@ -4,6 +4,8 @@ The aim of this project is to provide a cloud provider like foundation, build on
 
 This collection is a toolbox to build your own onpremise clouds following infrastructure as code principles. The main tools you will be working with are ansible and terraform. The collection only contains things every self hosted cloud needs, the rest is up to you to decide and to build.
 
+It merges ansible inventories directly with vms/lxcs on proxmox, aswell as providing an integrated kubernetes implementation.
+
 
 ### Project dependency structure
 

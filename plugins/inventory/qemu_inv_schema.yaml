@@ -13,7 +13,7 @@ properties:
     description: "Your stack name, needs to be unique within the parent_domain. Will create its own sub zone."
   target_pve:
     type: string
-    description: "The pve cluster this stack should reside in, defined in ~/.pve-inventory.yaml"
+    description: "The pve cluster this stack should reside in, defined in ~/.pve-cloud-dyn-inv.yaml via `pvcli connect-cluster`"
   qemus:
     type: array
     description: "Nodes for the cluster in form of qemu vms."
@@ -83,6 +83,7 @@ properties:
     description: "Variables that will be applied to all lxc hosts"
   pve_cloud_pytest:
     type: object
+    description: Variables object used only in e2e tests.
   plugin:
     type: string
     description: Id of ansible inventory plugin
