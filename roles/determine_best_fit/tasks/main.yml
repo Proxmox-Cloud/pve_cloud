@@ -1,0 +1,15 @@
+---
+# tasks file for determine_best_fit
+- name: Iterate over hosts and populate the map
+  set_fact:
+    host_mem_list: "{{ host_mem_list | default([]) + [{'hostname': item, 'mem_total': hostvars[item].ansible_memtotal_mb, 'reserved': hostvars[item].total_reserved_mem | int}] }}"
+  # only deploy on hosts in ha group if defined
+  when: pve_ha_group is not defined or (hostvars[item].pve_ha_groups is defined and pve_ha_group in hostvars[item].pve_ha_groups)
+  loop: "{{ groups['target_pve'] }}"
+
+- backtrack_fit:
+    host_mem_list: "{{ host_mem_list }}"
+    nodes_to_create: "{{ delete_create['vms_to_create'] }}"
+  register: best_fit
+  run_once: true # explicit to propagate to other hosts
+

@@ -1,0 +1,50 @@
+- name: Fetch created vm config
+  ansible.builtin.command: "qm config {{ pve_id.stdout }}"
+  register: qm_config_cmd
+
+- name: parse config into json
+  set_fact:
+    qm_config_parsed: "{{ qm_config_cmd.stdout | from_yaml }}"
+
+- name: construct base cinit network config
+  set_fact:
+    pve_ethernet_cinit:
+      network:
+        version: 2
+        ethernets:
+          pve:
+            dhcp4: true
+            match:
+              macaddress: "{{ qm_config_parsed[qemu_pve_nic] | regex_search('virtio=([0-9A-Fa-f:]+)', '\\1') | first | lower }}"
+            set-name: pve
+
+- name: ceph ethernet if second nic is defined
+  # default is set to {} in vars
+  set_fact:
+    ceph_ethernet_cinit:
+      network:
+        version: 2
+        ethernets:
+          cephfe:
+            dhcp4: true
+            match:
+              macaddress: "{{ qm_config_parsed[qemu_cephfe_nic] | regex_search('virtio=([0-9A-Fa-f:]+)', '\\1') | first | lower }}"
+            set-name: cephfe
+  when: qemu_cephfe_nic in qm_config_parsed
+
+- name: merge to full cinit network config
+  set_fact:
+    # base conf always present
+    # optional ceph config
+    # optional global config
+    # optional qemu specific config
+    cinit_network_conf: >-
+      {{
+        pve_ethernet_cinit 
+        | combine(ceph_ethernet_cinit, recursive=True)
+        | combine(qemu_network_config | from_yaml, recursive=True, list_merge='append')
+        | combine(args.network_config | default("network: {}") | from_yaml, recursive=True, list_merge='append')
+      }}
+
+- debug:
+    var: cinit_network_conf

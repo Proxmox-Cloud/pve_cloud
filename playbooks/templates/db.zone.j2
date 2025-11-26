@@ -1,0 +1,16 @@
+$ORIGIN {{ item }}.
+$TTL 86400
+@   IN  SOA     ns1.{{ item }}. {{ bind_zone_admin_email }} (
+                    {{ ansible_date_time.date | replace('-', '') }}01 ; Serial
+                    3600       ; Refresh
+                    1800       ; Retry
+                    1209600    ; Expire
+                    300 )    ; Minimum TTL - negative cache ttl 5 min
+
+; default ns entries back to our 2 servers
+@       IN  NS      ns1.{{ item }}.
+@       IN  NS      ns2.{{ item }}.
+ns1     IN  A       {{ bind_master_ip }}
+ns2     IN  A       {{ bind_slave_ip }}
+
+; all other updates happen via nsupdate (terraform module and ansible roles)

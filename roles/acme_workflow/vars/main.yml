@@ -1,0 +1,4 @@
+---
+# vars file for acme_workflow
+acme_staging_directory: https://acme-staging-v02.api.letsencrypt.org/directory
+acme_prod_directory: https://acme-v02.api.letsencrypt.org/directory

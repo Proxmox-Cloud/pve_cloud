@@ -1,0 +1,23 @@
+---
+# tasks file for select_kea_conf
+- name: select all reservations
+  delegate_to: localhost
+  alchemy_read:
+    pg_conn_str: "{{ pg_conn_str }}"
+    table: kea_reservations
+  register: db_reservations
+  
+- set_fact:
+    db_reservations: { "query_result": []}
+  when: db_reservations["failed"]
+
+- name: select class defs
+  delegate_to: localhost
+  alchemy_read:
+    pg_conn_str: "{{ pg_conn_str }}"
+    table: kea_client_class_defs
+  register: db_class_defs
+  
+- set_fact:
+    db_class_defs: { "query_result": []}
+  when: db_class_defs["failed"]

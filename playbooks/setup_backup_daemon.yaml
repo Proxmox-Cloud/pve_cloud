@@ -1,0 +1,128 @@
+- name: Slurp ceph conf and secrets from target
+  hosts: target_pve
+  tasks:
+    - slurp:
+        src: /etc/ceph/ceph.conf
+      register: ceph_conf
+      run_once: true
+    - slurp:
+        src: /etc/pve/priv/ceph.client.admin.keyring
+      register: ceph_keyring
+      run_once: true
+
+    # this is only for my custom rsync to hdds script
+    # todo: streamline into collection for home lab backups
+    - name: Slurp public keys
+      slurp:
+        src: /root/.ssh/id_rsa.pub
+      register: pve_key
+
+    - name: Set fact with decoded pubkey
+      set_fact:
+        pve_pubkey: "{{ pve_key['content'] | b64decode | trim }}"
+
+
+- name: Install requirements on debian 12 lxc/vm
+  hosts: lxcs:qemus
+  vars:
+    # increment this on releasing a new pve-cloud-backup version
+    py_pve_cloud_backup_version: "0.5.0"
+  tasks:
+    - name: Add pve pubkeys to authorized_keys (homelab)
+      authorized_key:
+        user: root
+        key: "{{ item }}"
+      loop: "{{ groups['target_pve'] | map('extract', hostvars, 'pve_pubkey') | list }}"
+
+    # install basic cli
+    - name: Install apt packages
+      ansible.builtin.apt:
+        update_cache: yes
+        name: 
+          - python3-venv
+          - borgbackup
+          - rsync
+          - gpg
+        state: present
+
+    # install ceph 19
+    - name: Add Ceph apt key
+      apt_key:
+        url: https://download.ceph.com/keys/release.asc
+        state: present
+    - name: Add Ceph APT repository
+      apt_repository:
+        repo: "deb https://download.ceph.com/debian-squid bookworm main"
+        filename: ceph
+        state: present
+    - name: Install ceph-common package
+      apt:
+        update_cache: yes
+        name: ceph-common
+        state: present
+
+    # copy ceph credentials
+    - copy:
+        content: "{{ hostvars[groups['target_pve'][0]]['ceph_conf'].content | b64decode }}"
+        dest: /etc/ceph/ceph.conf
+    - name: Ensure destination directory exists
+      file:
+        path: /etc/pve/priv
+        state: directory
+    - copy:
+        content: "{{ hostvars[groups['target_pve'][0]]['ceph_keyring'].content | b64decode }}"
+        dest: /etc/pve/priv/ceph.client.admin.keyring
+
+    - name: Ensure /opt/bdd directory exists
+      ansible.builtin.file:
+        path: /opt/bdd
+        state: directory
+
+    - name: Create Python virtual environment in /opt/bdd/.venv
+      ansible.builtin.command:
+        cmd: python3 -m venv /opt/bdd/.venv
+        creates: /opt/bdd/.venv/bin/activate
+
+    - name: Copy restore instructions
+      ansible.builtin.template:
+        src: "bdd-RESTORE.md.j2"
+        dest: "/opt/bdd/RESTORE.md"
+
+    - name: Install bdd into venv
+      ansible.builtin.command:
+        cmd: /opt/bdd/.venv/bin/pip install py-pve-cloud-backup=={{ py_pve_cloud_backup_version }}
+      when: tdd_local_pypi_host is not defined
+
+    - name: Install bdd into venv from tdd dog local pypi
+      ansible.builtin.command:
+        cmd: /opt/bdd/.venv/bin/pip install --index-url http://{{ tdd_local_pypi_host }}:8088/simple --trusted-host {{ tdd_local_pypi_host }} py-pve-cloud-backup=={{ py_pve_cloud_backup_version }}
+      when: tdd_local_pypi_host is defined
+
+    - name: Create a systemd service file
+      copy:
+        dest: "/etc/systemd/system/bdd.service"
+        content: |
+          [Unit]
+          Description=backup disk daemon 
+          After=network.target
+
+          [Service]
+          Type=simple
+          User=root
+          WorkingDirectory=/opt/bdd
+          ExecStart=/opt/bdd/.venv/bin/daemon
+          Restart=always
+          Environment="BACKUP_BASE_DIR={{ BACKUP_BASE_DIR }}"
+          Environment="ENV=PRODUCTION"
+
+          [Install]
+          WantedBy=multi-user.target
+
+    - name: Reload systemd daemon
+      command: systemctl daemon-reload
+
+    - name: Enable and start the application service
+      systemd:
+        name: "bdd"
+        state: restarted
+        enabled: yes

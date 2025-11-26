@@ -1,0 +1,88 @@
+---
+# tasks file for select_haproxy_conf
+- name: select all workers
+  delegate_to: localhost
+  alchemy_read:
+    pg_conn_str: "{{ pg_conn_str }}"
+    table: k8s_workers
+    where:
+      proxy_stack_fqdn: "{{ proxy_stack_fqdn }}"
+  register: k8s_workers
+
+- debug:
+    var: k8s_workers
+
+- name: set empty k8s_workers on fail or 0
+  set_fact:
+    k8s_workers: { "query_result": [] }
+  when: k8s_workers["failed"] or k8s_workers["rowcount"] == 0
+
+- name: select all masters 
+  delegate_to: localhost
+  alchemy_read:
+    pg_conn_str: "{{ pg_conn_str }}"
+    table: k8s_masters
+    where:
+      proxy_stack_fqdn: "{{ proxy_stack_fqdn }}"
+  register: k8s_masters
+
+- name: set empty k8s_masters on fail or 0
+  set_fact:
+    k8s_masters: { "query_result": [] }
+  when: k8s_masters["failed"] or k8s_masters["rowcount"] == 0
+
+- name: select all ingress rules
+  delegate_to: localhost
+  alchemy_read:
+    pg_conn_str: "{{ pg_conn_str }}"
+    table: k8s_ingress_rules
+    where:
+      proxy_stack_fqdn: "{{ proxy_stack_fqdn }}"
+  register: k8s_ingress_rules
+
+- name: set empty k8s_ingress_rules on fail or 0
+  set_fact:
+    k8s_ingress_rules: { "query_result": []}
+  when: k8s_ingress_rules["failed"] or k8s_ingress_rules["rowcount"] == 0
+
+- name: select all tcp proxy defs
+  delegate_to: localhost
+  alchemy_read:
+    pg_conn_str: "{{ pg_conn_str }}"
+    table: k8s_tcp_proxies
+    where:
+      proxy_stack_fqdn: "{{ proxy_stack_fqdn }}"
+  register: k8s_tcp_proxies
+
+- name: set empty k8s_tcp_proxies on fail or 0 
+  set_fact:
+    k8s_tcp_proxies: { "query_result": []}
+  when: k8s_tcp_proxies["failed"] or k8s_tcp_proxies["rowcount"] == 0
+
+- name: select all tcp proxy defs
+  delegate_to: localhost
+  alchemy_read:
+    pg_conn_str: "{{ pg_conn_str }}"
+    table: k8s_tcp_proxies
+    where:
+      proxy_stack_fqdn: "{{ proxy_stack_fqdn }}"
+  register: k8s_tcp_proxies
+
+- name: set empty k8s_tcp_proxies on fail or 0 
+  set_fact:
+    k8s_tcp_proxies: { "query_result": []}
+  when: k8s_tcp_proxies["failed"] or k8s_tcp_proxies["rowcount"] == 0
+
+- name: select external control plane defs
+  delegate_to: localhost
+  alchemy_read:
+    pg_conn_str: "{{ pg_conn_str }}"
+    table: k8s_ext_control_planes
+    where:
+      proxy_stack_fqdn: "{{ proxy_stack_fqdn }}"
+  register: k8s_ext_control_planes
+
+- name: set empty k8s_ext_control_planes on fail or 0 
+  set_fact:
+    k8s_ext_control_planes: { "query_result": []}
+  when: k8s_ext_control_planes["failed"] or k8s_ext_control_planes["rowcount"] == 0

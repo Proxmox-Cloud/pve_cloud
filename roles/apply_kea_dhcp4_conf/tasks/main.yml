@@ -1,0 +1,13 @@
+---
+# tasks file for kea_dhcp4_conf
+
+# dhcp
+- name: Copy dhcp conf
+  ansible.builtin.template:
+    src: ./kea-dhcp4.conf.j2
+    dest: /etc/kea/kea-dhcp4.conf
+- name: Restart dhcp server
+  ansible.builtin.service:
+    name: isc-kea-dhcp4-server
+    state: restarted
+

@@ -1,0 +1,3 @@
+---
+# defaults file for parse_secrets
+parse_cluster_secrets_host_group: target_pve

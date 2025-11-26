@@ -1,0 +1,21 @@
+---
+- name: Gather memory allocated for QEMU VMs
+  shell: "for vmid in $(qm list | awk 'NR>1 {print $1}'); do qm config $vmid | grep -i memory | awk '{print $2}'; done"
+  register: qemu_mem
+
+- name: Calculate total memory reserved by QEMU VMs
+  set_fact:
+    total_qemu_mem: "{{ qemu_mem.stdout_lines | map('int') | sum }}"
+
+- name: Gather memory allocated for LXC containers
+  shell: "for ctid in $(pct list | awk 'NR>1 {print $1}'); do pct config $ctid | grep -i memory | awk '{print $2}'; done"
+  register: lxc_mem
+
+- name: Calculate total memory reserved by LXC containers
+  set_fact:
+    total_lxc_mem: "{{ lxc_mem.stdout_lines | map('int') | sum }}"
+
+- name: Calculate total reserved memory
+  set_fact:
+    total_reserved_mem: "{{ ( total_qemu_mem | int ) + ( total_lxc_mem | int ) }}"
+      

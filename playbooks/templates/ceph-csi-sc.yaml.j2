@@ -1,0 +1,30 @@
+{% for csi_pool in ceph_csi_sc_pools %}
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: csi-rbd-sc-{{ csi_pool.name }}
+{% if csi_pool.default %}
+  annotations:
+    storageclass.kubernetes.io/is-default-class: 'true'
+{% endif %}
+provisioner: rbd.csi.ceph.com
+mountOptions:
+{% for mount_option in csi_pool.mount_options %}
+- {{ mount_option }}
+{% endfor %}
+parameters:
+  clusterID: "{{ ceph_cluster_fsid }}"
+  csi.storage.k8s.io/controller-expand-secret-name: csi-rbd-secret
+  csi.storage.k8s.io/controller-expand-secret-namespace: ceph-csi
+  csi.storage.k8s.io/fstype: ext4
+  csi.storage.k8s.io/node-stage-secret-name: csi-rbd-secret
+  csi.storage.k8s.io/node-stage-secret-namespace: ceph-csi
+  csi.storage.k8s.io/provisioner-secret-name: csi-rbd-secret
+  csi.storage.k8s.io/provisioner-secret-namespace: ceph-csi
+  imageFeatures: layering
+  pool: {{ csi_pool.name }}
+reclaimPolicy: Delete
+allowVolumeExpansion: true
+volumeBindingMode: Immediate
+{% endfor %}

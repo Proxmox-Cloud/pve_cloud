@@ -1,0 +1,12 @@
+---
+# tasks file for cleanup_dns01_ionos
+- debug:
+    msg: "{{ ret_acme_challenge['challenge_data_dns'] | dict2items }}"
+
+- set_fact:
+    ionos_api_key: "{{ pve_cloud_secrets_map['ionos-api-key.json'] | b64decode | from_json }}"
+
+- ionos_dns:
+    ionos_api_key: "{{ ionos_api_key }}"
+    challenge_data_dns: "{{ ret_acme_challenge['challenge_data_dns'] | dict2items }}"
+    cleanup: True

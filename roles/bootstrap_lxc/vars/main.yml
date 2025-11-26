@@ -1,0 +1,6 @@
+---
+# vars file for roles/create_lxc
+lxc_root_parameters:
+  unprivileged: "1"
+  password: password
+  features: "nesting=1" # somehow fixes slow login via ssh

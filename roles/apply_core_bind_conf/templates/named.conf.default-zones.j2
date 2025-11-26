@@ -1,0 +1,79 @@
+// prime the server with knowledge of the root servers
+zone "." {
+        type hint;
+        file "/usr/share/dns/root.hints";
+};
+
+// be authoritative for the localhost forward and reverse zones, and for
+// broadcast zones as per RFC 1912
+
+zone "localhost" {
+        type master;
+        file "/etc/bind/db.local";
+};
+
+zone "127.in-addr.arpa" {
+        type master;
+        file "/etc/bind/db.127";
+};
+
+zone "0.in-addr.arpa" {
+        type master;
+        file "/etc/bind/db.0";
+};
+
+zone "255.in-addr.arpa" {
+        type master;
+        file "/etc/bind/db.255";
+};
+
+// custom reverse zones
+{% for arpa_zone in bind_additional_arpa_zones + [bind_arpa_zone_service_lxcs] %}
+zone "{{ arpa_zone }}" {
+{% if bind_master %}
+        type master;
+        file "/etc/bind/db.{{ arpa_zone }}";
+        allow-update { key "internal."; }; 
+{% endif %}
+{% if not bind_master %}
+        type slave;
+        masters { {{ bind_master_ip }}; };
+{% endif %}
+};
+
+{% endfor %}
+
+// custom zones
+{% for domain in ([pve_cloud_domain] + mapped_domains) | unique %}
+zone "{{ domain }}" {
+{% if bind_master %}
+    type master;
+    allow-transfer { 
+        {{ bind_slave_ip }}; 
+        key "internal.";
+    };
+    also-notify { {{ bind_slave_ip }}; };
+    file "/etc/bind/db.{{ domain }}";  # Path to your zone file
+    allow-update { key "internal."; }; 
+{% endif %}
+{% if not bind_master %}
+    type slave;
+    masters { {{ bind_master_ip }}; };
+{% endif %}
+};
+{% endfor %}
+
+// delegation zones
+{% for dzone in bind_forward_zones | default([]) %}
+zone "{{ dzone.zone }}" {
+    type forward;
+    forward only;
+    forwarders {
+{% for nameserver in dzone.nameservers %}
+        {{ nameserver }};
+{% endfor %}
+    };
+};
+{% endfor %}
+
+include "/etc/bind/internal.key";

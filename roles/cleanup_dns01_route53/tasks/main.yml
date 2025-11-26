@@ -1,0 +1,15 @@
+---
+# tasks file for cleanup_dns01_route53
+- name: "ACME: Cleanup (remove TXT-records)"
+  loop: "{{ ret_acme_challenge['challenge_data_dns'] | dict2items }}"
+  loop_control:
+    loop_var: loop_acme_aws
+    label: "{{ loop_acme_aws['key'] }}"
+  amazon.aws.route53:
+    state: "absent"
+    access_key: "{{ aws_route53_global.AWS_ACCESS_KEY_ID }}"
+    secret_key: "{{ aws_route53_global.AWS_SECRET_ACCESS_KEY }}"
+    hosted_zone_id: "{{ loop_acme_aws['key'].removeprefix('_acme-challenge.') | pve.cloud.route53_zonebestmatch(ret_r53zones.hosted_zones) }}"
+    record: "{{ loop_acme_aws['key'] }}"
+    type: TXT
+    wait: false

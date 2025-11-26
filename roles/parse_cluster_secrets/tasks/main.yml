@@ -1,0 +1,20 @@
+---
+# tasks file for parse_secrets
+- name: set secret_map for easy access
+  set_fact:
+    pve_cloud_secrets_map: "{{ hostvars[groups[parse_cluster_secrets_host_group][0]]['secret_map'] }}"
+
+- name: set ceph mons if defined
+  set_fact:
+    pve_ceph_monitors: "{{ pve_cloud_secrets_map['ceph_conf'] | b64decode | regex_search('mon_host\\s*=\\s*(.*)', '\\1') | first | split() }}"
+  when: "'ceph_conf' in pve_cloud_secrets_map"
+
+- name: set other passwords and shorthands
+  set_fact:
+    bind_internal_key: "{{ pve_cloud_secrets_map['internal.key'] | b64decode | regex_search('(?<=secret \")[^\"]*') }}"
+    postgres_password: "{{ pve_cloud_secrets_map['patroni.pass'] | b64decode | trim }}"
+    pg_conn_str: "postgresql+psycopg2://postgres:{{ pve_cloud_secrets_map['patroni.pass'] | b64decode | trim }}@{{ pve_haproxy_floating_ip_internal }}:5000/pve_cloud?sslmode=disable"
+    haproxy_keepalived_password: "{{ pve_cloud_secrets_map['haproxy-keepalived.pass'] | b64decode | trim }}"
+    acme_accountkey: "{{ pve_cloud_secrets_map['acme-account.key'] | b64decode }}"
+    ceph_cluster_fsid: "{{ pve_cloud_secrets_map['ceph_fsid'] }}"
+    cluster_automation_pub_key: "{{ pve_cloud_secrets_map['automation_id_ed25519.pub'] }}"

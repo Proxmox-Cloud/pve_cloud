@@ -1,0 +1,203 @@
+
+{
+"Dhcp4": {
+    "interfaces-config": {
+        "interfaces": [ "pve" ]
+    },
+
+
+    "control-socket": {
+        "socket-type": "unix",
+        "socket-name": "/var/run/kea/kea4-ctrl-socket"
+    },
+
+
+    "lease-database": {
+        "type": "memfile",
+        "lfc-interval": 3600
+    },
+
+
+    "expired-leases-processing": {
+        "reclaim-timer-wait-time": 10,
+        "flush-reclaimed-timer-wait-time": 25,
+        "hold-reclaimed-time": 3600,
+        "max-reclaim-leases": 100,
+        "max-reclaim-time": 250,
+        "unwarned-reclaim-cycles": 5
+    },
+
+    "renew-timer": 900,
+    "rebind-timer": 1800,
+    "valid-lifetime": 3600,
+
+    "option-data": [
+    ],
+
+    "client-classes": [
+        {
+            // proxmox vms always receive the default routers
+            // we define this class here to leave the option open for extensions to define a default/fallback client class 
+            // and custom router options for example to the slop firewall
+            "name": "Proxmox_vm", // vms and lxcs
+            "test": "substring(pkt4.mac, 0, 3) == 0xBC2411", // proxmox default mac prefix
+            "option-data": [
+                // we need to keep this, because mobile phones ignore the classless directive
+                {
+                    "name": "routers",
+                    "data": "{{ kea_dhcp_routers }}",
+                },
+                {
+                    "name": "classless-static-route", // routers option will be ignored by desktops if this is provided, so we have to declare default route here
+                    "data": "{{ kea_dhcp_static_routes }}",
+                },
+            ]
+        },
+        // custom class defs from patroni database
+        {%- for class_def in db_class_defs.query_result +%}
+        {{ class_def.class_content | combine({'name': class_def.class_name})  | to_nice_json | indent(8) }},
+        {%- endfor +%}
+        // default fallback class => this allows for maximum flexibility overwriting options
+        {
+            "name": "Fallback_client",
+            "test": "member('ALL')",
+            "option-data": [
+                // we need to keep this, because mobile phones ignore the classless directive
+                {
+                    "name": "routers",
+                    "data": "{{ kea_dhcp_routers }}",
+                },
+                {
+                    "name": "classless-static-route", // routers option will be ignored by desktops if this is provided, so we have to declare default route here
+                    "data": "{{ kea_dhcp_static_routes }}",
+                },
+            ]
+        }
+    ],
+
+    "subnet4": [
+        {
+            "id": 1,
+
+            "interface": "pve",
+
+            "subnet": "{{ pve_vm_subnet }}",
+            // exclude router and dhcp range
+            "pools": [ 
+                {%- for pool in kea_dhcp_pools +%}
+                { "pool": "{{ pool }}" }{% if not loop.last %},{% endif %}
+                {% endfor +%}
+            ],
+
+            "option-data": [
+                {
+                    "name": "domain-name",
+                    "data": "{{ pve_cloud_domain }}"
+                },
+                {
+                    "name": "domain-search",
+                    "data": "{{ pve_cloud_domain }}"
+                },
+                {
+                    "name": "domain-name-servers",
+                    "data": "{{ bind_master_ip }},{{ bind_slave_ip }}"
+                }
+            ],
+
+            "reservations": [
+                {%- for item in db_reservations.query_result +%}
+                //  {{ item.hostname }}
+                {
+                    "hw-address": "{{ item.mac }}"{% if item.ip is not none %},
+                    "ip-address": "{{ item.ip }}"{% endif %}{% if item.client_classes is not none %},
+                    "client-classes": {{ item.client_classes.split(',') | to_json }}{% endif +%}
+                }{% if not loop.last %},{% endif %}
+                {% endfor +%}
+            ]
+            
+        }
+    ],
+
+    "hooks-libraries": [
+        {
+            "library": "/usr/lib/x86_64-linux-gnu/kea/hooks/libdhcp_lease_cmds.so",
+            "parameters": {}
+        },
+        {
+            "library": "/usr/lib/x86_64-linux-gnu/kea/hooks/libdhcp_ha.so",
+            "parameters": {
+                "high-availability": [
+                    {
+                        "this-server-name": "{{ "main" if kea_dhcp_main else "failover" }}",
+                        "trust-anchor": "/usr/lib/x86_64-linux-gnu/kea/CA.crt",
+                        "cert-file": "/usr/lib/x86_64-linux-gnu/kea/{{ "main" if kea_dhcp_main else "failover" }}_dhcp.crt",
+                        "key-file": "/usr/lib/x86_64-linux-gnu/kea/{{ "main" if kea_dhcp_main else "failover" }}_dhcp.key",
+                        "mode": "hot-standby",
+                        "heartbeat-delay": 10000,
+                        "max-response-delay": 60000,
+                        "max-ack-delay": 5000,
+                        "max-unacked-clients": 5,
+                        "peers": [
+                            {
+                                "name": "main",
+                                "url": "http://{{ kea_dhcp_main_ip }}:8001/",
+                                "role": "primary",
+                                "auto-failover": true
+                            },
+                            {
+                                "name": "failover",
+                                "url": "http://{{ kea_dhcp_failover_ip }}:8001/",
+                                "role": "standby",
+                                "auto-failover": true
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+    ],
+
+    "dhcp-ddns" : {
+        "enable-updates":true,
+        "server-ip":"127.0.0.1",
+        "server-port":53001,
+        "sender-ip":"",
+        "sender-port":0,
+        "max-queue-size":1024,
+        "ncr-protocol":"UDP",
+        "ncr-format":"JSON"
+    },
+
+    "ddns-send-updates": true,
+    "ddns-override-no-update": false,
+    "ddns-override-client-update": false,
+    "ddns-replace-client-name": "never",
+    "ddns-generated-prefix": "",
+    // dedicated domain for ddns, cnames are created in cluster domain
+    "ddns-qualifying-suffix": "{{ pve_cloud_domain }}",
+    "ddns-update-on-renew": true,
+    "ddns-conflict-resolution-mode": "check-with-dhcid",
+    "hostname-char-set": "",
+    "hostname-char-replacement": "",
+
+    "loggers": [
+    {
+        "name": "kea-dhcp4",
+        "output-options": [
+            {
+                "output": "stdout",
+                "pattern": "%-5p %m\n",
+            }
+        ],
+        // This specifies the severity of log messages to keep. Supported values
+        // are: FATAL, ERROR, WARN, INFO, DEBUG
+        "severity": "INFO",
+
+        // If DEBUG level is specified, this value is used. 0 is least verbose,
+        // 99 is most verbose. Be cautious, Kea can generate lots and lots
+        // of logs if told to do so.
+        "debuglevel": 0
+    }
+  ]
+}
+}

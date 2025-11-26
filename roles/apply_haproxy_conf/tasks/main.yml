@@ -1,0 +1,21 @@
+---
+# tasks file for haproxy_conf
+- name: Create dict of lists grouped by 'key'
+  set_fact:
+    grouped_k8s_workers: "{{ grouped_k8s_workers | combine({ item.stack_fqdn: (grouped_k8s_workers[item.stack_fqdn] | default([])) + [item] }) }}"
+  loop: "{{ k8s_workers.query_result }}"
+
+- name: Create dict of lists grouped by 'key'
+  set_fact:
+    grouped_k8s_masters: "{{ grouped_k8s_masters | combine({ item.stack_fqdn: (grouped_k8s_masters[item.stack_fqdn] | default([])) + [item] }) }}"
+  loop: "{{ k8s_masters.query_result }}"
+
+- name: Copy haproxy conf
+  ansible.builtin.template:
+    src: ./haproxy.cfg.j2
+    dest: /etc/haproxy/haproxy.cfg
+
+- name: Reload haproxy
+  ansible.builtin.service:
+    name: haproxy
+    state: reloaded

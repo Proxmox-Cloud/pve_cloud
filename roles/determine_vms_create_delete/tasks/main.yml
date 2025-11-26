@@ -1,0 +1,19 @@
+---
+# tasks file for determine_vms_create_delete
+
+# get the existing nodes
+- name: Get existing vms
+  command: pvesh get /cluster/resources --type vm --output-format json
+  register: pve_vms
+
+- set_fact:
+    stack_vms: "{{ pve_vms.stdout | from_json | selectattr('tags', 'defined') | selectattr('tags', 'search', stack_name + '.' + pve_cloud_domain) | list }}"
+
+# figure out what to delete / create
+- name: Get delete and create
+  determine_delete_create:
+    inventory_vms: "{{ vms | map('pve.cloud.sort_and_hash') | zip(vms) }}"
+    stack_vms: "{{ stack_vms }}"
+  register: delete_create
+  run_once: true # need the explicit run_once to set the result on all hosts
+

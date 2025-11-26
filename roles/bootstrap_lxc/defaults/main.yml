@@ -1,0 +1,5 @@
+---
+lxc_base_parameters:
+
+# pveam available --section system / run pveam update for newest
+lxc_os_template: debian-12-standard_12.12-1_amd64.tar.zst

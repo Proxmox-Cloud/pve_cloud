@@ -1,0 +1,25 @@
+- name: Delete qemus
+  hosts: target_pve
+  roles:
+    - slurp_cluster_secrets
+  tasks:
+    - name: Get existing vms
+      command: pvesh get /cluster/resources --type vm --output-format json
+      register: pve_vms
+
+    - set_fact:
+        stack_vms: "{{ pve_vms.stdout | from_json | selectattr('tags', 'defined') | selectattr('tags', 'search', stack_name + '.' + pve_cloud_domain) | list }}"
+
+    - name: Delete qemus
+      ansible.builtin.shell: |
+        qm stop {{ vm_id }}
+        while qm status {{ vm_id }} | grep -q "status: running"; do
+          echo "Waiting for vm to stop..."
+          sleep 2
+        done
+        qm destroy {{ vm_id }} --purge
+      ignore_errors: true
+      loop: "{{ stack_vms }}"
+      vars:
+        vm_id: "{{ item['vmid'] }}"
+      when: inventory_hostname == item['node'] + "." + pve_cluster

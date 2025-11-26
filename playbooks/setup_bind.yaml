@@ -1,0 +1,142 @@
+- name: Slurp certificates from pve + validate cloud services
+  hosts: target_pve
+  pre_tasks:
+    - name: Fail if not dns service in pve_unique_cloud_services
+      fail:
+        msg: "This cluster was not selected to host cloud dns service: {{ pve_clusters[pve_cluster].pve_unique_cloud_services }}"
+      when: not 'dns' in pve_clusters[pve_cluster].pve_unique_cloud_services
+  roles:
+    - slurp_cluster_secrets
+
+
+# set bind_host_dns_as_default: true and bind_disable_dnssec: true in lxc_global_vars to control behaviour    
+- name: Setup bind dns
+  hosts: lxcs
+  roles:
+    - parse_cluster_secrets
+  tasks:
+    - name: install bind
+      ansible.builtin.apt:
+        update_cache: yes
+        pkg:
+        - bind9
+        - bind9utils
+
+    - name: Give bind user ownership - needed for dnsupdates
+      ansible.builtin.file:
+        path: /etc/bind
+        owner: bind
+        group: bind
+        recurse: yes
+        state: directory
+
+    - name: Generate key for internal access
+      copy:
+        content: "{{ pve_cloud_secrets_map['internal.key'] | b64decode }}"
+        dest: /etc/bind/internal.key
+
+    - name: core bind conf
+      include_role:
+        name: apply_core_bind_conf
+
+    - name: template services arpa zone file
+      when: ansible_hostname == 'master-ha-bind'
+      template:
+        src: ./db.arpa-zone-services.j2
+        dest: /etc/bind/db.{{ bind_arpa_zone_service_lxcs }}
+        force: false
+
+    - name: template out additional arpa zones
+      when: ansible_hostname == 'master-ha-bind'
+      loop: "{{ bind_additional_arpa_zones }}"
+      template:
+        src: ./db.arpa-zone.j2
+        dest: /etc/bind/db.{{ item }}
+        force: false
+    
+    # parse resolv.conf to optionally use host defined dns as fallback
+    - name: Read resolv.conf content
+      ansible.builtin.slurp:
+        path: /etc/resolv.conf
+      register: resolv_conf_raw
+
+    - name: Decode resolv.conf content to string
+      set_fact:
+        resolv_conf: "{{ resolv_conf_raw.content | b64decode }}"
+
+    - name: Extract nameservers from resolv.conf
+      set_fact:
+        nameservers: "{{ resolv_conf | regex_findall('^nameserver\\s+([0-9\\.]+)', multiline=True) }}"
+
+    - name: Show extracted nameservers
+      debug:
+        var: nameservers
+
+    - name: template default options
+      template:
+        src: ./named.conf.options.j2
+        dest: /etc/bind/named.conf.options
+
+    # todo: add control for ipv6 compatibility
+    # right now bind will try to resolve via ipv6 even if not supported
+    - name: Force ipv4 mode
+      lineinfile:
+        path: /etc/default/named
+        regexp: '^OPTIONS='
+        line: 'OPTIONS="-u bind -4"'
+        
+    - name: Restart bind
+      ansible.builtin.service:
+        name: bind9
+        state: restarted 
+      register: result
+      until: result is succeeded
+      retries: 3
+      delay: 5
+      
+- name: Slurp secrets 
+  hosts: target_pve
+  roles:
+    - slurp_cluster_secrets
+
+- name: Core DNS Records
+  hosts: localhost
+  roles:
+    - parse_cluster_secrets
+  tasks:
+  - name: create dhcp main
+    community.general.nsupdate:
+      key_name: "internal."
+      key_algorithm: "hmac-sha256"
+      key_secret: "{{ bind_internal_key }}"
+      server: "{{ bind_master_ip }}"
+      zone: "{{ pve_cloud_domain }}"
+      record: "main-ha-dhcp"
+      value: "{{ kea_dhcp_main_ip }}"
+  - name: create dhcp failover
+    community.general.nsupdate:
+      key_name: "internal."
+      key_algorithm: "hmac-sha256"
+      key_secret: "{{ bind_internal_key }}"
+      server: "{{ bind_master_ip }}"
+      zone: "{{ pve_cloud_domain }}"
+      record: "failover-ha-dhcp"
+      value: "{{ kea_dhcp_failover_ip }}"
+  - name: create bind master
+    community.general.nsupdate:
+      key_name: "internal."
+      key_algorithm: "hmac-sha256"
+      key_secret: "{{ bind_internal_key }}"
+      server: "{{ bind_master_ip }}"
+      zone: "{{ pve_cloud_domain }}"
+      record: "master-ha-bind"
+      value: "{{ bind_master_ip }}"
+  - name: create bind slave
+    community.general.nsupdate:
+      key_name: "internal."
+      key_algorithm: "hmac-sha256"
+      key_secret: "{{ bind_internal_key }}"
+      server: "{{ bind_master_ip }}"
+      zone: "{{ pve_cloud_domain }}"
+      record: "slave-ha-bind"
+      value: "{{ bind_slave_ip }}"

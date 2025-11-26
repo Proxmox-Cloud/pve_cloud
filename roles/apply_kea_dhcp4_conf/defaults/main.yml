@@ -1,0 +1,5 @@
+---
+# defaults file for kea_dhcp4_conf
+db_reservations: {'query_result': []}
+
+db_class_defs: {'query_result': []}

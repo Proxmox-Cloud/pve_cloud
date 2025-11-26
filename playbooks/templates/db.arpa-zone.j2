@@ -1,0 +1,12 @@
+$ORIGIN {{ item }}.
+$TTL 86400
+@   IN  SOA     ns1.{{ pve_cloud_domain }}. {{ bind_zone_admin_email }} (
+                    {{ ansible_date_time.date | replace('-', '') }}01 ; Serial
+                    3600       ; Refresh
+                    1800       ; Retry
+                    1209600    ; Expire
+                    86400 )    ; Minimum TTL
+
+; all other updates happen via nsupdate
+@       IN  NS      ns1.{{ pve_cloud_domain }}.
+@       IN  NS      ns2.{{ pve_cloud_domain }}.

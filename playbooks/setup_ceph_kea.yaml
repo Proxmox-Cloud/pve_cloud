@@ -1,0 +1,68 @@
+- name: Slurp certificates from pve + validate cloud services
+  hosts: target_pve
+  roles:
+    - slurp_cluster_secrets
+ 
+- name: Setup ceph kea dhcp
+  hosts: lxcs
+  roles:
+    - parse_cluster_secrets
+  tags:
+    - setup
+  tasks:
+    - name: install requirements
+      ansible.builtin.apt:
+        update_cache: yes
+        pkg:
+        - curl
+
+    - name: isc sources
+      ansible.builtin.shell: |
+        curl -1sLf 'https://dl.cloudsmith.io/public/isc/kea-2-6/cfg/setup/bash.deb.sh' | bash
+        touch /root/isc.sources
+      args:
+        creates: /root/isc.sources
+
+    - name: isc install
+      ansible.builtin.apt:
+        update_cache: yes
+        pkg:
+        - isc-kea
+        - isc-kea-hooks
+        - isc-kea-common
+        - isc-kea-admin
+      
+    - name: Disable dhcp v6
+      ansible.builtin.service:
+        name: isc-kea-dhcp6-server
+        enabled: false
+        state: stopped
+
+    - name: Disable ctrl agent
+      ansible.builtin.service:
+        name: isc-kea-ctrl-agent
+        enabled: false
+        state: stopped
+
+    - name: Make sure dhcp started and enabled
+      ansible.builtin.service:
+        name: isc-kea-dhcp4-server
+        state: started
+        enabled: true
+
+
+- name: Configure dhcp
+  hosts: lxcs
+  roles:
+    - parse_cluster_secrets
+  tags:
+    - config
+  tasks:
+    - name: Copy dhcp conf
+      ansible.builtin.template:
+        src: ./ceph-kea-dhcp4.conf.j2
+        dest: /etc/kea/kea-dhcp4.conf
+    - name: Restart dhcp server
+      ansible.builtin.service:
+        name: isc-kea-dhcp4-server
+        state: restarted

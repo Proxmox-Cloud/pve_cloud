@@ -1,0 +1,141 @@
+- name: Slurp certificates from pve + validate cloud services
+  hosts: target_pve
+  tags:
+    - install
+    - tables
+  pre_tasks:
+    - name: Fail if not dns service in pve_unique_cloud_services
+      fail:
+        msg: "This cluster was not selected to host cloud postgres state store service: {{ pve_clusters[pve_cluster].pve_unique_cloud_services }}"
+      when: not 'psql-state' in pve_clusters[pve_cluster].pve_unique_cloud_services
+  roles:
+    - slurp_cluster_secrets
+ 
+- name: Setup patroni
+  hosts: lxcs
+  roles:
+    - parse_cluster_secrets
+  tags:
+    - install
+  tasks:
+    - name: install etcd
+      ansible.builtin.apt:
+        update_cache: yes
+        pkg:
+          - etcd-server
+
+    - name: template out etcd conf
+      template:
+        src: ./etcd.j2
+        dest: /etc/default/etcd
+      register: template_etcd_default
+
+    - name: Initial restart or when changing etcd configuration 
+      ansible.builtin.service:
+        name: etcd
+        state: restarted
+        enabled: yes
+      when: template_etcd_default.changed
+
+    - name: install dependencies
+      ansible.builtin.apt:
+        update_cache: yes
+        pkg:
+          - pip
+          - postgresql
+
+    - name: disable postgres systemd
+      ansible.builtin.service:
+        name: postgresql
+        state: stopped
+        enabled: false
+
+    - name: Install patroni
+      ansible.builtin.command: pip install --break-system-packages patroni[psycopg3,etcd3]
+
+    - name: copy patroni conf
+      template:
+        src: ./patroni.yaml.j2
+        dest: /etc/patroni.yml
+
+    - name: create data dir
+      file:
+        path: /opt/ha-postgres 
+        state: directory
+        owner: postgres
+        group: postgres
+        mode: '0700'
+        
+    - name: create patroni system service
+      copy:
+        dest: /etc/systemd/system/patroni.service
+        content: |
+          [Unit]
+          Description=Patroni PostgreSQL High Availability
+          After=network.target
+          Wants=network-online.target
+          After=etcd.service
+          StartLimitIntervalSec=0
+
+          [Service]
+          Type=simple
+          User=postgres
+          Group=postgres
+
+          ExecStart=/usr/local/bin/patroni /etc/patroni.yml
+
+          Restart=always
+          RestartSec=5
+
+          [Install]
+          WantedBy=multi-user.target
+
+    - name: start patroni service
+      ansible.builtin.service:
+        daemon_reload: true
+        name: patroni
+        state: started
+        enabled: yes
+
+
+- name: Conf database
+  hosts: lxcs
+  roles:
+    - parse_cluster_secrets
+  tags:
+    - tables
+  tasks:
+    - name: determine patroni master
+      uri:
+        url: http://{{ ansible_default_ipv4.address }}:8008/leader
+        method: GET
+        return_content: no
+      register: leader_response
+      until: leader_response.status == 200
+      retries: 5
+      delay: 5
+      ignore_errors: true # only one needs to succeed
+
+    - name: create db for albemic managed schemas
+      delegate_to: localhost
+      community.postgresql.postgresql_db:
+        name: pve_cloud
+        login_password: "{{ postgres_password }}"
+        login_host: "{{ ansible_default_ipv4.address }}"
+        port: 5432
+      when: leader_response.status == 200
+
+    - name: run albemic migrations
+      delegate_to: localhost
+      alchemy_migrate:
+        pg_conn_str: "postgresql+psycopg2://postgres:{{ postgres_password }}@{{ ansible_default_ipv4.address }}:5432/pve_cloud?sslmode=disable"
+      when: leader_response.status == 200
+
+    - name: create db for tf states
+      delegate_to: localhost
+      community.postgresql.postgresql_db:
+        name: tf_states
+        login_password: "{{ postgres_password }}"
+        login_host: "{{ ansible_default_ipv4.address }}"
+        port: 5432
+      when: leader_response.status == 200

@@ -1,0 +1,28 @@
+---
+# defaults file for create_node
+qemu_network_config: |-
+  # default network empty
+  network: {}
+
+# ssh password login is disabled, this is only for usage in the serial console
+qemu_hashed_pw: '$5$f0wtLQc7$/qMLrgXqzcHGFT7CaguAVgX9K8Tng/AqD.nncOTnHP1' # == password
+
+qemu_image_url: "https://cloud.debian.org/images/cloud/bookworm/20231013-1532/debian-12-generic-amd64-20231013-1532.qcow2"
+
+# defaults are for debian cloud init, might need adjustments for other operating systems
+qemu_default_user: admin
+
+qemu_keyboard_layout: de # ;)
+
+# nic for main vm to network communication
+qemu_pve_nic: net0
+
+# nic for ceph communication
+qemu_cephfe_nic: net1
+
+# parameters that are always used in our pve stacks
+qemu_base_parameters:
+
+squid_cache_settings:
+  enabled: false
+  # setup_only: true

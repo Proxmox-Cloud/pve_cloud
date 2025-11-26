@@ -1,0 +1,95 @@
+---
+# tasks file for set_stack_network_config
+# ingress
+- name: clear ingress domains
+  alchemy_delete:
+    pg_conn_str: "{{ pg_conn_str }}"
+    table: k8s_ingress_rules
+    where:
+      proxy_stack_fqdn: "{{ proxy_stack_fqdn }}"
+      stack_fqdn: "{{ stack_name }}.{{ pve_cloud_domain }}"
+
+- name: insert internal ingress domains from cert conf
+  alchemy_write:
+    pg_conn_str: "{{ pg_conn_str }}"
+    table: k8s_ingress_rules
+    rows:
+      - zone: "{{ item.0.zone }}"
+        name: "{{ item.1 }}"
+        stack_fqdn: "{{ stack_name }}.{{ pve_cloud_domain }}"
+        proxy_stack_fqdn: "{{ proxy_stack_fqdn }}"
+        external: false
+        rule_len: "{{ (item.0.zone | length) + (item.1 | length) }}"
+  loop: "{{ cluster_cert_entries | subelements('names') }}"
+  
+- name: insert external expose domains
+  alchemy_upsert:
+    pg_conn_str: "{{ pg_conn_str }}"
+    table: k8s_ingress_rules
+    values:
+      zone: "{{ item.0.zone }}"
+      name: "{{ item.1 }}"
+      stack_fqdn: "{{ stack_name }}.{{ pve_cloud_domain }}"
+      proxy_stack_fqdn: "{{ proxy_stack_fqdn }}"
+      external: true
+      rule_len: "{{ (item.0.zone | length) + (item.1  | length) }}"
+    conflict_cols:
+      - zone
+      - name
+      - stack_fqdn
+  loop: "{{ external_domains | subelements('names') }}"
+
+- name: insert external expose tld domains
+  alchemy_write:
+    pg_conn_str: "{{ pg_conn_str }}"
+    table: k8s_ingress_rules
+    rows:
+      - zone: "{{ (item.zone | split('.'))[-1] }}"
+        name: "{{ (item.zone | split('.'))[:-1] | join('.') }}"
+        stack_fqdn: "{{ stack_name }}.{{ pve_cloud_domain }}"
+        proxy_stack_fqdn: "{{ proxy_stack_fqdn }}"
+        external: true
+        rule_len: "{{ (item.zone | length) }}"
+  loop: "{{ external_domains }}"
+  when: item.expose_tld is defined and item.expose_tld
+
+# tcp proxies
+- name: clear tcp proxies
+  alchemy_delete:
+    pg_conn_str: "{{ pg_conn_str }}"
+    table: k8s_tcp_proxies
+    where:
+      stack_fqdn: "{{ stack_name }}.{{ pve_cloud_domain }}"
+      proxy_stack_fqdn: "{{ proxy_stack_fqdn }}"
+
+- name: insert tcp proxies
+  alchemy_write:
+    pg_conn_str: "{{ pg_conn_str }}"
+    table: k8s_tcp_proxies
+    rows:
+      - proxy_name: "{{ item.proxy_name }}"
+        haproxy_port: "{{ item.haproxy_port }}"
+        node_port: "{{ item.node_port }}"
+        stack_fqdn: "{{ stack_name }}.{{ pve_cloud_domain }}"
+        proxy_stack_fqdn: "{{ proxy_stack_fqdn }}"
+        external: "{{ False if item.external is not defined else item.external }}"
+        proxy_snippet: "{{ item.proxy_snippet if item.proxy_snippet is defined else None }}"
+  loop: "{{ tcp_proxies }}"
+
+# external controlplane
+- name: clear external control planes
+  alchemy_delete:
+    pg_conn_str: "{{ pg_conn_str }}"
+    table: k8s_ext_control_planes
+    where:
+      stack_fqdn: "{{ stack_name }}.{{ pve_cloud_domain }}"
+
+- name: insert external control plane sans
+  alchemy_write:
+    pg_conn_str: "{{ pg_conn_str }}"
+    table: k8s_ext_control_planes
+    rows:
+      - stack_fqdn: "{{ stack_name }}.{{ pve_cloud_domain }}"
+        proxy_stack_fqdn: "{{ proxy_stack_fqdn }}"
+        extra_sans: "{{ extra_control_plane_sans | join(',') }}"
+  when: extra_control_plane_sans is defined

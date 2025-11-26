@@ -1,0 +1,30 @@
+version: 3
+
+dependencies:
+  exclude:
+    system:
+      - openshift-clients # gets triggered by includes, conflicts with license server
+  ansible_core:
+    package_pip: ansible-core
+  ansible_runner:
+    package_pip: ansible-runner
+  galaxy:
+    collections:
+      - name: /pve-cloud.tar.gz
+      
+images:
+  base_image:
+    name: docker.io/redhat/ubi9:latest # needs rhel image
+
+additional_build_files:
+  - src: "pve-cloud.tar.gz"
+    dest: src
+
+additional_build_steps:
+  append_base:
+    # need git to install collection deps
+    - RUN dnf install git -y
+    # copy the collection into the image
+    - COPY _build/src/pve-cloud.tar.gz /pve-cloud.tar.gz
+    # missing distlib dependency in kubespray
+    - RUN /usr/bin/python3 -m pip install distlib

@@ -1,0 +1,239 @@
+type: object
+description: "Inventory for deploying k8s clusters via kubespray on PVE."
+title: "K8S Kubespray Inv."
+additionalProperties: false
+required:
+  - target_pve
+  - stack_name
+  - cluster_cert_entries
+  - tcp_proxies
+  - static_includes
+  - qemus
+  - ceph_csi_sc_pools
+  - root_ssh_pub_key
+properties:
+  target_pve:
+    type: string
+    description: "The pve cluster this stack should reside in, defined in ~/.pve-inventory.yaml"
+  stack_name:
+    type: string
+    description: "Your stack name, needs to be unique within the parent_domain. Will create its own sub zone."
+  extra_control_plane_sans:
+    type: array
+    description: "Extra sans that kubespray will put in kubeapi generated certificates. Original kubespray variable is named supplementary_addresses_in_ssl_keys, but is set via kubespray custom inventory. Read kubernetes page in pve cloud docs for more details."
+    items:
+      type: string
+  external_domains:
+    type: array
+    description: "Domains that will be exposed to the public proxies floating ip via haproxy routing rules."
+    items:
+      type: object
+      additionalProperties: false
+      required:
+        - zone
+        - names
+      properties:
+        zone:
+          type: string
+          description: "DNS parent zone, should also be the zone that external records are made under in AWS for example."
+        expose_tld:
+          type: boolean
+          description: "Expose the top level domain itself."
+        names:
+          type: array
+          items:
+            type: string
+            description: "Hostname part (host + zone)"
+  cluster_cert_entries:
+    type: array
+    description: "Content for the clusters certificate. Internal routing is handled by ingress dns!"
+    items:
+      type: object
+      additionalProperties: false
+      required:
+        - zone
+        - names
+      properties:
+        zone:
+          type: string
+          description: "DNS parent zone, should coincide with tld for dns01 challenge."
+        names:
+          type: array
+          items:
+            type: string
+            description: "Hostname part (host + zone)"
+        authoritative_zone:
+          type: boolean
+          description: "Create authoritative zone inside of pve cloud bind dns."
+        apex_zone_san:
+          type: boolean
+          description: "Creates additional SAN for the zone, if you have *.example.com you will also get example.com in your certificate. Defaults to false."
+  tcp_proxies:
+    type: array
+    description: "TCP forwards to this cluster on the pve cluster proxy."
+    items:
+      type: object
+      additionalProperties: false
+      required:
+        - proxy_name
+        - haproxy_port
+        - node_port
+      properties:
+        proxy_name:
+          type: string
+          description: "Name of the proxy port. Should be unique for the stack."
+        haproxy_port:
+          type: number
+          description: "Port on the haproxy frontend that listens."
+        node_port:
+          type: number
+          description: "Port on the nodes, usually via K8S NodePort"
+        proxy_snippet:
+          type: string
+          description: "additional snippet that will be inserted into the haproxy listen block. Can be used for custom logic."
+        external:
+          type: boolean
+          description: "Will bind to the external floating ip aswell."
+  static_includes:
+    type: object
+    additionalProperties: false
+    required:
+      - dhcp_stack
+      - proxy_stack
+      - postgres_stack
+      - bind_stack
+    properties:
+      dhcp_stack:
+        type: string
+        description: "Stack fqdn of dhcp stack where reservations for node ips should be made."
+      proxy_stack:
+        type: string
+        description: "Stack fqdn of haproxy stack where ingress and proxy rules should be configured."
+      postgres_stack:
+        type: string
+        description: "Stack fqdn of postgres stack where state and general configuration of our pve cloud is stored."
+      bind_stack:
+        type: string
+        description: "Stack fqdn of bind servers, where create_bind_zone: true ingress_domain zones will be created."
+      cache_stack:
+        type: string
+        description: "Cache stack to mount nfs for kubespray cache and apt cache. Assumes the cache lxc to have the hostname \"main\"." # todo: implement keepalived cache instead
+  include_stacks:
+    type: array
+    description: "Include other stacks into the ansible inventory, from any PVE cluster you like."
+    items:
+      type: object
+      required:
+        - stack_fqdn
+        - host_group
+      additionalProperties: false
+      properties:
+        stack_fqdn:
+          type: string
+          description: "Target stack fqdn to include (stack name + pve_cloud_domain). Will automatically include it from the right pve cluster."
+        host_group:
+          type: string
+          description: "This is the name of the hosts group of our ansible inventory the included vms will be under."
+        qemu_ansible_user:
+          type: string
+          description: User ansible will use to connect, defaults to admin.
+  qemus:
+    type: array
+    description: "Nodes for the cluster in form of qemu vms."
+    items:
+      type: object
+      additionalProperties: false
+      required:
+        - k8s_roles
+        - disk
+        - parameters
+      properties:
+        hostname:
+          type: string
+          description: "Optional unique hostname for this node, otherwise pet name random name will be generated."
+        vars:
+          type: object
+          description: "Custom variables for this node specifically."
+        k8s_roles:
+          type: array
+          description: "String array of k8s roles (master/worker)"
+        target_host:
+          type: string
+          description: "Pve host to tie this vm to."
+        parameters:
+          type: object
+          description: "In accordance with pve qm cli tool, creation args."
+        network_config:
+          type: string
+          description: "Cinit network config yaml string. Will be the last cfg piece that gets merged into the final cloudinit network config."
+        disk:
+          type: object
+          additionalProperties: false
+          required:
+            - size
+            - pool
+          properties:
+            size:
+              type: string
+              description: "Size of the vms disk."
+              example: 25G
+            options:
+              type: object
+              description: "Mount options"
+            pool:
+              type: string
+              description: "Ceph pool name the vms disk will be created in."
+  ceph_csi_sc_pools:
+    type: array
+    description: "Ceph pools that will be made available to the cluster CSI driver."
+    items:
+      type: object
+      additionalProperties: false
+      required:
+        - name
+        - default
+        - mount_options
+      properties:
+        name:
+          type: string
+          description: "Name of the pool in the ceph of our PVE cluster."
+        default:
+          type: boolean
+          description: "Whether or not the pool is the default storage class."
+        mount_options:
+          type: array
+          description: "String array of mount options that will be set in the storage class and applied to pvs."
+  root_ssh_pub_key:
+    type: string
+    description: trusted root key for the cloud init image.
+  pve_ha_group:
+    type: string
+    description: PVE HA group this vm should be assigned to (optional).
+  qemu_hashed_pw:
+    type: string
+    description: Pw for default user defaults to hashed 'password' for debian cloud init image.
+  qemu_base_parameters:
+    type: object
+    description: Base parameters passed to the proxmox qm cli tool for creating vm
+  qemu_image_url:
+    type: string
+    description: http(s) download link for cloud init image.
+  qemu_keyboard_layout:
+    type: string
+    description: Keyboard layout for cloudinit
+  qemu_network_config:
+    type: string
+    description: Optional qemu network config as a yaml string that is merged into the cloudinit network config of all qemus.
+  acme_staging:
+    type: boolean
+    description: "If set to true will use acme staging directory for issueing certs."
+  plugin:
+    type: string
+    description: Id of ansible inventory plugin
+    enum:
+      - pve.cloud.kubespray_inv
+  pve_cloud_pytest:
+    type: object
+  qemu_global_vars:
+    type: object
+    description: "Variables that will be applied to all lxc hosts"

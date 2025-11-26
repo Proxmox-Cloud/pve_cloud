@@ -1,0 +1,436 @@
+- name: Sync / create nodes
+  hosts: target_pve
+  vars:
+    vm_type: "qemu"
+  tags:
+    - qemus
+  roles:
+    - slurp_cluster_secrets
+    - parse_cluster_secrets
+  tasks:
+    - include_role:
+        name: determine_vms_create_delete
+      vars:
+        vms: "{{ qemus }}"
+      run_once: true
+
+    - pause:
+        prompt: "{{ delete_create['vms_to_delete'] | to_nice_json }}\n\nThe playbook determined the above mentioned vms to delete - continue? (yes/no)"
+      register: user_input
+      when: (delete_create['vms_to_delete'] | length) > 0
+      run_once: true
+
+    - fail:
+        msg: "User declined to continue. Aborting playbook."
+      when: (delete_create['vms_to_delete'] | length) > 0 and user_input.user_input | lower != 'yes'
+      run_once: true
+
+    - name: Delete qemus
+      ansible.builtin.shell: |
+        qm stop {{ vm_id }}
+        while qm status {{ vm_id }} | grep -q "status: running"; do
+          echo "Waiting for vm to stop..."
+          sleep 2
+        done
+        qm destroy {{ vm_id }} --purge
+      ignore_errors: true
+      loop: "{{ delete_create['vms_to_delete'] }}"
+      vars:
+        vm_id: "{{ item['vmid'] }}"
+      when: inventory_hostname == item['node'] + "." + pve_cluster
+
+    - include_role:
+        name: set_memory_facts
+      when: (delete_create['vms_to_create'] | length) > 0
+
+    - include_role:
+        name: determine_best_fit
+      when: (delete_create['vms_to_create'] | length) > 0
+      run_once: true
+
+    - include_role:
+        name: bootstrap_vm
+      loop: "{{ best_fit['best_distribution'] | zip(best_fit['best_fitted_hosts']) | list }}" # combine the lists
+      when: (delete_create['vms_to_create'] | length) > 0 and inventory_hostname == item[1] # execute on target host
+      vars:
+        blake: "{{ item[0][0] }}"
+        args: "{{ item[0][1] }}"
+
+    - name: Give pve some time to sync conf for api calls
+      ansible.builtin.wait_for:
+        timeout: 10
+      delegate_to: localhost
+
+    - name: Reload inventory to get created lxcs for next play
+      meta: refresh_inventory
+
+    # remove cloudinit drives + set ha
+    - name: Get existing vms
+      command: pvesh get /cluster/resources --type vm --output-format json
+      register: pve_vms
+      run_once: true
+
+    - set_fact:
+        stack_vms: "{{ pve_vms.stdout | from_json |  selectattr('tags', 'defined') | selectattr('tags', 'search', stack_name + '.' + pve_cloud_domain) | list }}"
+      run_once: true
+      
+    - name: Delete cloudinit drive
+      command: qm set {{ item['vmid'] }} --delete ide2
+      ignore_errors: true
+      loop: "{{ stack_vms }}"
+      when: inventory_hostname == item['node'] + "." + pve_cluster
+
+    - name: Set ha if enabled
+      when: pve_ha_group is defined
+      command: ha-manager add vm:{{ item['vmid'] }} --group {{ pve_ha_group }}
+      ignore_errors: true
+      loop: "{{ stack_vms }}"
+      run_once: true
+
+    - name: Remove ha if disabled
+      when: pve_ha_group is not defined
+      command: ha-manager remove vm:{{ item['vmid'] }}
+      ignore_errors: true
+      loop: "{{ stack_vms }}"
+      run_once: true
+
+
+# pve cloud infrastructure configuration
+- name: Fetch k8s_cluster
+  hosts: k8s_cluster
+  tags:
+    - config
+
+- name: Slurp secrets 
+  hosts: target_pve
+  tags:
+    - config
+    - acme
+    - deployments
+  roles:
+    - slurp_cluster_secrets
+
+- name: Write config to postgres
+  hosts: localhost
+  tags:
+    - config
+  vars:
+    proxy_stack_fqdn: "{{ static_includes.proxy_stack }}"
+  roles:
+    - parse_cluster_secrets
+    - set_kube_dns_records
+    - set_stack_network_config
+    - set_k8s_bind_domains
+
+- name: Config for all nodes in k8s cluster
+  hosts: k8s_cluster
+  tags:
+    - config
+  roles:
+    - parse_cluster_secrets
+    - set_kea_reservations
+    - adjust_networkd_oom_score
+  tasks:
+    - name: install automation pubkey
+      lineinfile:
+        path: /home/{{ "admin" if qemu_default_user is undefined else qemu_default_user }}/.ssh/authorized_keys
+        line: "{{ cluster_automation_pub_key | b64decode | trim }}"
+        state: present
+        
+- name: Config for master nodes
+  hosts: kube_control_plane
+  vars:
+    proxy_stack_fqdn: "{{ static_includes.proxy_stack }}"
+  tags:
+    - config
+  roles:
+    - set_haproxy_k8s_masters
+
+
+- name: Configs for worker nodes
+  hosts: kube_node
+  vars:
+    proxy_stack_fqdn: "{{ static_includes.proxy_stack }}"
+  tags:
+    - config
+  roles:
+    - set_haproxy_k8s_workers
+
+- name: Fetch ha-postgres
+  hosts: postgres_stack
+  tags:
+    - config
+
+- name: Refresh HAproxies
+  hosts: proxy_stack
+  tags:
+    - config
+  vars:
+    proxy_stack_fqdn: "{{ static_includes.proxy_stack }}"
+  roles:
+    - parse_cluster_secrets
+    - select_haproxy_conf
+    - apply_haproxy_conf
+
+- name: Kea reservations
+  hosts: dhcp_stack
+  roles:
+    - parse_cluster_secrets
+    - select_kea_conf
+    - apply_kea_dhcp4_conf
+  tags:
+    - config
+
+- name: Bind domains
+  hosts: bind_stack
+  tags:
+    - config
+  roles:
+    - parse_cluster_secrets
+    - apply_core_bind_conf
+  tasks:
+    - name: Restart bind
+      ansible.builtin.service:
+        name: bind9
+        state: restarted 
+
+# kubespray!
+- name: Setup kubespray cache on dev machine
+  hosts: localhost
+  tags:
+    - kubespray
+  tasks:
+    - name: create cache mnt dir
+      become: true
+      file:
+        path: /mnt/kubespray_cache
+        state: directory
+        mode: '0777'
+      when: "'cache_stack' in groups"
+
+    - name: unmount old cache dir if mounted
+      become: true
+      mount:
+        path: /mnt/kubespray_cache
+        src: localhost:/srv/kubespray_cache
+        fstype: nfs4
+        state: unmounted
+      when: "'cache_stack' in groups"
+
+    - name: kill old tunnel if running
+      shell: |
+        if [ -f /tmp/kc_tunnel.pid ]; then
+            kill $(cat /tmp/kc_tunnel.pid) 2>/dev/null || true
+            rm -f /tmp/kc_tunnel.pid
+        fi
+      ignore_errors: yes
+      when: "'cache_stack' in groups"
+
+    - name: Wait for old tunnel to release port
+      wait_for:
+        port: 3049
+        host: 127.0.0.1
+        state: drained
+        timeout: 5
+      when: "'cache_stack' in groups"
+
+    - name: create tunnel
+      shell: |
+        nohup ssh -fNv -L 3049:localhost:2049 root@main-{{ static_includes['cache_stack'] }}>/dev/null 2>&1 &
+        echo $! > /tmp/kc_tunnel.pid
+      args:
+        creates: /tmp/kc_tunnel.pid
+      when: "'cache_stack' in groups"
+
+    - name: mount cache dir
+      become: true
+      mount:
+        path: /mnt/kubespray_cache
+        src: localhost:/srv/kubespray_cache
+        fstype: nfs4
+        state: ephemeral # dont create fstab
+        opts: "port=3049"
+      when: "'cache_stack' in groups"
+
+# ! warning this is incomplete and does not 100% work like original ansible mechanisms, it assumes
+# the same structure of the sample kubespray inventory vars
+- name: Load preset kubespray all vars
+  hosts: all
+  tags:
+    - kubespray
+  tasks:
+    - include_vars:
+        dir: "{{ playbook_dir }}/kubespray/group_vars/all"
+    - include_vars:
+        dir: "{{ inventory_dir }}/group_vars/all" # overwrite in ansible traditional fashion
+      ignore_errors: true # incase the user did not specify their own variables and is using our presets
+
+- name: Load preset kubespray k8s_cluster vars
+  hosts: k8s_cluster
+  tags:
+    - kubespray
+  tasks:
+    - include_vars:
+        dir: "{{ playbook_dir }}/kubespray/group_vars/k8s_cluster"
+    - include_vars:
+        dir: "{{ inventory_dir }}/group_vars/k8s_cluster" 
+      ignore_errors: true 
+
+- name: Kubespray
+  tags:
+    - kubespray
+  ansible.builtin.import_playbook: kubernetes_sigs.kubespray.cluster
+
+- name: Unmount cache dir and kill tunnel 
+  hosts: localhost
+  tags:
+    - kubespray
+  tasks:
+    - name: unmount old cache dir if mounted
+      become: true
+      mount:
+        path: /mnt/kubespray_cache
+        src: localhost:/srv/kubespray_cache
+        fstype: nfs4
+        state: unmounted
+      when: "'cache_stack' in groups"
+
+    - name: kill old tunnel if running
+      shell: |
+        if [ -f /tmp/kc_tunnel.pid ]; then
+            kill $(cat /tmp/kc_tunnel.pid) 2>/dev/null || true
+            rm -f /tmp/kc_tunnel.pid
+        fi
+      ignore_errors: yes
+      when: "'cache_stack' in groups"
+
+
+- name: Allow locally hosted registry
+  hosts: k8s_cluster
+  tags:
+    - kubespray
+  tasks:
+    - name: Create containerd directory
+      file:
+        path: "/etc/containerd/certs.d/{{ test_repos_ip }}:5000"
+        state: directory
+      when: test_repos_ip is defined
+
+    - name: Create hosts.toml for the repo
+      copy:
+        dest: "/etc/containerd/certs.d/{{ test_repos_ip }}:5000/hosts.toml"
+        content: |
+          server = "http://{{ test_repos_ip }}:5000"
+
+          [host."http://{{ test_repos_ip }}:5000"]
+            skip_verify = true
+
+      when: test_repos_ip is defined
+      register: create_hosts_toml
+
+    - name: Restart containerd 
+      service:
+        name: containerd
+        state: restarted
+      when: test_repos_ip is defined and create_hosts_toml.changed
+
+# Acme certificates
+- name: Acme 
+  hosts: localhost
+  tags:
+    - acme
+  roles:
+    - pve.cloud.parse_cluster_secrets
+  tasks:
+    - debug:
+        var: cluster_cert_entries
+    - include_role:
+        name: pve.cloud.apply_acme_certs
+      when: acme_method is defined and cluster_cert_entries | length > 0
+
+# core helm deployments
+- name: Fetch nodes
+  hosts: kube_node
+  tags:
+    - deployments
+
+- name: Fetch the kubeconfig from a master node
+  hosts: kube_control_plane
+  tags:
+    - deployments
+  tasks:
+    - name: slurp kubeconfig
+      slurp:
+        src: "/etc/kubernetes/admin.conf"
+      register: slurp_kubeconf
+      run_once: true
+
+    - set_fact:
+        ext_kubeconfig: "{{ slurp_kubeconf.content | b64decode | replace('127.0.0.1',  ansible_default_ipv4.address)}}"
+      run_once: true
+
+- name: Deploy charts
+  hosts: localhost
+  tags:
+    - deployments
+  roles:
+    - pve.cloud.parse_cluster_secrets
+  vars:
+    # default when no taints are set
+    collected_node_taints: []
+  tasks:
+    - name: create temp path kubeconfig
+      tempfile:
+        state: file
+        suffix: .yaml
+      register: temp_kubeconfig
+
+    - name: write kubeconf to temp file
+      copy:
+        content: "{{ hostvars[groups['kube_control_plane'][0]].ext_kubeconfig }}"
+        dest: "{{ temp_kubeconfig.path }}"
+
+    - name: collect taints from workers
+      set_fact:
+        collected_node_taints: "{{ collected_node_taints | default([]) + [ hostvars[item].node_taints ] }}"
+      loop: "{{ groups['kube_node'] }}"
+      when: hostvars[item].node_taints is defined
+
+    - name: ceph csi repo
+      kubernetes.core.helm_repository:
+        name: ceph-csi
+        repo_url: https://ceph.github.io/csi-charts
+    
+    - name: deploy csi chart
+      kubernetes.core.helm:
+        name: ceph-csi
+        chart_ref: ceph-csi/ceph-csi-rbd
+        chart_version: 3.14.2
+        values: "{{ lookup('template', 'ceph-csi-values.yaml.j2') | from_yaml }}"
+        kubeconfig: "{{ temp_kubeconfig.path }}"
+        release_namespace: ceph-csi
+        create_namespace: true
+        update_repo_cache: true
+      
+    - name: create csi manifests
+      kubernetes.core.k8s:
+        state: present
+        template: ceph-csi-sc.yaml.j2
+        kubeconfig: "{{ temp_kubeconfig.path }}"
+
+    - name: ingress nginx repo
+      kubernetes.core.helm_repository:
+        name: ingress-nginx
+        repo_url: https://kubernetes.github.io/ingress-nginx
+
+    - name: deploy ingress chart
+      kubernetes.core.helm:
+        name: nginx-ingress
+        chart_ref: ingress-nginx/ingress-nginx
+        chart_version: 4.12.1
+        values: "{{ lookup('template', 'nginx-ingress-values.yaml.j2') | from_yaml }}"
+        kubeconfig: "{{ temp_kubeconfig.path }}"
+        release_namespace: nginx-ingress
+        create_namespace: true
+        update_repo_cache: true
+

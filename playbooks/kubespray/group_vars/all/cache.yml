@@ -1,0 +1,11 @@
+# pve cloud custom definitions
+
+# will trigger kubespray caching mechanism as soon as the cache stack is imported
+download_run_once: "{{ 'cache_stack' in groups }}"
+
+download_cache_dir: /mnt/kubespray_cache
+
+# use docker on localhost and containerd on nodes, need to set both vars for it to work ...?
+download_localhost: "{{ 'cache_stack' in groups and lookup('pipe', 'command -v docker >/dev/null && echo yes || echo no') == 'yes' }}"
+container_manager_on_localhost: "docker"
+image_command_tool_on_localhost: "docker"

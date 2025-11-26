@@ -1,0 +1,54 @@
+{
+"Control-agent": {
+    "http-host": "{{ ansible_default_ipv4.address }}",
+
+    "http-port": 8000,
+
+    "control-sockets": {
+        "dhcp4": {
+            "socket-type": "unix",
+            "socket-name": "/var/run/kea/kea4-ctrl-socket"
+        }
+    },
+    "trust-anchor": "/usr/lib/x86_64-linux-gnu/kea/CA.crt",
+    "cert-file": "/usr/lib/x86_64-linux-gnu/kea/{{ 'main' if kea_dhcp_main else 'failover' }}_dhcp.crt",
+    "key-file": "/usr/lib/x86_64-linux-gnu/kea/{{ 'main' if kea_dhcp_main else 'failover' }}_dhcp.key",
+    "cert-required": true,
+
+    "hooks-libraries": [
+    ],
+
+
+    "loggers": [
+    {
+        "name": "kea-ctrl-agent",
+        "output-options": [
+            {
+                "output": "stdout",
+
+                "pattern": "%-5p %m\n"
+
+                // This governs whether the log output is flushed to disk after
+                // every write.
+                // "flush": false,
+
+                // This specifies the maximum size of the file before it is
+                // rotated.
+                // "maxsize": 1048576,
+
+                // This specifies the maximum number of rotated files to keep.
+                // "maxver": 8
+            }
+        ],
+        // This specifies the severity of log messages to keep. Supported values
+        // are: FATAL, ERROR, WARN, INFO, DEBUG
+        "severity": "INFO",
+
+        // If DEBUG level is specified, this value is used. 0 is least verbose,
+        // 99 is most verbose. Be cautious, Kea can generate lots and lots
+        // of logs if told to do so.
+        "debuglevel": 0
+    }
+  ]
+}
+}

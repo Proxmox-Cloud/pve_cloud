@@ -1,0 +1,21 @@
+site_name: PVE Cloud Documentation
+
+nav:
+  - index.md
+  - bootstrap.md
+  - kubernetes.md
+  - tdd.md
+  - misc.md
+  - contributing.md
+  - Schemas:
+    - schemas
+
+theme:
+  name: material
+  features:
+    - toc.follow
+    - toc.integrate 
+
+plugins:
+  - search
+  - include_dir_to_nav

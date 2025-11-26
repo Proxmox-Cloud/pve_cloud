@@ -1,0 +1,40 @@
+# ! warning this is incomplete and does not 100% work like original ansible mechanisms, it assumes
+# the same structure of the sample kubespray inventory vars
+- name: Load preset kubespray all vars
+  hosts: all
+  tags:
+    - kubespray
+  tasks:
+    - include_vars:
+        dir: "{{ playbook_dir }}/kubespray/group_vars/all"
+    - include_vars:
+        dir: "{{ inventory_dir }}/group_vars/all" # overwrite in ansible traditional fashion
+      ignore_errors: true # incase the user did not specify their own variables and is using our presets
+
+- name: Load preset kubespray all vars
+  hosts: k8s_cluster
+  tags:
+    - kubespray
+  tasks:
+    - include_vars:
+        dir: "{{ playbook_dir }}/kubespray/group_vars/k8s_cluster"
+    - include_vars:
+        dir: "{{ inventory_dir }}/group_vars/k8s_cluster" 
+      ignore_errors: true 
+
+- name: Load preset etcd vars
+  hosts: etcd
+  tags:
+    - kubespray
+  tasks:
+    - include_vars:
+        file: "{{ playbook_dir }}/kubespray/group_vars/etcd.yml"
+    - include_vars:
+        file: "{{ inventory_dir }}/group_vars/etcd.yml" 
+      ignore_errors: true 
+
+# upgrade the kubespray cluster
+- name: Kubespray
+  tags:
+    - kubespray
+  ansible.builtin.import_playbook: kubernetes_sigs.kubespray.upgrade_cluster 

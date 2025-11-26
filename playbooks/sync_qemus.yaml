@@ -1,0 +1,97 @@
+- name: Sync nodes
+  hosts: target_pve
+  vars:
+    vm_type: "qemu"
+  tags:
+    - qemus
+  tasks:
+    - include_role:
+        name: determine_vms_create_delete
+      vars:
+        vms: "{{ qemus }}"
+      run_once: true
+
+    - pause:
+        prompt: "{{ delete_create['vms_to_delete'] | to_nice_json }}\n\nThe playbook determined the above mentioned vms to delete - continue? (yes/no)"
+      register: user_input
+      when: (delete_create['vms_to_delete'] | length) > 0
+      run_once: true
+
+    - fail:
+        msg: "User declined to continue. Aborting playbook."
+      when: (delete_create['vms_to_delete'] | length) > 0 and user_input.user_input | lower != 'yes'
+      run_once: true
+
+    - name: Delete qemus
+      ansible.builtin.shell: |
+        qm stop {{ vm_id }}
+        while qm status {{ vm_id }} | grep -q "status: running"; do
+          echo "Waiting for vm to stop..."
+          sleep 2
+        done
+        qm destroy {{ vm_id }} --purge
+      ignore_errors: true
+      loop: "{{ delete_create['vms_to_delete'] }}"
+      vars:
+        vm_id: "{{ item['vmid'] }}"
+      when: inventory_hostname == item['node'] + "." + pve_cluster
+
+    - include_role:
+        name: set_memory_facts
+      when: (delete_create['vms_to_create'] | length) > 0
+
+    - include_role:
+        name: determine_best_fit
+      when: (delete_create['vms_to_create'] | length) > 0
+      run_once: true
+
+    - include_role:
+        name: bootstrap_vm
+      loop: "{{ best_fit['best_distribution'] | zip(best_fit['best_fitted_hosts']) | list }}" # combine the lists
+      when: (delete_create['vms_to_create'] | length) > 0 and inventory_hostname == item[1] # execute on target host
+      vars:
+        blake: "{{ item[0][0] }}"
+        args: "{{ item[0][1] }}"
+
+    - name: Give pve some time to sync conf for api calls
+      ansible.builtin.wait_for:
+        timeout: 10
+      delegate_to: localhost
+
+    - name: Reload inventory to get created qemus for next play
+      meta: refresh_inventory
+
+    # remove cloudinit drives
+    - name: Get existing vms
+      command: pvesh get /cluster/resources --type vm --output-format json
+      register: pve_vms
+      run_once: true
+
+    - set_fact:
+        stack_vms: "{{ pve_vms.stdout | from_json |  selectattr('tags', 'defined') | selectattr('tags', 'search', stack_name + '.' + pve_cloud_domain) | list }}"
+      run_once: true
+      
+    - name: Delete cloudinit drive
+      command: qm set {{ item['vmid'] }} --delete ide2
+      ignore_errors: true
+      loop: "{{ stack_vms }}"
+      when: inventory_hostname == item['node'] + "." + pve_cluster
+
+- name: Slurp secrets 
+  hosts: target_pve
+  roles:
+    - slurp_cluster_secrets
+
+- name: Stack conf
+  hosts: qemus
+  tags:
+    - config
+  roles:
+    - alternate_ssh_port
+    - parse_cluster_secrets
+  tasks:
+    - name: install automation pubkey
+      lineinfile:
+        path: /home/{{ "admin" if qemu_default_user is undefined else qemu_default_user }}/.ssh/authorized_keys
+        line: "{{ cluster_automation_pub_key | b64decode | trim }}"
+        state: present

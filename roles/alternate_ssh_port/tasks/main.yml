@@ -1,0 +1,25 @@
+---
+# tasks file for alternate_ssh_port
+# set custom ssh port if specified
+- ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    line: "Port 2222"
+    state: "{{ 'present' if use_alternate_ssh_port | default(false) else 'absent' }}"
+  register: ssh_config_change
+
+- name: Run anti pve override change persist 
+  shell: |
+    systemctl mask ssh.socket
+    systemctl mask sshd.socket
+    systemctl disable sshd
+    systemctl enable ssh
+  when: ssh_config_change.changed
+
+- name: Restart SSH service
+  service:
+    name: sshd
+    state: restarted
+  when: ssh_config_change.changed
+  
+- name: Reload inventory to get created lxcs for next play
+  meta: refresh_inventory

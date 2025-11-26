@@ -1,0 +1,80 @@
+scope: ha-postgres
+name: {{ ansible_hostname }}
+
+log:
+  format: '%(asctime)s %(levelname)s: %(message)s'
+  level: INFO
+  max_queue_size: 1000
+  traceback_level: ERROR
+  type: plain
+
+restapi:
+  connect_address: {{ ansible_hostname }}.{{ pve_cloud_domain }}:8008
+  listen: 0.0.0.0:8008
+
+etcd3:
+  hosts:
+{% for host in groups['lxcs'] %}
+  - {{ hostvars[host].ansible_hostname }}.{{ pve_cloud_domain }}:2379
+{% endfor %}
+
+
+# The bootstrap configuration. Works only when the cluster is not yet initialized.
+# If the cluster is already initialized, all changes in the `bootstrap` section are ignored!
+bootstrap:
+  # This section will be written into <dcs>:/<namespace>/<scope>/config after initializing
+  # new cluster and all other cluster members will use it as a `global configuration`.
+  # WARNING! If you want to change any of the parameters that were set up
+  # via `bootstrap.dcs` section, please use `patronictl edit-config`!
+  dcs:
+    loop_wait: 10
+    retry_timeout: 10
+    ttl: 30
+    postgresql:
+      parameters:
+        hot_standby: 'on'
+        max_connections: 100
+        max_locks_per_transaction: 64
+        max_prepared_transactions: 0
+        max_replication_slots: 10
+        max_wal_senders: 10
+        max_worker_processes: 8
+        track_commit_timestamp: 'off'
+        wal_keep_size: 128MB
+        wal_level: replica
+        wal_log_hints: 'on'
+      use_pg_rewind: true
+      use_slots: true
+  initdb: 
+  - auth: scram-sha-256
+  - encoding: UTF8
+  - data-checksums
+
+postgresql:
+  authentication:
+    replication:
+      password: '{{ postgres_password }}'
+      username: replicator
+    rewind:
+      password: '{{ postgres_password }}'
+      username: rewind_user
+    superuser:
+      password: '{{ postgres_password }}'
+      username: postgres
+  bin_dir: '/usr/lib/postgresql/15/bin'
+  connect_address: '{{ ansible_hostname }}.{{ pve_cloud_domain }}:5432'
+  data_dir: '/opt/ha-postgres'
+  listen: 0.0.0.0:5432
+  parameters:
+    password_encryption: scram-sha-256
+  pg_hba:
+  - host all all all scram-sha-256
+  - host replication replicator all scram-sha-256
+
+tags:
+  clonefrom: true
+  failover_priority: 1
+  noloadbalance: false
+  nostream: false
+  nosync: false
+

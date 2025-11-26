@@ -1,0 +1,123 @@
+# pipeline trigger if the upstream releases
+py_pve_cloud_upstream:
+  stage: build
+  image: alpine/git:v2.49.1
+  script:
+    - git config --global user.name "$GITLAB_USER_NAME"
+    - git config --global user.email "$GITLAB_USER_EMAIL"
+
+    # write the new version
+    - sed -i "s/^py-pve-cloud==.*$/py-pve-cloud==${PY_PVE_CLOUD}/" meta/ee-requirements.txt
+
+    # commit and push
+    - git add meta/ee-requirements.txt
+    - git commit -m "Update py-pve-cloud version to $PY_PVE_CLOUD"
+    - git push origin HEAD:master
+
+    # UPSTREAM_TAG_MESSAGE contains the original tag used to build the upstream (release-major/minor/patch)
+    # gitlab ci premium dotenv to downstream pass workaround
+    - echo $UPSTREAM_TAG_MESSAGE
+    - git tag -f $UPSTREAM_TAG_MESSAGE
+    - git push -f origin $UPSTREAM_TAG_MESSAGE 
+  rules:
+    - if: ( $PY_PVE_CLOUD != null || $PY_PVE_CLOUD =~ /^./ ) # set by upstream
+
+
+pve_cloud_backup_upstream:
+  stage: build
+  image: alpine/git:v2.49.1
+  script:
+    - git config --global user.name "$GITLAB_USER_NAME"
+    - git config --global user.email "$GITLAB_USER_EMAIL"
+
+    # write the new version
+    - |
+      sed -i "s/py_pve_cloud_backup_version:\s.*$/py_pve_cloud_backup_version: \"${PVE_CLOUD_BACKUP}\"/" playbooks/setup_backup_daemon.yaml
+
+    # commit and push
+    - git add playbooks/setup_backup_daemon.yaml
+    - git commit -m "Update pve-cloud-backup version to $PVE_CLOUD_BACKUP"
+    - git push origin HEAD:master
+
+    # UPSTREAM_TAG_MESSAGE contains the original tag used to build the upstream (release-major/minor/patch)
+    # gitlab ci premium dotenv to downstream pass workaround
+    - echo $UPSTREAM_TAG_MESSAGE
+    - git tag -f $UPSTREAM_TAG_MESSAGE
+    - git push -f origin $UPSTREAM_TAG_MESSAGE 
+  rules:
+    - if: ( $PVE_CLOUD_BACKUP != null || $PVE_CLOUD_BACKUP =~ /^./ ) # set by upstream
+
+
+# call the pipeline for the release patch tag we just created above
+trigger_upstream_release_tag:
+  stage: deploy
+  image: alpine/curl:8.14.1
+  script:
+    - |
+      curl --request POST \
+        --form "token=${CI_JOB_TOKEN}" \
+        --form "ref=${UPSTREAM_TAG_MESSAGE}" \
+        "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/trigger/pipeline"
+  rules:
+    - if: ( $PY_PVE_CLOUD != null || $PY_PVE_CLOUD =~ /^./ ) # set by upstream
+    - if: ( $PVE_CLOUD_BACKUP != null || $PVE_CLOUD_BACKUP =~ /^./ ) # same trigger from both upstreams
+
+
+# this pipeline is either invoked manually or via the upstream
+release_tag:
+  stage: build
+  image: alpine/git:v2.49.1
+  script:
+    # set config based on the current commit for auto commit
+    - git config --global user.name "$GITLAB_USER_NAME"
+    - git config --global user.email "$GITLAB_USER_EMAIL"
+
+    # get the latest tag => default to 0.0.0
+    - |
+      tags=$(git tag -l | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$')
+      if [ -z "$tags" ]; then
+        latest_tag="0.0.0"
+      else
+        latest_tag=$(echo "$tags" | sort -V | tail -n 1)
+      fi
+        
+    # split the tag and increment
+    - |
+      major=$(echo "$latest_tag" | cut -d '.' -f 1)
+      minor=$(echo "$latest_tag" | cut -d '.' -f 2)
+      patch=$(echo "$latest_tag" | cut -d '.' -f 3)
+
+      increment=${CI_COMMIT_TAG#release-}
+
+      if [ "$increment" == "major" ]; then
+        major=$((major + 1))
+        minor=0
+        patch=0
+      elif [ "$increment" == "minor" ]; then
+        minor=$((minor + 1))
+        patch=0
+      elif [ "$increment" == "patch" ]; then
+        patch=$((patch + 1))
+      else
+        echo "Unknown increment type: $increment"
+        exit 1
+      fi
+
+      new_tag="$major.$minor.$patch"
+
+      echo $new_tag
+
+    # update galaxy yaml
+    - |
+      sed -i "s/^version:\s.*$/version: $new_tag/" galaxy.yml
+    - git add galaxy.yml
+    - git commit -m "Update collection version to $new_tag"
+    - git push origin HEAD:master
+
+    # tag and push => created by job ci token, will not trigger the tag released pipeline
+    - git tag "$new_tag" -m "$CI_COMMIT_TAG"
+    - git push origin "$new_tag"
+    
+  resource_group: deploy-prod
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^release-[a-z]+$/'

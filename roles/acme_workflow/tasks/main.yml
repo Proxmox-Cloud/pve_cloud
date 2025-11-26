@@ -1,0 +1,149 @@
+---
+# tasks file for acme_workflow
+
+# renew / create cert with dns01 and custom solver
+- name: determine acme stage
+  set_fact:
+    acme_directory: "{{ acme_staging_directory if acme_staging else acme_prod_directory }}"
+
+- name: "Validate ACME privkey: read key as pem"
+  ignore_errors: true
+  register: ret_keyinfo
+  community.crypto.openssl_privatekey_info:
+    content: "{{ acme_accountkey }}"
+
+- name: "Check ACME privkey: assert for valid key as pem"
+  ansible.builtin.assert:
+    that:
+      - not ret_keyinfo.failed
+    fail_msg: "Private key in 'acme_accountkey' can not be read. Make sure it is a private key and in PEM format."
+    quiet: true
+
+- name: Make sure account exists and has given contacts. We agree to TOS.
+  register: ret_account
+  community.crypto.acme_account:
+    account_key_content: "{{ acme_accountkey }}"
+    acme_directory: "{{ acme_directory }}"
+    acme_version: 2
+    state: present
+    terms_agreed: true
+    contact:
+      - "mailto:{{ acme_contact }}"
+
+- name: "validate csr: read csr as pem"
+  ignore_errors: true
+  register: ret_csrinfo
+  community.crypto.openssl_csr_info:
+    content: "{{ acme_x509.ec_csr.csr }}"
+
+- ansible.builtin.assert:
+    that:
+      - not ret_csrinfo.failed
+    fail_msg: "CSR in 'acme_x509.ec_csr.csr' can not be read. Make sure it is a CSR and in PEM format."
+    quiet: true
+
+- name: create tmp dir for storing certificate files
+  register: ret_tempdir
+  ansible.builtin.tempfile:
+    state: directory
+    prefix: "acme-workflow."
+
+- set_fact:
+    crt_dest: "{{ ret_tempdir.path }}/{{ acme_x509.stack_fqdn }}.ec.crt"
+    chain_dest: "{{ ret_tempdir.path }}/{{ acme_x509.stack_fqdn }}.chain.ec.crt"
+    fullchain_dest: "{{ ret_tempdir.path }}/{{ acme_x509.stack_fqdn }}.fullchain.ec.crt"
+
+- name: "block: always run temp-directory cleanup"
+  block:   
+    - name: store existing cert
+      when: acme_x509.ec_crt is not none and acme_x509.ec_crt.crt | length > 0
+      copy:
+        content: "{{ acme_x509.ec_crt.crt }}"
+        dest: "{{ crt_dest }}"
+        mode: "0600"
+
+    - name: "ACME: request challenge"
+      tags: challenge
+      register: ret_acme_challenge
+      community.crypto.acme_certificate:
+        select_crypto_backend: cryptography
+        acme_version: 2
+        acme_directory: "{{ acme_directory }}"
+        account_key_content: "{{ acme_accountkey }}"
+        modify_account: false
+        terms_agreed: true
+        challenge: dns-01
+        remaining_days: 14
+        force: "{{ acme_config_changed_or_new }}"
+        csr_content: "{{ acme_x509.ec_csr.csr }}"
+        dest: "{{ crt_dest }}"
+        chain_dest: "{{ chain_dest }}"
+        fullchain_dest: "{{ fullchain_dest }}"
+    - debug:
+        var: ret_acme_challenge
+
+    - name: dns solver challenge custom
+      include_role:
+        name: "set_dns01_{{ acme_method }}"
+      when: ret_acme_challenge.changed
+
+    - name: "Block: Always run TXT-cleanup"
+      block:
+        - name: "ACME: Collect certificate"
+          tags: acmecollect
+          ignore_errors: true
+          register: ret_acme_collect
+          community.crypto.acme_certificate:
+            data: "{{ ret_acme_challenge }}"
+            select_crypto_backend: cryptography
+            acme_version: 2
+            acme_directory: "{{ acme_directory }}"
+            account_key_content: "{{ acme_accountkey }}"
+            modify_account: false
+            challenge: dns-01
+            remaining_days: 14
+            force: "{{ acme_config_changed_or_new }}"
+            csr_content: "{{ acme_x509.ec_csr.csr }}"
+            dest: "{{ crt_dest }}"
+            chain_dest: "{{ chain_dest }}"
+            fullchain_dest: "{{ fullchain_dest }}"
+        - debug:
+            var: ret_acme_collect
+
+      always:
+        - name: clean dns01 custom
+          include_role:
+            name: "cleanup_dns01_{{ acme_method }}"
+          when: ret_acme_challenge.changed
+
+    - name: "Compile certdata for postgres update"
+      when: ret_acme_collect.changed # noqa: no-handler
+      ansible.builtin.set_fact:
+        tmp_psql_crt_update:
+          crt: "{{ lookup('ansible.builtin.file', crt_dest) }}"
+          chain: "{{ lookup('ansible.builtin.file', chain_dest) }}"
+          fullchain: "{{ lookup('ansible.builtin.file', fullchain_dest) }}"
+
+    - name: "Compile certdata for postgres update"
+      when: ret_acme_collect.changed # noqa: no-handler
+      ansible.builtin.set_fact:      
+        tmp_k8s_update:
+          tls.crt: "{{ (acme_x509.ec_crt | combine(tmp_psql_crt_update)).fullchain }}"
+          tls.key: "{{ (acme_x509.ec_csr | combine(tmp_psql_csr_update | default({}))).privkey }}"
+
+    - name: Update certificate in postgres
+      when: ret_acme_collect.changed
+      alchemy_update:
+        pg_conn_str: "{{ pg_conn_str }}"
+        table: acme_x509
+        values:
+          ec_crt: "{{ tmp_psql_crt_update }}"
+          k8s: "{{ tmp_k8s_update }}"
+        where:
+          stack_fqdn: "{{ acme_x509.stack_fqdn }}"
+
+  always:
+    - name: "Cleanup: temp-directory"
+      ansible.builtin.file:
+        state: absent
+        path: "{{ ret_tempdir.path }}"

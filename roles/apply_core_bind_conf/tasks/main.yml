@@ -1,0 +1,40 @@
+---
+# tasks file for apply_core_bind_conf
+- name: Check if haproxy is already running - wont be on first run
+  wait_for:
+    host: "{{ pve_haproxy_floating_ip_internal }}"
+    port: 5000
+    timeout: 5
+    state: started
+  register: postgres_connection_check
+  ignore_errors: yes
+
+- name: select all domains
+  delegate_to: localhost
+  alchemy_read:
+    pg_conn_str: "{{ pg_conn_str }}"
+    table: bind_domains
+  register: bind_domains
+  when: postgres_connection_check is succeeded
+  
+- name: set empty k8s_ingress_rules on fail or psql not yet up
+  set_fact:
+    bind_domains: { "query_result": [] }
+  when: postgres_connection_check is not succeeded or bind_domains["failed"]
+
+- set_fact:
+    mapped_domains: "{{ bind_domains.query_result | map(attribute='domain') | list }}"
+  when: postgres_connection_check is succeeded
+
+- name: template out default zone conf
+  template:
+    src: ./named.conf.default-zones.j2
+    dest: /etc/bind/named.conf.default-zones
+
+- name: template out db file for domains
+  when: bind_master
+  loop: "{{ ([pve_cloud_domain] + mapped_domains) | unique }}"
+  template:
+    src: ./db.zone.j2
+    dest: /etc/bind/db.{{ item }}
+    force: false

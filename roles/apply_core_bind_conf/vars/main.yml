@@ -1,0 +1,4 @@
+---
+# vars file for apply_core_bind_conf
+bind_domains: { "query_result": []}
+mapped_domains: []

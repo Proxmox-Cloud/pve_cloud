@@ -1,0 +1,117 @@
+- name: Sync nodes
+  hosts: target_pve
+  tags:
+    - create
+  vars:
+    vm_type: "lxc" # static key for triggering lxc creation logic
+  tasks:
+    - include_role:
+        name: determine_vms_create_delete
+      vars:
+        vms: "{{ lxcs }}"
+      run_once: true
+
+    - pause:
+        prompt: "{{ delete_create['vms_to_delete'] | to_nice_json }}\n\nThe playbook determined the above mentioned vms to delete - continue? (yes/no)"
+      register: user_input
+      when: (delete_create['vms_to_delete'] | length) > 0
+      run_once: true
+
+    - fail:
+        msg: "User declined to continue. Aborting playbook."
+      when: (delete_create['vms_to_delete'] | length) > 0 and user_input.user_input | lower != 'yes'
+      run_once: true
+
+    - name: Delete lxcs
+      ansible.builtin.shell: |
+        # stop and wait for stopped
+        pct stop {{ lxc_id }}
+        while pct status {{ lxc_id }} | grep -q "status: running"; do
+          echo "Waiting for container to stop..."
+          sleep 2
+        done
+        # purge delete (if the container is in an ha group)
+        pct destroy {{ lxc_id }} --purge
+      ignore_errors: true
+      loop: "{{ delete_create['vms_to_delete'] }}"
+      vars:
+        lxc_id: "{{ item['vmid'] }}"
+      when: inventory_hostname == item['node'] + "." + pve_cluster
+
+    - include_role:
+        name: set_memory_facts
+      when: (delete_create['vms_to_create'] | length) > 0
+
+    - include_role:
+        name: determine_best_fit
+      when: (delete_create['vms_to_create'] | length) > 0
+      run_once: true
+
+    - include_role:
+        name: bootstrap_lxc
+      loop: "{{ best_fit['best_distribution'] | zip(best_fit['best_fitted_hosts']) | list }}" # combine the lists
+      when: (delete_create['vms_to_create'] | length) > 0 and inventory_hostname == item[1] # execute on target host
+      vars:
+        blake: "{{ item[0][0] }}"
+        args: "{{ item[0][1] }}"
+
+    - name: Give pve some time to sync conf for api calls
+      ansible.builtin.wait_for:
+        timeout: 10
+      delegate_to: localhost
+
+    - name: Reload inventory to get created lxcs for next play
+      meta: refresh_inventory
+
+    # proxmox ha
+    - name: Get existing vms
+      command: pvesh get /cluster/resources --type vm --output-format json
+      register: pve_vms
+      run_once: true
+      
+    - set_fact:
+        stack_vms: "{{ pve_vms.stdout | from_json |  selectattr('tags', 'defined') | selectattr('tags', 'search', stack_name + '.' + pve_cloud_domain) | list }}"
+      run_once: true
+
+    - name: Set ha if enabled
+      when: pve_ha_group is defined
+      command: ha-manager add ct:{{ item['vmid'] }} --group {{ pve_ha_group }}
+      ignore_errors: true
+      loop: "{{ stack_vms }}"
+      run_once: true
+
+    - name: Remove ha if disabled
+      when: pve_ha_group is not defined
+      command: ha-manager remove ct:{{ item['vmid'] }}
+      ignore_errors: true
+      loop: "{{ stack_vms }}"
+      run_once: true
+
+- name: Slurp secrets 
+  hosts: target_pve
+  tags:
+    - config
+  roles:
+    - slurp_cluster_secrets
+
+- name: Stack conf
+  hosts: lxcs
+  tags:
+    - config
+  roles:
+    - alternate_ssh_port
+    - parse_cluster_secrets
+  tasks:
+    - name: write vm_vars_blake for include stacks
+      copy:
+        content: "{{ vm_vars_blake | combine(lxc_global_vars | default({})) | to_nice_yaml }}"
+        dest: /etc/pve-cloud-vars.yaml
+    - name: install systemd prom exporter
+      include_role:
+        name: prometheus.prometheus.systemd_exporter
+      when: install_prom_systemd_exporter is defined and install_prom_systemd_exporter
+    - name: install automation pubkey
+      lineinfile:
+        path: /root/.ssh/authorized_keys
+        line: "{{ cluster_automation_pub_key | b64decode | trim }}"
+        state: present

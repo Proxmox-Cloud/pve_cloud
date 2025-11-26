@@ -1,0 +1,70 @@
+---
+# tasks file for create_node
+- name: Get id for vm 
+  command: pvesh get /cluster/nextid
+  register: pve_id
+
+- name: Set hostname
+  set_fact:
+    qemu_hostname: "{{ args.hostname if 'hostname' in args else lookup('community.general.random_pet') }}-{{ stack_name }}"
+
+- set_fact:
+    create_cmd: "qm create {{ pve_id.stdout }} --name '{{ qemu_hostname }}' {% for key, value in (qemu_root_parameters | ansible.builtin.combine(qemu_base_parameters) | ansible.builtin.combine(args.parameters)).items() %}--{{ key }} '{{ value }}' {% endfor %}"
+
+- name: Debug print qm creation command
+  debug:
+    var: create_cmd
+
+- name: Create VM
+  ansible.builtin.command: "{{ create_cmd }}"
+
+- name: Set tags
+  ansible.builtin.command: "qm set {{ pve_id.stdout }} --tags '{{ stack_name }}.{{ pve_cloud_domain }},{{ args['k8s_roles'] | join(',') + ',' if 'k8s_roles' in args else ''}}{{ blake }}-blake'"
+
+- name: Create dir images
+  ansible.builtin.file:
+    path: "/opt/images"
+    state: directory
+    recurse: yes
+
+- name: Download image
+  get_url:
+    url: "{{ qemu_image_url }}"
+    dest: "/opt/images/{{ qemu_image_url.split('/')[-1] }}"
+
+- name: Create user.yaml snippet
+  template:
+    src: "user-config.yaml.j2"
+    dest: "/var/lib/vz/snippets/user-{{ pve_id.stdout }}.yaml"
+
+- name: Cinit network config
+  include_tasks: generate_cinit_net_cfg.yml
+
+- name: Create network.yaml snippet
+  copy:
+    content: "{{ cinit_network_conf | to_yaml }}"
+    dest: "/var/lib/vz/snippets/network-{{ pve_id.stdout }}.yaml"
+
+- name: Set scsi0 with the specified disk and options
+  ansible.builtin.command:
+    cmd: qm set {{ pve_id.stdout }} --scsi0 {{ args["disk"]["pool"] }}:0,discard=on,ssd=on,import-from=/opt/images/{{ qemu_image_url.split('/')[-1] }}
+
+- name: Resize the scsi0 disk
+  ansible.builtin.command:
+    cmd: qm resize {{ pve_id.stdout }} scsi0 +{{ args["disk"]["size"] }}
+
+- name: Set IDE2 for cloud-init
+  ansible.builtin.command:
+    cmd: qm set {{ pve_id.stdout }} --ide2 {{ args["disk"]["pool"] }}:cloudinit
+
+- name: Set boot order to scsi0
+  ansible.builtin.command:
+    cmd: qm set {{ pve_id.stdout }} --boot order=scsi0
+
+- name: Set cloud-init custom configuration for user and network
+  ansible.builtin.command:
+    cmd: qm set {{ pve_id.stdout }} --cicustom "user=local:snippets/user-{{ pve_id.stdout }}.yaml,network=local:snippets/network-{{ pve_id.stdout }}.yaml"
+
+- name: Start the virtual machine
+  ansible.builtin.command:
+    cmd: qm start {{ pve_id.stdout }}

@@ -1,0 +1,108 @@
+- name: Slurp certificates from pve
+  hosts: target_pve
+  roles:
+    - slurp_cluster_secrets
+
+- name: Fetch ha-postgres
+  hosts: postgres_stack
+
+- name: Setup haproxy
+  hosts: lxcs
+  roles:
+    - parse_cluster_secrets
+  tasks:
+    - name: Check if floating ips are defined
+      fail:
+        msg: "ERROR: 'pve_haproxy_floating_ip' or 'pve_haproxy_floating_ip_internal' is not in pve cloud vars!"
+      when: pve_haproxy_floating_ip is not defined or pve_haproxy_floating_ip_internal is not defined
+
+    - name: Install keepalived
+      ansible.builtin.apt:
+        update_cache: yes
+        name: keepalived
+        state: present
+
+    - name: install haproxy
+      ansible.builtin.apt:
+        name: haproxy
+        state: present
+
+    - name: enable and start proxy
+      ansible.builtin.service:
+        name: haproxy
+        state: started
+        enabled: yes
+
+    - name: Enable binding to keepalived vrips
+      ansible.posix.sysctl:
+        name: net.ipv4.ip_nonlocal_bind
+        value: '1'
+        state: present
+        sysctl_set: yes
+        reload: yes
+
+    - name: Check if haproxy is already running
+      wait_for:
+        host: "{{ pve_haproxy_floating_ip_internal }}"
+        port: 5000
+        timeout: 5
+        state: started
+      register: postgres_connection_check
+      ignore_errors: yes
+
+    - set_fact:
+        proxy_stack_fqdn: "{{ stack_name }}.{{ pve_cloud_domain }}"
+
+    - name: Try fetch config from postgres (on consecutive applies)
+      include_role:
+        name: select_haproxy_conf
+      when: postgres_connection_check is succeeded
+
+    - include_role:
+        name: apply_haproxy_conf
+
+    - name: Get vrid from stack_name
+      set_fact:
+        vrid: "{{ (( stack_name | hash('sha256') | int(base=16)) % 254) + 1 }}"
+        vrid_int: "{{ (( stack_name | hash('sha256') | int(base=16)) % 254) + 2 }}"
+
+    - name: copy keeaplived conf
+      ansible.builtin.copy:
+        dest: /etc/keepalived/keepalived.conf
+        content: |
+          # vrrp for external ingress haproxy
+          vrrp_instance VI_1 {
+            state {{ 'MASTER' if keepalived_master else 'BACKUP' }}
+            interface eth0
+            virtual_router_id {{ vrid }}
+            priority {{ '255' if keepalived_master else '254' }}
+            advert_int 1
+            authentication {
+              auth_type PASS
+              auth_pass {{ haproxy_keepalived_password }}
+            }
+            virtual_ipaddress {
+              {{ pve_haproxy_floating_ip }}/24
+            }
+          }
+          # internal proxy ip
+          vrrp_instance VI_2 {
+            state {{ 'MASTER' if keepalived_master else 'BACKUP' }}
+            interface eth0
+            virtual_router_id {{ vrid_int }}
+            priority {{ '255' if keepalived_master else '254' }}
+            advert_int 1
+            authentication {
+              auth_type PASS
+              auth_pass {{ haproxy_keepalived_password }}
+            }
+            virtual_ipaddress {
+              {{ pve_haproxy_floating_ip_internal }}/24
+            }
+          }
+
+    - name: Restart keepalived
+      ansible.builtin.service:
+        name: keepalived
+        state: restarted
+        enabled: yes

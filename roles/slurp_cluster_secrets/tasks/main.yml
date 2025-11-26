@@ -1,0 +1,51 @@
+---
+# tasks file for slurp_secrets
+- slurp_cloud_secrets_async:
+  register: slurped_secrets
+  run_once: true
+
+- name: create secret map
+  set_fact:
+    secret_map: "{{ secret_map | default({}) | combine({item.path | basename: item.content}) }}"
+  loop: "{{ slurped_secrets.results }}"    
+  run_once: true
+
+- name: check if ceph conf
+  stat:
+    path: /etc/pve/ceph.conf
+  run_once: true
+  register: ceph_conf_stat
+
+- name: Slurp file if it exists
+  slurp:
+    src: /etc/pve/ceph.conf
+  register: ceph_conf_slrp
+  run_once: true
+  when: ceph_conf_stat.stat.exists
+
+- name: add ceph conf to map 
+  set_fact:
+    secret_map: "{{ secret_map | combine({'ceph_conf': ceph_conf_slrp.content}) }}"
+  run_once: true
+  when: ceph_conf_stat.stat.exists
+
+- name: add ceph fsid
+  ansible.builtin.command: "ceph fsid"
+  run_once: true
+  register: ceph_fsid
+
+- name: add fsid to map
+  set_fact:
+    secret_map: "{{ secret_map | combine({'ceph_fsid': ceph_fsid.stdout}) }}"
+  run_once: true
+
+- name: Get the key using grep and awk
+  shell: |
+   grep -i 'key' /etc/pve/priv/ceph.client.admin.keyring | awk -F ' = ' '{print $2}'
+  register: ceph_key
+  run_once: true
+
+- name: add fsid to map
+  set_fact:
+    secret_map: "{{ secret_map | combine({'ceph_key': ceph_key.stdout}) }}"
+  run_once: true

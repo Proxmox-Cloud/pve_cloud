@@ -1,0 +1,34 @@
+---
+# tasks file for set_stack_dns_records
+- name: create master entries
+  community.general.nsupdate:
+    key_name: "internal."
+    key_algorithm: "hmac-sha256"
+    key_secret: "{{ bind_internal_key }}"
+    server: "{{ bind_master_ip }}"
+    zone: "{{ pve_cloud_domain }}"
+    record: "masters-{{ stack_name }}"
+    value: "{{ groups['kube_control_plane'] | map('extract', hostvars, ['ansible_default_ipv4', 'address']) | list }}"
+    state: "{{ 'present' if (groups['kube_control_plane'] | length) > 0 else 'absent' }}"
+
+- name: create worker entries
+  community.general.nsupdate:
+    key_name: "internal."
+    key_algorithm: "hmac-sha256"
+    key_secret: "{{ bind_internal_key }}"
+    server: "{{  bind_master_ip }}"
+    zone: "{{ pve_cloud_domain }}"
+    record: "workers-{{ stack_name }}"
+    value: "{{ groups['kube_node'] | map('extract', hostvars, ['ansible_default_ipv4', 'address']) | list }}"
+    state: "{{ 'present' if (groups['kube_node'] | length) > 0 else 'absent' }}"
+  
+- name: create control plane entry
+  community.general.nsupdate:
+    key_name: "internal."
+    key_algorithm: "hmac-sha256"
+    key_secret: "{{ bind_internal_key }}"
+    server: "{{ bind_master_ip }}"
+    zone: "{{ pve_cloud_domain }}"
+    record: "control-plane-{{ stack_name }}"
+    value: "{{ pve_haproxy_floating_ip_internal }}"
+    state: "{{ 'present' if (groups['kube_control_plane'] | length) > 0 else 'absent' }}"

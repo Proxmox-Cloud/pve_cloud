@@ -1,0 +1,33 @@
+#cloud-config
+hostname: {{ qemu_hostname }}
+manage_etc_hosts: true # todo: needed?
+# keep passwords set by cloud init
+chpasswd:
+  expire: False
+users:
+  - name: {{ qemu_default_user }}
+    ssh_authorized_keys: 
+      - {{ root_ssh_pub_key }}
+    sudo: "ALL=(ALL) NOPASSWD:ALL"
+    lock_passwd: false
+    passwd: {{ qemu_hashed_pw }}
+    shell: /bin/bash
+# todo: better integration with squid? seems to trigger before netplan and avoids squid
+package_upgrade: true
+package_update: true
+packages:
+  - qemu-guest-agent
+  # need these two for keyboard.layout to work
+  - console-setup
+  - keyboard-configuration
+keyboard:
+  layout: {{ qemu_keyboard_layout }}
+runcmd:
+  - systemctl start qemu-guest-agent
+{% if squid_cache_settings.enabled %}
+ca_certs:
+  trusted:
+    - |
+      {{ pve_cloud_secrets_map['slop_squid_ca.crt'] | b64decode | indent(6) }}
+
+{% endif %}

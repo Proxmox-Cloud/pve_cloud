@@ -1,0 +1,18 @@
+title: "Schema ext setup_kea playbook"
+properties:
+  lxcs:
+    items:
+      required:
+        - vars
+      properties:
+        parameters:
+          properties:
+            net0:
+              pattern: "\\bname=pve\\b"
+        vars:
+          required:
+            - kea_dhcp_main
+          properties:
+            kea_dhcp_main:
+              description: "Determines the lxc that will be the dhcp master instance. One lxc should be set to true, the other to false."
+              type: boolean

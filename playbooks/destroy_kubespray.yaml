@@ -1,0 +1,118 @@
+- name: Delete nodes
+  hosts: target_pve
+  roles:
+    - slurp_cluster_secrets
+  tasks:
+    - name: Get existing vms
+      command: pvesh get /cluster/resources --type vm --output-format json
+      register: pve_vms
+
+    - set_fact:
+        stack_vms: "{{ pve_vms.stdout | from_json | selectattr('tags', 'defined') | selectattr('tags', 'search', stack_name + '.' + pve_cloud_domain) | list }}"
+
+    - name: Delete qemus
+      ansible.builtin.shell: |
+        qm stop {{ vm_id }}
+        while qm status {{ vm_id }} | grep -q "status: running"; do
+          echo "Waiting for vm to stop..."
+          sleep 2
+        done
+        qm destroy {{ vm_id }} --purge
+      ignore_errors: true
+      loop: "{{ stack_vms }}"
+      vars:
+        vm_id: "{{ item['vmid'] }}"
+      when: inventory_hostname == item['node'] + "." + pve_cluster
+
+    - name: Reload inventory to get created lxcs for next play
+      meta: refresh_inventory
+
+
+- name: Delete postgres config and dns records
+  hosts: localhost
+  tags:
+    - config
+  roles:
+    - parse_cluster_secrets
+    - set_kube_dns_records # will delete records since after reload nodes are empty
+  tasks:
+    - name: wipe kea reservations
+      alchemy_delete:
+        pg_conn_str: "{{ pg_conn_str }}"
+        table: kea_reservations
+        where:
+          stack_fqdn: "{{ stack_name }}.{{ pve_cloud_domain }}"
+
+    - name: wipe k8s masters
+      alchemy_delete:
+        pg_conn_str: "{{ pg_conn_str }}"
+        table: k8s_masters
+        where:
+          stack_fqdn: "{{ stack_name }}.{{ pve_cloud_domain }}"
+
+    - name: wipe k8s workers
+      alchemy_delete:
+        pg_conn_str: "{{ pg_conn_str }}"
+        table: k8s_workers
+        where:
+          stack_fqdn: "{{ stack_name }}.{{ pve_cloud_domain }}"
+
+    - name: wipe bind domains
+      alchemy_delete:
+        pg_conn_str: "{{ pg_conn_str }}"
+        table: bind_domains
+        where:
+          stack_fqdn: "{{ stack_name }}.{{ pve_cloud_domain }}"
+
+    - name: clear ingress domains
+      alchemy_delete:
+        pg_conn_str: "{{ pg_conn_str }}"
+        table: k8s_ingress_rules
+        where:
+          stack_fqdn: "{{ stack_name }}.{{ pve_cloud_domain }}"
+
+    - name: clear tcp proxies
+      alchemy_delete:
+        pg_conn_str: "{{ pg_conn_str }}"
+        table: k8s_tcp_proxies
+        where:
+          stack_fqdn: "{{ stack_name }}.{{ pve_cloud_domain }}"
+
+    - name: clear external controlplane defs
+      alchemy_delete:
+        pg_conn_str: "{{ pg_conn_str }}"
+        table: k8s_ext_control_planes
+        where:
+          stack_fqdn: "{{ stack_name }}.{{ pve_cloud_domain }}"
+
+
+# refresh cloud services
+- name: Fetch ha-postgres
+  hosts: postgres_stack
+
+- name: Refresh HAproxies
+  hosts: proxy_stack
+  vars:
+    proxy_stack_fqdn: "{{ static_includes.proxy_stack }}"
+  roles:
+    - parse_cluster_secrets
+    - select_haproxy_conf
+    - apply_haproxy_conf
+
+- name: Kea reservations
+  hosts: dhcp_stack
+  roles:
+    - parse_cluster_secrets
+    - select_kea_conf
+    - apply_kea_dhcp4_conf
+
+- name: Bind domains
+  hosts: bind_stack
+  roles:
+    - parse_cluster_secrets
+    - apply_core_bind_conf
+  tasks:
+    - name: Restart bind
+      ansible.builtin.service:
+        name: bind9
+        state: restarted 

@@ -1,0 +1,26 @@
+title: "Schema ext setup_ceph_kea playbook"
+properties:
+  lxcs:
+    items:
+      required:
+        - vars
+      properties:
+        parameters:
+          properties:
+            net0:
+              pattern: "\\bname=pve\\b"
+            net1:
+              pattern: "\\bname=cephfe\\b"
+        vars:
+          required:
+            - kea_dhcp_ceph_frontend_subnet
+            - kea_dhcp_ceph_frontend_pool
+          properties:
+            kea_dhcp_ceph_frontend_subnet:
+              type: string
+              description: "Optional definition for a seperate dhcp if the ceph frontend resides on a different interface (map it inside the dhcp lxcs to pve0)."
+            kea_dhcp_ceph_frontend_pool:
+              type: string
+              description: "Pool for ceph frontend ip allocations, this way monitors can have their static block."
+              examples:
+                - "10.255.22.17 - 10.255.23.254"

@@ -1,0 +1,131 @@
+- name: Slurp certificates from pve + validate cloud services
+  hosts: target_pve
+  tags:
+    - setup
+    - config
+  pre_tasks:
+    - name: Fail if not dns service in pve_unique_cloud_services
+      fail:
+        msg: "This cluster was not selected to host cloud dhcp service: {{ pve_clusters[pve_cluster].pve_unique_cloud_services }}"
+      when: not 'dhcp' in pve_clusters[pve_cluster].pve_unique_cloud_services
+  roles:
+    - slurp_cluster_secrets
+ 
+- name: Setup ha kea dhcp
+  hosts: lxcs
+  roles:
+    - parse_cluster_secrets
+  tags:
+    - setup
+  tasks:
+    - name: install requirements
+      ansible.builtin.apt:
+        update_cache: yes
+        pkg:
+        - curl
+
+    - name: isc sources
+      ansible.builtin.shell: |
+        curl -1sLf 'https://dl.cloudsmith.io/public/isc/kea-2-6/cfg/setup/bash.deb.sh' | bash
+        touch /root/isc.sources
+      args:
+        creates: /root/isc.sources
+
+    - name: isc install
+      ansible.builtin.apt:
+        update_cache: yes
+        pkg:
+        - isc-kea
+        - isc-kea-ctrl-agent
+        - isc-kea-hooks
+        - isc-kea-common
+        - isc-kea-admin
+        - isc-kea-dhcp-ddns
+      
+    - name: Disable dhcp v6
+      ansible.builtin.service:
+        name: isc-kea-dhcp6-server
+        enabled: false
+        state: stopped
+
+    - name: Copy CA
+      copy:
+        content: "{{ pve_cloud_secrets_map['dhcp_CA.crt'] | b64decode }}"
+        dest: /usr/lib/x86_64-linux-gnu/kea/CA.crt
+    - name: Copy key
+      copy:
+        content: "{{ pve_cloud_secrets_map[('main' if kea_dhcp_main else 'failover') + '_dhcp.key'] | b64decode }}"
+        dest: "/usr/lib/x86_64-linux-gnu/kea/{{ 'main' if kea_dhcp_main else 'failover' }}_dhcp.key"
+    - name: Copy cert
+      copy:
+        content: "{{ pve_cloud_secrets_map[('main' if kea_dhcp_main else 'failover') + '_dhcp.crt'] | b64decode }}"
+        dest: "/usr/lib/x86_64-linux-gnu/kea/{{ 'main' if kea_dhcp_main else 'failover' }}_dhcp.crt"
+
+    - name: Make sure dhcp started and enabled
+      ansible.builtin.service:
+        name: isc-kea-dhcp4-server
+        state: started
+        enabled: true
+        
+    - name: Make sure agent started and enabled
+      ansible.builtin.service:
+        name: isc-kea-ctrl-agent
+        state: started
+        enabled: true
+
+- name: Configure dhcp
+  hosts: lxcs
+  roles:
+    - parse_cluster_secrets
+  tags:
+    - config
+  tasks:
+    - name: Check if haproxy is already running
+      wait_for:
+        host: "{{ pve_haproxy_floating_ip_internal }}"
+        port: 5000
+        timeout: 5
+        state: started
+      register: postgres_connection_check
+      ignore_errors: yes
+
+    # apply migrations here too, this is after initial bootstrap the first place the orm is needed  
+    - name: apply kea migrations (on consecutive applies)
+      delegate_to: localhost
+      alchemy_migrate:
+        pg_conn_str: "{{ pg_conn_str }}"  
+      when: postgres_connection_check is succeeded
+
+    - name: Try fetch config from postgres (on consecutive applies)
+      include_role:
+        name: select_kea_conf
+      when: postgres_connection_check is succeeded
+
+    # this will be later called regulary and dynamically filled with variables
+    - include_role:
+        name: apply_kea_dhcp4_conf
+    # the rest is static based on the initial dhcp config inv
+    # ddns
+    - name: Copy ddns conf
+      ansible.builtin.template:
+        src: ./kea-dhcp-ddns.conf.j2
+        dest: /etc/kea/kea-dhcp-ddns.conf
+    - name: Restart ddns server
+      ansible.builtin.service:
+        name: isc-kea-dhcp-ddns-server
+        state: restarted
+        enabled: true
+    # ctrl agent => will need for stork?
+    - name: Copy ctrl agent conf
+      ansible.builtin.template:
+        src: ./kea-ctrl-agent.conf.j2
+        dest: /etc/kea/kea-ctrl-agent.conf    
+    - name: Restart ctrl agent with retry
+      ansible.builtin.service:
+        name: isc-kea-ctrl-agent
+        state: restarted
+        enabled: true
+      register: result
+      until: result is succeeded
+      retries: 3
+      delay: 5

@@ -1,0 +1,29 @@
+- name: Destroy lxcs
+  hosts: target_pve
+  vars:
+    vm_type: "lxc" # static key for triggering lxc creation logic
+  roles:
+    - slurp_cluster_secrets
+  tasks:
+    - name: Get existing vms
+      command: pvesh get /cluster/resources --type vm --output-format json
+      register: pve_vms
+
+    - set_fact:
+        stack_vms: "{{ pve_vms.stdout | from_json | selectattr('tags', 'defined') | selectattr('tags', 'search', stack_name + '.' + pve_cloud_domain) | list }}"
+
+    - name: Delete lxcs
+      ansible.builtin.shell: |
+        # stop and wait for stopped
+        pct stop {{ lxc_id }}
+        while pct status {{ lxc_id }} | grep -q "status: running"; do
+          echo "Waiting for container to stop..."
+          sleep 2
+        done
+        # purge delete (if the container is in an ha group)
+        pct destroy {{ lxc_id }} --purge
+      ignore_errors: true
+      loop: "{{ stack_vms }}"
+      vars:
+        lxc_id: "{{ item['vmid'] }}"
+      when: inventory_hostname == item['node'] + "." + pve_cluster

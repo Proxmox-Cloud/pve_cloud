@@ -1,0 +1,67 @@
+{
+"DhcpDdns":
+{
+  "ip-address": "127.0.0.1",
+  "port": 53001,
+  "control-socket": {
+      "socket-type": "unix",
+      "socket-name": "/var/run/kea/kea-ddns-ctrl-socket"
+  },
+  "tsig-keys": [
+    {
+        "name": "internal.",
+        "algorithm": "HMAC-SHA256",
+        "secret": "{{ bind_internal_key }}"
+    }
+  ],
+  "forward-ddns": {
+    "ddns-domains": [
+        {
+            "name": "{{ pve_cloud_domain }}.",
+            "key-name": "internal.",
+            "dns-servers": [
+                {
+                    "ip-address": "{{ bind_master_ip }}",
+                    "port": 53
+                }
+            ]
+        }
+    ]
+  },
+  "reverse-ddns" : {
+    "ddns-domains": [
+{% for arpa_zone in bind_additional_arpa_zones + [bind_arpa_zone_service_lxcs] %}
+        {
+            "name": "{{ arpa_zone }}.",
+            "key-name": "internal.",
+            "dns-servers": [
+                {
+                    "ip-address": "{{ bind_master_ip }}",
+                    "port": 53
+                }
+            ]
+        }{% if not loop.last %},{% endif %}
+{% endfor %}
+    ]  
+  },
+
+
+  "loggers": [
+    {
+        "name": "kea-dhcp-ddns",
+        "output-options": [
+            {
+                "output": "stdout",
+
+                "pattern": "%-5p %m\n"
+            }
+        ],
+        // This specifies the severity of log messages to keep. Supported values
+        // are: FATAL, ERROR, WARN, INFO, DEBUG
+        "severity": "INFO",
+
+        "debuglevel": 0
+    }
+  ]
+}
+}

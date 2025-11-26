@@ -1,0 +1,223 @@
+global
+        log /dev/log    local0
+        log /dev/log    local1 notice
+        chroot /var/lib/haproxy
+        stats socket /run/haproxy/admin.sock mode 660 level admin expose-fd listeners
+        stats timeout 30s
+        user haproxy
+        group haproxy
+        daemon
+
+        # Default SSL material locations
+        ca-base /etc/ssl/certs
+        crt-base /etc/ssl/private
+
+        # See: https://ssl-config.mozilla.org/#server=haproxy&server-version=2.0.3&config=intermediate
+        ssl-default-bind-ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384
+        ssl-default-bind-ciphersuites TLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256
+        ssl-default-bind-options ssl-min-ver TLSv1.2 no-tls-tickets
+
+
+# we need this for ddns, hosts might not instantly have dns records
+# since they only get one after dhclient sends a request
+resolvers pve-cloud-dns
+    nameserver dns1 {{ bind_master_ip }}:53
+    nameserver dns2 {{ bind_slave_ip }}:53
+    resolve_retries       3
+    timeout retry         1s
+    hold valid            10s
+
+
+defaults
+        log     global
+        mode    http
+        option  httplog
+        option  dontlognull
+        timeout connect 5000
+        timeout client  50000
+        timeout server  50000
+        errorfile 400 /etc/haproxy/errors/400.http
+        errorfile 403 /etc/haproxy/errors/403.http
+        errorfile 408 /etc/haproxy/errors/408.http
+        errorfile 500 /etc/haproxy/errors/500.http
+        errorfile 502 /etc/haproxy/errors/502.http
+        errorfile 503 /etc/haproxy/errors/503.http
+        errorfile 504 /etc/haproxy/errors/504.http
+        # added this to allow startup if even if not all backends can be resolved
+        # also add default pve cloud resolver
+        default-server init-addr last,libc,none resolvers pve-cloud-dns
+
+
+frontend haproxy-statistics
+        bind {{ pve_haproxy_floating_ip_internal }}:1936
+        mode http
+        stats uri /stats
+        stats show-legends
+        option dontlog-normal
+
+
+# access to ha postgres (state store/orm for pve cloud)
+listen ha-postgres
+        mode tcp
+        bind {{ pve_haproxy_floating_ip_internal }}:5000
+        
+        # logic for selecting current master
+        option httpchk
+        http-check expect status 200
+        default-server inter 3s fall 3 rise 2 on-marked-down shutdown-sessions
+
+{% for host in groups['postgres_stack'] %}
+        server {{ hostvars[host].ansible_hostname }} {{ hostvars[host].ansible_hostname }}.{{ pve_cloud_domain }}:5432 maxconn 100 check port 8008
+{% endfor %}
+
+
+# generic https ingress for k8s clusters
+frontend k8s-ingress-internal
+        mode tcp
+        bind {{ pve_haproxy_floating_ip_internal }}:443
+
+        # Extract SNI (Server Name Indication)
+        tcp-request inspect-delay 5s
+        tcp-request content accept if { req_ssl_hello_type 1 }
+
+        # internal get all ingress rules
+{% for ingress_rule in k8s_ingress_rules.query_result | sort(attribute='rule_len', reverse=true) %}
+        use_backend k8s-ingress_{{ ingress_rule.stack_fqdn }} if { req.ssl_sni -m reg ^{{ ingress_rule.name | regex_replace('\.', '\\.') | regex_replace('\\*', '.*')  }}\.{{ ingress_rule.zone | regex_replace('\.', '\\.') }}$ }
+{% endfor %}
+
+
+# specific external floating ip for access control
+frontend k8s-ingress-external
+        mode tcp
+        bind {{ pve_haproxy_floating_ip }}:443
+
+        # Extract SNI (Server Name Indication)
+        tcp-request inspect-delay 5s
+        tcp-request content accept if { req_ssl_hello_type 1 }
+
+        # external gets only rules specifically declared for external
+{% for ingress_rule in k8s_ingress_rules.query_result | sort(attribute='rule_len', reverse=true) if ingress_rule.external %}
+        use_backend k8s-ingress_{{ ingress_rule.stack_fqdn }} if { req.ssl_sni -m reg ^{{ ingress_rule.name | regex_replace('\.', '\\.') | regex_replace('\\*', '.*')  }}\.{{ ingress_rule.zone | regex_replace('\.', '\\.') }}$ }
+{% endfor %}
+
+
+# create https backend for all cluster stacks
+{% for stack_fqdn, workers in grouped_k8s_workers.items() %}
+backend k8s-ingress_{{ stack_fqdn }}
+        mode tcp
+{% for worker in workers %}
+        server {{ worker.hostname }} {{ worker.ip }}:443 check
+{% endfor %}
+
+
+{% endfor %}
+
+{% if auto_http_redirect %}
+# this is the default prod mode
+frontend https-redirect
+    mode http
+    bind :80
+    http-request redirect scheme https unless { ssl_fc }
+{% else %}
+# this is for testing environments for now, in the future this might turn into a full feature
+# where you can toggle it for domains so normal redirect still works
+frontend k8s-ingress-http
+        mode tcp
+        bind {{ pve_haproxy_floating_ip_internal }}:80
+
+        # internal get all ingress rules
+{% for ingress_rule in k8s_ingress_rules.query_result | sort(attribute='rule_len', reverse=true) %}
+        use_backend k8s-ingress-http_{{ ingress_rule.stack_fqdn }} if { hdr(host) -m reg ^{{ ingress_rule.name | regex_replace('\.', '\\.') | regex_replace('\\*', '.*')  }}\.{{ ingress_rule.zone | regex_replace('\.', '\\.') }}$ }
+{% endfor %}
+
+
+# create backend for all cluster stacks
+{% for stack_fqdn, workers in grouped_k8s_workers.items() %}
+backend k8s-ingress-http_{{ stack_fqdn }}
+        mode tcp
+{% for worker in workers %}
+        server {{ worker.hostname }} {{ worker.ip }}:80 check
+{% endfor %}
+
+
+{% endfor %}
+
+{% endif %}
+
+# we also expose the controlplane via our proxy to provide ha
+frontend k8s-control-plane-internal
+        mode tcp
+        bind {{ pve_haproxy_floating_ip_internal }}:6443
+
+        # Extract SNI (Server Name Indication)
+        tcp-request inspect-delay 5s
+        tcp-request content accept if { req_ssl_hello_type 1 }
+
+{% for stack_fqdn in grouped_k8s_masters.keys() %}     
+        use_backend k8s-control-plane_{{ stack_fqdn }} if { req.ssl_sni -m reg ^control-plane-{{ stack_fqdn }}$ }
+{% endfor %}
+{% for control_plane in k8s_ext_control_planes.query_result %}
+{% for extra_san in control_plane.extra_sans.split(',') %}
+        use_backend k8s-control-plane_{{ control_plane.stack_fqdn }} if { req.ssl_sni -m reg ^{{ extra_san | regex_replace('\.', '\\.') }}$ }
+{% endfor %}
+{% endfor %}
+
+
+# sometimes we might want to expose the controlplane to the world wide web
+frontend k8s-control-plane-external
+        mode tcp
+        bind {{ pve_haproxy_floating_ip }}:6443
+
+        # Extract SNI (Server Name Indication)
+        tcp-request inspect-delay 5s
+        tcp-request content accept if { req_ssl_hello_type 1 }
+
+{% for control_plane in k8s_ext_control_planes.query_result %}
+{% for extra_san in control_plane.extra_sans.split(',') %}
+        use_backend k8s-control-plane_{{ control_plane.stack_fqdn }} if { req.ssl_sni -m reg ^{{ extra_san | regex_replace('\.', '\\.') }}$ }
+{% endfor %}
+{% endfor %}
+
+
+# create backend for all cluster stacks
+{% for stack_fqdn, masters in grouped_k8s_masters.items() %}
+backend k8s-control-plane_{{ stack_fqdn }}
+        mode tcp
+{% for master in masters %}
+        server {{ master.hostname }} {{ master.ip }}:6443 check
+{% endfor %}
+
+
+{% endfor %}
+
+# internal tcp proxies to k8s workers
+{% for tcp_proxy in k8s_tcp_proxies.query_result %}
+listen k8s-tcp-frontend-internal_{{ tcp_proxy.stack_fqdn }}_{{ tcp_proxy.proxy_name }}
+        mode tcp
+        bind {{ pve_haproxy_floating_ip_internal }}:{{ tcp_proxy.haproxy_port }}
+
+{% if tcp_proxy.proxy_snippet %}
+        {{ tcp_proxy.proxy_snippet | indent(8) }}
+{% endif %}
+{% for worker in grouped_k8s_workers[tcp_proxy.stack_fqdn] %}
+        server {{ worker.hostname }} {{ worker.ip }}:{{ tcp_proxy.node_port }} check
+{% endfor %}
+
+
+{% endfor %}
+
+# external tcp proxies to k8s workers
+{% for tcp_proxy in k8s_tcp_proxies.query_result if tcp_proxy.external %}
+listen k8s-tcp-frontend-external_{{ tcp_proxy.stack_fqdn }}_{{ tcp_proxy.proxy_name }}
+        mode tcp
+        bind {{ pve_haproxy_floating_ip }}:{{ tcp_proxy.haproxy_port }}
+
+{% if tcp_proxy.proxy_snippet %}
+        {{ tcp_proxy.proxy_snippet | indent(8) }}
+{% endif %}
+{% for worker in grouped_k8s_workers[tcp_proxy.stack_fqdn] %}
+        server {{ worker.hostname }} {{ worker.ip }}:{{ tcp_proxy.node_port }} check
+{% endfor %}
+
+
+{% endfor %}

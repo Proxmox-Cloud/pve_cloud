@@ -1,0 +1,14 @@
+- name: Slurp secrets 
+  hosts: target_pve
+  roles:
+    - slurp_cluster_secrets
+    
+# Acme certificates
+- name: Acme 
+  hosts: localhost
+  roles:
+    - pve.cloud.parse_cluster_secrets
+  tasks:
+    - include_role:
+        name: pve.cloud.apply_acme_certs
+      when: acme_method is defined and cluster_cert_entries | length > 0

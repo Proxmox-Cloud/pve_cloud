@@ -1,0 +1,11 @@
+---
+qemu_root_parameters:
+  ide2: "none,media=cdrom" # cloud init drive
+  ostype: l26 # 5x kernel
+  scsihw: virtio-scsi-single
+  agent: 1
+  cpu: host
+
+
+ceph_ethernet_cinit: 
+  network: {}

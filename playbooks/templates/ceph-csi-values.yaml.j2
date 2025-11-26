@@ -1,0 +1,40 @@
+csiConfig:
+  - clusterID: "{{ pve_cloud_secrets_map['ceph_fsid'] }}"
+    monitors: 
+      # todo: make default port configurable?
+{% for monitor in pve_ceph_monitors %}
+      - "{{ monitor }}:6789"
+{% endfor %}
+      
+secret:
+  create: true
+  userID: admin
+  userKey: "{{ pve_cloud_secrets_map['ceph_key'] }}"
+
+provisioner:
+  replicaCount: 1
+  # deploy on control plane to ensure running even if oom
+  nodeSelector:
+    node-role.kubernetes.io/control-plane: ""
+  tolerations:
+    - key: "node-role.kubernetes.io/control-plane"
+      operator: "Exists"
+      effect: "NoSchedule"
+
+nodeplugin:
+  tolerations:
+    # derived from kubespray node_taints of each worker node
+{% for collected_taint in (collected_node_taints | flatten) %}
+    - key: "{{ (collected_taint | split('='))[0] }}"
+      value: "{{ ((collected_taint | split('='))[1] | split(':'))[0] }}"
+      effect: "{{ ((collected_taint | split('='))[1] | split(':'))[1] }}"
+{% endfor %}
+  plugin:
+    # fix request memory to make oom less likely
+    resources:
+      requests:
+        memory: "512Mi"
+
+
+CSIDriver:
+  fsGroupPolicy: "ReadWriteOnceWithFSType"

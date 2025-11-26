@@ -1,0 +1,17 @@
+__pycache__
+.vscode
+.venv
+tests/output
+tests/integration/inventory
+py_pve_cloud.egg-info
+dist
+build
+pve-cloud.tar.gz
+pve-cloud*.tar.gz
+context
+.pytest_cache
+artifacts
+env/extravars
+.test-kubeconfig.yaml
+.envrc
+tdd-requirements.yml

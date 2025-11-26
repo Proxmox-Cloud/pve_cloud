@@ -1,0 +1,21 @@
+---
+# tasks file for adjust_networkd_oom_score
+- name: Ensure OOMScoreAdjust=-1000 is set
+  ansible.builtin.lineinfile:
+    path: /lib/systemd/system/systemd-networkd.service
+    regexp: '^OOMScoreAdjust='
+    line: 'OOMScoreAdjust=-1000'
+    insertafter: '^\[Service\]'
+    state: present
+  register: oom_adjust
+
+- name: Reload systemd daemon if service file changed
+  ansible.builtin.systemd:
+    daemon_reload: yes
+  when: oom_adjust.changed
+
+- name: Restart systemd-networkd if service file changed
+  ansible.builtin.systemd:
+    name: systemd-networkd
+    state: restarted
+  when: oom_adjust.changed

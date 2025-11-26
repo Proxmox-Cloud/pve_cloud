@@ -1,0 +1,14 @@
+- name: Sync nodes
+  hosts: localhost
+  tags:
+    - create
+  tasks:
+    - blakes_for_inv:
+        vms: "{{ lxcs }}"
+      register: result
+      run_once: true
+      when: lxcs is defined
+    - debug:
+        var: result.blakes
+      run_once: true
+      when: lxcs is defined

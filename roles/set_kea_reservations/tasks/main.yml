@@ -1,0 +1,22 @@
+---
+# tasks file for set_kea_reservations
+# wipe stack reservations once (for this and the next play enough)
+- name: wipe kea reservations
+  delegate_to: localhost
+  run_once: true
+  alchemy_delete:
+    pg_conn_str: "{{ pg_conn_str }}"
+    table: kea_reservations
+    where:
+      stack_fqdn: "{{ stack_name }}.{{ pve_cloud_domain }}"
+
+- name: insert kea cp reservations
+  delegate_to: localhost
+  alchemy_write:
+    pg_conn_str: "{{ pg_conn_str }}"
+    table: kea_reservations
+    rows:
+      - ip: "{{ ansible_default_ipv4.address }}"
+        mac: "{{ ansible_default_ipv4.macaddress }}"
+        hostname: "{{ ansible_fqdn }}"
+        stack_fqdn: "{{ stack_name }}.{{ pve_cloud_domain }}"

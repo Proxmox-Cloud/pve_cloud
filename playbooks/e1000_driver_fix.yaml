@@ -1,0 +1,19 @@
+- name: Old nic fix
+  hosts: all_pve_hosts
+  tasks:
+    - name: Add post-up and pre-down commands to iface vmbr0 inet static
+      blockinfile:
+        path: /etc/network/interfaces
+        marker: "        # {mark} FIX BLOCK {{ item }}"
+        insertafter: "^iface vmbr0 inet static"
+        block: |
+          {% filter indent(width=8, first=true) %}
+          post-up ethtool -K {{ item }} tso off gso off
+          {% endfilter %}
+      when: tso_gso_fix is defined
+      loop: "{{ tso_gso_fix }}"
+
+    - name: Apply fix now
+      shell: "ethtool -K {{ item }} tso off gso off"
+      when: tso_gso_fix is defined
+      loop: "{{ tso_gso_fix }}"

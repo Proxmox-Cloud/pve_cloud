@@ -1,0 +1,22 @@
+required:
+  - static_includes
+properties:
+  static_includes:
+    additionalProperties: false
+    required:
+      - postgres_stack
+    properties:
+      postgres_stack:
+        type: string
+        description: Stack fqdn for postgres patroni stack
+  lxcs:
+    items:
+      required:
+        - vars
+      properties:
+        vars:
+          required:
+            - keepalived_master
+          properties:
+            keepalived_master:
+              type: boolean

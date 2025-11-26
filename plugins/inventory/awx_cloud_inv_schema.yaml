@@ -1,0 +1,39 @@
+type: object
+additionalProperties: false
+title: "AWX Cron Inventory"
+required:
+  - target_pve
+  - plugin
+  - pve_clusters
+properties:
+  target_pve:
+    type: string
+  plugin:
+    type: string
+    description: Id of ansible inventory plugin
+    enum:
+      - pve.cloud.awx_cloud_inv
+  pve_clusters:
+    type: object
+    description: "Inventory file located in user home directory ~/.pve-inventory.yaml, containing all the pve clusters the user has access to via ssh."
+    additionalProperties: false
+    patternProperties:
+      '^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]$':
+        type: object
+        title: "PVE cluster fqdn"
+        additionalProperties: false
+        description: "The identifying cluster domain. Synonymous with target_pve. Will be appended to stack_name(s)."
+        patternProperties:
+          "^[a-z0-9][a-z0-9-]{0,61}[a-z0-9]$":
+            type: object
+            title: "PVE Node Hostname"
+            additionalProperties: false
+            description: "Hostname of a pve host (short)."
+            required:
+              - ansible_user
+              - ansible_host
+            properties:
+              ansible_user:
+                type: string
+              ansible_host:
+                type: string

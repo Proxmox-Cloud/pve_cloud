@@ -1,0 +1,28 @@
+---
+- name: Generic setup
+  hosts: all_pve_hosts 
+  tags:
+    - generic
+  tasks:
+    - name: uninstall prometheus-node-exporter
+      ansible.builtin.apt:
+        name: prometheus-node-exporter
+        state: absent
+
+    - name: uninstall pip3
+      ansible.builtin.apt:
+        name: python3-pip
+        state: absent
+
+    - name: uninstall bind9
+      ansible.builtin.apt:
+        name: bind9
+        state: absent
+
+- name: Cluster reps setup
+  hosts: pve_cluster_reps
+  tasks:
+    - name: Remove pve cloud dir from clusters 
+      ansible.builtin.file:
+        path: /etc/pve/cloud
+        state: absent

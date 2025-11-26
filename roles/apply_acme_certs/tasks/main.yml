@@ -1,0 +1,88 @@
+---
+# tasks file for cluster_acme_certs
+
+# Initial generation / update of config and cert data
+- name: generate cert config from inventory variables
+  set_fact:
+    ext_sans: "{{ (ext_sans | default([])) + ['DNS:' + item.1 + '.' + item.0.zone] }}"
+  loop: "{{ cluster_cert_entries | subelements('names') }}"
+
+- name: set apex sans
+  set_fact:
+    ext_sans: "{{ ext_sans + ['DNS:' + item.zone] }}"
+  loop: "{{ cluster_cert_entries }}"
+  when: item.apex_zone_san is defined and item.apex_zone_san
+
+- debug:
+    var: ext_sans
+
+- set_fact:
+    acme_config:
+      cn: "{{ cluster_cert_entries[0].names[0] }}.{{ cluster_cert_entries[0].zone }}"
+      san: "{{ ext_sans }}"
+      workflow: 'acme'
+
+- name: try to select existing data
+  alchemy_read:
+    pg_conn_str: "{{ pg_conn_str }}"
+    table: acme_x509
+    where:
+      stack_fqdn: "{{ stack_name }}.{{ pve_cloud_domain }}"
+  register: acme_x509_query
+
+- debug:
+    var: acme_x509_query
+
+- set_fact:
+    acme_config_changed_or_new: "{{ acme_x509_query.rowcount == 0 or acme_x509_query.query_result[0].config != acme_config}}"
+- debug:
+    var: acme_config_changed_or_new
+
+- name: generate private key if no data exists
+  register: ret_newprivkey
+  community.crypto.openssl_privatekey_pipe:
+    type: "ECC"
+    curve: "secp256r1"
+  when: acme_x509_query.rowcount == 0 # only on new
+
+- name: generate csr on init or when config changed
+  register: ret_newcsr
+  community.crypto.openssl_csr_pipe:
+    common_name: "{{ acme_config.cn }}"
+    subject_alt_name: "{{ acme_config.san | join(',') }}"
+    # on initial take generated private key, on change take privatekey from postgres record
+    privatekey_content: "{{ ret_newprivkey.privatekey if acme_x509_query.rowcount == 0 else acme_x509_query.query_result[0].ec_csr.privkey }}" 
+  when: acme_config_changed_or_new
+
+- name: compile postgres cert data on init or when changed
+  ansible.builtin.set_fact:
+    tmp_psql_csr_update:
+      privkey: "{{ ret_newprivkey.privatekey if acme_x509_query.rowcount == 0 else acme_x509_query.query_result[0].ec_csr.privkey }}" 
+      csr: "{{ ret_newcsr.csr }}"
+  when: acme_config_changed_or_new
+
+- name: upsert postgres config and cert data on init or when changed
+  alchemy_upsert:
+    pg_conn_str: "{{ pg_conn_str }}"
+    table: acme_x509
+    values:
+      stack_fqdn: "{{ stack_name }}.{{ pve_cloud_domain }}"
+      config: "{{ acme_config }}"
+      ec_csr: "{{ tmp_psql_csr_update }}"
+    conflict_cols:
+      - stack_fqdn
+  when: acme_config_changed_or_new
+
+- name: select full acme row from postgres again
+  alchemy_read:
+    pg_conn_str: "{{ pg_conn_str }}"
+    table: acme_x509
+    where:
+      stack_fqdn: "{{ stack_name }}.{{ pve_cloud_domain }}"
+  register: acme_x509_query
+
+- set_fact:
+    acme_x509: "{{ acme_x509_query.query_result[0] }}"
+
+- include_role:
+    name: pve.cloud.acme_workflow

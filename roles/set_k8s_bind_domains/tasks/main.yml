@@ -1,0 +1,22 @@
+---
+# tasks file for k8s_bind_domains
+# insert domains
+- name: wipe bind domains
+  delegate_to: localhost
+  run_once: true
+  alchemy_delete:
+    pg_conn_str: "{{ pg_conn_str }}"
+    table: bind_domains
+    where:
+      stack_fqdn: "{{ stack_name }}.{{ pve_cloud_domain }}"
+
+- name: insert bind domains
+  delegate_to: localhost
+  alchemy_write:
+    pg_conn_str: "{{ pg_conn_str }}"
+    table: bind_domains
+    rows:
+      - domain: "{{ item.zone }}"
+        stack_fqdn: "{{ stack_name }}.{{ pve_cloud_domain }}"
+  when: item.authoritative_zone is defined and item.authoritative_zone # specific flag for internal dns
+  loop: "{{ cluster_cert_entries }}"

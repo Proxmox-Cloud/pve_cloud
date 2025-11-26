@@ -1,0 +1,212 @@
+---
+- name: Generic setup
+  hosts: all_pve_hosts 
+  tags:
+    - generic
+  roles:
+    - prometheus.prometheus.systemd_exporter
+  tasks:
+    - name: install prometheus-node-exporter
+      ansible.builtin.apt:
+        name: prometheus-node-exporter
+        state: present
+    
+    # create mac iface mapping
+    - name: Create link files
+      copy:
+        dest: /etc/systemd/network/90-{{ item.iface }}.link
+        content: |
+          [Match]  
+          MACAddress={{ item.mac_addr }}
+
+          [Link]
+          Name={{ item.iface }}
+      when: mac_iface_mapping is defined
+      loop: "{{ mac_iface_mapping }}"
+      register: link_files
+    
+    - name: Update initramfs
+      command: update-initramfs -u -k all
+      when: link_files.changed
+
+    - name: Reboot
+      reboot:
+        msg: "Reboot after iface rename"
+      when: link_files.changed
+    
+    # wake on lan
+    - name: Add post-up ethtool wol enable if defined
+      blockinfile:
+        path: /etc/network/interfaces
+        marker: "        # {mark} WOL BLOCK {{ wol_iface }}"
+        insertafter: "^iface vmbr0 inet static"
+        block: |
+          {% filter indent(width=8, first=true) %}
+          post-up /usr/sbin/ethtool -s {{ wol_iface }} wol g
+          {% endfilter %}
+      when: wol_iface is defined
+
+    - name: Apply wol now
+      shell: "ethtool -s {{ wol_iface }} wol g"
+      when: wol_iface is defined
+
+    # download newest lxc templates on hosts
+    - name: Update lxc templates
+      command: "pveam update"
+    
+    # install aio files for fast slurp module
+    - name: install pip3
+      ansible.builtin.apt:
+        name: python3-pip
+        state: present
+    
+    - name: install aiofiles
+      command: pip3 install aiofiles --break-system-packages
+
+    # disable openipmi if set
+    - name: disable openipmi
+      ansible.builtin.systemd:
+        name: openipmi
+        enabled: no
+        state: stopped
+        masked: yes
+      when: disable_ipmi is defined and disable_ipmi
+
+- name: Cluster reps setup
+  hosts: pve_cluster_reps
+  tasks:
+    # install ssh trusted keys between clusters, needed for rsync
+    - name: slurp ssh pub key
+      slurp:
+        src: /root/.ssh/id_rsa.pub
+      register: slurp_pub
+    
+    - name: install keys from other hosts on host
+      lineinfile:
+        path: /root/.ssh/authorized_keys
+        line: "{{ hostvars[item].slurp_pub.content | b64decode | trim }}"
+        state: present
+      when: inventory_hostname != item
+      loop: "{{ groups['pve_cluster_reps'] }}"
+
+    # create pve cloud secret dirs
+    - name: Create a directory if it does not exist
+      ansible.builtin.file:
+        path: /etc/pve/cloud/kubespray-kubeadm-cert-keys
+        state: directory
+        recurse: yes
+
+    - name: Create a directory if it does not exist
+      ansible.builtin.file:
+        path: /etc/pve/cloud/secrets
+        state: directory
+        recurse: yes
+
+    # check if automation ssh key exists, create locally and copy if it doesnt
+    - name: Check if automation id key exists
+      ansible.builtin.stat:
+        path: /etc/pve/cloud/automation_id_ed25519
+      register: automation_id_key
+
+    - name: Generate pve cloud cluster key (used for automation access)
+      ansible.builtin.openssh_keypair:
+        path: /root/automation_id_ed25519
+        type: ed25519
+        comment: "automation@{{ pve_cluster_name }}"
+      when: not automation_id_key.stat.exists
+
+    - name: Copy to key proxmox fs, direct writing crashes
+      command: cp /root/automation_id_ed25519 /root/automation_id_ed25519.pub /etc/pve/cloud/
+      when: not automation_id_key.stat.exists
+
+    # generate bind master key
+    - name: install bind9 for tsig-keygen
+      ansible.builtin.apt:
+        update_cache: yes
+        pkg:
+          - bind9
+      when: "'dns' in cluster_vars['pve_unique_cloud_services']"
+
+    - name: generate dns access key
+      ansible.builtin.shell: |
+        tsig-keygen internal. > /etc/pve/cloud/secrets/internal.key
+      args:
+        creates: /etc/pve/cloud/secrets/internal.key
+      when: "'dns' in cluster_vars['pve_unique_cloud_services']"
+
+    # dhcp certificates, only needed on pve cluster that runs the dhcp
+    - name: generate certificates for dhcp
+      ansible.builtin.shell: |
+        cd /etc/pve/cloud/secrets
+
+        openssl genrsa -out dhcp_CA.key 2048
+        openssl req -x509 -new -nodes -key dhcp_CA.key -sha256 -days 36500 -out dhcp_CA.crt -batch
+
+        # generate certs for 2 instances
+        openssl genrsa -out main_dhcp.key 2048
+        openssl genrsa -out failover_dhcp.key 2048
+
+        openssl req -new -key main_dhcp.key -out main_dhcp.csr -batch
+        openssl req -new -key failover_dhcp.key -out failover_dhcp.csr -batch
+        
+        # openssl 3.0 requires the extfile
+        openssl x509 -req -in main_dhcp.csr -CA dhcp_CA.crt -CAkey dhcp_CA.key -CAcreateserial -out main_dhcp.crt -days 36500 -sha256 -extfile <(echo -e "[ v3_ext ]\nauthorityKeyIdentifier=keyid") -extensions v3_ext
+        openssl x509 -req -in failover_dhcp.csr -CA dhcp_CA.crt -CAkey dhcp_CA.key -CAcreateserial -out failover_dhcp.crt -days 36500 -sha256 -extfile <(echo -e "[ v3_ext ]\nauthorityKeyIdentifier=keyid") -extensions v3_ext
+      args:
+        executable: /bin/bash 
+        creates: /etc/pve/cloud/secrets/failover_dhcp.crt
+      when: "'dhcp' in cluster_vars['pve_unique_cloud_services']"
+
+    # keepalived password for the clusters proxy. generate on every cluster since every cluster might have a proxy
+    - name: generate keepalived haproxy passphrase
+      ansible.builtin.shell: |
+        openssl rand -base64 40 | tr -dc 'a-zA-Z0-9' | head -c 20 > /etc/pve/cloud/secrets/haproxy-keepalived.pass
+      args:
+        creates: /etc/pve/cloud/secrets/haproxy-keepalived.pass
+
+    # generate patroni db secret => central postgres for state and secrets
+    - name: generate patroni passphrase
+      ansible.builtin.shell: |
+        openssl rand -base64 40 | tr -dc 'a-zA-Z0-9' | head -c 20 > /etc/pve/cloud/secrets/patroni.pass
+      args:
+        creates: /etc/pve/cloud/secrets/patroni.pass
+      when: "'psql-state' in cluster_vars['pve_unique_cloud_services']"
+
+    - name: generate letsencrypt account private key
+      ansible.builtin.shell: |
+        openssl genrsa -out /etc/pve/cloud/secrets/acme-account.key 4096
+      args:
+        creates: /etc/pve/cloud/secrets/acme-account.key
+      run_once: true # will get rsynced to all pves
+
+    # set pve cluster vars
+    - name: Copy pve cluster vars
+      copy:
+        content: "{{ cluster_vars | to_nice_yaml }}"
+        dest: /opt/cluster_vars.yaml
+    
+    - name: Copy to proxmox fs, direct writing crashes
+      command: cp /opt/cluster_vars.yaml /etc/pve/cloud/cluster_vars.yaml
+
+    - name: Enable ceph metrics
+      command: ceph mgr module enable prometheus
+
+    - include_role:
+        name: slurp_cluster_secrets
+
+- name: rsync cluster reps
+  hosts: pve_cluster_reps
+  tags:
+    - rsync
+  serial: 1
+  tasks:
+    - name: rsync missing secrets
+      ansible.builtin.command: "rsync -avz --inplace --ignore-existing -e 'ssh -o StrictHostKeyChecking=no' root@{{ hostvars[item]['ansible_default_ipv4']['address'] }}:/etc/pve/cloud/secrets/ /etc/pve/cloud/secrets/"
+      loop: "{{ groups['pve_cluster_reps'] }}"
+      when: inventory_hostname != item
+      register: rsync_out
+
+    - debug:
+        msg: "{{ item.stdout_lines }}"
+      loop: "{{ rsync_out.results }}"
+      when: item.stdout_lines is defined

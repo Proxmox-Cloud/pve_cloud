@@ -1,0 +1,19 @@
+controller:
+  kind: DaemonSet
+  # allow snippets
+  allowSnippetAnnotations: true
+  config:
+    annotations-risk-level: Critical # allow snippets that contain functions that are considered unsafe
+  hostPort:
+    enabled: true
+  service:
+    enabled: false
+  extraArgs:
+    enable-ssl-passthrough: "" # we use this for keycloak since it does its own tls termination always
+  tolerations:
+    # derived from kubespray node_taints of each worker node
+{% for collected_taint in (collected_node_taints | flatten) %}
+    - key: "{{ (collected_taint | split('='))[0] }}"
+      value: "{{ ((collected_taint | split('='))[1] | split(':'))[0] }}"
+      effect: "{{ ((collected_taint | split('='))[1] | split(':'))[1] }}"
+{% endfor %}

@@ -1,0 +1,30 @@
+options {
+        directory "/var/cache/bind";
+
+        // If there is a firewall between you and nameservers you want
+        // to talk to, you may need to fix the firewall to allow multiple
+        // ports to talk.  See http://www.kb.cert.org/vuls/id/800113
+
+        // lan dns allow queries for any domain
+        allow-query { any; };
+        allow-recursion { any; };
+
+{% if bind_host_dns_as_default is defined and bind_host_dns_as_default %}
+        // use host passed dns from /etc/resolv.conf
+        forwarders {
+{% for ns in nameservers %}
+                {{ ns }};
+{% endfor %}
+        };
+{% endif %}
+
+        //========================================================================
+        // If BIND logs error messages about the root key being expired,
+        // you will need to update your keys.  See https://www.isc.org/bind-keys
+        //========================================================================
+        dnssec-validation {% if bind_disable_dnssec is defined and bind_disable_dnssec %}no{% else %}auto{% endif %};
+
+        listen-on-v6 { any; };
+
+        max-cache-size 24M;
+};

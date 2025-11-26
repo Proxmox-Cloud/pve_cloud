@@ -1,0 +1,33 @@
+- name: Create dir for lxc pub keys
+  ansible.builtin.file:
+    path: "/opt/lxc-pub-keys"
+    state: directory
+    recurse: yes
+
+- name: Write pubkey
+  ansible.builtin.copy:
+    content: "{{ root_ssh_pub_key }}"
+    dest: "/opt/lxc-pub-keys/{{ stack_name }}.{{ pve_cloud_domain }}.pub"
+
+- name: Download template
+  ansible.builtin.command: "pveam download local {{ lxc_os_template }}"
+
+- name: Get id for vm 
+  command: pvesh get /cluster/nextid
+  register: pve_id
+
+- set_fact:
+    create_cmd: "pct create {{ pve_id.stdout }} 'local:vztmpl/{{ lxc_os_template }}' --ssh-public-keys '/opt/lxc-pub-keys/{{ stack_name }}.{{ pve_cloud_domain }}.pub' --searchdomain '{{ pve_cloud_domain }}' --hostname '{{ args.hostname if 'hostname' in args else lookup('community.general.random_pet') }}-{{ stack_name }}' {% for key, value in (lxc_root_parameters | ansible.builtin.combine(lxc_base_parameters) | ansible.builtin.combine(args.parameters)).items() %}--{{ key }} '{{ value }}' {% endfor %}"
+
+- name: Debug print pct creation command
+  debug:
+    var: create_cmd
+
+- name: Create container
+  ansible.builtin.command: "{{ create_cmd }}"
+
+- name: Set tags
+  ansible.builtin.command: "pct set {{ pve_id.stdout }} --tags '{{ stack_name }}.{{ pve_cloud_domain }};{{ blake }}-blake'"
+
+- name: Start container
+  ansible.builtin.command: "pct start {{ pve_id.stdout }}"
