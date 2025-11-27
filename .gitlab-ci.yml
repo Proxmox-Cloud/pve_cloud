@@ -13,6 +13,7 @@ trigger_version_tag:
   dependencies:
     - release_tag
   script:
+    - source tag.env
     - |
       curl --request POST \
         --form "token=${CI_JOB_TOKEN}" \
