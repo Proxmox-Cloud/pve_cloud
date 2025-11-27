@@ -103,10 +103,14 @@ release_artifacts:
   stage: deploy
   image: ghcr.io/ansible/community-ansible-dev-tools:v25.11.0
   script:
+    - echo $DOCKER_AUTH_CONFIG_B64 | base64 -d > /root/.config/containers/auth.json
     - ansible-galaxy collection build
     - mv pve-cloud-$CI_COMMIT_TAG.tar.gz pve-cloud.tar.gz
-    - ansible-builder build -f cloud-ee.yaml --tag tobiashvmz/pve-cloud-ee:$CI_COMMIT_TAG
+    - ansible-builder build -f cloud-ee.yaml --tag tobiashvmz/pve-cloud-ee:$CI_COMMIT_TAG -v
+    - podman push tobiashvmz/pve-cloud-ee:$CI_COMMIT_TAG
   rules:
     - if: '$CI_COMMIT_TAG =~ /^\d+\.\d+\.\d+$/'
-
-
+  variables:
+    # building this takes insane storage requirments
+    KUBERNETES_MEMORY_REQUEST: "8Gi"
+    KUBERNETES_MEMORY_LIMIT: "12Gi"
