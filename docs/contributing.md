@@ -17,3 +17,9 @@ This makes the process of updating of different environments easier.
 ## Authentication
 
 SSH is our core layer for authentication. Most of the collection is using it in one way or another, even the terraform modules are using it to fetch secrets and authenticate with k8s.
+
+## Merging
+
+After you have tested your changes please create merge requests in the different repositories, providing cross links in all of them. If you made a change in py-pve-cloud and pve_cloud, create MRs in both and provide links in both to all related MRs. 
+
+(This is subject to change and might be replaced with a mail-based patch workflow).

@@ -71,7 +71,3 @@ pytest -s tests/e2e/test_cloud.py::test_bind --skip-cleanup
 
 If you passed `--skip-cleanup` to pytest, the kubespray tests will write a `.test-kubeconfig.yaml` file you can use for lens access to the testing cluster.
 
-## Merging
-
-After you have tested your changes please create merge requests in the different repositories, providing cross links in all of them. If you made a change in py-pve-cloud and pve_cloud, create MRs in both and provide links in both to all related MRs.
-
