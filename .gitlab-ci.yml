@@ -51,6 +51,9 @@ release_collection:
   stage: deploy
   image: alpine/git:v2.49.1
   script:
+    - git config --global user.name "$GITLAB_USER_NAME"
+    - git config --global user.email "$GITLAB_USER_EMAIL"
+    
     # update galaxy yaml
     - |
       sed -i "s/^version:\s.*$/version: $CI_COMMIT_TAG/" galaxy.yml
