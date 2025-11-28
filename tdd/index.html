@@ -664,29 +664,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../schemas/test_env_schema/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    Schema Docs
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -735,7 +712,7 @@
 <ul>
 <li>install <code>direnv</code> and activate it in your local profile (add <code>eval "$(direnv hook bash)"</code> to .bashrc)</li>
 <li>create a <code>pve-cloud</code> folder and checkout all the repositories you want to make changes to, if you checkout the ansible collections they have to be under <code>ansible_collections/pve/</code></li>
-<li>for <code>py-pve-cloud</code>, <code>pve-cloud-schemas</code> and <code>pytest-pve-cloud</code> run <code>pip install -e .</code> once / on updating the toml file for local development</li>
+<li>create a dedicated venv for pve cloud development <code>python3 -m venv ~/.pve-cloud-dev-venv</code> and activate <code>source ~/.pve-cloud-dev-venv/bin/activate</code></li>
 <li>create a test environment config yaml (you can find the schema definition in the src folder of the <a href="https://github.com/Proxmox-Cloud/pytest-pve-cloud">pytest-pve-cloud repository</a>)</li>
 <li>create a <code>.envrc</code> file with env variables stored for development</li>
 </ul>
@@ -752,10 +729,9 @@ pve-cloud-controller
 test-env-conf.yaml
 </code></pre>
 <ol>
-<li>create a dedicated venv for pve cloud development <code>python3 -m venv ~/.pve-cloud-dev-venv</code> and activate <code>source ~/.pve-cloud-dev-venv/bin/activate</code></li>
 <li>run <code>pip install pytest-pve-cloud</code>, you might need first install <code>sudo apt install build-essential python3-dev</code> (or your distros equivalent)</li>
 <li>also install the core ansible dependencies from the <a href="../bootstrap/">bootstrap section</a>, followed by <code>pip install -r meta/ee-requirements.txt</code></li>
-<li>run <code>tdd-reqs</code> clic ommand inside the pve_cloud collection and <code>ansible-galaxy install -r tdd-requirements.yml</code>, this will install all the ansible collection dependencies</li>
+<li>run <code>tdd-reqs</code> cli command inside the pve_cloud collection and <code>ansible-galaxy install -r tdd-requirements.yml</code>, this will install all the ansible collection dependencies</li>
 <li>launch local registries for watchdog rebuilds and fast deployment</li>
 </ol>
 <pre><code class="language-bash">docker run -d -p 5000:5000 --name pxc-local-registry registry:3 # local docker registry
