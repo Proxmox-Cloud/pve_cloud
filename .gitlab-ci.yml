@@ -127,7 +127,6 @@ release_artifacts:
   variables:
     # building this takes insane storage requirments
     KUBERNETES_MEMORY_REQUEST: "8Gi"
-    KUBERNETES_MEMORY_LIMIT: "12Gi"
 
 
 release_docs:
