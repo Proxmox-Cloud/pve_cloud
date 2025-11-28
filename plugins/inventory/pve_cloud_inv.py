@@ -5,6 +5,7 @@ from ansible_collections.pve.cloud.plugins.module_utils.validate import validate
 import os
 from ansible.utils.display import Display
 import socket
+import json
 
 
 display = Display()
@@ -45,6 +46,13 @@ class InventoryModule(BaseInventoryPlugin):
         # contains only one pve host per pve cluster (since it uses corosync)
         inventory.add_group('pve_cluster_reps')
 
+        # get the collection version
+        collection_path = os.path.dirname(os.path.dirname(__file__))
+        manifest_path = os.path.join(collection_path, "MANIFEST.json")
+        with open(manifest_path, "r") as f:
+            manifest = json.load(f)
+            manifest_version = manifest.get("version")
+
         # load pve clusters and set cluster variables for them
         for pve_cluster in yaml_data['pve_clusters']:
             # cluster rep group
@@ -69,9 +77,14 @@ class InventoryModule(BaseInventoryPlugin):
                 inventory.set_variable(fqdn_host, 'pve_cluster_name', pve_cluster)
 
                 # build pve cluster vars, entire yaml vars + cluster specific vars
-                inventory.set_variable(fqdn_host, "cluster_vars",  yaml_data | yaml_data['pve_clusters'][pve_cluster])
+                cluster_vars = yaml_data | yaml_data['pve_clusters'][pve_cluster]
+                
+                # add collection version to version check against
+                cluster_vars["pve_cloud_collection_version"] = version
 
-                display.v("cluster_vars",  yaml_data | yaml_data['pve_clusters'][pve_cluster])
+                inventory.set_variable(fqdn_host, "cluster_vars",  cluster_vars)
+
+                display.v("cluster_vars", cluster_vars)
                 
                 # set pve host specific vars if specified
                 if host in yaml_data['pve_clusters'][pve_cluster]['pve_host_vars']:

@@ -324,6 +324,19 @@ async def init_plugin(loader, inventory, yaml_data, plugin_dir):
 
     cluster_map = await get_cluster_map(inventory, online_pve_hosts)
     display.v("len cluster map", len(cluster_map))
+    target_cluster = cluster_map[yaml_data['target_pve']]
+
+    installed_pve_cloud_version = target_cluster.cluster_vars['pve_cloud_collection_version']
+
+    # compare installed version with version we are using, crash on missmatch
+    collection_path = os.path.dirname(os.path.dirname(__file__))
+    manifest_path = os.path.join(collection_path, "MANIFEST.json")
+    with open(manifest_path, "r") as f:
+        manifest = json.load(f)
+        manifest_version = manifest.get("version")
+
+    if installed_pve_cloud_version != manifest_version:
+        raise Exception(f"Version missmatch! Cloud version: {installed_pve_cloud_version}, local version: {manifest_version}! Please update pve_cloud on your machine / run all setup playbooks again!")
 
     build_pve_inventory(inventory, yaml_data, online_pve_hosts, cluster_map)
 
@@ -344,7 +357,6 @@ async def init_plugin(loader, inventory, yaml_data, plugin_dir):
     display.v("done running includes")
 
     # now we get to the stack specific code
-    target_cluster = cluster_map[yaml_data['target_pve']]
     stack_fqdn = f"{yaml_data['stack_name']}.{target_cluster.cluster_vars['pve_cloud_domain']}"
 
     # extract vms that belong to this stack

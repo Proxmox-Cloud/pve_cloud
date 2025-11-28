@@ -11,14 +11,6 @@ You need a development machine with the following tools/packages installed:
 
 Aswell as a proxmox cluster you have root access via ssh to the hosts.
 
-## Quickstart Samples
-
-Checkout the [samples directory](https://github.com/Proxmox-Cloud/pve_cloud/tree/master/samples) to get an idea how to structure your cloud repositories.
-
-In the `cloud-instance/` directory you will find an example of how to setup core lxcs needed for the cloud to function. 
-
-The `kubespray-cluster/` contains an example inventory for a kubespray cluster aswell as example terraform configuration for authenticating.
-
 ## Bootstrap
 
 Create a repository for your cloud instance for example company-xyz-cloud and setup your environment:

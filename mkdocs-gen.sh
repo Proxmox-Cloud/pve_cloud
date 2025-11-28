@@ -10,6 +10,7 @@ pip install -r mkdocs-requirements.txt
 # validate samples
 cd samples
 
+pcval cloud-instance/cloud-inv.yaml
 pcval cloud-instance/dhcp-inv.yaml pve.cloud.setup_kea # pass the playbook aswell to get full validation against the schema ext
 pcval cloud-instance/bind-inv.yaml pve.cloud.setup_bind
 pcval cloud-instance/proxy-inv.yaml pve.cloud.setup_haproxy
