@@ -1,0 +1,3755 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../awx_cloud_inv_schema/">
+      
+      
+        <link rel="next" href="../lxc_inv_schema/">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.21">
+    
+    
+      
+        <title>K8S Kubespray Inv. - PVE Cloud Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.2a3383ac.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#k8s-kubespray-inv" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="PVE Cloud Documentation" class="md-header__button md-logo" aria-label="PVE Cloud Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            PVE Cloud Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              K8S Kubespray Inv.
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="PVE Cloud Documentation" class="md-nav__button md-logo" aria-label="PVE Cloud Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    PVE Cloud Documentation
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    General
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../bootstrap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Setup/Bootstrap
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../kubernetes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Kubespray K8S
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tdd/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Test Driven Development
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../misc/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Miscellaneous
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Contributing
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Schemas
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            Schemas
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../awx_cloud_inv_schema/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    AWX Cron Inventory
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    K8S Kubespray Inv.
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    K8S Kubespray Inv.
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-property-k8s-kubespray-inv-target_pve" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. Property K8S Kubespray Inv. &gt; target_pve
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-property-k8s-kubespray-inv-stack_name" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Property K8S Kubespray Inv. &gt; stack_name
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-property-k8s-kubespray-inv-extra_control_plane_sans" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Property K8S Kubespray Inv. &gt; extra_control_plane_sans
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Property K8S Kubespray Inv. &gt; extra_control_plane_sans">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-k8s-kubespray-inv-extra_control_plane_sans-extra_control_plane_sans-items" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.1. K8S Kubespray Inv. &gt; extra_control_plane_sans &gt; extra_control_plane_sans items
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-property-k8s-kubespray-inv-external_domains" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. Property K8S Kubespray Inv. &gt; external_domains
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Property K8S Kubespray Inv. &gt; external_domains">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41-k8s-kubespray-inv-external_domains-external_domains-items" class="md-nav__link">
+    <span class="md-ellipsis">
+      4.1. K8S Kubespray Inv. &gt; external_domains &gt; external_domains items
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4.1. K8S Kubespray Inv. &gt; external_domains &gt; external_domains items">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#411-property-k8s-kubespray-inv-external_domains-external_domains-items-zone" class="md-nav__link">
+    <span class="md-ellipsis">
+      4.1.1. Property K8S Kubespray Inv. &gt; external_domains &gt; external_domains items &gt; zone
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#412-property-k8s-kubespray-inv-external_domains-external_domains-items-expose_tld" class="md-nav__link">
+    <span class="md-ellipsis">
+      4.1.2. Property K8S Kubespray Inv. &gt; external_domains &gt; external_domains items &gt; expose_tld
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#413-property-k8s-kubespray-inv-external_domains-external_domains-items-names" class="md-nav__link">
+    <span class="md-ellipsis">
+      4.1.3. Property K8S Kubespray Inv. &gt; external_domains &gt; external_domains items &gt; names
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4.1.3. Property K8S Kubespray Inv. &gt; external_domains &gt; external_domains items &gt; names">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#4131-k8s-kubespray-inv-external_domains-external_domains-items-names-names-items" class="md-nav__link">
+    <span class="md-ellipsis">
+      4.1.3.1. K8S Kubespray Inv. &gt; external_domains &gt; external_domains items &gt; names &gt; names items
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-property-k8s-kubespray-inv-cluster_cert_entries" class="md-nav__link">
+    <span class="md-ellipsis">
+      5. Property K8S Kubespray Inv. &gt; cluster_cert_entries
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Property K8S Kubespray Inv. &gt; cluster_cert_entries">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#51-k8s-kubespray-inv-cluster_cert_entries-cluster_cert_entries-items" class="md-nav__link">
+    <span class="md-ellipsis">
+      5.1. K8S Kubespray Inv. &gt; cluster_cert_entries &gt; cluster_cert_entries items
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5.1. K8S Kubespray Inv. &gt; cluster_cert_entries &gt; cluster_cert_entries items">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#511-property-k8s-kubespray-inv-cluster_cert_entries-cluster_cert_entries-items-zone" class="md-nav__link">
+    <span class="md-ellipsis">
+      5.1.1. Property K8S Kubespray Inv. &gt; cluster_cert_entries &gt; cluster_cert_entries items &gt; zone
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#512-property-k8s-kubespray-inv-cluster_cert_entries-cluster_cert_entries-items-names" class="md-nav__link">
+    <span class="md-ellipsis">
+      5.1.2. Property K8S Kubespray Inv. &gt; cluster_cert_entries &gt; cluster_cert_entries items &gt; names
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5.1.2. Property K8S Kubespray Inv. &gt; cluster_cert_entries &gt; cluster_cert_entries items &gt; names">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#5121-k8s-kubespray-inv-cluster_cert_entries-cluster_cert_entries-items-names-names-items" class="md-nav__link">
+    <span class="md-ellipsis">
+      5.1.2.1. K8S Kubespray Inv. &gt; cluster_cert_entries &gt; cluster_cert_entries items &gt; names &gt; names items
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#513-property-k8s-kubespray-inv-cluster_cert_entries-cluster_cert_entries-items-authoritative_zone" class="md-nav__link">
+    <span class="md-ellipsis">
+      5.1.3. Property K8S Kubespray Inv. &gt; cluster_cert_entries &gt; cluster_cert_entries items &gt; authoritative_zone
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#514-property-k8s-kubespray-inv-cluster_cert_entries-cluster_cert_entries-items-apex_zone_san" class="md-nav__link">
+    <span class="md-ellipsis">
+      5.1.4. Property K8S Kubespray Inv. &gt; cluster_cert_entries &gt; cluster_cert_entries items &gt; apex_zone_san
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-property-k8s-kubespray-inv-tcp_proxies" class="md-nav__link">
+    <span class="md-ellipsis">
+      6. Property K8S Kubespray Inv. &gt; tcp_proxies
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Property K8S Kubespray Inv. &gt; tcp_proxies">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#61-k8s-kubespray-inv-tcp_proxies-tcp_proxies-items" class="md-nav__link">
+    <span class="md-ellipsis">
+      6.1. K8S Kubespray Inv. &gt; tcp_proxies &gt; tcp_proxies items
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6.1. K8S Kubespray Inv. &gt; tcp_proxies &gt; tcp_proxies items">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#611-property-k8s-kubespray-inv-tcp_proxies-tcp_proxies-items-proxy_name" class="md-nav__link">
+    <span class="md-ellipsis">
+      6.1.1. Property K8S Kubespray Inv. &gt; tcp_proxies &gt; tcp_proxies items &gt; proxy_name
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#612-property-k8s-kubespray-inv-tcp_proxies-tcp_proxies-items-haproxy_port" class="md-nav__link">
+    <span class="md-ellipsis">
+      6.1.2. Property K8S Kubespray Inv. &gt; tcp_proxies &gt; tcp_proxies items &gt; haproxy_port
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#613-property-k8s-kubespray-inv-tcp_proxies-tcp_proxies-items-node_port" class="md-nav__link">
+    <span class="md-ellipsis">
+      6.1.3. Property K8S Kubespray Inv. &gt; tcp_proxies &gt; tcp_proxies items &gt; node_port
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#614-property-k8s-kubespray-inv-tcp_proxies-tcp_proxies-items-proxy_snippet" class="md-nav__link">
+    <span class="md-ellipsis">
+      6.1.4. Property K8S Kubespray Inv. &gt; tcp_proxies &gt; tcp_proxies items &gt; proxy_snippet
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#615-property-k8s-kubespray-inv-tcp_proxies-tcp_proxies-items-external" class="md-nav__link">
+    <span class="md-ellipsis">
+      6.1.5. Property K8S Kubespray Inv. &gt; tcp_proxies &gt; tcp_proxies items &gt; external
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-property-k8s-kubespray-inv-static_includes" class="md-nav__link">
+    <span class="md-ellipsis">
+      7. Property K8S Kubespray Inv. &gt; static_includes
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. Property K8S Kubespray Inv. &gt; static_includes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#71-property-k8s-kubespray-inv-static_includes-dhcp_stack" class="md-nav__link">
+    <span class="md-ellipsis">
+      7.1. Property K8S Kubespray Inv. &gt; static_includes &gt; dhcp_stack
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#72-property-k8s-kubespray-inv-static_includes-proxy_stack" class="md-nav__link">
+    <span class="md-ellipsis">
+      7.2. Property K8S Kubespray Inv. &gt; static_includes &gt; proxy_stack
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#73-property-k8s-kubespray-inv-static_includes-postgres_stack" class="md-nav__link">
+    <span class="md-ellipsis">
+      7.3. Property K8S Kubespray Inv. &gt; static_includes &gt; postgres_stack
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#74-property-k8s-kubespray-inv-static_includes-bind_stack" class="md-nav__link">
+    <span class="md-ellipsis">
+      7.4. Property K8S Kubespray Inv. &gt; static_includes &gt; bind_stack
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#75-property-k8s-kubespray-inv-static_includes-cache_stack" class="md-nav__link">
+    <span class="md-ellipsis">
+      7.5. Property K8S Kubespray Inv. &gt; static_includes &gt; cache_stack
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-property-k8s-kubespray-inv-include_stacks" class="md-nav__link">
+    <span class="md-ellipsis">
+      8. Property K8S Kubespray Inv. &gt; include_stacks
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. Property K8S Kubespray Inv. &gt; include_stacks">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#81-k8s-kubespray-inv-include_stacks-include_stacks-items" class="md-nav__link">
+    <span class="md-ellipsis">
+      8.1. K8S Kubespray Inv. &gt; include_stacks &gt; include_stacks items
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8.1. K8S Kubespray Inv. &gt; include_stacks &gt; include_stacks items">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#811-property-k8s-kubespray-inv-include_stacks-include_stacks-items-stack_fqdn" class="md-nav__link">
+    <span class="md-ellipsis">
+      8.1.1. Property K8S Kubespray Inv. &gt; include_stacks &gt; include_stacks items &gt; stack_fqdn
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#812-property-k8s-kubespray-inv-include_stacks-include_stacks-items-host_group" class="md-nav__link">
+    <span class="md-ellipsis">
+      8.1.2. Property K8S Kubespray Inv. &gt; include_stacks &gt; include_stacks items &gt; host_group
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#813-property-k8s-kubespray-inv-include_stacks-include_stacks-items-qemu_ansible_user" class="md-nav__link">
+    <span class="md-ellipsis">
+      8.1.3. Property K8S Kubespray Inv. &gt; include_stacks &gt; include_stacks items &gt; qemu_ansible_user
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-property-k8s-kubespray-inv-qemus" class="md-nav__link">
+    <span class="md-ellipsis">
+      9. Property K8S Kubespray Inv. &gt; qemus
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="9. Property K8S Kubespray Inv. &gt; qemus">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#91-k8s-kubespray-inv-qemus-qemus-items" class="md-nav__link">
+    <span class="md-ellipsis">
+      9.1. K8S Kubespray Inv. &gt; qemus &gt; qemus items
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="9.1. K8S Kubespray Inv. &gt; qemus &gt; qemus items">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#911-property-k8s-kubespray-inv-qemus-qemus-items-hostname" class="md-nav__link">
+    <span class="md-ellipsis">
+      9.1.1. Property K8S Kubespray Inv. &gt; qemus &gt; qemus items &gt; hostname
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#912-property-k8s-kubespray-inv-qemus-qemus-items-vars" class="md-nav__link">
+    <span class="md-ellipsis">
+      9.1.2. Property K8S Kubespray Inv. &gt; qemus &gt; qemus items &gt; vars
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#913-property-k8s-kubespray-inv-qemus-qemus-items-k8s_roles" class="md-nav__link">
+    <span class="md-ellipsis">
+      9.1.3. Property K8S Kubespray Inv. &gt; qemus &gt; qemus items &gt; k8s_roles
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#914-property-k8s-kubespray-inv-qemus-qemus-items-target_host" class="md-nav__link">
+    <span class="md-ellipsis">
+      9.1.4. Property K8S Kubespray Inv. &gt; qemus &gt; qemus items &gt; target_host
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#915-property-k8s-kubespray-inv-qemus-qemus-items-parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      9.1.5. Property K8S Kubespray Inv. &gt; qemus &gt; qemus items &gt; parameters
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#916-property-k8s-kubespray-inv-qemus-qemus-items-network_config" class="md-nav__link">
+    <span class="md-ellipsis">
+      9.1.6. Property K8S Kubespray Inv. &gt; qemus &gt; qemus items &gt; network_config
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#917-property-k8s-kubespray-inv-qemus-qemus-items-disk" class="md-nav__link">
+    <span class="md-ellipsis">
+      9.1.7. Property K8S Kubespray Inv. &gt; qemus &gt; qemus items &gt; disk
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="9.1.7. Property K8S Kubespray Inv. &gt; qemus &gt; qemus items &gt; disk">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#9171-property-k8s-kubespray-inv-qemus-qemus-items-disk-size" class="md-nav__link">
+    <span class="md-ellipsis">
+      9.1.7.1. Property K8S Kubespray Inv. &gt; qemus &gt; qemus items &gt; disk &gt; size
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#9172-property-k8s-kubespray-inv-qemus-qemus-items-disk-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      9.1.7.2. Property K8S Kubespray Inv. &gt; qemus &gt; qemus items &gt; disk &gt; options
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#9173-property-k8s-kubespray-inv-qemus-qemus-items-disk-pool" class="md-nav__link">
+    <span class="md-ellipsis">
+      9.1.7.3. Property K8S Kubespray Inv. &gt; qemus &gt; qemus items &gt; disk &gt; pool
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-property-k8s-kubespray-inv-ceph_csi_sc_pools" class="md-nav__link">
+    <span class="md-ellipsis">
+      10. Property K8S Kubespray Inv. &gt; ceph_csi_sc_pools
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="10. Property K8S Kubespray Inv. &gt; ceph_csi_sc_pools">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#101-k8s-kubespray-inv-ceph_csi_sc_pools-ceph_csi_sc_pools-items" class="md-nav__link">
+    <span class="md-ellipsis">
+      10.1. K8S Kubespray Inv. &gt; ceph_csi_sc_pools &gt; ceph_csi_sc_pools items
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="10.1. K8S Kubespray Inv. &gt; ceph_csi_sc_pools &gt; ceph_csi_sc_pools items">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1011-property-k8s-kubespray-inv-ceph_csi_sc_pools-ceph_csi_sc_pools-items-name" class="md-nav__link">
+    <span class="md-ellipsis">
+      10.1.1. Property K8S Kubespray Inv. &gt; ceph_csi_sc_pools &gt; ceph_csi_sc_pools items &gt; name
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1012-property-k8s-kubespray-inv-ceph_csi_sc_pools-ceph_csi_sc_pools-items-default" class="md-nav__link">
+    <span class="md-ellipsis">
+      10.1.2. Property K8S Kubespray Inv. &gt; ceph_csi_sc_pools &gt; ceph_csi_sc_pools items &gt; default
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1013-property-k8s-kubespray-inv-ceph_csi_sc_pools-ceph_csi_sc_pools-items-mount_options" class="md-nav__link">
+    <span class="md-ellipsis">
+      10.1.3. Property K8S Kubespray Inv. &gt; ceph_csi_sc_pools &gt; ceph_csi_sc_pools items &gt; mount_options
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-property-k8s-kubespray-inv-root_ssh_pub_key" class="md-nav__link">
+    <span class="md-ellipsis">
+      11. Property K8S Kubespray Inv. &gt; root_ssh_pub_key
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-property-k8s-kubespray-inv-pve_ha_group" class="md-nav__link">
+    <span class="md-ellipsis">
+      12. Property K8S Kubespray Inv. &gt; pve_ha_group
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#13-property-k8s-kubespray-inv-qemu_hashed_pw" class="md-nav__link">
+    <span class="md-ellipsis">
+      13. Property K8S Kubespray Inv. &gt; qemu_hashed_pw
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#14-property-k8s-kubespray-inv-qemu_base_parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      14. Property K8S Kubespray Inv. &gt; qemu_base_parameters
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15-property-k8s-kubespray-inv-qemu_image_url" class="md-nav__link">
+    <span class="md-ellipsis">
+      15. Property K8S Kubespray Inv. &gt; qemu_image_url
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#16-property-k8s-kubespray-inv-qemu_keyboard_layout" class="md-nav__link">
+    <span class="md-ellipsis">
+      16. Property K8S Kubespray Inv. &gt; qemu_keyboard_layout
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#17-property-k8s-kubespray-inv-qemu_network_config" class="md-nav__link">
+    <span class="md-ellipsis">
+      17. Property K8S Kubespray Inv. &gt; qemu_network_config
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#18-property-k8s-kubespray-inv-acme_staging" class="md-nav__link">
+    <span class="md-ellipsis">
+      18. Property K8S Kubespray Inv. &gt; acme_staging
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#19-property-k8s-kubespray-inv-plugin" class="md-nav__link">
+    <span class="md-ellipsis">
+      19. Property K8S Kubespray Inv. &gt; plugin
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20-property-k8s-kubespray-inv-pve_cloud_pytest" class="md-nav__link">
+    <span class="md-ellipsis">
+      20. Property K8S Kubespray Inv. &gt; pve_cloud_pytest
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#21-property-k8s-kubespray-inv-qemu_global_vars" class="md-nav__link">
+    <span class="md-ellipsis">
+      21. Property K8S Kubespray Inv. &gt; qemu_global_vars
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lxc_inv_schema/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    LXC Inventory
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pve_cloud_inv_schema/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Cloud Inventory
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pve_inventory_schema/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Schema Docs
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../qemu_inv_schema/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    VM Inventory
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../setup_bind_schema_ext/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    LXC Inventory
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../setup_ceph_kea_schema_ext/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Schema ext setup_ceph_kea playbook
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../setup_haproxy_schema_ext/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    LXC Inventory
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../setup_kea_schema_ext/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Schema ext setup_kea playbook
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../test_env_schema/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Schema Docs
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="k8s-kubespray-inv">K8S Kubespray Inv.</h1>
+<p><strong>Title:</strong> K8S Kubespray Inv.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>object</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+<tr>
+<td><strong>Additional properties</strong></td>
+<td>Not allowed</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Inventory for deploying k8s clusters via kubespray on PVE.</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Pattern</th>
+<th>Type</th>
+<th>Deprecated</th>
+<th>Definition</th>
+<th>Title/Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>+ <a href="#target_pve">target_pve</a></td>
+<td>No</td>
+<td>string</td>
+<td>No</td>
+<td>-</td>
+<td>The pve cluster this stack should reside in, defined in ~/.pve-cloud-dyn-inv.yaml via `pvcli connect-cluster`</td>
+</tr>
+<tr>
+<td>+ <a href="#stack_name">stack_name</a></td>
+<td>No</td>
+<td>string</td>
+<td>No</td>
+<td>-</td>
+<td>Your stack name, needs to be unique within the cloud domain. Will create its own sub zone.</td>
+</tr>
+<tr>
+<td>- <a href="#extra_control_plane_sans">extra_control_plane_sans</a></td>
+<td>No</td>
+<td>array of string</td>
+<td>No</td>
+<td>-</td>
+<td>Extra sans that kubespray will put in kubeapi generated certificates. Original kubespray variable is named supplementary_addresses_in_ssl_keys, <br />but is set via kubespray custom inventory. Read kubernetes page in pve cloud docs for more details.<br /></td>
+</tr>
+<tr>
+<td>- <a href="#external_domains">external_domains</a></td>
+<td>No</td>
+<td>array of object</td>
+<td>No</td>
+<td>-</td>
+<td>Domains that will be exposed to the public proxies floating ip via haproxy routing rules.</td>
+</tr>
+<tr>
+<td>+ <a href="#cluster_cert_entries">cluster_cert_entries</a></td>
+<td>No</td>
+<td>array of object</td>
+<td>No</td>
+<td>-</td>
+<td>Content for the clusters certificate. Internal routing is handled by ingress dns!</td>
+</tr>
+<tr>
+<td>+ <a href="#tcp_proxies">tcp_proxies</a></td>
+<td>No</td>
+<td>array of object</td>
+<td>No</td>
+<td>-</td>
+<td>TCP forwards to this cluster on the pve cluster proxy.</td>
+</tr>
+<tr>
+<td>+ <a href="#static_includes">static_includes</a></td>
+<td>No</td>
+<td>object</td>
+<td>No</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>- <a href="#include_stacks">include_stacks</a></td>
+<td>No</td>
+<td>array of object</td>
+<td>No</td>
+<td>-</td>
+<td>Include other stacks into the ansible inventory, from any PVE cluster you like.</td>
+</tr>
+<tr>
+<td>+ <a href="#qemus">qemus</a></td>
+<td>No</td>
+<td>array of object</td>
+<td>No</td>
+<td>-</td>
+<td>Nodes for the cluster in form of qemu vms.</td>
+</tr>
+<tr>
+<td>+ <a href="#ceph_csi_sc_pools">ceph_csi_sc_pools</a></td>
+<td>No</td>
+<td>array of object</td>
+<td>No</td>
+<td>-</td>
+<td>Ceph pools that will be made available to the cluster CSI driver.</td>
+</tr>
+<tr>
+<td>+ <a href="#root_ssh_pub_key">root_ssh_pub_key</a></td>
+<td>No</td>
+<td>string</td>
+<td>No</td>
+<td>-</td>
+<td>trusted root key for the cloud init image.</td>
+</tr>
+<tr>
+<td>- <a href="#pve_ha_group">pve_ha_group</a></td>
+<td>No</td>
+<td>string</td>
+<td>No</td>
+<td>-</td>
+<td>PVE HA group this vm should be assigned to (optional).</td>
+</tr>
+<tr>
+<td>- <a href="#qemu_hashed_pw">qemu_hashed_pw</a></td>
+<td>No</td>
+<td>string</td>
+<td>No</td>
+<td>-</td>
+<td>Pw for default user defaults to hashed 'password' for debian cloud init image.</td>
+</tr>
+<tr>
+<td>- <a href="#qemu_base_parameters">qemu_base_parameters</a></td>
+<td>No</td>
+<td>object</td>
+<td>No</td>
+<td>-</td>
+<td>Base parameters passed to the proxmox qm cli tool for creating vm</td>
+</tr>
+<tr>
+<td>- <a href="#qemu_image_url">qemu_image_url</a></td>
+<td>No</td>
+<td>string</td>
+<td>No</td>
+<td>-</td>
+<td>http(s) download link for cloud init image.</td>
+</tr>
+<tr>
+<td>- <a href="#qemu_keyboard_layout">qemu_keyboard_layout</a></td>
+<td>No</td>
+<td>string</td>
+<td>No</td>
+<td>-</td>
+<td>Keyboard layout for cloudinit.</td>
+</tr>
+<tr>
+<td>- <a href="#qemu_network_config">qemu_network_config</a></td>
+<td>No</td>
+<td>string</td>
+<td>No</td>
+<td>-</td>
+<td>Optional qemu network config as a yaml string that is merged into the cloudinit network config of all qemus.</td>
+</tr>
+<tr>
+<td>- <a href="#acme_staging">acme_staging</a></td>
+<td>No</td>
+<td>boolean</td>
+<td>No</td>
+<td>-</td>
+<td>If set to true will use acme staging directory for issueing certs.</td>
+</tr>
+<tr>
+<td>- <a href="#plugin">plugin</a></td>
+<td>No</td>
+<td>enum (of string)</td>
+<td>No</td>
+<td>-</td>
+<td>Id of ansible inventory plugin.</td>
+</tr>
+<tr>
+<td>- <a href="#pve_cloud_pytest">pve_cloud_pytest</a></td>
+<td>No</td>
+<td>object</td>
+<td>No</td>
+<td>-</td>
+<td>Variables object used only in e2e tests.</td>
+</tr>
+<tr>
+<td>- <a href="#qemu_global_vars">qemu_global_vars</a></td>
+<td>No</td>
+<td>object</td>
+<td>No</td>
+<td>-</td>
+<td>Variables that will be applied to all lxc hosts.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="1-property-k8s-kubespray-inv-target_pve"><a name="target_pve"></a>1. Property <code>K8S Kubespray Inv. &gt; target_pve</code></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>string</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> The pve cluster this stack should reside in, defined in ~/.pve-cloud-dyn-inv.yaml via <code>pvcli connect-cluster</code></p>
+<h2 id="2-property-k8s-kubespray-inv-stack_name"><a name="stack_name"></a>2. Property <code>K8S Kubespray Inv. &gt; stack_name</code></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>string</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Your stack name, needs to be unique within the cloud domain. Will create its own sub zone.</p>
+<h2 id="3-property-k8s-kubespray-inv-extra_control_plane_sans"><a name="extra_control_plane_sans"></a>3. Property <code>K8S Kubespray Inv. &gt; extra_control_plane_sans</code></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>array of string</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Extra sans that kubespray will put in kubeapi generated certificates. Original kubespray variable is named supplementary_addresses_in_ssl_keys, 
+but is set via kubespray custom inventory. Read kubernetes page in pve cloud docs for more details.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Array restrictions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Min items</strong></td>
+<td>N/A</td>
+</tr>
+<tr>
+<td><strong>Max items</strong></td>
+<td>N/A</td>
+</tr>
+<tr>
+<td><strong>Items unicity</strong></td>
+<td>False</td>
+</tr>
+<tr>
+<td><strong>Additional items</strong></td>
+<td>False</td>
+</tr>
+<tr>
+<td><strong>Tuple validation</strong></td>
+<td>See below</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Each item of this array must be</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="#extra_control_plane_sans_items">extra_control_plane_sans items</a></td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<h3 id="31-k8s-kubespray-inv-extra_control_plane_sans-extra_control_plane_sans-items"><a name="extra_control_plane_sans_items"></a>3.1. K8S Kubespray Inv. &gt; extra_control_plane_sans &gt; extra_control_plane_sans items</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>string</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<h2 id="4-property-k8s-kubespray-inv-external_domains"><a name="external_domains"></a>4. Property <code>K8S Kubespray Inv. &gt; external_domains</code></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>array of object</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Domains that will be exposed to the public proxies floating ip via haproxy routing rules.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Array restrictions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Min items</strong></td>
+<td>N/A</td>
+</tr>
+<tr>
+<td><strong>Max items</strong></td>
+<td>N/A</td>
+</tr>
+<tr>
+<td><strong>Items unicity</strong></td>
+<td>False</td>
+</tr>
+<tr>
+<td><strong>Additional items</strong></td>
+<td>False</td>
+</tr>
+<tr>
+<td><strong>Tuple validation</strong></td>
+<td>See below</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Each item of this array must be</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="#external_domains_items">external_domains items</a></td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<h3 id="41-k8s-kubespray-inv-external_domains-external_domains-items"><a name="external_domains_items"></a>4.1. K8S Kubespray Inv. &gt; external_domains &gt; external_domains items</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>object</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+<tr>
+<td><strong>Additional properties</strong></td>
+<td>Not allowed</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Pattern</th>
+<th>Type</th>
+<th>Deprecated</th>
+<th>Definition</th>
+<th>Title/Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>+ <a href="#external_domains_items_zone">zone</a></td>
+<td>No</td>
+<td>string</td>
+<td>No</td>
+<td>-</td>
+<td>DNS parent zone, should also be the zone that external records are made under in AWS for example.</td>
+</tr>
+<tr>
+<td>- <a href="#external_domains_items_expose_tld">expose_tld</a></td>
+<td>No</td>
+<td>boolean</td>
+<td>No</td>
+<td>-</td>
+<td>Expose the top level domain itself.</td>
+</tr>
+<tr>
+<td>+ <a href="#external_domains_items_names">names</a></td>
+<td>No</td>
+<td>array of string</td>
+<td>No</td>
+<td>-</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<h4 id="411-property-k8s-kubespray-inv-external_domains-external_domains-items-zone"><a name="external_domains_items_zone"></a>4.1.1. Property <code>K8S Kubespray Inv. &gt; external_domains &gt; external_domains items &gt; zone</code></h4>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>string</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> DNS parent zone, should also be the zone that external records are made under in AWS for example.</p>
+<h4 id="412-property-k8s-kubespray-inv-external_domains-external_domains-items-expose_tld"><a name="external_domains_items_expose_tld"></a>4.1.2. Property <code>K8S Kubespray Inv. &gt; external_domains &gt; external_domains items &gt; expose_tld</code></h4>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Expose the top level domain itself.</p>
+<h4 id="413-property-k8s-kubespray-inv-external_domains-external_domains-items-names"><a name="external_domains_items_names"></a>4.1.3. Property <code>K8S Kubespray Inv. &gt; external_domains &gt; external_domains items &gt; names</code></h4>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>array of string</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Array restrictions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Min items</strong></td>
+<td>N/A</td>
+</tr>
+<tr>
+<td><strong>Max items</strong></td>
+<td>N/A</td>
+</tr>
+<tr>
+<td><strong>Items unicity</strong></td>
+<td>False</td>
+</tr>
+<tr>
+<td><strong>Additional items</strong></td>
+<td>False</td>
+</tr>
+<tr>
+<td><strong>Tuple validation</strong></td>
+<td>See below</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Each item of this array must be</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="#external_domains_items_names_items">names items</a></td>
+<td>Hostname part (host + zone)</td>
+</tr>
+</tbody>
+</table>
+<h5 id="4131-k8s-kubespray-inv-external_domains-external_domains-items-names-names-items"><a name="external_domains_items_names_items"></a>4.1.3.1. K8S Kubespray Inv. &gt; external_domains &gt; external_domains items &gt; names &gt; names items</h5>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>string</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Hostname part (host + zone)</p>
+<h2 id="5-property-k8s-kubespray-inv-cluster_cert_entries"><a name="cluster_cert_entries"></a>5. Property <code>K8S Kubespray Inv. &gt; cluster_cert_entries</code></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>array of object</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Content for the clusters certificate. Internal routing is handled by ingress dns!</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Array restrictions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Min items</strong></td>
+<td>N/A</td>
+</tr>
+<tr>
+<td><strong>Max items</strong></td>
+<td>N/A</td>
+</tr>
+<tr>
+<td><strong>Items unicity</strong></td>
+<td>False</td>
+</tr>
+<tr>
+<td><strong>Additional items</strong></td>
+<td>False</td>
+</tr>
+<tr>
+<td><strong>Tuple validation</strong></td>
+<td>See below</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Each item of this array must be</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="#cluster_cert_entries_items">cluster_cert_entries items</a></td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<h3 id="51-k8s-kubespray-inv-cluster_cert_entries-cluster_cert_entries-items"><a name="cluster_cert_entries_items"></a>5.1. K8S Kubespray Inv. &gt; cluster_cert_entries &gt; cluster_cert_entries items</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>object</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+<tr>
+<td><strong>Additional properties</strong></td>
+<td>Not allowed</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Pattern</th>
+<th>Type</th>
+<th>Deprecated</th>
+<th>Definition</th>
+<th>Title/Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>+ <a href="#cluster_cert_entries_items_zone">zone</a></td>
+<td>No</td>
+<td>string</td>
+<td>No</td>
+<td>-</td>
+<td>DNS parent zone, should coincide with tld for dns01 challenge.</td>
+</tr>
+<tr>
+<td>+ <a href="#cluster_cert_entries_items_names">names</a></td>
+<td>No</td>
+<td>array of string</td>
+<td>No</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>- <a href="#cluster_cert_entries_items_authoritative_zone">authoritative_zone</a></td>
+<td>No</td>
+<td>boolean</td>
+<td>No</td>
+<td>-</td>
+<td>Create authoritative zone inside of pve cloud bind dns.</td>
+</tr>
+<tr>
+<td>- <a href="#cluster_cert_entries_items_apex_zone_san">apex_zone_san</a></td>
+<td>No</td>
+<td>boolean</td>
+<td>No</td>
+<td>-</td>
+<td>Creates additional SAN for the zone, if you have *.example.com you will also get example.com in your certificate. Defaults to false.</td>
+</tr>
+</tbody>
+</table>
+<h4 id="511-property-k8s-kubespray-inv-cluster_cert_entries-cluster_cert_entries-items-zone"><a name="cluster_cert_entries_items_zone"></a>5.1.1. Property <code>K8S Kubespray Inv. &gt; cluster_cert_entries &gt; cluster_cert_entries items &gt; zone</code></h4>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>string</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> DNS parent zone, should coincide with tld for dns01 challenge.</p>
+<h4 id="512-property-k8s-kubespray-inv-cluster_cert_entries-cluster_cert_entries-items-names"><a name="cluster_cert_entries_items_names"></a>5.1.2. Property <code>K8S Kubespray Inv. &gt; cluster_cert_entries &gt; cluster_cert_entries items &gt; names</code></h4>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>array of string</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Array restrictions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Min items</strong></td>
+<td>N/A</td>
+</tr>
+<tr>
+<td><strong>Max items</strong></td>
+<td>N/A</td>
+</tr>
+<tr>
+<td><strong>Items unicity</strong></td>
+<td>False</td>
+</tr>
+<tr>
+<td><strong>Additional items</strong></td>
+<td>False</td>
+</tr>
+<tr>
+<td><strong>Tuple validation</strong></td>
+<td>See below</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Each item of this array must be</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="#cluster_cert_entries_items_names_items">names items</a></td>
+<td>Hostname part (host + zone)</td>
+</tr>
+</tbody>
+</table>
+<h5 id="5121-k8s-kubespray-inv-cluster_cert_entries-cluster_cert_entries-items-names-names-items"><a name="cluster_cert_entries_items_names_items"></a>5.1.2.1. K8S Kubespray Inv. &gt; cluster_cert_entries &gt; cluster_cert_entries items &gt; names &gt; names items</h5>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>string</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Hostname part (host + zone)</p>
+<h4 id="513-property-k8s-kubespray-inv-cluster_cert_entries-cluster_cert_entries-items-authoritative_zone"><a name="cluster_cert_entries_items_authoritative_zone"></a>5.1.3. Property <code>K8S Kubespray Inv. &gt; cluster_cert_entries &gt; cluster_cert_entries items &gt; authoritative_zone</code></h4>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Create authoritative zone inside of pve cloud bind dns.</p>
+<h4 id="514-property-k8s-kubespray-inv-cluster_cert_entries-cluster_cert_entries-items-apex_zone_san"><a name="cluster_cert_entries_items_apex_zone_san"></a>5.1.4. Property <code>K8S Kubespray Inv. &gt; cluster_cert_entries &gt; cluster_cert_entries items &gt; apex_zone_san</code></h4>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Creates additional SAN for the zone, if you have *.example.com you will also get example.com in your certificate. Defaults to false.</p>
+<h2 id="6-property-k8s-kubespray-inv-tcp_proxies"><a name="tcp_proxies"></a>6. Property <code>K8S Kubespray Inv. &gt; tcp_proxies</code></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>array of object</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> TCP forwards to this cluster on the pve cluster proxy.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Array restrictions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Min items</strong></td>
+<td>N/A</td>
+</tr>
+<tr>
+<td><strong>Max items</strong></td>
+<td>N/A</td>
+</tr>
+<tr>
+<td><strong>Items unicity</strong></td>
+<td>False</td>
+</tr>
+<tr>
+<td><strong>Additional items</strong></td>
+<td>False</td>
+</tr>
+<tr>
+<td><strong>Tuple validation</strong></td>
+<td>See below</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Each item of this array must be</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="#tcp_proxies_items">tcp_proxies items</a></td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<h3 id="61-k8s-kubespray-inv-tcp_proxies-tcp_proxies-items"><a name="tcp_proxies_items"></a>6.1. K8S Kubespray Inv. &gt; tcp_proxies &gt; tcp_proxies items</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>object</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+<tr>
+<td><strong>Additional properties</strong></td>
+<td>Not allowed</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Pattern</th>
+<th>Type</th>
+<th>Deprecated</th>
+<th>Definition</th>
+<th>Title/Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>+ <a href="#tcp_proxies_items_proxy_name">proxy_name</a></td>
+<td>No</td>
+<td>string</td>
+<td>No</td>
+<td>-</td>
+<td>Name of the proxy port. Should be unique for the stack.</td>
+</tr>
+<tr>
+<td>+ <a href="#tcp_proxies_items_haproxy_port">haproxy_port</a></td>
+<td>No</td>
+<td>number</td>
+<td>No</td>
+<td>-</td>
+<td>Port on the haproxy frontend that listens.</td>
+</tr>
+<tr>
+<td>+ <a href="#tcp_proxies_items_node_port">node_port</a></td>
+<td>No</td>
+<td>number</td>
+<td>No</td>
+<td>-</td>
+<td>Port on the nodes, usually via K8S NodePort</td>
+</tr>
+<tr>
+<td>- <a href="#tcp_proxies_items_proxy_snippet">proxy_snippet</a></td>
+<td>No</td>
+<td>string</td>
+<td>No</td>
+<td>-</td>
+<td>additional snippet that will be inserted into the haproxy listen block. Can be used for custom logic.</td>
+</tr>
+<tr>
+<td>- <a href="#tcp_proxies_items_external">external</a></td>
+<td>No</td>
+<td>boolean</td>
+<td>No</td>
+<td>-</td>
+<td>Will bind to the external floating ip aswell.</td>
+</tr>
+</tbody>
+</table>
+<h4 id="611-property-k8s-kubespray-inv-tcp_proxies-tcp_proxies-items-proxy_name"><a name="tcp_proxies_items_proxy_name"></a>6.1.1. Property <code>K8S Kubespray Inv. &gt; tcp_proxies &gt; tcp_proxies items &gt; proxy_name</code></h4>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>string</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Name of the proxy port. Should be unique for the stack.</p>
+<h4 id="612-property-k8s-kubespray-inv-tcp_proxies-tcp_proxies-items-haproxy_port"><a name="tcp_proxies_items_haproxy_port"></a>6.1.2. Property <code>K8S Kubespray Inv. &gt; tcp_proxies &gt; tcp_proxies items &gt; haproxy_port</code></h4>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Port on the haproxy frontend that listens.</p>
+<h4 id="613-property-k8s-kubespray-inv-tcp_proxies-tcp_proxies-items-node_port"><a name="tcp_proxies_items_node_port"></a>6.1.3. Property <code>K8S Kubespray Inv. &gt; tcp_proxies &gt; tcp_proxies items &gt; node_port</code></h4>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Port on the nodes, usually via K8S NodePort</p>
+<h4 id="614-property-k8s-kubespray-inv-tcp_proxies-tcp_proxies-items-proxy_snippet"><a name="tcp_proxies_items_proxy_snippet"></a>6.1.4. Property <code>K8S Kubespray Inv. &gt; tcp_proxies &gt; tcp_proxies items &gt; proxy_snippet</code></h4>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>string</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> additional snippet that will be inserted into the haproxy listen block. Can be used for custom logic.</p>
+<h4 id="615-property-k8s-kubespray-inv-tcp_proxies-tcp_proxies-items-external"><a name="tcp_proxies_items_external"></a>6.1.5. Property <code>K8S Kubespray Inv. &gt; tcp_proxies &gt; tcp_proxies items &gt; external</code></h4>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Will bind to the external floating ip aswell.</p>
+<h2 id="7-property-k8s-kubespray-inv-static_includes"><a name="static_includes"></a>7. Property <code>K8S Kubespray Inv. &gt; static_includes</code></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>object</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><strong>Additional properties</strong></td>
+<td>Not allowed</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Pattern</th>
+<th>Type</th>
+<th>Deprecated</th>
+<th>Definition</th>
+<th>Title/Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>+ <a href="#static_includes_dhcp_stack">dhcp_stack</a></td>
+<td>No</td>
+<td>string</td>
+<td>No</td>
+<td>-</td>
+<td>Stack fqdn of dhcp stack where reservations for node ips should be made.</td>
+</tr>
+<tr>
+<td>+ <a href="#static_includes_proxy_stack">proxy_stack</a></td>
+<td>No</td>
+<td>string</td>
+<td>No</td>
+<td>-</td>
+<td>Stack fqdn of haproxy stack where ingress and proxy rules should be configured.</td>
+</tr>
+<tr>
+<td>+ <a href="#static_includes_postgres_stack">postgres_stack</a></td>
+<td>No</td>
+<td>string</td>
+<td>No</td>
+<td>-</td>
+<td>Stack fqdn of postgres stack where state and general configuration of our pve cloud is stored.</td>
+</tr>
+<tr>
+<td>+ <a href="#static_includes_bind_stack">bind_stack</a></td>
+<td>No</td>
+<td>string</td>
+<td>No</td>
+<td>-</td>
+<td>Stack fqdn of bind servers, where create_bind_zone: true ingress_domain zones will be created.</td>
+</tr>
+<tr>
+<td>- <a href="#static_includes_cache_stack">cache_stack</a></td>
+<td>No</td>
+<td>string</td>
+<td>No</td>
+<td>-</td>
+<td>Cache stack to mount nfs for kubespray cache and apt cache. Assumes the cache lxc to have the hostname "main".</td>
+</tr>
+</tbody>
+</table>
+<h3 id="71-property-k8s-kubespray-inv-static_includes-dhcp_stack"><a name="static_includes_dhcp_stack"></a>7.1. Property <code>K8S Kubespray Inv. &gt; static_includes &gt; dhcp_stack</code></h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>string</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Stack fqdn of dhcp stack where reservations for node ips should be made.</p>
+<h3 id="72-property-k8s-kubespray-inv-static_includes-proxy_stack"><a name="static_includes_proxy_stack"></a>7.2. Property <code>K8S Kubespray Inv. &gt; static_includes &gt; proxy_stack</code></h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>string</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Stack fqdn of haproxy stack where ingress and proxy rules should be configured.</p>
+<h3 id="73-property-k8s-kubespray-inv-static_includes-postgres_stack"><a name="static_includes_postgres_stack"></a>7.3. Property <code>K8S Kubespray Inv. &gt; static_includes &gt; postgres_stack</code></h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>string</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Stack fqdn of postgres stack where state and general configuration of our pve cloud is stored.</p>
+<h3 id="74-property-k8s-kubespray-inv-static_includes-bind_stack"><a name="static_includes_bind_stack"></a>7.4. Property <code>K8S Kubespray Inv. &gt; static_includes &gt; bind_stack</code></h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>string</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Stack fqdn of bind servers, where create_bind_zone: true ingress_domain zones will be created.</p>
+<h3 id="75-property-k8s-kubespray-inv-static_includes-cache_stack"><a name="static_includes_cache_stack"></a>7.5. Property <code>K8S Kubespray Inv. &gt; static_includes &gt; cache_stack</code></h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>string</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Cache stack to mount nfs for kubespray cache and apt cache. Assumes the cache lxc to have the hostname "main".</p>
+<h2 id="8-property-k8s-kubespray-inv-include_stacks"><a name="include_stacks"></a>8. Property <code>K8S Kubespray Inv. &gt; include_stacks</code></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>array of object</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Include other stacks into the ansible inventory, from any PVE cluster you like.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Array restrictions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Min items</strong></td>
+<td>N/A</td>
+</tr>
+<tr>
+<td><strong>Max items</strong></td>
+<td>N/A</td>
+</tr>
+<tr>
+<td><strong>Items unicity</strong></td>
+<td>False</td>
+</tr>
+<tr>
+<td><strong>Additional items</strong></td>
+<td>False</td>
+</tr>
+<tr>
+<td><strong>Tuple validation</strong></td>
+<td>See below</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Each item of this array must be</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="#include_stacks_items">include_stacks items</a></td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<h3 id="81-k8s-kubespray-inv-include_stacks-include_stacks-items"><a name="include_stacks_items"></a>8.1. K8S Kubespray Inv. &gt; include_stacks &gt; include_stacks items</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>object</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+<tr>
+<td><strong>Additional properties</strong></td>
+<td>Not allowed</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Pattern</th>
+<th>Type</th>
+<th>Deprecated</th>
+<th>Definition</th>
+<th>Title/Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>+ <a href="#include_stacks_items_stack_fqdn">stack_fqdn</a></td>
+<td>No</td>
+<td>string</td>
+<td>No</td>
+<td>-</td>
+<td>Target stack fqdn to include (stack name + pve_cloud_domain). Will automatically include it from the right pve cluster.</td>
+</tr>
+<tr>
+<td>+ <a href="#include_stacks_items_host_group">host_group</a></td>
+<td>No</td>
+<td>string</td>
+<td>No</td>
+<td>-</td>
+<td>This is the name of the hosts group of our ansible inventory the included vms will be under.</td>
+</tr>
+<tr>
+<td>- <a href="#include_stacks_items_qemu_ansible_user">qemu_ansible_user</a></td>
+<td>No</td>
+<td>string</td>
+<td>No</td>
+<td>-</td>
+<td>User ansible will use to connect, defaults to admin.</td>
+</tr>
+</tbody>
+</table>
+<h4 id="811-property-k8s-kubespray-inv-include_stacks-include_stacks-items-stack_fqdn"><a name="include_stacks_items_stack_fqdn"></a>8.1.1. Property <code>K8S Kubespray Inv. &gt; include_stacks &gt; include_stacks items &gt; stack_fqdn</code></h4>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>string</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Target stack fqdn to include (stack name + pve_cloud_domain). Will automatically include it from the right pve cluster.</p>
+<h4 id="812-property-k8s-kubespray-inv-include_stacks-include_stacks-items-host_group"><a name="include_stacks_items_host_group"></a>8.1.2. Property <code>K8S Kubespray Inv. &gt; include_stacks &gt; include_stacks items &gt; host_group</code></h4>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>string</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> This is the name of the hosts group of our ansible inventory the included vms will be under.</p>
+<h4 id="813-property-k8s-kubespray-inv-include_stacks-include_stacks-items-qemu_ansible_user"><a name="include_stacks_items_qemu_ansible_user"></a>8.1.3. Property <code>K8S Kubespray Inv. &gt; include_stacks &gt; include_stacks items &gt; qemu_ansible_user</code></h4>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>string</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> User ansible will use to connect, defaults to admin.</p>
+<h2 id="9-property-k8s-kubespray-inv-qemus"><a name="qemus"></a>9. Property <code>K8S Kubespray Inv. &gt; qemus</code></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>array of object</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Nodes for the cluster in form of qemu vms.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Array restrictions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Min items</strong></td>
+<td>N/A</td>
+</tr>
+<tr>
+<td><strong>Max items</strong></td>
+<td>N/A</td>
+</tr>
+<tr>
+<td><strong>Items unicity</strong></td>
+<td>False</td>
+</tr>
+<tr>
+<td><strong>Additional items</strong></td>
+<td>False</td>
+</tr>
+<tr>
+<td><strong>Tuple validation</strong></td>
+<td>See below</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Each item of this array must be</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="#qemus_items">qemus items</a></td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<h3 id="91-k8s-kubespray-inv-qemus-qemus-items"><a name="qemus_items"></a>9.1. K8S Kubespray Inv. &gt; qemus &gt; qemus items</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>object</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+<tr>
+<td><strong>Additional properties</strong></td>
+<td>Not allowed</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Pattern</th>
+<th>Type</th>
+<th>Deprecated</th>
+<th>Definition</th>
+<th>Title/Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>- <a href="#qemus_items_hostname">hostname</a></td>
+<td>No</td>
+<td>string</td>
+<td>No</td>
+<td>-</td>
+<td>Optional unique hostname for this node, otherwise pet name random name will be generated.</td>
+</tr>
+<tr>
+<td>- <a href="#qemus_items_vars">vars</a></td>
+<td>No</td>
+<td>object</td>
+<td>No</td>
+<td>-</td>
+<td>Custom variables for this node specifically.</td>
+</tr>
+<tr>
+<td>+ <a href="#qemus_items_k8s_roles">k8s_roles</a></td>
+<td>No</td>
+<td>array</td>
+<td>No</td>
+<td>-</td>
+<td>String array of k8s roles (master/worker)</td>
+</tr>
+<tr>
+<td>- <a href="#qemus_items_target_host">target_host</a></td>
+<td>No</td>
+<td>string</td>
+<td>No</td>
+<td>-</td>
+<td>Pve host to tie this vm to.</td>
+</tr>
+<tr>
+<td>+ <a href="#qemus_items_parameters">parameters</a></td>
+<td>No</td>
+<td>object</td>
+<td>No</td>
+<td>-</td>
+<td>In accordance with pve qm cli tool, creation args.</td>
+</tr>
+<tr>
+<td>- <a href="#qemus_items_network_config">network_config</a></td>
+<td>No</td>
+<td>string</td>
+<td>No</td>
+<td>-</td>
+<td>Cinit network config yaml string. Will be the last cfg piece that gets merged into the final cloudinit network config.</td>
+</tr>
+<tr>
+<td>+ <a href="#qemus_items_disk">disk</a></td>
+<td>No</td>
+<td>object</td>
+<td>No</td>
+<td>-</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<h4 id="911-property-k8s-kubespray-inv-qemus-qemus-items-hostname"><a name="qemus_items_hostname"></a>9.1.1. Property <code>K8S Kubespray Inv. &gt; qemus &gt; qemus items &gt; hostname</code></h4>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>string</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Optional unique hostname for this node, otherwise pet name random name will be generated.</p>
+<h4 id="912-property-k8s-kubespray-inv-qemus-qemus-items-vars"><a name="qemus_items_vars"></a>9.1.2. Property <code>K8S Kubespray Inv. &gt; qemus &gt; qemus items &gt; vars</code></h4>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>object</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+<tr>
+<td><strong>Additional properties</strong></td>
+<td>Any type allowed</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Custom variables for this node specifically.</p>
+<h4 id="913-property-k8s-kubespray-inv-qemus-qemus-items-k8s_roles"><a name="qemus_items_k8s_roles"></a>9.1.3. Property <code>K8S Kubespray Inv. &gt; qemus &gt; qemus items &gt; k8s_roles</code></h4>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>array</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> String array of k8s roles (master/worker)</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Array restrictions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Min items</strong></td>
+<td>N/A</td>
+</tr>
+<tr>
+<td><strong>Max items</strong></td>
+<td>N/A</td>
+</tr>
+<tr>
+<td><strong>Items unicity</strong></td>
+<td>False</td>
+</tr>
+<tr>
+<td><strong>Additional items</strong></td>
+<td>False</td>
+</tr>
+<tr>
+<td><strong>Tuple validation</strong></td>
+<td>N/A</td>
+</tr>
+</tbody>
+</table>
+<h4 id="914-property-k8s-kubespray-inv-qemus-qemus-items-target_host"><a name="qemus_items_target_host"></a>9.1.4. Property <code>K8S Kubespray Inv. &gt; qemus &gt; qemus items &gt; target_host</code></h4>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>string</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Pve host to tie this vm to.</p>
+<h4 id="915-property-k8s-kubespray-inv-qemus-qemus-items-parameters"><a name="qemus_items_parameters"></a>9.1.5. Property <code>K8S Kubespray Inv. &gt; qemus &gt; qemus items &gt; parameters</code></h4>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>object</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><strong>Additional properties</strong></td>
+<td>Any type allowed</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> In accordance with pve qm cli tool, creation args.</p>
+<h4 id="916-property-k8s-kubespray-inv-qemus-qemus-items-network_config"><a name="qemus_items_network_config"></a>9.1.6. Property <code>K8S Kubespray Inv. &gt; qemus &gt; qemus items &gt; network_config</code></h4>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>string</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Cinit network config yaml string. Will be the last cfg piece that gets merged into the final cloudinit network config.</p>
+<h4 id="917-property-k8s-kubespray-inv-qemus-qemus-items-disk"><a name="qemus_items_disk"></a>9.1.7. Property <code>K8S Kubespray Inv. &gt; qemus &gt; qemus items &gt; disk</code></h4>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>object</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><strong>Additional properties</strong></td>
+<td>Not allowed</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Pattern</th>
+<th>Type</th>
+<th>Deprecated</th>
+<th>Definition</th>
+<th>Title/Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>+ <a href="#qemus_items_disk_size">size</a></td>
+<td>No</td>
+<td>string</td>
+<td>No</td>
+<td>-</td>
+<td>Size of the vms disk.</td>
+</tr>
+<tr>
+<td>- <a href="#qemus_items_disk_options">options</a></td>
+<td>No</td>
+<td>object</td>
+<td>No</td>
+<td>-</td>
+<td>Mount options</td>
+</tr>
+<tr>
+<td>+ <a href="#qemus_items_disk_pool">pool</a></td>
+<td>No</td>
+<td>string</td>
+<td>No</td>
+<td>-</td>
+<td>Ceph pool name the vms disk will be created in.</td>
+</tr>
+</tbody>
+</table>
+<h5 id="9171-property-k8s-kubespray-inv-qemus-qemus-items-disk-size"><a name="qemus_items_disk_size"></a>9.1.7.1. Property <code>K8S Kubespray Inv. &gt; qemus &gt; qemus items &gt; disk &gt; size</code></h5>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>string</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Size of the vms disk.</p>
+<h5 id="9172-property-k8s-kubespray-inv-qemus-qemus-items-disk-options"><a name="qemus_items_disk_options"></a>9.1.7.2. Property <code>K8S Kubespray Inv. &gt; qemus &gt; qemus items &gt; disk &gt; options</code></h5>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>object</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+<tr>
+<td><strong>Additional properties</strong></td>
+<td>Any type allowed</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Mount options</p>
+<h5 id="9173-property-k8s-kubespray-inv-qemus-qemus-items-disk-pool"><a name="qemus_items_disk_pool"></a>9.1.7.3. Property <code>K8S Kubespray Inv. &gt; qemus &gt; qemus items &gt; disk &gt; pool</code></h5>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>string</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Ceph pool name the vms disk will be created in.</p>
+<h2 id="10-property-k8s-kubespray-inv-ceph_csi_sc_pools"><a name="ceph_csi_sc_pools"></a>10. Property <code>K8S Kubespray Inv. &gt; ceph_csi_sc_pools</code></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>array of object</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Ceph pools that will be made available to the cluster CSI driver.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Array restrictions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Min items</strong></td>
+<td>N/A</td>
+</tr>
+<tr>
+<td><strong>Max items</strong></td>
+<td>N/A</td>
+</tr>
+<tr>
+<td><strong>Items unicity</strong></td>
+<td>False</td>
+</tr>
+<tr>
+<td><strong>Additional items</strong></td>
+<td>False</td>
+</tr>
+<tr>
+<td><strong>Tuple validation</strong></td>
+<td>See below</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Each item of this array must be</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="#ceph_csi_sc_pools_items">ceph_csi_sc_pools items</a></td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<h3 id="101-k8s-kubespray-inv-ceph_csi_sc_pools-ceph_csi_sc_pools-items"><a name="ceph_csi_sc_pools_items"></a>10.1. K8S Kubespray Inv. &gt; ceph_csi_sc_pools &gt; ceph_csi_sc_pools items</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>object</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+<tr>
+<td><strong>Additional properties</strong></td>
+<td>Not allowed</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Pattern</th>
+<th>Type</th>
+<th>Deprecated</th>
+<th>Definition</th>
+<th>Title/Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>+ <a href="#ceph_csi_sc_pools_items_name">name</a></td>
+<td>No</td>
+<td>string</td>
+<td>No</td>
+<td>-</td>
+<td>Name of the pool in the ceph of our PVE cluster.</td>
+</tr>
+<tr>
+<td>+ <a href="#ceph_csi_sc_pools_items_default">default</a></td>
+<td>No</td>
+<td>boolean</td>
+<td>No</td>
+<td>-</td>
+<td>Whether or not the pool is the default storage class.</td>
+</tr>
+<tr>
+<td>+ <a href="#ceph_csi_sc_pools_items_mount_options">mount_options</a></td>
+<td>No</td>
+<td>array</td>
+<td>No</td>
+<td>-</td>
+<td>String array of mount options that will be set in the storage class and applied to pvs.</td>
+</tr>
+</tbody>
+</table>
+<h4 id="1011-property-k8s-kubespray-inv-ceph_csi_sc_pools-ceph_csi_sc_pools-items-name"><a name="ceph_csi_sc_pools_items_name"></a>10.1.1. Property <code>K8S Kubespray Inv. &gt; ceph_csi_sc_pools &gt; ceph_csi_sc_pools items &gt; name</code></h4>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>string</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Name of the pool in the ceph of our PVE cluster.</p>
+<h4 id="1012-property-k8s-kubespray-inv-ceph_csi_sc_pools-ceph_csi_sc_pools-items-default"><a name="ceph_csi_sc_pools_items_default"></a>10.1.2. Property <code>K8S Kubespray Inv. &gt; ceph_csi_sc_pools &gt; ceph_csi_sc_pools items &gt; default</code></h4>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Whether or not the pool is the default storage class.</p>
+<h4 id="1013-property-k8s-kubespray-inv-ceph_csi_sc_pools-ceph_csi_sc_pools-items-mount_options"><a name="ceph_csi_sc_pools_items_mount_options"></a>10.1.3. Property <code>K8S Kubespray Inv. &gt; ceph_csi_sc_pools &gt; ceph_csi_sc_pools items &gt; mount_options</code></h4>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>array</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> String array of mount options that will be set in the storage class and applied to pvs.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Array restrictions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Min items</strong></td>
+<td>N/A</td>
+</tr>
+<tr>
+<td><strong>Max items</strong></td>
+<td>N/A</td>
+</tr>
+<tr>
+<td><strong>Items unicity</strong></td>
+<td>False</td>
+</tr>
+<tr>
+<td><strong>Additional items</strong></td>
+<td>False</td>
+</tr>
+<tr>
+<td><strong>Tuple validation</strong></td>
+<td>N/A</td>
+</tr>
+</tbody>
+</table>
+<h2 id="11-property-k8s-kubespray-inv-root_ssh_pub_key"><a name="root_ssh_pub_key"></a>11. Property <code>K8S Kubespray Inv. &gt; root_ssh_pub_key</code></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>string</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> trusted root key for the cloud init image.</p>
+<h2 id="12-property-k8s-kubespray-inv-pve_ha_group"><a name="pve_ha_group"></a>12. Property <code>K8S Kubespray Inv. &gt; pve_ha_group</code></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>string</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> PVE HA group this vm should be assigned to (optional).</p>
+<h2 id="13-property-k8s-kubespray-inv-qemu_hashed_pw"><a name="qemu_hashed_pw"></a>13. Property <code>K8S Kubespray Inv. &gt; qemu_hashed_pw</code></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>string</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Pw for default user defaults to hashed 'password' for debian cloud init image.</p>
+<h2 id="14-property-k8s-kubespray-inv-qemu_base_parameters"><a name="qemu_base_parameters"></a>14. Property <code>K8S Kubespray Inv. &gt; qemu_base_parameters</code></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>object</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+<tr>
+<td><strong>Additional properties</strong></td>
+<td>Any type allowed</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Base parameters passed to the proxmox qm cli tool for creating vm</p>
+<h2 id="15-property-k8s-kubespray-inv-qemu_image_url"><a name="qemu_image_url"></a>15. Property <code>K8S Kubespray Inv. &gt; qemu_image_url</code></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>string</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> http(s) download link for cloud init image.</p>
+<h2 id="16-property-k8s-kubespray-inv-qemu_keyboard_layout"><a name="qemu_keyboard_layout"></a>16. Property <code>K8S Kubespray Inv. &gt; qemu_keyboard_layout</code></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>string</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Keyboard layout for cloudinit.</p>
+<h2 id="17-property-k8s-kubespray-inv-qemu_network_config"><a name="qemu_network_config"></a>17. Property <code>K8S Kubespray Inv. &gt; qemu_network_config</code></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>string</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Optional qemu network config as a yaml string that is merged into the cloudinit network config of all qemus.</p>
+<h2 id="18-property-k8s-kubespray-inv-acme_staging"><a name="acme_staging"></a>18. Property <code>K8S Kubespray Inv. &gt; acme_staging</code></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> If set to true will use acme staging directory for issueing certs.</p>
+<h2 id="19-property-k8s-kubespray-inv-plugin"><a name="plugin"></a>19. Property <code>K8S Kubespray Inv. &gt; plugin</code></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>enum (of string)</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Id of ansible inventory plugin.</p>
+<p>Must be one of:
+* "pve.cloud.kubespray_inv"</p>
+<h2 id="20-property-k8s-kubespray-inv-pve_cloud_pytest"><a name="pve_cloud_pytest"></a>20. Property <code>K8S Kubespray Inv. &gt; pve_cloud_pytest</code></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>object</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+<tr>
+<td><strong>Additional properties</strong></td>
+<td>Any type allowed</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Variables object used only in e2e tests.</p>
+<h2 id="21-property-k8s-kubespray-inv-qemu_global_vars"><a name="qemu_global_vars"></a>21. Property <code>K8S Kubespray Inv. &gt; qemu_global_vars</code></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>object</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+<tr>
+<td><strong>Additional properties</strong></td>
+<td>Any type allowed</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Variables that will be applied to all lxc hosts.</p>
+<hr />
+<p>Generated using <a href="https://github.com/coveooss/json-schema-for-humans">json-schema-for-humans</a> on 2025-11-28 at 15:23:20 +0000</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../..", "features": ["toc.follow", "toc.integrate"], "search": "../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.f55a23d4.min.js"></script>
+      
+    
+  </body>
+</html>

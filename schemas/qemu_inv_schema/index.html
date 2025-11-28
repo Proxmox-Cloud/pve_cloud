@@ -1,0 +1,1881 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../pve_inventory_schema/">
+      
+      
+        <link rel="next" href="../setup_bind_schema_ext/">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.21">
+    
+    
+      
+        <title>VM Inventory - PVE Cloud Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.2a3383ac.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#vm-inventory" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="PVE Cloud Documentation" class="md-header__button md-logo" aria-label="PVE Cloud Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            PVE Cloud Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              VM Inventory
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="PVE Cloud Documentation" class="md-nav__button md-logo" aria-label="PVE Cloud Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    PVE Cloud Documentation
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    General
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../bootstrap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Setup/Bootstrap
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../kubernetes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Kubespray K8S
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tdd/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Test Driven Development
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../misc/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Miscellaneous
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Contributing
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Schemas
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            Schemas
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../awx_cloud_inv_schema/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    AWX Cron Inventory
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kubespray_inv_schema/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    K8S Kubespray Inv.
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lxc_inv_schema/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    LXC Inventory
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pve_cloud_inv_schema/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Cloud Inventory
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pve_inventory_schema/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Schema Docs
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    VM Inventory
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    VM Inventory
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-property-vm-inventory-stack_name" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. Property VM Inventory &gt; stack_name
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-property-vm-inventory-target_pve" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Property VM Inventory &gt; target_pve
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-property-vm-inventory-qemus" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Property VM Inventory &gt; qemus
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Property VM Inventory &gt; qemus">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-vm-inventory-qemus-qemus-items" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.1. VM Inventory &gt; qemus &gt; qemus items
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3.1. VM Inventory &gt; qemus &gt; qemus items">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#311-property-vm-inventory-qemus-qemus-items-parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.1.1. Property VM Inventory &gt; qemus &gt; qemus items &gt; parameters
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#312-property-vm-inventory-qemus-qemus-items-disk" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.1.2. Property VM Inventory &gt; qemus &gt; qemus items &gt; disk
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3.1.2. Property VM Inventory &gt; qemus &gt; qemus items &gt; disk">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#3121-property-vm-inventory-qemus-qemus-items-disk-size" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.1.2.1. Property VM Inventory &gt; qemus &gt; qemus items &gt; disk &gt; size
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3122-property-vm-inventory-qemus-qemus-items-disk-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.1.2.2. Property VM Inventory &gt; qemus &gt; qemus items &gt; disk &gt; options
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3123-property-vm-inventory-qemus-qemus-items-disk-pool" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.1.2.3. Property VM Inventory &gt; qemus &gt; qemus items &gt; disk &gt; pool
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-property-vm-inventory-include_stacks" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. Property VM Inventory &gt; include_stacks
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Property VM Inventory &gt; include_stacks">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41-vm-inventory-include_stacks-include_stacks-items" class="md-nav__link">
+    <span class="md-ellipsis">
+      4.1. VM Inventory &gt; include_stacks &gt; include_stacks items
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4.1. VM Inventory &gt; include_stacks &gt; include_stacks items">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#411-property-vm-inventory-include_stacks-include_stacks-items-stack_fqdn" class="md-nav__link">
+    <span class="md-ellipsis">
+      4.1.1. Property VM Inventory &gt; include_stacks &gt; include_stacks items &gt; stack_fqdn
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#412-property-vm-inventory-include_stacks-include_stacks-items-host_group" class="md-nav__link">
+    <span class="md-ellipsis">
+      4.1.2. Property VM Inventory &gt; include_stacks &gt; include_stacks items &gt; host_group
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#413-property-vm-inventory-include_stacks-include_stacks-items-qemu_ansible_user" class="md-nav__link">
+    <span class="md-ellipsis">
+      4.1.3. Property VM Inventory &gt; include_stacks &gt; include_stacks items &gt; qemu_ansible_user
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-property-vm-inventory-static_includes" class="md-nav__link">
+    <span class="md-ellipsis">
+      5. Property VM Inventory &gt; static_includes
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-property-vm-inventory-root_ssh_pub_key" class="md-nav__link">
+    <span class="md-ellipsis">
+      6. Property VM Inventory &gt; root_ssh_pub_key
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-property-vm-inventory-pve_ha_group" class="md-nav__link">
+    <span class="md-ellipsis">
+      7. Property VM Inventory &gt; pve_ha_group
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-property-vm-inventory-qemu_default_user" class="md-nav__link">
+    <span class="md-ellipsis">
+      8. Property VM Inventory &gt; qemu_default_user
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-property-vm-inventory-qemu_hashed_pw" class="md-nav__link">
+    <span class="md-ellipsis">
+      9. Property VM Inventory &gt; qemu_hashed_pw
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-property-vm-inventory-qemu_base_parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      10. Property VM Inventory &gt; qemu_base_parameters
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-property-vm-inventory-qemu_image_url" class="md-nav__link">
+    <span class="md-ellipsis">
+      11. Property VM Inventory &gt; qemu_image_url
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-property-vm-inventory-qemu_keyboard_layout" class="md-nav__link">
+    <span class="md-ellipsis">
+      12. Property VM Inventory &gt; qemu_keyboard_layout
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#13-property-vm-inventory-qemu_global_vars" class="md-nav__link">
+    <span class="md-ellipsis">
+      13. Property VM Inventory &gt; qemu_global_vars
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#14-property-vm-inventory-pve_cloud_pytest" class="md-nav__link">
+    <span class="md-ellipsis">
+      14. Property VM Inventory &gt; pve_cloud_pytest
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15-property-vm-inventory-plugin" class="md-nav__link">
+    <span class="md-ellipsis">
+      15. Property VM Inventory &gt; plugin
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../setup_bind_schema_ext/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    LXC Inventory
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../setup_ceph_kea_schema_ext/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Schema ext setup_ceph_kea playbook
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../setup_haproxy_schema_ext/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    LXC Inventory
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../setup_kea_schema_ext/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Schema ext setup_kea playbook
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../test_env_schema/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Schema Docs
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="vm-inventory">VM Inventory</h1>
+<p><strong>Title:</strong> VM Inventory</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>object</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+<tr>
+<td><strong>Additional properties</strong></td>
+<td>Not allowed</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Inventory for deploying k8s clusters via kubespray on PVE.</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Pattern</th>
+<th>Type</th>
+<th>Deprecated</th>
+<th>Definition</th>
+<th>Title/Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>+ <a href="#stack_name">stack_name</a></td>
+<td>No</td>
+<td>string</td>
+<td>No</td>
+<td>-</td>
+<td>Your stack name, needs to be unique within the parent_domain. Will create its own sub zone.</td>
+</tr>
+<tr>
+<td>+ <a href="#target_pve">target_pve</a></td>
+<td>No</td>
+<td>string</td>
+<td>No</td>
+<td>-</td>
+<td>The pve cluster this stack should reside in, defined in ~/.pve-cloud-dyn-inv.yaml via `pvcli connect-cluster`</td>
+</tr>
+<tr>
+<td>+ <a href="#qemus">qemus</a></td>
+<td>No</td>
+<td>array of object</td>
+<td>No</td>
+<td>-</td>
+<td>Nodes for the cluster in form of qemu vms.</td>
+</tr>
+<tr>
+<td>- <a href="#include_stacks">include_stacks</a></td>
+<td>No</td>
+<td>array of object</td>
+<td>No</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>- <a href="#static_includes">static_includes</a></td>
+<td>No</td>
+<td>object</td>
+<td>No</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>+ <a href="#root_ssh_pub_key">root_ssh_pub_key</a></td>
+<td>No</td>
+<td>string</td>
+<td>No</td>
+<td>-</td>
+<td>Ssh key for qemu_default_user</td>
+</tr>
+<tr>
+<td>- <a href="#pve_ha_group">pve_ha_group</a></td>
+<td>No</td>
+<td>string</td>
+<td>No</td>
+<td>-</td>
+<td>PVE HA Group this qemu instance should be assigned to.</td>
+</tr>
+<tr>
+<td>- <a href="#qemu_default_user">qemu_default_user</a></td>
+<td>No</td>
+<td>string</td>
+<td>No</td>
+<td>-</td>
+<td>User for cinit.</td>
+</tr>
+<tr>
+<td>- <a href="#qemu_hashed_pw">qemu_hashed_pw</a></td>
+<td>No</td>
+<td>string</td>
+<td>No</td>
+<td>-</td>
+<td>The hashed password that will be passed to cloudinit. Use `mkpasswd --method=SHA-512` with the fitting method for your cinit image.</td>
+</tr>
+<tr>
+<td>- <a href="#qemu_base_parameters">qemu_base_parameters</a></td>
+<td>No</td>
+<td>object</td>
+<td>No</td>
+<td>-</td>
+<td>Parameters from qm create proxmox cli tool that will be passed to all created qemus.</td>
+</tr>
+<tr>
+<td>- <a href="#qemu_image_url">qemu_image_url</a></td>
+<td>No</td>
+<td>string</td>
+<td>No</td>
+<td>-</td>
+<td>http(s) download link to the cinit image you want to use.</td>
+</tr>
+<tr>
+<td>- <a href="#qemu_keyboard_layout">qemu_keyboard_layout</a></td>
+<td>No</td>
+<td>string</td>
+<td>No</td>
+<td>-</td>
+<td>The keyboard layout, can be and of de, en ....</td>
+</tr>
+<tr>
+<td>- <a href="#qemu_global_vars">qemu_global_vars</a></td>
+<td>No</td>
+<td>object</td>
+<td>No</td>
+<td>-</td>
+<td>Variables that will be applied to all lxc hosts</td>
+</tr>
+<tr>
+<td>- <a href="#pve_cloud_pytest">pve_cloud_pytest</a></td>
+<td>No</td>
+<td>object</td>
+<td>No</td>
+<td>-</td>
+<td>Variables object used only in e2e tests.</td>
+</tr>
+<tr>
+<td>- <a href="#plugin">plugin</a></td>
+<td>No</td>
+<td>enum (of string)</td>
+<td>No</td>
+<td>-</td>
+<td>Id of ansible inventory plugin</td>
+</tr>
+</tbody>
+</table>
+<h2 id="1-property-vm-inventory-stack_name"><a name="stack_name"></a>1. Property <code>VM Inventory &gt; stack_name</code></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>string</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Your stack name, needs to be unique within the parent_domain. Will create its own sub zone.</p>
+<h2 id="2-property-vm-inventory-target_pve"><a name="target_pve"></a>2. Property <code>VM Inventory &gt; target_pve</code></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>string</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> The pve cluster this stack should reside in, defined in ~/.pve-cloud-dyn-inv.yaml via <code>pvcli connect-cluster</code></p>
+<h2 id="3-property-vm-inventory-qemus"><a name="qemus"></a>3. Property <code>VM Inventory &gt; qemus</code></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>array of object</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Nodes for the cluster in form of qemu vms.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Array restrictions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Min items</strong></td>
+<td>N/A</td>
+</tr>
+<tr>
+<td><strong>Max items</strong></td>
+<td>N/A</td>
+</tr>
+<tr>
+<td><strong>Items unicity</strong></td>
+<td>False</td>
+</tr>
+<tr>
+<td><strong>Additional items</strong></td>
+<td>False</td>
+</tr>
+<tr>
+<td><strong>Tuple validation</strong></td>
+<td>See below</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Each item of this array must be</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="#qemus_items">qemus items</a></td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<h3 id="31-vm-inventory-qemus-qemus-items"><a name="qemus_items"></a>3.1. VM Inventory &gt; qemus &gt; qemus items</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>object</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+<tr>
+<td><strong>Additional properties</strong></td>
+<td>Any type allowed</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Pattern</th>
+<th>Type</th>
+<th>Deprecated</th>
+<th>Definition</th>
+<th>Title/Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>- <a href="#qemus_items_parameters">parameters</a></td>
+<td>No</td>
+<td>object</td>
+<td>No</td>
+<td>-</td>
+<td>In accordance with pve qm cli tool, creation args.</td>
+</tr>
+<tr>
+<td>- <a href="#qemus_items_disk">disk</a></td>
+<td>No</td>
+<td>object</td>
+<td>No</td>
+<td>-</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<h4 id="311-property-vm-inventory-qemus-qemus-items-parameters"><a name="qemus_items_parameters"></a>3.1.1. Property <code>VM Inventory &gt; qemus &gt; qemus items &gt; parameters</code></h4>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>object</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+<tr>
+<td><strong>Additional properties</strong></td>
+<td>Any type allowed</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> In accordance with pve qm cli tool, creation args.</p>
+<h4 id="312-property-vm-inventory-qemus-qemus-items-disk"><a name="qemus_items_disk"></a>3.1.2. Property <code>VM Inventory &gt; qemus &gt; qemus items &gt; disk</code></h4>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>object</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+<tr>
+<td><strong>Additional properties</strong></td>
+<td>Not allowed</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Pattern</th>
+<th>Type</th>
+<th>Deprecated</th>
+<th>Definition</th>
+<th>Title/Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>+ <a href="#qemus_items_disk_size">size</a></td>
+<td>No</td>
+<td>string</td>
+<td>No</td>
+<td>-</td>
+<td>Size of the vms disk.</td>
+</tr>
+<tr>
+<td>- <a href="#qemus_items_disk_options">options</a></td>
+<td>No</td>
+<td>object</td>
+<td>No</td>
+<td>-</td>
+<td>Mount options</td>
+</tr>
+<tr>
+<td>+ <a href="#qemus_items_disk_pool">pool</a></td>
+<td>No</td>
+<td>string</td>
+<td>No</td>
+<td>-</td>
+<td>Ceph pool name the vms disk will be created in.</td>
+</tr>
+</tbody>
+</table>
+<h5 id="3121-property-vm-inventory-qemus-qemus-items-disk-size"><a name="qemus_items_disk_size"></a>3.1.2.1. Property <code>VM Inventory &gt; qemus &gt; qemus items &gt; disk &gt; size</code></h5>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>string</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Size of the vms disk.</p>
+<h5 id="3122-property-vm-inventory-qemus-qemus-items-disk-options"><a name="qemus_items_disk_options"></a>3.1.2.2. Property <code>VM Inventory &gt; qemus &gt; qemus items &gt; disk &gt; options</code></h5>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>object</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+<tr>
+<td><strong>Additional properties</strong></td>
+<td>Any type allowed</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Mount options</p>
+<h5 id="3123-property-vm-inventory-qemus-qemus-items-disk-pool"><a name="qemus_items_disk_pool"></a>3.1.2.3. Property <code>VM Inventory &gt; qemus &gt; qemus items &gt; disk &gt; pool</code></h5>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>string</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Ceph pool name the vms disk will be created in.</p>
+<h2 id="4-property-vm-inventory-include_stacks"><a name="include_stacks"></a>4. Property <code>VM Inventory &gt; include_stacks</code></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>array of object</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Array restrictions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Min items</strong></td>
+<td>N/A</td>
+</tr>
+<tr>
+<td><strong>Max items</strong></td>
+<td>N/A</td>
+</tr>
+<tr>
+<td><strong>Items unicity</strong></td>
+<td>False</td>
+</tr>
+<tr>
+<td><strong>Additional items</strong></td>
+<td>False</td>
+</tr>
+<tr>
+<td><strong>Tuple validation</strong></td>
+<td>See below</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Each item of this array must be</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="#include_stacks_items">include_stacks items</a></td>
+<td>Include other stacks into the ansible inventory, from any PVE cluster you like.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="41-vm-inventory-include_stacks-include_stacks-items"><a name="include_stacks_items"></a>4.1. VM Inventory &gt; include_stacks &gt; include_stacks items</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>object</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+<tr>
+<td><strong>Additional properties</strong></td>
+<td>Any type allowed</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Include other stacks into the ansible inventory, from any PVE cluster you like.</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Pattern</th>
+<th>Type</th>
+<th>Deprecated</th>
+<th>Definition</th>
+<th>Title/Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>- <a href="#include_stacks_items_stack_fqdn">stack_fqdn</a></td>
+<td>No</td>
+<td>string</td>
+<td>No</td>
+<td>-</td>
+<td>Target stack fqdn to include (stack name + pve_cloud_domain)</td>
+</tr>
+<tr>
+<td>- <a href="#include_stacks_items_host_group">host_group</a></td>
+<td>No</td>
+<td>string</td>
+<td>No</td>
+<td>-</td>
+<td>This is the name of the hosts group of our ansible inventory the included vms will be under.</td>
+</tr>
+<tr>
+<td>- <a href="#include_stacks_items_qemu_ansible_user">qemu_ansible_user</a></td>
+<td>No</td>
+<td>string</td>
+<td>No</td>
+<td>-</td>
+<td>User ansible will use to connect, defaults to admin.</td>
+</tr>
+</tbody>
+</table>
+<h4 id="411-property-vm-inventory-include_stacks-include_stacks-items-stack_fqdn"><a name="include_stacks_items_stack_fqdn"></a>4.1.1. Property <code>VM Inventory &gt; include_stacks &gt; include_stacks items &gt; stack_fqdn</code></h4>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>string</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Target stack fqdn to include (stack name + pve_cloud_domain)</p>
+<h4 id="412-property-vm-inventory-include_stacks-include_stacks-items-host_group"><a name="include_stacks_items_host_group"></a>4.1.2. Property <code>VM Inventory &gt; include_stacks &gt; include_stacks items &gt; host_group</code></h4>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>string</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> This is the name of the hosts group of our ansible inventory the included vms will be under.</p>
+<h4 id="413-property-vm-inventory-include_stacks-include_stacks-items-qemu_ansible_user"><a name="include_stacks_items_qemu_ansible_user"></a>4.1.3. Property <code>VM Inventory &gt; include_stacks &gt; include_stacks items &gt; qemu_ansible_user</code></h4>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>string</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> User ansible will use to connect, defaults to admin.</p>
+<h2 id="5-property-vm-inventory-static_includes"><a name="static_includes"></a>5. Property <code>VM Inventory &gt; static_includes</code></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>object</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+<tr>
+<td><strong>Additional properties</strong></td>
+<td>Any type allowed</td>
+</tr>
+</tbody>
+</table>
+<h2 id="6-property-vm-inventory-root_ssh_pub_key"><a name="root_ssh_pub_key"></a>6. Property <code>VM Inventory &gt; root_ssh_pub_key</code></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>string</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Ssh key for qemu_default_user</p>
+<h2 id="7-property-vm-inventory-pve_ha_group"><a name="pve_ha_group"></a>7. Property <code>VM Inventory &gt; pve_ha_group</code></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>string</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> PVE HA Group this qemu instance should be assigned to.</p>
+<h2 id="8-property-vm-inventory-qemu_default_user"><a name="qemu_default_user"></a>8. Property <code>VM Inventory &gt; qemu_default_user</code></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>string</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> User for cinit.</p>
+<h2 id="9-property-vm-inventory-qemu_hashed_pw"><a name="qemu_hashed_pw"></a>9. Property <code>VM Inventory &gt; qemu_hashed_pw</code></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>string</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> The hashed password that will be passed to cloudinit. Use <code>mkpasswd --method=SHA-512</code> with the fitting method for your cinit image.</p>
+<h2 id="10-property-vm-inventory-qemu_base_parameters"><a name="qemu_base_parameters"></a>10. Property <code>VM Inventory &gt; qemu_base_parameters</code></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>object</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+<tr>
+<td><strong>Additional properties</strong></td>
+<td>Any type allowed</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Parameters from qm create proxmox cli tool that will be passed to all created qemus.</p>
+<h2 id="11-property-vm-inventory-qemu_image_url"><a name="qemu_image_url"></a>11. Property <code>VM Inventory &gt; qemu_image_url</code></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>string</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> http(s) download link to the cinit image you want to use.</p>
+<h2 id="12-property-vm-inventory-qemu_keyboard_layout"><a name="qemu_keyboard_layout"></a>12. Property <code>VM Inventory &gt; qemu_keyboard_layout</code></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>string</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> The keyboard layout, can be and of de, en ....</p>
+<h2 id="13-property-vm-inventory-qemu_global_vars"><a name="qemu_global_vars"></a>13. Property <code>VM Inventory &gt; qemu_global_vars</code></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>object</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+<tr>
+<td><strong>Additional properties</strong></td>
+<td>Any type allowed</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Variables that will be applied to all lxc hosts</p>
+<h2 id="14-property-vm-inventory-pve_cloud_pytest"><a name="pve_cloud_pytest"></a>14. Property <code>VM Inventory &gt; pve_cloud_pytest</code></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>object</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+<tr>
+<td><strong>Additional properties</strong></td>
+<td>Any type allowed</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Variables object used only in e2e tests.</p>
+<h2 id="15-property-vm-inventory-plugin"><a name="plugin"></a>15. Property <code>VM Inventory &gt; plugin</code></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>enum (of string)</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Id of ansible inventory plugin</p>
+<p>Must be one of:
+* "pve.cloud.qemu_inv"</p>
+<hr />
+<p>Generated using <a href="https://github.com/coveooss/json-schema-for-humans">json-schema-for-humans</a> on 2025-11-28 at 15:23:20 +0000</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../..", "features": ["toc.follow", "toc.integrate"], "search": "../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.f55a23d4.min.js"></script>
+      
+    
+  </body>
+</html>
