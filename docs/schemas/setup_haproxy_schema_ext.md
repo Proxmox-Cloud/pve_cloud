@@ -14,7 +14,7 @@
 | ---------------------------------------------- | ------- | ---------------- | ---------- | ---------- | ------------------------------------------------------------------------------------------------------------------------ |
 | + [target_pve](#target_pve )                   | No      | string           | No         | -          | Proxmox cluster name + cloud domain, this is where the lxcs will be created.                                             |
 | + [stack_name](#stack_name )                   | No      | string           | No         | -          | Your stack name, needs to be unique within the cloud.                                                                    |
-| - [static_includes](#static_includes )         | No      | object           | No         | -          | -                                                                                                                        |
+| + [static_includes](#static_includes )         | No      | object           | No         | -          | -                                                                                                                        |
 | + [lxcs](#lxcs )                               | No      | array of object  | No         | -          | List of lxcs that will be created for the stack.                                                                         |
 | - [include_stacks](#include_stacks )           | No      | array of object  | No         | -          | Include other cloud stacks into the ansible inventory, from any PVE cluster within the cloud you like.                   |
 | - [lxc_global_vars](#lxc_global_vars )         | No      | object           | No         | -          | Variables that will be applied to all lxc hosts and are available in playbooks.                                          |
@@ -45,11 +45,24 @@
 
 ## <a name="static_includes"></a>3. Property `LXC Inventory > static_includes`
 
-|                           |                  |
-| ------------------------- | ---------------- |
-| **Type**                  | `object`         |
-| **Required**              | No               |
-| **Additional properties** | Any type allowed |
+|                           |             |
+| ------------------------- | ----------- |
+| **Type**                  | `object`    |
+| **Required**              | Yes         |
+| **Additional properties** | Not allowed |
+
+| Property                                             | Pattern | Type   | Deprecated | Definition | Title/Description                      |
+| ---------------------------------------------------- | ------- | ------ | ---------- | ---------- | -------------------------------------- |
+| + [postgres_stack](#static_includes_postgres_stack ) | No      | string | No         | -          | Stack fqdn for postgres patroni stack. |
+
+### <a name="static_includes_postgres_stack"></a>3.1. Property `LXC Inventory > static_includes > postgres_stack`
+
+|              |          |
+| ------------ | -------- |
+| **Type**     | `string` |
+| **Required** | Yes      |
+
+**Description:** Stack fqdn for postgres patroni stack.
 
 ## <a name="lxcs"></a>4. Property `LXC Inventory > lxcs`
 
@@ -84,7 +97,7 @@
 | ----------------------------------------- | ------- | ------ | ---------- | ---------- | ------------------------------------------------------------------------------------------- |
 | - [hostname](#lxcs_items_hostname )       | No      | string | No         | -          | Optional unique hostname for this lxc, otherwise pet name random name will be generated.    |
 | - [target_host](#lxcs_items_target_host ) | No      | string | No         | -          | Pve host to tie this vm to. This is useful to always deploy specifically on a proxmox host. |
-| - [vars](#lxcs_items_vars )               | No      | object | No         | -          | Custom variables for this lxc specifically. Will be usable in playbooks.                    |
+| + [vars](#lxcs_items_vars )               | No      | object | No         | -          | Custom variables for this lxc specifically. Will be usable in playbooks.                    |
 | + [parameters](#lxcs_items_parameters )   | No      | object | No         | -          | Parameters that will be passed to pve pct cli tool for lxc creation.                        |
 
 #### <a name="lxcs_items_hostname"></a>4.1.1. Property `LXC Inventory > lxcs > lxcs items > hostname`
@@ -110,10 +123,23 @@
 |                           |                  |
 | ------------------------- | ---------------- |
 | **Type**                  | `object`         |
-| **Required**              | No               |
+| **Required**              | Yes              |
 | **Additional properties** | Any type allowed |
 
 **Description:** Custom variables for this lxc specifically. Will be usable in playbooks.
+
+| Property                                                   | Pattern | Type    | Deprecated | Definition | Title/Description                                        |
+| ---------------------------------------------------------- | ------- | ------- | ---------- | ---------- | -------------------------------------------------------- |
+| + [keepalived_master](#lxcs_items_vars_keepalived_master ) | No      | boolean | No         | -          | One LXC should have this set to true the other to false. |
+
+##### <a name="lxcs_items_vars_keepalived_master"></a>4.1.3.1. Property `LXC Inventory > lxcs > lxcs items > vars > keepalived_master`
+
+|              |           |
+| ------------ | --------- |
+| **Type**     | `boolean` |
+| **Required** | Yes       |
+
+**Description:** One LXC should have this set to true the other to false.
 
 #### <a name="lxcs_items_parameters"></a>4.1.4. Property `LXC Inventory > lxcs > lxcs items > parameters`
 

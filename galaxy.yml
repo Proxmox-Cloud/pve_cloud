@@ -71,12 +71,14 @@ build_ignore:
   - tests
   - docs
   - env
+  - samples
   - .gitlab-ci.yml
   - docs-config.yaml
   - cloud-ee.yaml
   - mkdocs.yml
   - pytest.ini
-  - requirements-doc.txt
+  - mkdocs-requirements.txt
+  - schemas_raw
 
 # A dict controlling use of manifest directives used in building the collection artifact. The key 'directives' is a
 # list of MANIFEST.in style

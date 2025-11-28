@@ -48,7 +48,10 @@ class InventoryModule(BaseInventoryPlugin):
         super(InventoryModule, self).parse(inventory, loader, path, cache)
         yaml_data = loader.load_from_file(path)
 
-        validate_schema(loader, yaml_data, os.path.dirname(os.path.realpath(__file__)), "awx_cloud_inv")
+        try:
+            validate_inventory(yaml_data)
+        except jsonschema.ValidationError as e:
+            raise AnsibleParserError(e.message)
 
         target_pve = yaml_data['target_pve']
 

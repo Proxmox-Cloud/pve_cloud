@@ -1,0 +1,10 @@
+# get a pve host that is online in the target pve cluster
+TARGET_PVE=$(yq '.target_pve' ../kubespray-inv.yaml)
+STACK_NAME=$(yq '.stack_name' ../kubespray-inv.yaml)
+
+# pve cloud helper script
+eval "$(pvclu export-envrc --target-pve $TARGET_PVE --stack-name $STACK_NAME)"
+
+# create the schema name used by terraform backend dynamically
+STACK_NAME=$(yq '.stack_name' ../kubespray-inv.yaml)
+export PG_SCHEMA_NAME="${STACK_NAME}"

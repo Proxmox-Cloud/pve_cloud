@@ -84,7 +84,7 @@
 | ----------------------------------------- | ------- | ------ | ---------- | ---------- | ------------------------------------------------------------------------------------------- |
 | - [hostname](#lxcs_items_hostname )       | No      | string | No         | -          | Optional unique hostname for this lxc, otherwise pet name random name will be generated.    |
 | - [target_host](#lxcs_items_target_host ) | No      | string | No         | -          | Pve host to tie this vm to. This is useful to always deploy specifically on a proxmox host. |
-| - [vars](#lxcs_items_vars )               | No      | object | No         | -          | Custom variables for this lxc specifically. Will be usable in playbooks.                    |
+| + [vars](#lxcs_items_vars )               | No      | object | No         | -          | Custom variables for this lxc specifically. Will be usable in playbooks.                    |
 | + [parameters](#lxcs_items_parameters )   | No      | object | No         | -          | Parameters that will be passed to pve pct cli tool for lxc creation.                        |
 
 #### <a name="lxcs_items_hostname"></a>4.1.1. Property `LXC Inventory > lxcs > lxcs items > hostname`
@@ -110,10 +110,21 @@
 |                           |                  |
 | ------------------------- | ---------------- |
 | **Type**                  | `object`         |
-| **Required**              | No               |
+| **Required**              | Yes              |
 | **Additional properties** | Any type allowed |
 
 **Description:** Custom variables for this lxc specifically. Will be usable in playbooks.
+
+| Property                                       | Pattern | Type    | Deprecated | Definition | Title/Description |
+| ---------------------------------------------- | ------- | ------- | ---------- | ---------- | ----------------- |
+| + [bind_master](#lxcs_items_vars_bind_master ) | No      | boolean | No         | -          | -                 |
+
+##### <a name="lxcs_items_vars_bind_master"></a>4.1.3.1. Property `LXC Inventory > lxcs > lxcs items > vars > bind_master`
+
+|              |           |
+| ------------ | --------- |
+| **Type**     | `boolean` |
+| **Required** | Yes       |
 
 #### <a name="lxcs_items_parameters"></a>4.1.4. Property `LXC Inventory > lxcs > lxcs items > parameters`
 

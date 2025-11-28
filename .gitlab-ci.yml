@@ -42,7 +42,7 @@ release_tag:
     - |
       sed -i "s/^version:\s.*$/version: $new_tag/" galaxy.yml
     - git add galaxy.yml
-    - git commit -m "Update collection version to $new_tag"
+    - git commit -m "Update collection version to $new_tag / update schemas."
     - git push origin HEAD:master
 
     # tag and push
@@ -59,7 +59,19 @@ release_tag:
     - if: '$CI_COMMIT_TAG =~ /^release-[a-z]+$/'
   resource_group: deploy-prod
 
-    
+
+pve_cloud_schemas_upstream:
+  stage: build
+  image: tobiashvmz/pve-cloud-ci:latest
+  script:
+    # write the new version
+    - sed -i "s/^pve-cloud-schemas==.*$/pve-cloud-schemas==${PY_PVE_CLOUD}/" meta/ee-requirements.txt
+    - sed -i "s/^pve-cloud-schemas==.*$/pve-cloud-schemas==${PY_PVE_CLOUD}/" mkdocs-requirements.txt
+    - /scripts/upstream-push.sh "Update pve-cloud-schemas version to $PVE_CLOUD_SCHEMAS"
+  rules:
+    - if: ( $PVE_CLOUD_SCHEMAS != null || $PVE_CLOUD_SCHEMAS =~ /^./ ) # set by upstream
+
+
 # pipeline trigger if the upstream releases
 py_pve_cloud_upstream:
   stage: build
@@ -114,3 +126,21 @@ release_artifacts:
     # building this takes insane storage requirments
     KUBERNETES_MEMORY_REQUEST: "8Gi"
     KUBERNETES_MEMORY_LIMIT: "12Gi"
+
+
+release_docs:
+  stage: deploy
+  image: python:3.14-trixie
+  script:
+    - ./mkdocs-gen.sh # generate and validate schema docs + install mkdocs packages
+    - git add docs/schemas/
+    - |
+      if ! git diff --cached --quiet; then
+          git commit -m "Update schema doc files"
+          git push origin HEAD:master
+      else
+          echo "Schemas have not changed"
+      fi
+    - mkdocs gh-deploy # update github pages branch - always, might have doc changes but no schema
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^\d+\.\d+\.\d+$/'

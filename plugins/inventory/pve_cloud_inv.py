@@ -32,7 +32,10 @@ class InventoryModule(BaseInventoryPlugin):
         super(InventoryModule, self).parse(inventory, loader, path, cache)
         yaml_data = loader.load_from_file(path)
 
-        validate_schema(loader, yaml_data, os.path.dirname(os.path.realpath(__file__)), "pve_cloud_inv")
+        try:
+            validate_inventory(yaml_data)
+        except jsonschema.ValidationError as e:
+            raise AnsibleParserError(e.message)
 
         pve_inventory = get_pve_inventory_yaml(loader, yaml_data)[yaml_data['pve_cloud_domain']]
         display.v("pve_inventory", pve_inventory)

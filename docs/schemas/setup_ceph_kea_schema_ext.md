@@ -1,6 +1,6 @@
-# LXC Inventory
+# Schema ext setup_ceph_kea playbook
 
-**Title:** LXC Inventory
+**Title:** Schema ext setup_ceph_kea playbook
 
 |                           |             |
 | ------------------------- | ----------- |
@@ -25,7 +25,7 @@
 | - [pve_cloud_pytest](#pve_cloud_pytest )       | No      | object           | No         | -          | Variables object used only in e2e tests.                                                                                 |
 | - [plugin](#plugin )                           | No      | enum (of string) | No         | -          | Id of ansible inventory plugin.                                                                                          |
 
-## <a name="target_pve"></a>1. Property `LXC Inventory > target_pve`
+## <a name="target_pve"></a>1. Property `Schema ext setup_ceph_kea playbook > target_pve`
 
 |              |          |
 | ------------ | -------- |
@@ -34,7 +34,7 @@
 
 **Description:** Proxmox cluster name + cloud domain, this is where the lxcs will be created.
 
-## <a name="stack_name"></a>2. Property `LXC Inventory > stack_name`
+## <a name="stack_name"></a>2. Property `Schema ext setup_ceph_kea playbook > stack_name`
 
 |              |          |
 | ------------ | -------- |
@@ -43,7 +43,7 @@
 
 **Description:** Your stack name, needs to be unique within the cloud.
 
-## <a name="static_includes"></a>3. Property `LXC Inventory > static_includes`
+## <a name="static_includes"></a>3. Property `Schema ext setup_ceph_kea playbook > static_includes`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -51,7 +51,7 @@
 | **Required**              | No               |
 | **Additional properties** | Any type allowed |
 
-## <a name="lxcs"></a>4. Property `LXC Inventory > lxcs`
+## <a name="lxcs"></a>4. Property `Schema ext setup_ceph_kea playbook > lxcs`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -72,7 +72,7 @@
 | ------------------------------- | ----------- |
 | [lxcs items](#lxcs_items)       | -           |
 
-### <a name="lxcs_items"></a>4.1. LXC Inventory > lxcs > lxcs items
+### <a name="lxcs_items"></a>4.1. Schema ext setup_ceph_kea playbook > lxcs > lxcs items
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -84,10 +84,10 @@
 | ----------------------------------------- | ------- | ------ | ---------- | ---------- | ------------------------------------------------------------------------------------------- |
 | - [hostname](#lxcs_items_hostname )       | No      | string | No         | -          | Optional unique hostname for this lxc, otherwise pet name random name will be generated.    |
 | - [target_host](#lxcs_items_target_host ) | No      | string | No         | -          | Pve host to tie this vm to. This is useful to always deploy specifically on a proxmox host. |
-| - [vars](#lxcs_items_vars )               | No      | object | No         | -          | Custom variables for this lxc specifically. Will be usable in playbooks.                    |
+| + [vars](#lxcs_items_vars )               | No      | object | No         | -          | Custom variables for this lxc specifically. Will be usable in playbooks.                    |
 | + [parameters](#lxcs_items_parameters )   | No      | object | No         | -          | Parameters that will be passed to pve pct cli tool for lxc creation.                        |
 
-#### <a name="lxcs_items_hostname"></a>4.1.1. Property `LXC Inventory > lxcs > lxcs items > hostname`
+#### <a name="lxcs_items_hostname"></a>4.1.1. Property `Schema ext setup_ceph_kea playbook > lxcs > lxcs items > hostname`
 
 |              |          |
 | ------------ | -------- |
@@ -96,7 +96,7 @@
 
 **Description:** Optional unique hostname for this lxc, otherwise pet name random name will be generated.
 
-#### <a name="lxcs_items_target_host"></a>4.1.2. Property `LXC Inventory > lxcs > lxcs items > target_host`
+#### <a name="lxcs_items_target_host"></a>4.1.2. Property `Schema ext setup_ceph_kea playbook > lxcs > lxcs items > target_host`
 
 |              |          |
 | ------------ | -------- |
@@ -105,17 +105,46 @@
 
 **Description:** Pve host to tie this vm to. This is useful to always deploy specifically on a proxmox host.
 
-#### <a name="lxcs_items_vars"></a>4.1.3. Property `LXC Inventory > lxcs > lxcs items > vars`
+#### <a name="lxcs_items_vars"></a>4.1.3. Property `Schema ext setup_ceph_kea playbook > lxcs > lxcs items > vars`
 
 |                           |                  |
 | ------------------------- | ---------------- |
 | **Type**                  | `object`         |
-| **Required**              | No               |
+| **Required**              | Yes              |
 | **Additional properties** | Any type allowed |
 
 **Description:** Custom variables for this lxc specifically. Will be usable in playbooks.
 
-#### <a name="lxcs_items_parameters"></a>4.1.4. Property `LXC Inventory > lxcs > lxcs items > parameters`
+| Property                                                                           | Pattern | Type   | Deprecated | Definition | Title/Description                                                                                                                    |
+| ---------------------------------------------------------------------------------- | ------- | ------ | ---------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| + [kea_dhcp_ceph_frontend_subnet](#lxcs_items_vars_kea_dhcp_ceph_frontend_subnet ) | No      | string | No         | -          | Optional definition for a seperate dhcp if the ceph frontend resides on a different interface (map it inside the dhcp lxcs to pve0). |
+| + [kea_dhcp_ceph_frontend_pool](#lxcs_items_vars_kea_dhcp_ceph_frontend_pool )     | No      | string | No         | -          | Pool for ceph frontend ip allocations, this way monitors can have their static block.                                                |
+
+##### <a name="lxcs_items_vars_kea_dhcp_ceph_frontend_subnet"></a>4.1.3.1. Property `Schema ext setup_ceph_kea playbook > lxcs > lxcs items > vars > kea_dhcp_ceph_frontend_subnet`
+
+|              |          |
+| ------------ | -------- |
+| **Type**     | `string` |
+| **Required** | Yes      |
+
+**Description:** Optional definition for a seperate dhcp if the ceph frontend resides on a different interface (map it inside the dhcp lxcs to pve0).
+
+##### <a name="lxcs_items_vars_kea_dhcp_ceph_frontend_pool"></a>4.1.3.2. Property `Schema ext setup_ceph_kea playbook > lxcs > lxcs items > vars > kea_dhcp_ceph_frontend_pool`
+
+|              |          |
+| ------------ | -------- |
+| **Type**     | `string` |
+| **Required** | Yes      |
+
+**Description:** Pool for ceph frontend ip allocations, this way monitors can have their static block.
+
+**Example:**
+
+```json
+"10.255.22.17 - 10.255.23.254"
+```
+
+#### <a name="lxcs_items_parameters"></a>4.1.4. Property `Schema ext setup_ceph_kea playbook > lxcs > lxcs items > parameters`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -131,8 +160,9 @@
 | + [cores](#lxcs_items_parameters_cores )   | No      | integer | No         | -          | Number of virtual CPU cores.                 |
 | + [memory](#lxcs_items_parameters_memory ) | No      | integer | No         | -          | Memory in bytes, use POW 2.                  |
 | + [net0](#lxcs_items_parameters_net0 )     | No      | string  | No         | -          | Configuration for primary network interface. |
+| - [net1](#lxcs_items_parameters_net1 )     | No      | object  | No         | -          | -                                            |
 
-##### <a name="lxcs_items_parameters_rootfs"></a>4.1.4.1. Property `LXC Inventory > lxcs > lxcs items > parameters > rootfs`
+##### <a name="lxcs_items_parameters_rootfs"></a>4.1.4.1. Property `Schema ext setup_ceph_kea playbook > lxcs > lxcs items > parameters > rootfs`
 
 |              |          |
 | ------------ | -------- |
@@ -141,7 +171,7 @@
 
 **Description:** PVE storage for the container disk.
 
-##### <a name="lxcs_items_parameters_cores"></a>4.1.4.2. Property `LXC Inventory > lxcs > lxcs items > parameters > cores`
+##### <a name="lxcs_items_parameters_cores"></a>4.1.4.2. Property `Schema ext setup_ceph_kea playbook > lxcs > lxcs items > parameters > cores`
 
 |              |           |
 | ------------ | --------- |
@@ -150,7 +180,7 @@
 
 **Description:** Number of virtual CPU cores.
 
-##### <a name="lxcs_items_parameters_memory"></a>4.1.4.3. Property `LXC Inventory > lxcs > lxcs items > parameters > memory`
+##### <a name="lxcs_items_parameters_memory"></a>4.1.4.3. Property `Schema ext setup_ceph_kea playbook > lxcs > lxcs items > parameters > memory`
 
 |              |           |
 | ------------ | --------- |
@@ -159,7 +189,7 @@
 
 **Description:** Memory in bytes, use POW 2.
 
-##### <a name="lxcs_items_parameters_net0"></a>4.1.4.4. Property `LXC Inventory > lxcs > lxcs items > parameters > net0`
+##### <a name="lxcs_items_parameters_net0"></a>4.1.4.4. Property `Schema ext setup_ceph_kea playbook > lxcs > lxcs items > parameters > net0`
 
 |              |          |
 | ------------ | -------- |
@@ -174,7 +204,23 @@
 "name=eth0,bridge=vmbr0,tag=120,firewall=1,ip=dhcp"
 ```
 
-## <a name="include_stacks"></a>5. Property `LXC Inventory > include_stacks`
+| Restrictions                      |                                                                                                                                                                |
+| --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Must match regular expression** | ```\bname=pve\b``` [Test](https://regex101.com/?regex=%5Cbname%3Dpve%5Cb&testString=%22name%3Deth0%2Cbridge%3Dvmbr0%2Ctag%3D120%2Cfirewall%3D1%2Cip%3Ddhcp%22) |
+
+##### <a name="lxcs_items_parameters_net1"></a>4.1.4.5. Property `Schema ext setup_ceph_kea playbook > lxcs > lxcs items > parameters > net1`
+
+|                           |                  |
+| ------------------------- | ---------------- |
+| **Type**                  | `object`         |
+| **Required**              | No               |
+| **Additional properties** | Any type allowed |
+
+| Restrictions                      |                                                                                 |
+| --------------------------------- | ------------------------------------------------------------------------------- |
+| **Must match regular expression** | ```\bname=cephfe\b``` [Test](https://regex101.com/?regex=%5Cbname%3Dcephfe%5Cb) |
+
+## <a name="include_stacks"></a>5. Property `Schema ext setup_ceph_kea playbook > include_stacks`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -195,7 +241,7 @@
 | --------------------------------------------- | ----------- |
 | [include_stacks items](#include_stacks_items) | -           |
 
-### <a name="include_stacks_items"></a>5.1. LXC Inventory > include_stacks > include_stacks items
+### <a name="include_stacks_items"></a>5.1. Schema ext setup_ceph_kea playbook > include_stacks > include_stacks items
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -209,7 +255,7 @@
 | - [host_group](#include_stacks_items_host_group )               | No      | string | No         | -          | This is the name of the hosts group of our ansible inventory the included vms will be under.                            |
 | - [qemu_ansible_user](#include_stacks_items_qemu_ansible_user ) | No      | string | No         | -          | User ansible will use to connect if its a vm, defaults to admin. LXCs are always root.                                  |
 
-#### <a name="include_stacks_items_stack_fqdn"></a>5.1.1. Property `LXC Inventory > include_stacks > include_stacks items > stack_fqdn`
+#### <a name="include_stacks_items_stack_fqdn"></a>5.1.1. Property `Schema ext setup_ceph_kea playbook > include_stacks > include_stacks items > stack_fqdn`
 
 |              |          |
 | ------------ | -------- |
@@ -218,7 +264,7 @@
 
 **Description:** Target stack fqdn to include (stack name + pve_cloud_domain). Will automatically include it from the right pve cluster.
 
-#### <a name="include_stacks_items_host_group"></a>5.1.2. Property `LXC Inventory > include_stacks > include_stacks items > host_group`
+#### <a name="include_stacks_items_host_group"></a>5.1.2. Property `Schema ext setup_ceph_kea playbook > include_stacks > include_stacks items > host_group`
 
 |              |          |
 | ------------ | -------- |
@@ -227,7 +273,7 @@
 
 **Description:** This is the name of the hosts group of our ansible inventory the included vms will be under.
 
-#### <a name="include_stacks_items_qemu_ansible_user"></a>5.1.3. Property `LXC Inventory > include_stacks > include_stacks items > qemu_ansible_user`
+#### <a name="include_stacks_items_qemu_ansible_user"></a>5.1.3. Property `Schema ext setup_ceph_kea playbook > include_stacks > include_stacks items > qemu_ansible_user`
 
 |              |          |
 | ------------ | -------- |
@@ -236,7 +282,7 @@
 
 **Description:** User ansible will use to connect if its a vm, defaults to admin. LXCs are always root.
 
-## <a name="lxc_global_vars"></a>6. Property `LXC Inventory > lxc_global_vars`
+## <a name="lxc_global_vars"></a>6. Property `Schema ext setup_ceph_kea playbook > lxc_global_vars`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -252,7 +298,7 @@
 | - [install_prom_systemd_exporter](#lxc_global_vars_install_prom_systemd_exporter ) | No      | boolean | No         | -          | Will install prometheus metrics exporter for systemd. This implements with pve cloud terraform monitoring modules. |
 | - [](#lxc_global_vars_additionalProperties )                                       | No      | object  | No         | -          | -                                                                                                                  |
 
-### <a name="lxc_global_vars_use_alternate_ssh_port"></a>6.1. Property `LXC Inventory > lxc_global_vars > use_alternate_ssh_port`
+### <a name="lxc_global_vars_use_alternate_ssh_port"></a>6.1. Property `Schema ext setup_ceph_kea playbook > lxc_global_vars > use_alternate_ssh_port`
 
 |              |           |
 | ------------ | --------- |
@@ -261,7 +307,7 @@
 
 **Description:** Will use 2222 instead of 22 for ssh.
 
-### <a name="lxc_global_vars_install_prom_systemd_exporter"></a>6.2. Property `LXC Inventory > lxc_global_vars > install_prom_systemd_exporter`
+### <a name="lxc_global_vars_install_prom_systemd_exporter"></a>6.2. Property `Schema ext setup_ceph_kea playbook > lxc_global_vars > install_prom_systemd_exporter`
 
 |              |           |
 | ------------ | --------- |
@@ -270,7 +316,7 @@
 
 **Description:** Will install prometheus metrics exporter for systemd. This implements with pve cloud terraform monitoring modules.
 
-## <a name="pve_ha_group"></a>7. Property `LXC Inventory > pve_ha_group`
+## <a name="pve_ha_group"></a>7. Property `Schema ext setup_ceph_kea playbook > pve_ha_group`
 
 |              |          |
 | ------------ | -------- |
@@ -279,7 +325,7 @@
 
 **Description:** When set the stack will be added to the corresponding PVE high availability group.
 
-## <a name="lxc_base_parameters"></a>8. Property `LXC Inventory > lxc_base_parameters`
+## <a name="lxc_base_parameters"></a>8. Property `Schema ext setup_ceph_kea playbook > lxc_base_parameters`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -289,7 +335,7 @@
 
 **Description:** PVE pct cli parameters that will be used for all lxcs.
 
-## <a name="lxc_os_template"></a>9. Property `LXC Inventory > lxc_os_template`
+## <a name="lxc_os_template"></a>9. Property `Schema ext setup_ceph_kea playbook > lxc_os_template`
 
 |              |          |
 | ------------ | -------- |
@@ -298,7 +344,7 @@
 
 **Description:** `pveam available --section system` / run `pveam update` for newest, PVE available LXC template (will be downloaded).
 
-## <a name="root_ssh_pub_key"></a>10. Property `LXC Inventory > root_ssh_pub_key`
+## <a name="root_ssh_pub_key"></a>10. Property `Schema ext setup_ceph_kea playbook > root_ssh_pub_key`
 
 |              |          |
 | ------------ | -------- |
@@ -307,7 +353,7 @@
 
 **Description:** Public key that will be installed for the root user of all lxcs in the stack.
 
-## <a name="pve_cloud_pytest"></a>11. Property `LXC Inventory > pve_cloud_pytest`
+## <a name="pve_cloud_pytest"></a>11. Property `Schema ext setup_ceph_kea playbook > pve_cloud_pytest`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -317,7 +363,7 @@
 
 **Description:** Variables object used only in e2e tests.
 
-## <a name="plugin"></a>12. Property `LXC Inventory > plugin`
+## <a name="plugin"></a>12. Property `Schema ext setup_ceph_kea playbook > plugin`
 
 |              |                    |
 | ------------ | ------------------ |

@@ -1,0 +1,125 @@
+target_pve: pve-cluster-name.pve-cloud-domain.example
+stack_name: sample-cluster
+
+cluster_cert_entries:
+  - zone: example.com
+    authoritative_zone: true
+    names: 
+      - '*.subdomain'
+      - '*'
+  - zone: another.sample
+    names: 
+      - '*'
+
+external_domains:
+  - zone: example.com
+    names:
+      - my-public-service
+  - zone: another.sample
+    names:
+      - '*' # all names get exposed
+
+tcp_proxies:
+  - proxy_name: postgres-sample
+    haproxy_port: 5342
+    node_port: 30342 # nodeport its exposed under
+    external: true
+
+static_includes:
+  # stack names of the other inventories
+  dhcp_stack: dhcp.pve-cloud-domain.example
+  proxy_stack: haproxy.pve-cloud-domain.example
+  postgres_stack: patroni.pve-cloud-domain.example
+  bind_stack: bind.pve-cloud-domain.example
+
+qemus:
+- k8s_roles: ['master']
+  disk:
+    size: 50G
+    options:
+      discard: "on"
+      iothread: "on"
+      ssd: "on"
+    pool: ssd
+  parameters:
+    sockets: 2
+    cores: 1
+    memory: 4096
+- k8s_roles: ['master']
+  disk:
+    size: 50G
+    options:
+      discard: "on"
+      iothread: "on"
+      ssd: "on"
+    pool: ssd
+  parameters:
+    sockets: 2
+    cores: 1
+    memory: 4096
+- k8s_roles: ['master']
+  disk:
+    size: 50G
+    options:
+      discard: "on"
+      iothread: "on"
+      ssd: "on"
+    pool: ssd
+  parameters:
+    sockets: 2
+    cores: 1
+    memory: 4096
+
+- k8s_roles: ['worker']
+  disk:
+    size: 175G
+    options:
+      discard: "on"
+      iothread: "on"
+      ssd: "on"
+    pool: ssd
+  parameters:
+    sockets: 2
+    cores: 16
+    memory: 65536
+    
+- hostname: example-service-exclusive
+  k8s_roles: ['worker']
+  disk:
+    size: 150G
+    options:
+      discard: "on"
+      iothread: "on"
+      ssd: "on"
+    pool: ssd
+  parameters:
+    sockets: 2
+    cores: 8
+    memory: 32768
+  vars:
+    # any label / taint you want to toggle on
+    node_labels:
+      exclusive-service: example
+    node_taints:
+      - exclusive-service=example:NoSchedule
+
+# these pools will be made available as storage classes inside k8s
+ceph_csi_sc_pools:
+  - name: ssd
+    default: true
+    mount_options:
+      - discard
+
+
+root_ssh_pub_key: 'ssh-ed25519 AAAeAC3NzaC1tlZDI1NdasdAAIGreJ6EeeGddasB30hv1h5+erHhreUHzvmYE' # your public ssh key
+
+qemu_base_parameters:
+  # this config assumes your ceph is on the same interface as default vm communication
+  # setup an additional bridge with ceph if you have a seperate net
+  net0: virtio,bridge=vmbr0,firewall=1,tag=100
+  onboot: 1
+
+acme_staging: false # toggle prod generation for acme certs, otherwise goes against letsencrypt staging
+
+plugin: pve.cloud.kubespray_inv
+

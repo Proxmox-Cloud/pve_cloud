@@ -1,0 +1,35 @@
+target_pve: pve-cluster-name.pve-cloud-domain.example
+stack_name: haproxy
+
+static_includes:
+  postgres_stack: patroni.pve-cloud-domain.example # the setup_haproxy playbook needs this stack too 
+
+lxcs:
+- hostname: main
+  parameters:
+    rootfs: "volume=ssd:15,mountoptions=discard" # ssd is the name of the storage pool in proxmox
+    cores: 2
+    memory: 1024
+    # ip addresses from pve-cluster-inventory
+    net0: "name=pve,bridge=vmbr0,tag=100,firewall=1,ip=dhcp"
+  vars:
+    keepalived_master: true
+
+- hostname: failover
+  parameters:
+    rootfs: "volume=ssd:15,mountoptions=discard"
+    cores: 1
+    memory: 1024
+    net0: "name=pve,bridge=vmbr0,tag=100,firewall=1,ip=dhcp"
+  vars:
+    keepalived_master: false
+
+lxc_global_vars:
+  install_prom_systemd_exporter: true
+
+lxc_base_parameters:
+  onboot: 1
+
+root_ssh_pub_key: 'ssh-ed25519 AAAeAC3NzaC1tlZDI1NdasdAAIGreJ6EeeGddasB30hv1h5+erHhreUHzvmYE' # your public ssh key
+
+plugin: pve.cloud.lxc_inv # use the pve_cloud custom inventory for lxcs

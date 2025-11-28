@@ -9,7 +9,7 @@ from ansible_collections.pve.cloud.plugins.module_utils.network import check_hos
 import asyncio, asyncssh
 from dataclasses import dataclass
 import ipaddress
-
+from pve_cloud_schemas.validate import validate_inventory
 
 @dataclass
 class PveHost:
@@ -33,7 +33,11 @@ display = Display()
 
 def get_pve_inventory_yaml(loader, inv_yaml_data):
     pve_inventory = loader.load_from_file(inv_yaml_data["pve_cloud_pytest"]["dyn_inv_path"]) if "pve_cloud_pytest" in inv_yaml_data else loader.load_from_file(os.path.expanduser("~/.pve-cloud-dyn-inv.yaml"))
-    validate_schema(loader, pve_inventory, os.path.dirname(os.path.realpath(__file__)), "pve_inventory")
+    try:
+        validate_inventory(yaml_data)
+    except jsonschema.ValidationError as e:
+        raise AnsibleParserError(e.message)
+
     return pve_inventory
 
 
@@ -156,8 +160,6 @@ def build_pve_inventory(inventory, yaml_data, online_pve_hosts, cluster_map):
 
     for key in target_cluster.cluster_vars.keys():
         inventory.set_variable('all', key, target_cluster.cluster_vars[key]) 
-
-
 
 
 async def add_lxc_to_inv(inventory, online_pve_hosts, target_pve, vm):
@@ -311,8 +313,10 @@ async def include_stack(inventory, online_pve_hosts, cluster_map, include_fqdn, 
 async def init_plugin(loader, inventory, yaml_data, plugin_dir):
     plugin_name = yaml_data["plugin"].split(".")[-1]
 
-    # validate schema of the yaml inventory
-    validate_schema_ext(loader, yaml_data, plugin_dir, plugin_name)
+    try:
+        validate_inventory(yaml_data)
+    except jsonschema.ValidationError as e:
+        raise AnsibleParserError(e.message)
 
     # get pve hosts that are online
     online_pve_hosts = await get_online_pve_hosts(loader, yaml_data)

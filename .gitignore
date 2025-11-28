@@ -16,3 +16,4 @@ env/extravars
 .envrc
 tdd-requirements.yml
 site
+schemas_raw

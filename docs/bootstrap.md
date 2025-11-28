@@ -11,6 +11,10 @@ You need a development machine with the following tools/packages installed:
 
 Aswell as a proxmox cluster you have root access via ssh to the hosts.
 
+## Quickstart Samples
+
+
+
 ## Bootstrap
 
 Create a repository for your cloud instance for example company-xyz-cloud and setup your environment:
