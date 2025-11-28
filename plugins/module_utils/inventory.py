@@ -39,7 +39,7 @@ def get_pve_inventory_yaml(loader, inv_yaml_data):
     pve_inventory["plugin"] = "pve.cloud.pve_inventory" # has no default plugin tag, we inject it here
 
     try:
-        validate_inventory(pve_inventory)
+        validate_inventory(pve_inventory, False)
     except ValidationError as e:
         raise AnsibleParserError(e.message)
 
