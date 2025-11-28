@@ -13,7 +13,11 @@ Aswell as a proxmox cluster you have root access via ssh to the hosts.
 
 ## Quickstart Samples
 
+Checkout the [samples directory](https://github.com/Proxmox-Cloud/pve_cloud/tree/master/samples) to get an idea how to structure your cloud repositories.
 
+In the `cloud-instance/` directory you will find an example of how to setup core lxcs needed for the cloud to function. 
+
+The `kubespray-cluster/` contains an example inventory for a kubespray cluster aswell as example terraform configuration for authenticating.
 
 ## Bootstrap
 
@@ -49,10 +53,11 @@ This repository should contain:
 
 * pve cloud inventory file - [cloud schema](schemas/pve_cloud_inv_schema.md) => for the `pve.cloud.setup_pve_clusters` playbook
 * lxc inventory files for the basic services - [lxc inv schema](schemas/lxc_inv_schema.md)
-  * inventory for two kea lxcs => for use with `pve.cloud.setup_kea` playbook
-  * inventory for two bind lxcs => `pve.cloud.setup_bind` playbook
-  * two haproxy lxcs => `pve.cloud.setup_haproxy` playbook
-  * three lxcs for patroni postgres => `pve.cloud.setup_postgres` playbook
+  * inventory for two kea lxcs => for use with `pve.cloud.setup_kea` playbook - [dhcp inv schema](schemas/setup_kea_schema_ext.md)
+  * inventory for two bind lxcs => `pve.cloud.setup_bind` playbook - [bind inv schema](schemas/setup_bind_schema_ext.md)
+  * three lxcs for patroni postgres => `pve.cloud.setup_postgres` playbook - no special schema
+  * two haproxy lxcs => `pve.cloud.setup_haproxy` playbook - [haproxy inv schema](schemas/setup_haproxy_schema_ext.md)
+
 
 From here you can start deploying your first kubernetes cluster, which will serve as the basis for most deployments/services.
 

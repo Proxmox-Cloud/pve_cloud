@@ -4,6 +4,8 @@ The collection contains and integrates with the official kubespray collection.
 
 It is recommended to create a seperate repository per kubernetes cluster, or aleast put the cluster inventory file into a seperate folder.
 
+Checkout the `kubespray-cluster` dir in the [samples directory](https://github.com/Proxmox-Cloud/pve_cloud/tree/master/samples) for a quick idea on how to setup!
+
 ## Deploying a cluster
 
 Again create custom inventory yaml file following this [cluster schema](schemas/kubespray_inv_schema.md).
@@ -13,6 +15,39 @@ Afterwards run the `pve.cloud.sync_kubespray` playbook, this will fully create V
 To get kubeconf after creation of the cluster for cli/ide access (expiring) use:
 
 `pvcli print-kubeconfig --inventory YOUR-KUBESPRAY-INV.yaml`
+
+
+## TLS ACME Certificates
+
+This collection doesn't use kubernetes certmanager for TLS certificates, but instead comes with an external centralised solution. 
+
+Initially certificates are generated via ansible roles, integrated into the collection. The update process afterwards is handled via [AWX cron jobs](https://github.com/Proxmox-Cloud/pve-cloud-awx-cron). Use the awx helm chart via terraform to deploy your own instance.
+
+### DNS Provider Secrets
+
+At the moment the collection supports ionos and aws route53 for dynamically solving dns01 challenges and obtaining certificates.
+
+You need to create secret files inside the clouds secret folder on your proxmox cluster:
+
+* for aws route53 create `/etc/pve/cloud/secrets/aws-route53-global.json`, this should contain read / write access to your route53:
+```json
+{
+  "AWS_ACCESS_KEY_ID": "ACCESS_ID_HERE",
+  "AWS_SECRET_ACCESS_KEY": "SECRET_KEY_HERE",
+  "AWS_REGION": "REGION"
+}
+```
+
+* for method `ionos` create `/etc/pve/cloud/secrets/ionos-api-key.json`:
+```json
+{
+  "IONOS_PRAEFIX": "PRAEFIX_HERE",
+  "IONOS_VERSCHLUESSELUNG": "SECRET_KEY_HERE"
+}
+```
+
+afterwards you need to sync those secrets to all hosts in the cloud, you can do that by rerunning the `setup_pve_clusters` playbook - `ansible-playbook -i YOUR-CLOUD-INV.yaml pve.cloud.setup_pve_clusters --tags rsync`. This needs to be done only once! There is no support for multiple dns providers / multiple accounts yet.
+
 
 ## Upgrading a cluster
 
@@ -52,36 +87,6 @@ eviction_hard:
 ```
 => this, in addition to the `adjust_networkd_oom_score` role, will allow k8s nodes to run even if we got memory hungry, ram hogging deployments. eviction hard and reservations alone are not enough, in oom scenarios it will cause the networkd service to stop working.
 
-## TLS ACME Certificates
-
-This collection doesn't use kubernetes certmanager for TLS certificates, but instead comes with an external centralised solution. 
-
-Initially certificates are generated via ansible roles, integrated into the collection. The update process afterwards is handled via [AWX cron jobs](https://github.com/Proxmox-Cloud/pve-cloud-awx-cron). Use the awx helm chart via terraform to deploy your own instance.
-
-### DNS Provider Secrets
-
-At the moment the collection supports ionos and aws route53 for dynamically solving dns01 challenges and obtaining certificates.
-
-You need to create secret files inside the clouds secret folder on your proxmox cluster:
-
-* for aws route53 create `/etc/pve/cloud/secrets/aws-route53-global.json`, this should contain read / write access to your route53:
-```json
-{
-  "AWS_ACCESS_KEY_ID": "ACCESS_ID_HERE",
-  "AWS_SECRET_ACCESS_KEY": "SECRET_KEY_HERE",
-  "AWS_REGION": "REGION"
-}
-```
-
-* for method `ionos` create `/etc/pve/cloud/secrets/ionos-api-key.json`:
-```json
-{
-  "IONOS_PRAEFIX": "PRAEFIX_HERE",
-  "IONOS_VERSCHLUESSELUNG": "SECRET_KEY_HERE"
-}
-```
-
-afterwards you need to sync those secrets to all hosts in the cloud, you can do that by rerunning the `setup_pve_clusters` playbook - `ansible-playbook -i YOUR-CLOUD-INV.yaml pve.cloud.setup_pve_clusters --tags rsync`. This needs to be done only once! There is no support for multiple dns providers / multiple accounts yet.
 
 ## Exposing K8S Controlplane API
 
@@ -95,4 +100,4 @@ DNS Records for these SANs have to be created manually (for internal and externa
 
 After you deployed your first kubernetes cluster, further deployments and configuration is handled almost exclusively via terraform.
 
-Checkout the [pve-cloud-tf repository](https://github.com/Proxmox-Cloud/pve-cloud-tf), for examples on how to connect and some core deployment ideas.
+Checkout the [pve-cloud-tf repository](https://github.com/Proxmox-Cloud/pve-cloud-tf), for core pve cloud related deployments.
