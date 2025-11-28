@@ -28,6 +28,7 @@ Host *
 ```
 * install `direnv` and activate it in your local profile (add `eval "$(direnv hook bash)"` to .bashrc)
 * create a `pve-cloud` folder and checkout all the repositories you want to make changes to, if you checkout the ansible collections they have to be under `ansible_collections/pve/`
+* for `py-pve-cloud`, `pve-cloud-schemas` and `pytest-pve-cloud` run `pip install -e .` once / on updating the toml file for local development
 * create a test environment config yaml (you can find the schema definition in the src folder of the [pytest-pve-cloud repository](https://github.com/Proxmox-Cloud/pytest-pve-cloud))
 * create a `.envrc` file with env variables stored for development
 ```bash
