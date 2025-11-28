@@ -7,6 +7,8 @@ locals {
   pve_inventory = yamldecode(file("${pathexpand("~/.pve-cloud-dyn-inv.yaml")}"))
 }
 
+# initialize providers from kubeconfig passed via env vars
+# fetched directly from the masters via ssh
 locals {
   kubeconfig = yamldecode(base64decode(var.master_b64_kubeconf))
 }

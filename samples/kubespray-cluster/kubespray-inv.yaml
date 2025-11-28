@@ -42,8 +42,8 @@ qemus:
       ssd: "on"
     pool: ssd
   parameters:
-    sockets: 2
-    cores: 1
+    sockets: 1
+    cores: 2
     memory: 4096
 - k8s_roles: ['master']
   disk:
@@ -54,8 +54,8 @@ qemus:
       ssd: "on"
     pool: ssd
   parameters:
-    sockets: 2
-    cores: 1
+    sockets: 1
+    cores: 2
     memory: 4096
 - k8s_roles: ['master']
   disk:
@@ -66,8 +66,8 @@ qemus:
       ssd: "on"
     pool: ssd
   parameters:
-    sockets: 2
-    cores: 1
+    sockets: 1
+    cores: 2
     memory: 4096
 
 - k8s_roles: ['worker']
@@ -79,23 +79,23 @@ qemus:
       ssd: "on"
     pool: ssd
   parameters:
-    sockets: 2
-    cores: 16
-    memory: 65536
+    sockets: 1
+    cores: 4
+    memory: 16384
     
 - hostname: example-service-exclusive
   k8s_roles: ['worker']
   disk:
-    size: 150G
+    size: 175G
     options:
       discard: "on"
       iothread: "on"
       ssd: "on"
     pool: ssd
   parameters:
-    sockets: 2
-    cores: 8
-    memory: 32768
+    sockets: 1
+    cores: 4
+    memory: 16384
   vars:
     # any label / taint you want to toggle on
     node_labels:
@@ -110,7 +110,6 @@ ceph_csi_sc_pools:
     mount_options:
       - discard
 
-
 root_ssh_pub_key: 'ssh-ed25519 AAAeAC3NzaC1tlZDI1NdasdAAIGreJ6EeeGddasB30hv1h5+erHhreUHzvmYE' # your public ssh key
 
 qemu_base_parameters:
@@ -122,4 +121,3 @@ qemu_base_parameters:
 acme_staging: false # toggle prod generation for acme certs, otherwise goes against letsencrypt staging
 
 plugin: pve.cloud.kubespray_inv
-
