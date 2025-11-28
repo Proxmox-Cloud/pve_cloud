@@ -46,7 +46,7 @@ You need to create secret files inside the clouds secret folder on your proxmox 
 }
 ```
 
-afterwards you need to sync those secrets to all hosts in the cloud, you can do that by rerunning the `setup_pve_clusters` playbook - `ansible-playbook -i YOUR-CLOUD-INV.yaml pve.cloud.setup_pve_clusters --tags rsync`. This needs to be done only once! There is no support for multiple dns providers / multiple accounts yet.
+Afterwards you need to sync those secrets to all hosts in the cloud, you can do that by rerunning the `setup_pve_clusters` playbook - `ansible-playbook -i YOUR-CLOUD-INV.yaml pve.cloud.setup_pve_clusters --tags rsync`. This needs to be done only once! There is no support for multiple dns providers / multiple accounts yet.
 
 
 ## Upgrading a cluster
@@ -55,7 +55,7 @@ Upgrading the cluster is as simple as updating the version tag reference of this
 
 You can skip to the latest patch version, but shouldn't skip minor versions as they are tied to kubespray updates. After updating the cloud collection version in your requirements.yaml,
 
-you have to run `ansible-galaxy install -r requirements.yaml` and `pip install -r ~/.ansible/collections/ansible_collections/pve/cloud/meta/ee-requirements.txt` again.
+You have to run `ansible-galaxy install -r requirements.yaml` and `pip install -r ~/.ansible/collections/ansible_collections/pve/cloud/meta/ee-requirements.txt` again.
 
 Then run the upgrade playbook `ansible-playbook -i YOUR-KUBESPRAY-INV.yaml pve.cloud.upgrade_kubespray`.
 

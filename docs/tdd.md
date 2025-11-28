@@ -1,6 +1,6 @@
 # Test Driven Development
 
-For development you will need a dedicated proxmox cluster (a small one will suffice), and a dedicated vlan. The testing suite deploys and configures a proxmox cloud with locally build artifacts.
+For development you will need a dedicated proxmox cluster (a small one will suffice), and another dedicated vlan. The testing suite deploys and configures a proxmox cloud with locally build artifacts.
 
 ## E2E Architecture
 
