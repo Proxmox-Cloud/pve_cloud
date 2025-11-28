@@ -1,10 +1,12 @@
 
 from ansible.plugins.inventory import BaseInventoryPlugin
-from ansible_collections.pve.cloud.plugins.module_utils.validate import validate_schema
+from pve_cloud_schemas.validate import validate_inventory
 import os
 import paramiko
 import yaml
 import io
+from jsonschema.exceptions import ValidationError
+from ansible.errors import AnsibleParserError
 
 
 def get_pve_cluster_vars(target_pve_inventory):
@@ -50,7 +52,7 @@ class InventoryModule(BaseInventoryPlugin):
 
         try:
             validate_inventory(yaml_data)
-        except jsonschema.ValidationError as e:
+        except ValidationError as e:
             raise AnsibleParserError(e.message)
 
         target_pve = yaml_data['target_pve']

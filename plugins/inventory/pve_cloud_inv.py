@@ -1,11 +1,13 @@
 
 from ansible.plugins.inventory import BaseInventoryPlugin
-from ansible_collections.pve.cloud.plugins.module_utils.inventory import get_pve_inventory_yaml
-from ansible_collections.pve.cloud.plugins.module_utils.validate import validate_schema
+from ansible_collections.pve.cloud.plugins.module_utils.inventory import get_pve_inventory_yaml, get_manifest_version
+from pve_cloud_schemas.validate import validate_inventory
 import os
 from ansible.utils.display import Display
 import socket
 import json
+from jsonschema.exceptions import ValidationError
+from ansible.errors import AnsibleParserError
 
 
 display = Display()
@@ -35,7 +37,7 @@ class InventoryModule(BaseInventoryPlugin):
 
         try:
             validate_inventory(yaml_data)
-        except jsonschema.ValidationError as e:
+        except ValidationError as e:
             raise AnsibleParserError(e.message)
 
         pve_inventory = get_pve_inventory_yaml(loader, yaml_data)[yaml_data['pve_cloud_domain']]
@@ -47,11 +49,7 @@ class InventoryModule(BaseInventoryPlugin):
         inventory.add_group('pve_cluster_reps')
 
         # get the collection version
-        collection_path = os.path.dirname(os.path.dirname(__file__))
-        manifest_path = os.path.join(collection_path, "MANIFEST.json")
-        with open(manifest_path, "r") as f:
-            manifest = json.load(f)
-            manifest_version = manifest.get("version")
+        manifest_version = get_manifest_version()
 
         # load pve clusters and set cluster variables for them
         for pve_cluster in yaml_data['pve_clusters']:
@@ -80,7 +78,7 @@ class InventoryModule(BaseInventoryPlugin):
                 cluster_vars = yaml_data | yaml_data['pve_clusters'][pve_cluster]
                 
                 # add collection version to version check against
-                cluster_vars["pve_cloud_collection_version"] = version
+                cluster_vars["pve_cloud_collection_version"] = manifest_version
 
                 inventory.set_variable(fqdn_host, "cluster_vars",  cluster_vars)
 

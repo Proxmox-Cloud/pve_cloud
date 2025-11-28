@@ -79,6 +79,7 @@ build_ignore:
   - pytest.ini
   - mkdocs-requirements.txt
   - schemas_raw
+  - tdd-requirements.yml
 
 # A dict controlling use of manifest directives used in building the collection artifact. The key 'directives' is a
 # list of MANIFEST.in style

@@ -3,13 +3,16 @@ import re
 from ansible.utils.display import Display
 import yaml
 import json
-from ansible_collections.pve.cloud.plugins.module_utils.validate import validate_schema, validate_schema_ext
+from pve_cloud_schemas.validate import validate_inventory
 from ansible_collections.pve.cloud.plugins.module_utils.identity import sort_and_hash
 from ansible_collections.pve.cloud.plugins.module_utils.network import check_host_ssh_online, wait_for_ssh_open
 import asyncio, asyncssh
 from dataclasses import dataclass
 import ipaddress
-from pve_cloud_schemas.validate import validate_inventory
+from jsonschema.exceptions import ValidationError
+from ansible.errors import AnsibleParserError
+
+
 
 @dataclass
 class PveHost:
@@ -33,9 +36,11 @@ display = Display()
 
 def get_pve_inventory_yaml(loader, inv_yaml_data):
     pve_inventory = loader.load_from_file(inv_yaml_data["pve_cloud_pytest"]["dyn_inv_path"]) if "pve_cloud_pytest" in inv_yaml_data else loader.load_from_file(os.path.expanduser("~/.pve-cloud-dyn-inv.yaml"))
+    pve_inventory["plugin"] = "pve.cloud.pve_inventory" # has no default plugin tag, we inject it here
+
     try:
-        validate_inventory(yaml_data)
-    except jsonschema.ValidationError as e:
+        validate_inventory(pve_inventory)
+    except ValidationError as e:
         raise AnsibleParserError(e.message)
 
     return pve_inventory
@@ -308,6 +313,24 @@ async def include_stack(inventory, online_pve_hosts, cluster_map, include_fqdn, 
     await asyncio.gather(*add_to_inv_tasks)
 
 
+def get_manifest_version():
+    collection_path = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+    display.v(f"collection_path {collection_path}")
+    galaxy_path = os.path.join(collection_path, "galaxy.yml")
+    manifest_path = os.path.join(collection_path, "MANIFEST.json")
+
+    if os.path.isfile(galaxy_path):
+        with open(galaxy_path, "r") as f:
+            manifest_version = yaml.safe_load(f)["version"]
+    elif os.path.isfile(manifest_path):
+        with open(manifest_path, "r") as f:
+            manifest = json.load(f)
+            manifest_version = manifest.get("version")
+    else:
+        raise Exception("Could neither find pve cloud galaxy.yml nor MANIFEST.json")
+
+    return manifest_version
+
 
 # generic init plugin function called by most inventory plugins
 async def init_plugin(loader, inventory, yaml_data, plugin_dir):
@@ -315,7 +338,7 @@ async def init_plugin(loader, inventory, yaml_data, plugin_dir):
 
     try:
         validate_inventory(yaml_data)
-    except jsonschema.ValidationError as e:
+    except ValidationError as e:
         raise AnsibleParserError(e.message)
 
     # get pve hosts that are online
@@ -329,11 +352,7 @@ async def init_plugin(loader, inventory, yaml_data, plugin_dir):
     installed_pve_cloud_version = target_cluster.cluster_vars['pve_cloud_collection_version']
 
     # compare installed version with version we are using, crash on missmatch
-    collection_path = os.path.dirname(os.path.dirname(__file__))
-    manifest_path = os.path.join(collection_path, "MANIFEST.json")
-    with open(manifest_path, "r") as f:
-        manifest = json.load(f)
-        manifest_version = manifest.get("version")
+    manifest_version = get_manifest_version()
 
     if installed_pve_cloud_version != manifest_version:
         raise Exception(f"Version missmatch! Cloud version: {installed_pve_cloud_version}, local version: {manifest_version}! Please update pve_cloud on your machine / run all setup playbooks again!")

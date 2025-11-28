@@ -1,11 +1,36 @@
 ---
 - name: Generic setup
-  hosts: all_pve_hosts 
+  hosts: all_pve_hosts
   tags:
-    - generic
+    - rsync # check version first also for rsync play
+  pre_tasks:
+    - name: Check if cluster vars exist
+      stat:
+        path: "/etc/pve/cloud/cluster_vars.yaml"
+      register: cvars_stat
+
+    - name: Slurp the file content if it exists
+      slurp:
+        src: "/etc/pve/cloud/cluster_vars.yaml"
+      when: cvars_stat.stat.exists
+      register: cvars_slurped
+
+    - name: Set installed cloud collection version
+      set_fact:
+        installed_cc_vers: "{{ (cvars_slurped.content | b64decode | from_yaml)['pve_cloud_collection_version'] }}"
+      when: cvars_stat.stat.exists
+
+    - name: Fail when 
+      fail:
+        msg: "Installed version {{ installed_cc_vers }} is ahead of local version {{ cluster_vars['pve_cloud_collection_version'] }}"
+      when: installed_cc_vers is version(cluster_vars['pve_cloud_collection_version'], '>')
+
   roles:
     - prometheus.prometheus.systemd_exporter
+
   tasks:
+
+
     - name: install prometheus-node-exporter
       ansible.builtin.apt:
         name: prometheus-node-exporter
