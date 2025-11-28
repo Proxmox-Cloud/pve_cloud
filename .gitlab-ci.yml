@@ -65,8 +65,8 @@ pve_cloud_schemas_upstream:
   image: tobiashvmz/pve-cloud-ci:latest
   script:
     # write the new version
-    - sed -i "s/^pve-cloud-schemas==.*$/pve-cloud-schemas==${PY_PVE_CLOUD}/" meta/ee-requirements.txt
-    - sed -i "s/^pve-cloud-schemas==.*$/pve-cloud-schemas==${PY_PVE_CLOUD}/" mkdocs-requirements.txt
+    - sed -i "s/^pve-cloud-schemas==.*$/pve-cloud-schemas==${PVE_CLOUD_SCHEMAS}/" meta/ee-requirements.txt
+    - sed -i "s/^pve-cloud-schemas==.*$/pve-cloud-schemas==${PVE_CLOUD_SCHEMAS}/" mkdocs-requirements.txt
     - /scripts/upstream-push.sh "Update pve-cloud-schemas version to $PVE_CLOUD_SCHEMAS"
   rules:
     - if: ( $PVE_CLOUD_SCHEMAS != null || $PVE_CLOUD_SCHEMAS =~ /^./ ) # set by upstream
@@ -109,7 +109,7 @@ trigger_upstream_release_tag:
   rules:
     - if: ( $PY_PVE_CLOUD != null || $PY_PVE_CLOUD =~ /^./ ) # set by upstream
     - if: ( $PVE_CLOUD_BACKUP != null || $PVE_CLOUD_BACKUP =~ /^./ ) # same trigger from both upstreams
-
+    - if: ( $PVE_CLOUD_SCHEMAS != null || $PVE_CLOUD_SCHEMAS =~ /^./ )
 
 # todo: comment in after upgrade
 # release_artifacts:
