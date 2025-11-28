@@ -49,6 +49,8 @@ release_tag:
     - git tag "$new_tag" -m "$CI_COMMIT_TAG"
     - git push origin "$new_tag"
 
+    - sleep 5
+
     # trigger pipelines
     - |
       curl --request POST \
