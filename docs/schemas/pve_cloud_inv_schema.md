@@ -517,4 +517,4 @@ Must be one of:
 * "pve.cloud.pve_cloud_inv"
 
 ----------------------------------------------------------------------------------------------------------------------------
-Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2025-11-28 at 18:45:46 +0000
+Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2025-11-28 at 18:48:44 +0000
