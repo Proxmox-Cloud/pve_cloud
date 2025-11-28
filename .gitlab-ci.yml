@@ -134,6 +134,9 @@ release_docs:
   image: python:3.14-trixie
   script:
     - ./mkdocs-gen.sh # generate and validate schema docs + install mkdocs packages
+
+    - git config --global user.name "$GITLAB_USER_NAME"
+    - git config --global user.email "$GITLAB_USER_EMAIL"
     - git add docs/schemas/
     - |
       if ! git diff --cached --quiet; then
