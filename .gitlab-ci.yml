@@ -145,6 +145,7 @@ release_docs:
       else
           echo "Schemas have not changed"
       fi
+    # fetch the gh pages branch once
     - git fetch origin gh-pages:gh-pages
     - mkdocs gh-deploy # update github pages branch - always, might have doc changes but no schema
   rules:
