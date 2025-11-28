@@ -779,4 +779,4 @@ Must be one of:
 **Description:** Variables that will be applied to all lxc hosts.
 
 ----------------------------------------------------------------------------------------------------------------------------
-Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2025-11-28 at 23:27:20 +0000
+Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2025-11-28 at 23:55:18 +0000
