@@ -409,4 +409,4 @@ must respect the following conditions
 | **Additional properties** | Any type allowed |
 
 ----------------------------------------------------------------------------------------------------------------------------
-Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2025-11-28 at 12:39:47 +0000
+Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2025-11-28 at 15:23:20 +0000
