@@ -299,4 +299,4 @@ Must be one of:
 * "pve.cloud.qemu_inv"
 
 ----------------------------------------------------------------------------------------------------------------------------
-Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2025-11-28 at 22:52:22 +0000
+Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2025-11-28 at 23:22:07 +0000
