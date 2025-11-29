@@ -1,3 +1,4 @@
+# read bind-inv.yaml for docs, or the schemas in the main documentation
 target_pve: pve-cluster-name.pve-cloud-domain.example
 stack_name: patroni
 
@@ -18,13 +19,10 @@ lxcs:
     memory: 1024
     net0: "name=eth0,bridge=vmbr0,firewall=1,ip=dhcp,tag=100"
 
-
-lxc_global_vars:
-  install_prom_systemd_exporter: true
   
 lxc_base_parameters:
   onboot: 1
 
-root_ssh_pub_key: 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGJ6EGojNV/m7jZ3B+pBWVmWB30hv1h5+erHhUHzvmYE' # vmzadmin
+root_ssh_pub_key: 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGJ6EGojNV/m7jZ3B+pBWVmWB30hv1h5+erHhUHzvmYE'
 
 plugin: pve.cloud.lxc_inv

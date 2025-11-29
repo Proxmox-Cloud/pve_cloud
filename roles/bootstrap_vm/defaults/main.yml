@@ -22,7 +22,3 @@ qemu_cephfe_nic: net1
 
 # parameters that are always used in our pve stacks
 qemu_base_parameters:
-
-squid_cache_settings:
-  enabled: false
-  # setup_only: true

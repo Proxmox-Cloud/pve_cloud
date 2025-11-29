@@ -51,7 +51,7 @@
         external: true
         rule_len: "{{ (item.zone | length) }}"
   loop: "{{ external_domains }}"
-  when: item.expose_tld is defined and item.expose_tld
+  when: item.expose_apex is defined and item.expose_apex
 
 # tcp proxies
 - name: clear tcp proxies

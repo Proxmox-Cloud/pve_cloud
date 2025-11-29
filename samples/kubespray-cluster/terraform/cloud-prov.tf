@@ -4,6 +4,7 @@ terraform {
 
 locals {
   inventory = yamldecode(file("../kubespray-inv.yaml"))
+  # this assumes the user executed pvcli connect-cluster
   pve_inventory = yamldecode(file("${pathexpand("~/.pve-cloud-dyn-inv.yaml")}"))
 }
 

@@ -12,7 +12,7 @@ GLOBAL_KEYS = [
     "qemu_network_config", "qemu_base_parameters", "qemu_image_url", 
     "root_ssh_pub_key", "qemu_keyboard_layout", "cluster_cert_entries", "external_domains",
     "tcp_proxies", "qemu_hashed_pw", "qemu_default_user", 
-    "acme_staging", "ceph_csi_sc_pools", "static_includes", "squid_cache_settings", "qemu_global_vars"
+    "acme_staging", "ceph_csi_sc_pools", "static_includes", "qemu_global_vars"
 ]
 
 class InventoryModule(BaseInventoryPlugin):

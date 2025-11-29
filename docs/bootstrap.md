@@ -26,10 +26,23 @@ collections:
     version: $LATEST_TAG_VERSION
 ```
 * run `ansible-galaxy install -r requirements.yaml`, then install the python requirements from `pip install -r ~/.ansible/collections/ansible_collections/pve/cloud/meta/ee-requirements.txt`.
+* you also might want to creata a `ansible.cfg` file on the top level of your repo with the following content:
+```ini
+[defaults]
+# on recreating vms this will prevent issues executing the playbook
+host_key_checking = False
+
+[inventory]
+# this is needed so that if our custom inventory plugins raise an error
+# playbook execution gets halted
+any_unparsed_is_failed = True
+```
 
 ### Cloud domain selection
 
 * connect to your proxmox clusters `pvcli connect-cluster --pve-host $PROXMOX_HOST` (run once per cluster, same domain)
+
+The cli will ask you for a cloud domain if the cluster has not already one assigned.
 
 The cloud domain should be a unique domain that can be used for the hostnames and services of the cloud. It should not overlap with a domain you host generic services under, we need unambiguousness for our ddns hostname records.
 

@@ -10,7 +10,7 @@ GLOBAL_KEYS = [
     "qemus", "stack_name", "pve_ha_group", 
     "qemu_network_config", "qemu_base_parameters", 
     "qemu_image_url", "root_ssh_pub_key", "qemu_keyboard_layout", 
-    "qemu_hashed_pw", "qemu_default_user", "squid_cache_settings", "qemu_global_vars"
+    "qemu_hashed_pw", "qemu_default_user", "qemu_global_vars"
 ]
 
 class InventoryModule(BaseInventoryPlugin):

@@ -1,6 +1,11 @@
+# for kubernetes clusters the node creation and kubespray bootstrap are done in one go
+# in the pve.cloud.sync_kubespray playbook
 target_pve: pve-cluster-name.pve-cloud-domain.example
 stack_name: sample-cluster
 
+# these entries will populate the dedicated cluster tls certificate
+# not to be confused with the kubeapi cert. this is a cert meant to be
+# used by the ingress controller
 cluster_cert_entries:
   - zone: example.com
     authoritative_zone: true
@@ -11,6 +16,7 @@ cluster_cert_entries:
     names: 
       - '*'
 
+# domains and names listed here will bind to the external haproxy floating ip
 external_domains:
   - zone: example.com
     names:
@@ -19,12 +25,17 @@ external_domains:
     names:
       - '*' # all names get exposed
 
+# our cluster haproxy can also forward special tcp traffic to nodeport nodes
 tcp_proxies:
   - proxy_name: postgres-sample
     haproxy_port: 5342
     node_port: 30342 # nodeport its exposed under
     external: true
 
+# these default pve cloud stacks are needed for bootstrapping the cluster
+# dhcp will automatically make static reservations for the node ips initially assigned
+# via dhcp. bind is used for masters recordset with all masters ips
+# postgres for state records and proxy for reconfiguring and reloading
 static_includes:
   # stack names of the other inventories
   dhcp_stack: dhcp.pve-cloud-domain.example
@@ -32,6 +43,8 @@ static_includes:
   postgres_stack: patroni.pve-cloud-domain.example
   bind_stack: bind.pve-cloud-domain.example
 
+# our nodes we want to create, they will also be kept in sync everytime you execute the playbook
+# if you need a unique node with labels/taints you have to assign a unique hostname
 qemus:
 - k8s_roles: ['master']
   disk:
@@ -69,7 +82,7 @@ qemus:
     sockets: 1
     cores: 2
     memory: 4096
-
+# workers
 - k8s_roles: ['worker']
   disk:
     size: 175G
@@ -82,7 +95,6 @@ qemus:
     sockets: 1
     cores: 4
     memory: 16384
-    
 - hostname: example-service-exclusive
   k8s_roles: ['worker']
   disk:
@@ -104,6 +116,8 @@ qemus:
       - exclusive-service=example:NoSchedule
 
 # these pools will be made available as storage classes inside k8s
+# the ceph csi storage provisioner chart is also installed automatically by
+# the playbook
 ceph_csi_sc_pools:
   - name: ssd
     default: true
@@ -112,6 +126,7 @@ ceph_csi_sc_pools:
 
 root_ssh_pub_key: 'ssh-ed25519 AAAeAC3NzaC1tlZDI1NdasdAAIGreJ6EeeGddasB30hv1h5+erHhreUHzvmYE' # your public ssh key
 
+# base parameters all nodes share
 qemu_base_parameters:
   # this config assumes your ceph is on the same interface as default vm communication
   # setup an additional bridge with ceph if you have a seperate net

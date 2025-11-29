@@ -127,6 +127,7 @@ release_artifacts:
   variables:
     # building this takes insane storage requirments
     KUBERNETES_MEMORY_REQUEST: "8Gi"
+  resource_group: deploy-prod # don't run this twice ;)
 
 
 release_docs:

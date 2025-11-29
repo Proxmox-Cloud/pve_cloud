@@ -10,7 +10,7 @@ import asyncio, asyncssh
 from dataclasses import dataclass
 import ipaddress
 from jsonschema.exceptions import ValidationError
-from ansible.errors import AnsibleParserError
+from ansible.errors import AnsibleParserError, AnsibleError
 
 
 
@@ -36,12 +36,8 @@ display = Display()
 
 def get_pve_inventory_yaml(loader, inv_yaml_data):
     pve_inventory = loader.load_from_file(inv_yaml_data["pve_cloud_pytest"]["dyn_inv_path"]) if "pve_cloud_pytest" in inv_yaml_data else loader.load_from_file(os.path.expanduser("~/.pve-cloud-dyn-inv.yaml"))
-    pve_inventory["plugin"] = "pve.cloud.pve_inventory" # has no default plugin tag, we inject it here
 
-    try:
-        validate_inventory(pve_inventory, False)
-    except ValidationError as e:
-        raise AnsibleParserError(e.message)
+    # this doesnt get validated as it is created entirely via automation / cli
 
     return pve_inventory
 
@@ -59,7 +55,7 @@ async def get_online_pve_hosts(loader, yaml_data):
                 break
     
     if target_cloud is None:
-        raise Exception(f"Could not identify cloud for {target_pve}")
+        raise AnsibleError(f"Could not identify cloud for {target_pve}")
 
     display.v(f"identified {target_cloud}")
 
@@ -176,7 +172,7 @@ async def add_lxc_to_inv(inventory, online_pve_hosts, target_pve, vm):
             break
     
     if hosting_pve is None:
-        raise Exception(f"PVE Host of lxc {vm['vmid']} is offline!")
+        raise AnsibleError(f"PVE Host of lxc {vm['vmid']} is offline!")
     
     # attempt to get the ip of the lxc
     ip = None
@@ -201,17 +197,17 @@ async def add_lxc_to_inv(inventory, online_pve_hosts, target_pve, vm):
                 if attempt < max_retries - 1:
                     await asyncio.sleep(1)
                 else:
-                    raise Exception(f"All attempts failed for {vm['vmid']}.")
+                    raise AnsibleError(f"All attempts failed for {vm['vmid']}.")
                     
     if ip is None:
-        raise Exception(f"Could not get ip for vm {vm['vmid']}")
+        raise AnsibleError(f"Could not get ip for vm {vm['vmid']}")
     
     inventory.set_variable(vm['name'], "ansible_host", ip)
 
     open_ssh_port = await wait_for_ssh_open(ip)
 
     if open_ssh_port is None:
-        raise Exception(f"Can't reach SSH server on {ip}")
+        raise AnsibleError(f"Can't reach SSH server on {ip}")
 
     if open_ssh_port != 22:
         inventory.set_variable(vm['name'], "ansible_port", open_ssh_port)
@@ -263,17 +259,17 @@ async def add_qemu_to_inv(inventory, cluster, vm):
                 if attempt < max_retries - 1:
                     await asyncio.sleep(5)
                 else:
-                    raise Exception("All attempts failed.")
+                    raise AnsibleError("All attempts failed.")
 
         if ip is None:
-            raise Exception(f"Could not find ip for vmid {vm['vmid']}")
+            raise AnsibleError(f"Could not find ip for vmid {vm['vmid']}")
         
         inventory.set_variable(vm['name'], "ansible_host", ip)
 
         open_ssh_port = await wait_for_ssh_open(ip)
 
         if open_ssh_port is None:
-            raise Exception(f"Can't reach SSH server on {ip}")
+            raise AnsibleError(f"Can't reach SSH server on {ip}")
 
 
 async def include_stack(inventory, online_pve_hosts, cluster_map, include_fqdn, host_group, qemu_ansible_user):
@@ -286,7 +282,7 @@ async def include_stack(inventory, online_pve_hosts, cluster_map, include_fqdn, 
                 tags = vm['tags'].split(';')
                 if include_fqdn in tags:
                     if matched_cluster_fqdn is not None and matched_cluster_fqdn != cluster_fqdn:
-                        raise Exception(f"Stack to include is in multiple pve clusters {include_fqdn} - unexpected behaviour {cluster_fqdn}/{matched_cluster_fqdn}")
+                        raise AnsibleError(f"Stack to include is in multiple pve clusters {include_fqdn} - unexpected behaviour {cluster_fqdn}/{matched_cluster_fqdn}")
 
                     # append and set single source pve cluster variable
                     include_vms.append(vm)
@@ -294,7 +290,7 @@ async def include_stack(inventory, online_pve_hosts, cluster_map, include_fqdn, 
 
 
     if matched_cluster_fqdn is None:
-        raise Exception(f"Couldnt match cluster for include {include_fqdn}")
+        raise AnsibleError(f"Couldnt match cluster for include {include_fqdn}")
     
     inventory.add_group(host_group)
 
@@ -308,7 +304,7 @@ async def include_stack(inventory, online_pve_hosts, cluster_map, include_fqdn, 
             inventory.set_variable(vm['name'], "ansible_user", qemu_ansible_user)
             add_to_inv_tasks.append(add_qemu_to_inv(inventory, cluster_map[matched_cluster_fqdn], vm))
         else:
-            raise Exception(f"Unknown vm type discovered {vm['type']}")
+            raise AnsibleError(f"Unknown vm type discovered {vm['type']}")
     
     await asyncio.gather(*add_to_inv_tasks)
 
@@ -327,7 +323,7 @@ def get_manifest_version():
             manifest = json.load(f)
             manifest_version = manifest.get("version")
     else:
-        raise Exception("Could neither find pve cloud galaxy.yml nor MANIFEST.json")
+        raise AnsibleError("Could neither find pve cloud galaxy.yml nor MANIFEST.json")
 
     return manifest_version
 
@@ -355,7 +351,7 @@ async def init_plugin(loader, inventory, yaml_data, plugin_dir):
     manifest_version = get_manifest_version()
 
     if installed_pve_cloud_version != manifest_version:
-        raise Exception(f"Version missmatch! Cloud version: {installed_pve_cloud_version}, local version: {manifest_version}! Please update pve_cloud on your machine / run all setup playbooks again!")
+        raise AnsibleError(f"Version missmatch! Cloud version: {installed_pve_cloud_version}, local version: {manifest_version}! Please update pve_cloud on your machine / run all setup playbooks again!")
 
     build_pve_inventory(inventory, yaml_data, online_pve_hosts, cluster_map)
 

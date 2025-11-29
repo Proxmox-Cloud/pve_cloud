@@ -1,5 +1,6 @@
 # the cloud controller connects your cluster with the postgres running inside the lxc containers from the cloud-instance directory
-# it takes care of automatically synchronizing tls secrets
+# it takes care of automatically synchronizing tls secrets, making dns record based on ingress resources, ...
+# additional functionaltity is triggered by setting additional terraform variables defined in the modules spec
 module "cloud_controller" {
   source = "git@github.com:Proxmox-Cloud/pve-cloud-tf.git//modules/controller?ref=$NEWEST_TAG"
   k8s_stack_fqdn = "${local.inventory.stack_name}.${var.pve_cloud_domain}"

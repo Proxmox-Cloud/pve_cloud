@@ -1,16 +1,18 @@
+# read bind-inv.yaml for docs, or the schemas in the main documentation
 target_pve: pve-cluster-name.pve-cloud-domain.example
 stack_name: haproxy
 
+# the postgres_stack key is statically defined in pve-cloud-schemas
+# the playbooks need the postgres stack present to apply
 static_includes:
-  postgres_stack: patroni.pve-cloud-domain.example # the setup_haproxy playbook needs this stack too 
+  postgres_stack: patroni.pve-cloud-domain.example 
 
 lxcs:
 - hostname: main
   parameters:
-    rootfs: "volume=ssd:15,mountoptions=discard" # ssd is the name of the storage pool in proxmox
+    rootfs: "volume=ssd:15,mountoptions=discard"
     cores: 2
     memory: 1024
-    # ip addresses from pve-cluster-inventory
     net0: "name=pve,bridge=vmbr0,tag=100,firewall=1,ip=dhcp"
   vars:
     keepalived_master: true
@@ -23,9 +25,6 @@ lxcs:
     net0: "name=pve,bridge=vmbr0,tag=100,firewall=1,ip=dhcp"
   vars:
     keepalived_master: false
-
-lxc_global_vars:
-  install_prom_systemd_exporter: true
 
 lxc_base_parameters:
   onboot: 1

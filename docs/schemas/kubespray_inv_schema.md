@@ -113,7 +113,7 @@ but is set via kubespray custom inventory. Read kubernetes page in pve cloud doc
 | Property                                            | Pattern | Type            | Deprecated | Definition | Title/Description                                                                                 |
 | --------------------------------------------------- | ------- | --------------- | ---------- | ---------- | ------------------------------------------------------------------------------------------------- |
 | + [zone](#external_domains_items_zone )             | No      | string          | No         | -          | DNS parent zone, should also be the zone that external records are made under in AWS for example. |
-| - [expose_tld](#external_domains_items_expose_tld ) | No      | boolean         | No         | -          | Expose the top level domain itself.                                                               |
+| - [expose_apex](#external_domains_items_expose_apex ) | No      | boolean         | No         | -          | Expose the top level domain itself.                                                               |
 | + [names](#external_domains_items_names )           | No      | array of string | No         | -          | -                                                                                                 |
 
 #### <a name="external_domains_items_zone"></a>4.1.1. Property `K8S Kubespray Inv. > external_domains > external_domains items > zone`
@@ -125,7 +125,7 @@ but is set via kubespray custom inventory. Read kubernetes page in pve cloud doc
 
 **Description:** DNS parent zone, should also be the zone that external records are made under in AWS for example.
 
-#### <a name="external_domains_items_expose_tld"></a>4.1.2. Property `K8S Kubespray Inv. > external_domains > external_domains items > expose_tld`
+#### <a name="external_domains_items_expose_apex"></a>4.1.2. Property `K8S Kubespray Inv. > external_domains > external_domains items > expose_apex`
 
 |              |           |
 | ------------ | --------- |

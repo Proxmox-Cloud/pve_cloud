@@ -29,52 +29,11 @@
     - prometheus.prometheus.systemd_exporter
 
   tasks:
-
-
     - name: install prometheus-node-exporter
       ansible.builtin.apt:
         name: prometheus-node-exporter
         state: present
-    
-    # create mac iface mapping
-    - name: Create link files
-      copy:
-        dest: /etc/systemd/network/90-{{ item.iface }}.link
-        content: |
-          [Match]  
-          MACAddress={{ item.mac_addr }}
-
-          [Link]
-          Name={{ item.iface }}
-      when: mac_iface_mapping is defined
-      loop: "{{ mac_iface_mapping }}"
-      register: link_files
-    
-    - name: Update initramfs
-      command: update-initramfs -u -k all
-      when: link_files.changed
-
-    - name: Reboot
-      reboot:
-        msg: "Reboot after iface rename"
-      when: link_files.changed
-    
-    # wake on lan
-    - name: Add post-up ethtool wol enable if defined
-      blockinfile:
-        path: /etc/network/interfaces
-        marker: "        # {mark} WOL BLOCK {{ wol_iface }}"
-        insertafter: "^iface vmbr0 inet static"
-        block: |
-          {% filter indent(width=8, first=true) %}
-          post-up /usr/sbin/ethtool -s {{ wol_iface }} wol g
-          {% endfilter %}
-      when: wol_iface is defined
-
-    - name: Apply wol now
-      shell: "ethtool -s {{ wol_iface }} wol g"
-      when: wol_iface is defined
-
+        
     # download newest lxc templates on hosts
     - name: Update lxc templates
       command: "pveam update"

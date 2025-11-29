@@ -1,4 +1,4 @@
-# pve-cloud sample config
+# Infrastructure as code Example
 
 ## cloud-instance
 
@@ -7,9 +7,9 @@ In the `cloud-instance/` directory you will find an example of how to setup core
 The `playbooks.sh` script contains all commands in the needed order, to boostrap and setup core cloud services:
 
 * Kea DHCP - Provide DHCP for your dedicated vlan your cloud machines will live in
-* Bind DNS - DynDNS with Kea for machines and K8S ingress dns
-* Patroni Postgres - Central store for persistent configuration of the cloud, TLS Certificates, Terraform states, ...
-* HAProxy - Central loadbalancer of a proxmox cluster inside a pve cloud. Has public and private floating ips aswell as routing based on service / kubernetes inventory file definitions
+* Bind DNS - DynDNS with Kea for machines and k8s ingress dns
+* Patroni Postgres - central store for persistent configuration of the cloud, TLS certificates, terraform states, ...
+* HAProxy - central loadbalancer of a proxmox cluster inside a pve cloud (if you have multiple proxmox clusters you can also deploy multiple proxies). Has public and private floating ips aswell as routing based on sni inspection with names defined in kubernetes inventory file definitions
 
 ## kubespray-cluster
 

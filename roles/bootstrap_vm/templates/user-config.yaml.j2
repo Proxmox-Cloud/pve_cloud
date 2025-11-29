@@ -24,10 +24,3 @@ keyboard:
   layout: {{ qemu_keyboard_layout }}
 runcmd:
   - systemctl start qemu-guest-agent
-{% if squid_cache_settings.enabled %}
-ca_certs:
-  trusted:
-    - |
-      {{ pve_cloud_secrets_map['slop_squid_ca.crt'] | b64decode | indent(6) }}
-
-{% endif %}

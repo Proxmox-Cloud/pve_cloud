@@ -6,7 +6,7 @@ import paramiko
 import yaml
 import io
 from jsonschema.exceptions import ValidationError
-from ansible.errors import AnsibleParserError
+from ansible.errors import AnsibleParserError, AnsibleError
 
 
 def get_pve_cluster_vars(target_pve_inventory):
@@ -27,7 +27,7 @@ def get_pve_cluster_vars(target_pve_inventory):
         loaded_key = paramiko.Ed25519Key.from_private_key(io.StringIO(os.getenv("SSH_PRIVATE_KEY")))
         client.connect(pve_host, port=22, username='root', pkey=loaded_key)
     else:
-        raise Exception("No ssh keys loaded and no fallback defined")
+        raise AnsibleError("No ssh keys loaded and no fallback defined")
     
 
     stdin, stdout, stderr = client.exec_command("cat /etc/pve/cloud/cluster_vars.yaml")

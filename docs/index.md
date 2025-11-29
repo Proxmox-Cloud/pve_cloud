@@ -2,7 +2,7 @@
 
 The aim of this project is to provide a self hosted cloud provider (AWS, Google Cloud, Azure) like foundation, build on proxmox using other open source / free to use software.
 
-This collection is a toolbox to build your own onpremise clouds following infrastructure as code principles. The main tools you will be working with are ansible and terraform. The collection only contains things every self hosted cloud needs, the rest is up to you to decide and to build.
+This collection is a toolbox to build your own on-premise cloud(s) following infrastructure as code principles. The main tools you will be working with are ansible and terraform.
 
 It merges ansible inventories directly with vms/lxcs on proxmox, aswell as providing an integrated kubernetes implementation.
 
@@ -12,7 +12,7 @@ Checkout the [samples directory](https://github.com/Proxmox-Cloud/pve_cloud/tree
 
 ### Project dependency structure
 
-![Arch](dependency-arch.svg)
+![Arch](cloud-arch.svg)
 
 ## Compatibility
 

@@ -1,6 +1,7 @@
 target_pve: pve-cluster-name.pve-cloud-domain.example
 stack_name: bind
 
+# lxcs defined here will be automatically created / deleted if missing by the pve.cloud.sync_lxcs playbook
 lxcs:
 - hostname: main
   parameters:
@@ -11,7 +12,6 @@ lxcs:
     net0: "name=pve,bridge=vmbr0,tag=100,firewall=1,ip=192.168.1.4/22,gw=192.168.1.1"
   vars:
     bind_master: true
-
 - hostname: failover
   parameters:
     rootfs: "volume=ssd:15,mountoptions=discard"
@@ -21,12 +21,12 @@ lxcs:
   vars:
     bind_master: false
 
-lxc_global_vars:
-  install_prom_systemd_exporter: true
-
+# autostart the lxc on boot of our proxmox host
+# these parameters get applied to all lxcs
 lxc_base_parameters:
   onboot: 1
 
 root_ssh_pub_key: 'ssh-ed25519 AAAeAC3NzaC1tlZDI1NdasdAAIGreJ6EeeGddasB30hv1h5+erHhreUHzvmYE' # your public ssh key
 
-plugin: pve.cloud.lxc_inv # use the pve_cloud custom inventory for lxcs
+# standard field ansible look for to load dynamic inventories
+plugin: pve.cloud.lxc_inv 
