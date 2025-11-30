@@ -8,22 +8,22 @@
 | **Required**              | No          |
 | **Additional properties** | Not allowed |
 
-**Description:** Base inventory for creating lxcs for a single stack on PVE.
+**Description:** Inventory for creating lxcs for a single stack on PVE.
 
-| Property                                       | Pattern | Type             | Deprecated | Definition | Title/Description                                                                                                        |
-| ---------------------------------------------- | ------- | ---------------- | ---------- | ---------- | ------------------------------------------------------------------------------------------------------------------------ |
-| + [target_pve](#target_pve )                   | No      | string           | No         | -          | Proxmox cluster name + cloud domain, this is where the lxcs will be created.                                             |
-| + [stack_name](#stack_name )                   | No      | string           | No         | -          | Your stack name, needs to be unique within the cloud.                                                                    |
-| - [static_includes](#static_includes )         | No      | object           | No         | -          | -                                                                                                                        |
-| + [lxcs](#lxcs )                               | No      | array of object  | No         | -          | List of lxcs that will be created for the stack.                                                                         |
-| - [include_stacks](#include_stacks )           | No      | array of object  | No         | -          | Include other cloud stacks into the ansible inventory, from any PVE cluster within the cloud you like.                   |
-| - [lxc_global_vars](#lxc_global_vars )         | No      | object           | No         | -          | Variables that will be applied to all lxc hosts and are available in playbooks.                                          |
-| - [pve_ha_group](#pve_ha_group )               | No      | string           | No         | -          | When set the stack will be added to the corresponding PVE high availability group.                                       |
-| - [lxc_base_parameters](#lxc_base_parameters ) | No      | object           | No         | -          | PVE pct cli parameters that will be used for all lxcs.                                                                   |
-| - [lxc_os_template](#lxc_os_template )         | No      | string           | No         | -          | \`pveam available --section system\` / run \`pveam update\` for newest, PVE available LXC template (will be downloaded). |
-| + [root_ssh_pub_key](#root_ssh_pub_key )       | No      | string           | No         | -          | Public key that will be installed for the root user of all lxcs in the stack.                                            |
-| - [pve_cloud_pytest](#pve_cloud_pytest )       | No      | object           | No         | -          | Variables object used only in e2e tests.                                                                                 |
-| - [plugin](#plugin )                           | No      | enum (of string) | No         | -          | Id of ansible inventory plugin.                                                                                          |
+| Property                                       | Pattern | Type             | Deprecated | Definition | Title/Description                                                                                                                                       |
+| ---------------------------------------------- | ------- | ---------------- | ---------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| + [target_pve](#target_pve )                   | No      | string           | No         | -          | Proxmox cluster name + . + pve cloud domain. This determines the cloud and the proxmox cluster the k8s cluster will be created in.                      |
+| + [stack_name](#stack_name )                   | No      | string           | No         | -          | Your stack name, needs to be unique within the cloud domain.                                                                                            |
+| - [static_includes](#static_includes )         | No      | object           | No         | -          | -                                                                                                                                                       |
+| - [include_stacks](#include_stacks )           | No      | array of object  | No         | -          | Include other stacks into the ansible inventory, from any pve cloud you are connected to. From here you can freely extend and write your own playbooks. |
+| + [root_ssh_pub_key](#root_ssh_pub_key )       | No      | string           | No         | -          | trusted root key for the cloud init image.                                                                                                              |
+| - [pve_ha_group](#pve_ha_group )               | No      | string           | No         | -          | PVE HA group this vm should be assigned to (optional).                                                                                                  |
+| - [pve_cloud_pytest](#pve_cloud_pytest )       | No      | object           | No         | -          | Variables object used only in e2e tests.                                                                                                                |
+| + [lxcs](#lxcs )                               | No      | array of object  | No         | -          | List of lxcs that will be created for the stack.                                                                                                        |
+| - [lxc_global_vars](#lxc_global_vars )         | No      | object           | No         | -          | Variables that will be applied to all lxc hosts and are available in playbooks.                                                                         |
+| - [lxc_base_parameters](#lxc_base_parameters ) | No      | object           | No         | -          | PVE pct cli parameters that will be used for all lxcs.                                                                                                  |
+| - [lxc_os_template](#lxc_os_template )         | No      | string           | No         | -          | \`pveam available --section system\` / run \`pveam update\` for newest, PVE available LXC template (will be downloaded).                                |
+| - [plugin](#plugin )                           | No      | enum (of string) | No         | -          | Id of ansible inventory plugin.                                                                                                                         |
 
 ## <a name="target_pve"></a>1. Property `Schema ext setup_kea playbook > target_pve`
 
@@ -32,7 +32,13 @@
 | **Type**     | `string` |
 | **Required** | Yes      |
 
-**Description:** Proxmox cluster name + cloud domain, this is where the lxcs will be created.
+**Description:** Proxmox cluster name + . + pve cloud domain. This determines the cloud and the proxmox cluster the k8s cluster will be created in.
+
+**Example:**
+
+```json
+"proxmox-cluster-a.your-cloud.domain"
+```
 
 ## <a name="stack_name"></a>2. Property `Schema ext setup_kea playbook > stack_name`
 
@@ -41,7 +47,7 @@
 | **Type**     | `string` |
 | **Required** | Yes      |
 
-**Description:** Your stack name, needs to be unique within the cloud.
+**Description:** Your stack name, needs to be unique within the cloud domain.
 
 ## <a name="static_includes"></a>3. Property `Schema ext setup_kea playbook > static_includes`
 
@@ -51,7 +57,108 @@
 | **Required**              | No               |
 | **Additional properties** | Any type allowed |
 
-## <a name="lxcs"></a>4. Property `Schema ext setup_kea playbook > lxcs`
+## <a name="include_stacks"></a>4. Property `Schema ext setup_kea playbook > include_stacks`
+
+|              |                   |
+| ------------ | ----------------- |
+| **Type**     | `array of object` |
+| **Required** | No                |
+
+**Description:** Include other stacks into the ansible inventory, from any pve cloud you are connected to. From here you can freely extend and write your own playbooks.
+
+|                      | Array restrictions |
+| -------------------- | ------------------ |
+| **Min items**        | N/A                |
+| **Max items**        | N/A                |
+| **Items unicity**    | False              |
+| **Additional items** | False              |
+| **Tuple validation** | See below          |
+
+| Each item of this array must be               | Description |
+| --------------------------------------------- | ----------- |
+| [include_stacks items](#include_stacks_items) | -           |
+
+### <a name="include_stacks_items"></a>4.1. Schema ext setup_kea playbook > include_stacks > include_stacks items
+
+|                           |             |
+| ------------------------- | ----------- |
+| **Type**                  | `object`    |
+| **Required**              | No          |
+| **Additional properties** | Not allowed |
+
+| Property                                                        | Pattern | Type   | Deprecated | Definition | Title/Description                                                                                                                                                                                                                  |
+| --------------------------------------------------------------- | ------- | ------ | ---------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| + [stack_fqdn](#include_stacks_items_stack_fqdn )               | No      | string | No         | -          | Target stack fqdn to include (stack name + pve_cloud_domain). Will automatically include it from the right pve cluster.                                                                                                            |
+| + [host_group](#include_stacks_items_host_group )               | No      | string | No         | -          | This is the name of the hosts group of our ansible inventory the included vms/lxcs will be available under.                                                                                                                        |
+| - [qemu_ansible_user](#include_stacks_items_qemu_ansible_user ) | No      | string | No         | -          | User ansible will use to connect, defaults to admin. If you dont want to use debian cinit images you might need to set something else than admin.<br />Ubuntu for example wont work if you set the cloud init user to admin.<br /> |
+
+#### <a name="include_stacks_items_stack_fqdn"></a>4.1.1. Property `Schema ext setup_kea playbook > include_stacks > include_stacks items > stack_fqdn`
+
+|              |          |
+| ------------ | -------- |
+| **Type**     | `string` |
+| **Required** | Yes      |
+
+**Description:** Target stack fqdn to include (stack name + pve_cloud_domain). Will automatically include it from the right pve cluster.
+
+**Examples:**
+
+```json
+"bind.your-other-cloud.domain"
+```
+
+```json
+"other-k8s.your-other-cloud.domain"
+```
+
+#### <a name="include_stacks_items_host_group"></a>4.1.2. Property `Schema ext setup_kea playbook > include_stacks > include_stacks items > host_group`
+
+|              |          |
+| ------------ | -------- |
+| **Type**     | `string` |
+| **Required** | Yes      |
+
+**Description:** This is the name of the hosts group of our ansible inventory the included vms/lxcs will be available under.
+
+#### <a name="include_stacks_items_qemu_ansible_user"></a>4.1.3. Property `Schema ext setup_kea playbook > include_stacks > include_stacks items > qemu_ansible_user`
+
+|              |          |
+| ------------ | -------- |
+| **Type**     | `string` |
+| **Required** | No       |
+
+**Description:** User ansible will use to connect, defaults to admin. If you dont want to use debian cinit images you might need to set something else than admin.
+Ubuntu for example wont work if you set the cloud init user to admin.
+
+## <a name="root_ssh_pub_key"></a>5. Property `Schema ext setup_kea playbook > root_ssh_pub_key`
+
+|              |          |
+| ------------ | -------- |
+| **Type**     | `string` |
+| **Required** | Yes      |
+
+**Description:** trusted root key for the cloud init image.
+
+## <a name="pve_ha_group"></a>6. Property `Schema ext setup_kea playbook > pve_ha_group`
+
+|              |          |
+| ------------ | -------- |
+| **Type**     | `string` |
+| **Required** | No       |
+
+**Description:** PVE HA group this vm should be assigned to (optional).
+
+## <a name="pve_cloud_pytest"></a>7. Property `Schema ext setup_kea playbook > pve_cloud_pytest`
+
+|                           |                  |
+| ------------------------- | ---------------- |
+| **Type**                  | `object`         |
+| **Required**              | No               |
+| **Additional properties** | Any type allowed |
+
+**Description:** Variables object used only in e2e tests.
+
+## <a name="lxcs"></a>8. Property `Schema ext setup_kea playbook > lxcs`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -72,7 +179,7 @@
 | ------------------------------- | ----------- |
 | [lxcs items](#lxcs_items)       | -           |
 
-### <a name="lxcs_items"></a>4.1. Schema ext setup_kea playbook > lxcs > lxcs items
+### <a name="lxcs_items"></a>8.1. Schema ext setup_kea playbook > lxcs > lxcs items
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -87,7 +194,7 @@
 | + [vars](#lxcs_items_vars )               | No      | object | No         | -          | Custom variables for this lxc specifically. Will be usable in playbooks.                    |
 | + [parameters](#lxcs_items_parameters )   | No      | object | No         | -          | Parameters that will be passed to pve pct cli tool for lxc creation.                        |
 
-#### <a name="lxcs_items_hostname"></a>4.1.1. Property `Schema ext setup_kea playbook > lxcs > lxcs items > hostname`
+#### <a name="lxcs_items_hostname"></a>8.1.1. Property `Schema ext setup_kea playbook > lxcs > lxcs items > hostname`
 
 |              |          |
 | ------------ | -------- |
@@ -96,7 +203,7 @@
 
 **Description:** Optional unique hostname for this lxc, otherwise pet name random name will be generated.
 
-#### <a name="lxcs_items_target_host"></a>4.1.2. Property `Schema ext setup_kea playbook > lxcs > lxcs items > target_host`
+#### <a name="lxcs_items_target_host"></a>8.1.2. Property `Schema ext setup_kea playbook > lxcs > lxcs items > target_host`
 
 |              |          |
 | ------------ | -------- |
@@ -105,7 +212,7 @@
 
 **Description:** Pve host to tie this vm to. This is useful to always deploy specifically on a proxmox host.
 
-#### <a name="lxcs_items_vars"></a>4.1.3. Property `Schema ext setup_kea playbook > lxcs > lxcs items > vars`
+#### <a name="lxcs_items_vars"></a>8.1.3. Property `Schema ext setup_kea playbook > lxcs > lxcs items > vars`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -119,7 +226,7 @@
 | -------------------------------------------------- | ------- | ------- | ---------- | ---------- | ------------------------------------------------------------------------------------------------------------ |
 | + [kea_dhcp_main](#lxcs_items_vars_kea_dhcp_main ) | No      | boolean | No         | -          | Determines the lxc that will be the dhcp master instance. One lxc should be set to true, the other to false. |
 
-##### <a name="lxcs_items_vars_kea_dhcp_main"></a>4.1.3.1. Property `Schema ext setup_kea playbook > lxcs > lxcs items > vars > kea_dhcp_main`
+##### <a name="lxcs_items_vars_kea_dhcp_main"></a>8.1.3.1. Property `Schema ext setup_kea playbook > lxcs > lxcs items > vars > kea_dhcp_main`
 
 |              |           |
 | ------------ | --------- |
@@ -128,7 +235,7 @@
 
 **Description:** Determines the lxc that will be the dhcp master instance. One lxc should be set to true, the other to false.
 
-#### <a name="lxcs_items_parameters"></a>4.1.4. Property `Schema ext setup_kea playbook > lxcs > lxcs items > parameters`
+#### <a name="lxcs_items_parameters"></a>8.1.4. Property `Schema ext setup_kea playbook > lxcs > lxcs items > parameters`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -138,14 +245,14 @@
 
 **Description:** Parameters that will be passed to pve pct cli tool for lxc creation.
 
-| Property                                   | Pattern | Type    | Deprecated | Definition | Title/Description                            |
-| ------------------------------------------ | ------- | ------- | ---------- | ---------- | -------------------------------------------- |
-| + [rootfs](#lxcs_items_parameters_rootfs ) | No      | string  | No         | -          | PVE storage for the container disk.          |
-| + [cores](#lxcs_items_parameters_cores )   | No      | integer | No         | -          | Number of virtual CPU cores.                 |
-| + [memory](#lxcs_items_parameters_memory ) | No      | integer | No         | -          | Memory in bytes, use POW 2.                  |
-| + [net0](#lxcs_items_parameters_net0 )     | No      | string  | No         | -          | Configuration for primary network interface. |
+| Property                                   | Pattern | Type    | Deprecated | Definition | Title/Description                                                                                                                                                                               |
+| ------------------------------------------ | ------- | ------- | ---------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| + [rootfs](#lxcs_items_parameters_rootfs ) | No      | string  | No         | -          | PVE storage for the container disk.                                                                                                                                                             |
+| + [cores](#lxcs_items_parameters_cores )   | No      | integer | No         | -          | Number of virtual CPU cores.                                                                                                                                                                    |
+| + [memory](#lxcs_items_parameters_memory ) | No      | integer | No         | -          | Memory in bytes, use POW 2.                                                                                                                                                                     |
+| + [net0](#lxcs_items_parameters_net0 )     | No      | string  | No         | -          | Network interface the dhcp will serve on. This has to be named "pve" instead of the normal eth0 for the dhcp playbooks to work,<br />they configure kea to listen on this interface name.<br /> |
 
-##### <a name="lxcs_items_parameters_rootfs"></a>4.1.4.1. Property `Schema ext setup_kea playbook > lxcs > lxcs items > parameters > rootfs`
+##### <a name="lxcs_items_parameters_rootfs"></a>8.1.4.1. Property `Schema ext setup_kea playbook > lxcs > lxcs items > parameters > rootfs`
 
 |              |          |
 | ------------ | -------- |
@@ -154,7 +261,7 @@
 
 **Description:** PVE storage for the container disk.
 
-##### <a name="lxcs_items_parameters_cores"></a>4.1.4.2. Property `Schema ext setup_kea playbook > lxcs > lxcs items > parameters > cores`
+##### <a name="lxcs_items_parameters_cores"></a>8.1.4.2. Property `Schema ext setup_kea playbook > lxcs > lxcs items > parameters > cores`
 
 |              |           |
 | ------------ | --------- |
@@ -163,7 +270,7 @@
 
 **Description:** Number of virtual CPU cores.
 
-##### <a name="lxcs_items_parameters_memory"></a>4.1.4.3. Property `Schema ext setup_kea playbook > lxcs > lxcs items > parameters > memory`
+##### <a name="lxcs_items_parameters_memory"></a>8.1.4.3. Property `Schema ext setup_kea playbook > lxcs > lxcs items > parameters > memory`
 
 |              |           |
 | ------------ | --------- |
@@ -172,14 +279,15 @@
 
 **Description:** Memory in bytes, use POW 2.
 
-##### <a name="lxcs_items_parameters_net0"></a>4.1.4.4. Property `Schema ext setup_kea playbook > lxcs > lxcs items > parameters > net0`
+##### <a name="lxcs_items_parameters_net0"></a>8.1.4.4. Property `Schema ext setup_kea playbook > lxcs > lxcs items > parameters > net0`
 
 |              |          |
 | ------------ | -------- |
 | **Type**     | `string` |
 | **Required** | Yes      |
 
-**Description:** Configuration for primary network interface.
+**Description:** Network interface the dhcp will serve on. This has to be named "pve" instead of the normal eth0 for the dhcp playbooks to work,
+they configure kea to listen on this interface name.
 
 **Example:**
 
@@ -191,69 +299,7 @@
 | --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Must match regular expression** | ```\bname=pve\b``` [Test](https://regex101.com/?regex=%5Cbname%3Dpve%5Cb&testString=%22name%3Deth0%2Cbridge%3Dvmbr0%2Ctag%3D120%2Cfirewall%3D1%2Cip%3Ddhcp%22) |
 
-## <a name="include_stacks"></a>5. Property `Schema ext setup_kea playbook > include_stacks`
-
-|              |                   |
-| ------------ | ----------------- |
-| **Type**     | `array of object` |
-| **Required** | No                |
-
-**Description:** Include other cloud stacks into the ansible inventory, from any PVE cluster within the cloud you like.
-
-|                      | Array restrictions |
-| -------------------- | ------------------ |
-| **Min items**        | N/A                |
-| **Max items**        | N/A                |
-| **Items unicity**    | False              |
-| **Additional items** | False              |
-| **Tuple validation** | See below          |
-
-| Each item of this array must be               | Description |
-| --------------------------------------------- | ----------- |
-| [include_stacks items](#include_stacks_items) | -           |
-
-### <a name="include_stacks_items"></a>5.1. Schema ext setup_kea playbook > include_stacks > include_stacks items
-
-|                           |                  |
-| ------------------------- | ---------------- |
-| **Type**                  | `object`         |
-| **Required**              | No               |
-| **Additional properties** | Any type allowed |
-
-| Property                                                        | Pattern | Type   | Deprecated | Definition | Title/Description                                                                                                       |
-| --------------------------------------------------------------- | ------- | ------ | ---------- | ---------- | ----------------------------------------------------------------------------------------------------------------------- |
-| - [stack_fqdn](#include_stacks_items_stack_fqdn )               | No      | string | No         | -          | Target stack fqdn to include (stack name + pve_cloud_domain). Will automatically include it from the right pve cluster. |
-| - [host_group](#include_stacks_items_host_group )               | No      | string | No         | -          | This is the name of the hosts group of our ansible inventory the included vms will be under.                            |
-| - [qemu_ansible_user](#include_stacks_items_qemu_ansible_user ) | No      | string | No         | -          | User ansible will use to connect if its a vm, defaults to admin. LXCs are always root.                                  |
-
-#### <a name="include_stacks_items_stack_fqdn"></a>5.1.1. Property `Schema ext setup_kea playbook > include_stacks > include_stacks items > stack_fqdn`
-
-|              |          |
-| ------------ | -------- |
-| **Type**     | `string` |
-| **Required** | No       |
-
-**Description:** Target stack fqdn to include (stack name + pve_cloud_domain). Will automatically include it from the right pve cluster.
-
-#### <a name="include_stacks_items_host_group"></a>5.1.2. Property `Schema ext setup_kea playbook > include_stacks > include_stacks items > host_group`
-
-|              |          |
-| ------------ | -------- |
-| **Type**     | `string` |
-| **Required** | No       |
-
-**Description:** This is the name of the hosts group of our ansible inventory the included vms will be under.
-
-#### <a name="include_stacks_items_qemu_ansible_user"></a>5.1.3. Property `Schema ext setup_kea playbook > include_stacks > include_stacks items > qemu_ansible_user`
-
-|              |          |
-| ------------ | -------- |
-| **Type**     | `string` |
-| **Required** | No       |
-
-**Description:** User ansible will use to connect if its a vm, defaults to admin. LXCs are always root.
-
-## <a name="lxc_global_vars"></a>6. Property `Schema ext setup_kea playbook > lxc_global_vars`
+## <a name="lxc_global_vars"></a>9. Property `Schema ext setup_kea playbook > lxc_global_vars`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -269,7 +315,7 @@
 | - [install_prom_systemd_exporter](#lxc_global_vars_install_prom_systemd_exporter ) | No      | boolean | No         | -          | Will install prometheus metrics exporter for systemd. This implements with pve cloud terraform monitoring modules. |
 | - [](#lxc_global_vars_additionalProperties )                                       | No      | object  | No         | -          | -                                                                                                                  |
 
-### <a name="lxc_global_vars_use_alternate_ssh_port"></a>6.1. Property `Schema ext setup_kea playbook > lxc_global_vars > use_alternate_ssh_port`
+### <a name="lxc_global_vars_use_alternate_ssh_port"></a>9.1. Property `Schema ext setup_kea playbook > lxc_global_vars > use_alternate_ssh_port`
 
 |              |           |
 | ------------ | --------- |
@@ -278,7 +324,7 @@
 
 **Description:** Will use 2222 instead of 22 for ssh.
 
-### <a name="lxc_global_vars_install_prom_systemd_exporter"></a>6.2. Property `Schema ext setup_kea playbook > lxc_global_vars > install_prom_systemd_exporter`
+### <a name="lxc_global_vars_install_prom_systemd_exporter"></a>9.2. Property `Schema ext setup_kea playbook > lxc_global_vars > install_prom_systemd_exporter`
 
 |              |           |
 | ------------ | --------- |
@@ -287,16 +333,7 @@
 
 **Description:** Will install prometheus metrics exporter for systemd. This implements with pve cloud terraform monitoring modules.
 
-## <a name="pve_ha_group"></a>7. Property `Schema ext setup_kea playbook > pve_ha_group`
-
-|              |          |
-| ------------ | -------- |
-| **Type**     | `string` |
-| **Required** | No       |
-
-**Description:** When set the stack will be added to the corresponding PVE high availability group.
-
-## <a name="lxc_base_parameters"></a>8. Property `Schema ext setup_kea playbook > lxc_base_parameters`
+## <a name="lxc_base_parameters"></a>10. Property `Schema ext setup_kea playbook > lxc_base_parameters`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -306,7 +343,7 @@
 
 **Description:** PVE pct cli parameters that will be used for all lxcs.
 
-## <a name="lxc_os_template"></a>9. Property `Schema ext setup_kea playbook > lxc_os_template`
+## <a name="lxc_os_template"></a>11. Property `Schema ext setup_kea playbook > lxc_os_template`
 
 |              |          |
 | ------------ | -------- |
@@ -314,25 +351,6 @@
 | **Required** | No       |
 
 **Description:** `pveam available --section system` / run `pveam update` for newest, PVE available LXC template (will be downloaded).
-
-## <a name="root_ssh_pub_key"></a>10. Property `Schema ext setup_kea playbook > root_ssh_pub_key`
-
-|              |          |
-| ------------ | -------- |
-| **Type**     | `string` |
-| **Required** | Yes      |
-
-**Description:** Public key that will be installed for the root user of all lxcs in the stack.
-
-## <a name="pve_cloud_pytest"></a>11. Property `Schema ext setup_kea playbook > pve_cloud_pytest`
-
-|                           |                  |
-| ------------------------- | ---------------- |
-| **Type**                  | `object`         |
-| **Required**              | No               |
-| **Additional properties** | Any type allowed |
-
-**Description:** Variables object used only in e2e tests.
 
 ## <a name="plugin"></a>12. Property `Schema ext setup_kea playbook > plugin`
 
@@ -347,4 +365,4 @@ Must be one of:
 * "pve.cloud.lxc_inv"
 
 ----------------------------------------------------------------------------------------------------------------------------
-Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2025-11-29 at 23:48:23 +0000
+Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2025-11-30 at 00:14:56 +0000
