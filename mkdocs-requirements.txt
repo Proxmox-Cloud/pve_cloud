@@ -1,4 +1,4 @@
 mkdocs-material==9.6.21
 json-schema-for-humans==1.4.1
 mkdocs-include-dir-to-nav==1.2.0
-pve-cloud-schemas==0.3.3
+pve-cloud-schemas==0.3.4
