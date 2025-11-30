@@ -8,7 +8,7 @@ Checkout the `kubespray-cluster` dir in the [samples directory](https://github.c
 
 ## Deploying a cluster
 
-Again create custom inventory yaml file following this [cluster schema](schemas/kubespray_inv_schema.md).
+Again create custom inventory yaml file following this [k8s cluster schema](schemas/kubespray_inv_schema.md).
 
 Afterwards run the `pve.cloud.sync_kubespray` playbook, this will fully create VMs, setup kubespray, initialize TLS Certificates and deploy core kubernetes helm charts (Ceph CSI, Ingress).
 
@@ -48,16 +48,18 @@ You need to create secret files inside the clouds secret folder on your proxmox 
 
 Afterwards you need to sync those secrets to all hosts in the cloud, you can do that by rerunning the `setup_pve_clusters` playbook - `ansible-playbook -i YOUR-CLOUD-INV.yaml pve.cloud.setup_pve_clusters --tags rsync`. This needs to be done only once! There is no support for multiple dns providers / multiple accounts yet.
 
+You are welcome to create and submit a MR with your own roles / logic for other providers!
+
 
 ## Upgrading a cluster
 
 Upgrading the cluster is as simple as updating the version tag reference of this collection.
 
-You can skip to the latest patch version, but shouldn't skip minor versions as they are tied to kubespray updates. After updating the cloud collection version in your requirements.yaml,
-
-You have to run `ansible-galaxy install -r requirements.yaml` and `pip install -r ~/.ansible/collections/ansible_collections/pve/cloud/meta/ee-requirements.txt` again.
+You can skip to the latest patch version, but shouldn't skip minor versions as they are tied to kubespray updates. After updating the cloud collection version in your requirements.yaml, you have to run `ansible-galaxy install -r requirements.yaml` and `pip install -r ~/.ansible/collections/ansible_collections/pve/cloud/meta/ee-requirements.txt` again.
 
 Then run the upgrade playbook `ansible-playbook -i YOUR-KUBESPRAY-INV.yaml pve.cloud.upgrade_kubespray`.
+
+Right now kubespray is tightly coupled with the entire collection, meaning you have to update the collection a minor version, then update all your clusters, then the collection again and so forth. In the future this will be split to make it more versatile. There is a version lock for the collection that will prevent you from doing updates, if you do this in any other order.
 
 ## Custom kubespray vars
 
@@ -90,9 +92,9 @@ eviction_hard:
 
 ## Exposing K8S Controlplane API
 
-If you want to expose your kubenetes clusters controlplane to integrate with external running services, you can set additional SANs that will be generated and inserted by kubespray into the kubeapi certificates, by listing them in your kubespray inventory file under `extra_control_plane_sans` as simple strings. See the [cluster schema](schemas/kubespray_inv_schema.md).
+If you want to expose your kubenetes clusters controlplane to integrate with external running services, you can set additional SANs that will be generated and inserted by kubespray into the kubeapi certificates, by listing them in your kubespray inventory file under `extra_control_plane_sans` as simple strings.
 
-Adding SANs there will also configure the pve cloud haproxy to route traffic to the respecive clusters controlplane hitting its external floating ip.
+Adding SANs there will also configure the pve cloud haproxy to route any control plane traffic (6443) on its external ip to respecive cluster.
 
 DNS Records for these SANs have to be created manually (for internal and external DNS servers), for that use terraforms dns, route53 and ionos provider.
 

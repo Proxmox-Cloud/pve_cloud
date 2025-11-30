@@ -48,7 +48,6 @@ pve-cloud-controller
 test-env-conf.yaml
 ```
 
-
 1. run `pip install pytest-pve-cloud`, you might need first install `sudo apt install build-essential python3-dev` (or your distros equivalent)
 2. also install the core ansible dependencies from the [bootstrap section](bootstrap.md), followed by `pip install -r meta/ee-requirements.txt`
 3. run `tdd-reqs` cli command inside the pve_cloud collection and `ansible-galaxy install -r tdd-requirements.yml`, this will install all the ansible collection dependencies

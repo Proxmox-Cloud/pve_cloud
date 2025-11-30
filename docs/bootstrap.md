@@ -26,7 +26,7 @@ collections:
     version: $LATEST_TAG_VERSION
 ```
 * run `ansible-galaxy install -r requirements.yaml`, then install the python requirements from `pip install -r ~/.ansible/collections/ansible_collections/pve/cloud/meta/ee-requirements.txt`.
-* you also might want to creata a `ansible.cfg` file on the top level of your repo with the following content:
+* you also might want to create a `ansible.cfg` file on the top level of your repo with the following content:
 ```ini
 [defaults]
 # on recreating vms this will prevent issues executing the playbook
@@ -58,10 +58,10 @@ This repository should contain:
 
 * pve cloud inventory file - [cloud schema](schemas/pve_cloud_inv_schema.md) => for the `pve.cloud.setup_pve_clusters` playbook
 * lxc inventory files for the basic services - [lxc inv schema](schemas/lxc_inv_schema.md)
-  * inventory for two kea lxcs => for use with `pve.cloud.setup_kea` playbook - [dhcp inv schema](schemas/setup_kea_schema_ext.md)
-  * inventory for two bind lxcs => `pve.cloud.setup_bind` playbook - [bind inv schema](schemas/setup_bind_schema_ext.md)
-  * three lxcs for patroni postgres => `pve.cloud.setup_postgres` playbook - no special schema
-  * two haproxy lxcs => `pve.cloud.setup_haproxy` playbook - [haproxy inv schema](schemas/setup_haproxy_schema_ext.md)
+    * inventory for two kea lxcs => for use with `pve.cloud.setup_kea` playbook - [dhcp inv schema](schemas/setup_kea_schema_ext.md)
+    * inventory for two bind lxcs => `pve.cloud.setup_bind` playbook - [bind inv schema](schemas/setup_bind_schema_ext.md)
+    * three lxcs for patroni postgres => `pve.cloud.setup_postgres` playbook - no special schema
+    * two haproxy lxcs => `pve.cloud.setup_haproxy` playbook - [haproxy inv schema](schemas/setup_haproxy_schema_ext.md)
 
 
 From here you can start deploying your first kubernetes cluster, which will serve as the basis for most deployments/services.
