@@ -12,7 +12,7 @@
         <link rel="prev" href="../lxc_inv_schema/">
       
       
-        <link rel="next" href="../pve_inventory_schema/">
+        <link rel="next" href="../qemu_inv_schema/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -368,35 +368,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../awx_cloud_inv_schema/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    AWX Cron Inventory
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../kubespray_inv_schema/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    K8S Kubespray Inv.
+    Kubernetes kubespray inventory
     
   </span>
   
@@ -505,57 +482,168 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#3-property-cloud-inventory-pve_clusters" class="md-nav__link">
+  <a href="#3-property-cloud-inventory-kea_dhcp_main_ip" class="md-nav__link">
     <span class="md-ellipsis">
-      3. Property Cloud Inventory &gt; pve_clusters
+      3. Property Cloud Inventory &gt; kea_dhcp_main_ip
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="3. Property Cloud Inventory &gt; pve_clusters">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#31-pattern-property-cloud-inventory-pve_clusters-pve-cluster-fqdn" class="md-nav__link">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-property-cloud-inventory-kea_dhcp_failover_ip" class="md-nav__link">
     <span class="md-ellipsis">
-      3.1. Pattern Property Cloud Inventory &gt; pve_clusters &gt; PVE cluster fqdn
+      4. Property Cloud Inventory &gt; kea_dhcp_failover_ip
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="3.1. Pattern Property Cloud Inventory &gt; pve_clusters &gt; PVE cluster fqdn">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-property-cloud-inventory-kea_dhcp_routers" class="md-nav__link">
+    <span class="md-ellipsis">
+      5. Property Cloud Inventory &gt; kea_dhcp_routers
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-property-cloud-inventory-kea_dhcp_pools" class="md-nav__link">
+    <span class="md-ellipsis">
+      6. Property Cloud Inventory &gt; kea_dhcp_pools
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Property Cloud Inventory &gt; kea_dhcp_pools">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#311-property-cloud-inventory-pve_clusters-pve-cluster-fqdn-pve_haproxy_floating_ip" class="md-nav__link">
+  <a href="#61-cloud-inventory-kea_dhcp_pools-kea_dhcp_pools-items" class="md-nav__link">
     <span class="md-ellipsis">
-      3.1.1. Property Cloud Inventory &gt; pve_clusters &gt; PVE cluster fqdn &gt; pve_haproxy_floating_ip
+      6.1. Cloud Inventory &gt; kea_dhcp_pools &gt; kea_dhcp_pools items
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-property-cloud-inventory-kea_dhcp_static_routes" class="md-nav__link">
+    <span class="md-ellipsis">
+      7. Property Cloud Inventory &gt; kea_dhcp_static_routes
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-property-cloud-inventory-bind_master_ip" class="md-nav__link">
+    <span class="md-ellipsis">
+      8. Property Cloud Inventory &gt; bind_master_ip
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-property-cloud-inventory-bind_slave_ip" class="md-nav__link">
+    <span class="md-ellipsis">
+      9. Property Cloud Inventory &gt; bind_slave_ip
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-property-cloud-inventory-bind_arpa_zone_service_lxcs" class="md-nav__link">
+    <span class="md-ellipsis">
+      10. Property Cloud Inventory &gt; bind_arpa_zone_service_lxcs
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-property-cloud-inventory-bind_additional_arpa_zones" class="md-nav__link">
+    <span class="md-ellipsis">
+      11. Property Cloud Inventory &gt; bind_additional_arpa_zones
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="11. Property Cloud Inventory &gt; bind_additional_arpa_zones">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#111-cloud-inventory-bind_additional_arpa_zones-bind_additional_arpa_zones-items" class="md-nav__link">
+    <span class="md-ellipsis">
+      11.1. Cloud Inventory &gt; bind_additional_arpa_zones &gt; bind_additional_arpa_zones items
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-property-cloud-inventory-pve_clusters" class="md-nav__link">
+    <span class="md-ellipsis">
+      12. Property Cloud Inventory &gt; pve_clusters
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="12. Property Cloud Inventory &gt; pve_clusters">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#121-pattern-property-cloud-inventory-pve_clusters-pve-cluster-fqdn" class="md-nav__link">
+    <span class="md-ellipsis">
+      12.1. Pattern Property Cloud Inventory &gt; pve_clusters &gt; PVE cluster fqdn
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="12.1. Pattern Property Cloud Inventory &gt; pve_clusters &gt; PVE cluster fqdn">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1211-property-cloud-inventory-pve_clusters-pve-cluster-fqdn-pve_haproxy_floating_ip_internal" class="md-nav__link">
+    <span class="md-ellipsis">
+      12.1.1. Property Cloud Inventory &gt; pve_clusters &gt; PVE cluster fqdn &gt; pve_haproxy_floating_ip_internal
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#312-property-cloud-inventory-pve_clusters-pve-cluster-fqdn-pve_haproxy_floating_ip_internal" class="md-nav__link">
+  <a href="#1212-property-cloud-inventory-pve_clusters-pve-cluster-fqdn-pve_haproxy_floating_ip" class="md-nav__link">
     <span class="md-ellipsis">
-      3.1.2. Property Cloud Inventory &gt; pve_clusters &gt; PVE cluster fqdn &gt; pve_haproxy_floating_ip_internal
+      12.1.2. Property Cloud Inventory &gt; pve_clusters &gt; PVE cluster fqdn &gt; pve_haproxy_floating_ip
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#313-property-cloud-inventory-pve_clusters-pve-cluster-fqdn-pve_unique_cloud_services" class="md-nav__link">
+  <a href="#1213-property-cloud-inventory-pve_clusters-pve-cluster-fqdn-pve_unique_cloud_services" class="md-nav__link">
     <span class="md-ellipsis">
-      3.1.3. Property Cloud Inventory &gt; pve_clusters &gt; PVE cluster fqdn &gt; pve_unique_cloud_services
+      12.1.3. Property Cloud Inventory &gt; pve_clusters &gt; PVE cluster fqdn &gt; pve_unique_cloud_services
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="3.1.3. Property Cloud Inventory &gt; pve_clusters &gt; PVE cluster fqdn &gt; pve_unique_cloud_services">
+    <nav class="md-nav" aria-label="12.1.3. Property Cloud Inventory &gt; pve_clusters &gt; PVE cluster fqdn &gt; pve_unique_cloud_services">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#3131-cloud-inventory-pve_clusters-pve-cluster-fqdn-pve_unique_cloud_services-pve_unique_cloud_services-items" class="md-nav__link">
+  <a href="#12131-cloud-inventory-pve_clusters-pve-cluster-fqdn-pve_unique_cloud_services-pve_unique_cloud_services-items" class="md-nav__link">
     <span class="md-ellipsis">
-      3.1.3.1. Cloud Inventory &gt; pve_clusters &gt; PVE cluster fqdn &gt; pve_unique_cloud_services &gt; pve_unique_cloud_services items
+      12.1.3.1. Cloud Inventory &gt; pve_clusters &gt; PVE cluster fqdn &gt; pve_unique_cloud_services &gt; pve_unique_cloud_services items
     </span>
   </a>
   
@@ -567,178 +655,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#314-property-cloud-inventory-pve_clusters-pve-cluster-fqdn-pve_host_vars" class="md-nav__link">
+  <a href="#1214-property-cloud-inventory-pve_clusters-pve-cluster-fqdn-pve_host_vars" class="md-nav__link">
     <span class="md-ellipsis">
-      3.1.4. Property Cloud Inventory &gt; pve_clusters &gt; PVE cluster fqdn &gt; pve_host_vars
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="3.1.4. Property Cloud Inventory &gt; pve_clusters &gt; PVE cluster fqdn &gt; pve_host_vars">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#3141-property-cloud-inventory-pve_clusters-pve-cluster-fqdn-pve_host_vars-wol_iface" class="md-nav__link">
-    <span class="md-ellipsis">
-      3.1.4.1. Property Cloud Inventory &gt; pve_clusters &gt; PVE cluster fqdn &gt; pve_host_vars &gt; wol_iface
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#3142-property-cloud-inventory-pve_clusters-pve-cluster-fqdn-pve_host_vars-tso_gso_fix" class="md-nav__link">
-    <span class="md-ellipsis">
-      3.1.4.2. Property Cloud Inventory &gt; pve_clusters &gt; PVE cluster fqdn &gt; pve_host_vars &gt; tso_gso_fix
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#3143-property-cloud-inventory-pve_clusters-pve-cluster-fqdn-pve_host_vars-mac_iface_mapping" class="md-nav__link">
-    <span class="md-ellipsis">
-      3.1.4.3. Property Cloud Inventory &gt; pve_clusters &gt; PVE cluster fqdn &gt; pve_host_vars &gt; mac_iface_mapping
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="3.1.4.3. Property Cloud Inventory &gt; pve_clusters &gt; PVE cluster fqdn &gt; pve_host_vars &gt; mac_iface_mapping">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#31431-cloud-inventory-pve_clusters-pve-cluster-fqdn-pve_host_vars-mac_iface_mapping-mac_iface_mapping-items" class="md-nav__link">
-    <span class="md-ellipsis">
-      3.1.4.3.1. Cloud Inventory &gt; pve_clusters &gt; PVE cluster fqdn &gt; pve_host_vars &gt; mac_iface_mapping &gt; mac_iface_mapping items
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#314311-property-cloud-inventory-pve_clusters-pve-cluster-fqdn-pve_host_vars-mac_iface_mapping-mac_iface_mapping-items-mac_addr" class="md-nav__link">
-    <span class="md-ellipsis">
-      3.1.4.3.1.1. Property Cloud Inventory &gt; pve_clusters &gt; PVE cluster fqdn &gt; pve_host_vars &gt; mac_iface_mapping &gt; mac_iface_mapping items &gt; mac_addr
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#314312-property-cloud-inventory-pve_clusters-pve-cluster-fqdn-pve_host_vars-mac_iface_mapping-mac_iface_mapping-items-iface" class="md-nav__link">
-    <span class="md-ellipsis">
-      3.1.4.3.1.2. Property Cloud Inventory &gt; pve_clusters &gt; PVE cluster fqdn &gt; pve_host_vars &gt; mac_iface_mapping &gt; mac_iface_mapping items &gt; iface
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#4-property-cloud-inventory-bind_master_ip" class="md-nav__link">
-    <span class="md-ellipsis">
-      4. Property Cloud Inventory &gt; bind_master_ip
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#5-property-cloud-inventory-bind_slave_ip" class="md-nav__link">
-    <span class="md-ellipsis">
-      5. Property Cloud Inventory &gt; bind_slave_ip
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#6-property-cloud-inventory-bind_arpa_zone_service_lxcs" class="md-nav__link">
-    <span class="md-ellipsis">
-      6. Property Cloud Inventory &gt; bind_arpa_zone_service_lxcs
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#7-property-cloud-inventory-bind_additional_arpa_zones" class="md-nav__link">
-    <span class="md-ellipsis">
-      7. Property Cloud Inventory &gt; bind_additional_arpa_zones
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#8-property-cloud-inventory-bind_zone_admin_email" class="md-nav__link">
-    <span class="md-ellipsis">
-      8. Property Cloud Inventory &gt; bind_zone_admin_email
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#9-property-cloud-inventory-bind_forward_zones" class="md-nav__link">
-    <span class="md-ellipsis">
-      9. Property Cloud Inventory &gt; bind_forward_zones
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="9. Property Cloud Inventory &gt; bind_forward_zones">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#91-cloud-inventory-bind_forward_zones-bind_forward_zones-items" class="md-nav__link">
-    <span class="md-ellipsis">
-      9.1. Cloud Inventory &gt; bind_forward_zones &gt; bind_forward_zones items
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="9.1. Cloud Inventory &gt; bind_forward_zones &gt; bind_forward_zones items">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#911-property-cloud-inventory-bind_forward_zones-bind_forward_zones-items-zone" class="md-nav__link">
-    <span class="md-ellipsis">
-      9.1.1. Property Cloud Inventory &gt; bind_forward_zones &gt; bind_forward_zones items &gt; zone
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#912-property-cloud-inventory-bind_forward_zones-bind_forward_zones-items-nameservers" class="md-nav__link">
-    <span class="md-ellipsis">
-      9.1.2. Property Cloud Inventory &gt; bind_forward_zones &gt; bind_forward_zones items &gt; nameservers
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="9.1.2. Property Cloud Inventory &gt; bind_forward_zones &gt; bind_forward_zones items &gt; nameservers">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#9121-cloud-inventory-bind_forward_zones-bind_forward_zones-items-nameservers-nameservers-items" class="md-nav__link">
-    <span class="md-ellipsis">
-      9.1.2.1. Cloud Inventory &gt; bind_forward_zones &gt; bind_forward_zones items &gt; nameservers &gt; nameservers items
+      12.1.4. Property Cloud Inventory &gt; pve_clusters &gt; PVE cluster fqdn &gt; pve_host_vars
     </span>
   </a>
   
@@ -753,53 +672,59 @@
     </nav>
   
 </li>
-        
-      </ul>
-    </nav>
-  
-</li>
       
         <li class="md-nav__item">
-  <a href="#10-property-cloud-inventory-kea_dhcp_main_ip" class="md-nav__link">
+  <a href="#13-property-cloud-inventory-bind_zone_admin_email" class="md-nav__link">
     <span class="md-ellipsis">
-      10. Property Cloud Inventory &gt; kea_dhcp_main_ip
+      13. Property Cloud Inventory &gt; bind_zone_admin_email
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#11-property-cloud-inventory-kea_dhcp_failover_ip" class="md-nav__link">
+  <a href="#14-property-cloud-inventory-bind_forward_zones" class="md-nav__link">
     <span class="md-ellipsis">
-      11. Property Cloud Inventory &gt; kea_dhcp_failover_ip
+      14. Property Cloud Inventory &gt; bind_forward_zones
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#12-property-cloud-inventory-kea_dhcp_routers" class="md-nav__link">
-    <span class="md-ellipsis">
-      12. Property Cloud Inventory &gt; kea_dhcp_routers
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#13-property-cloud-inventory-kea_dhcp_pools" class="md-nav__link">
-    <span class="md-ellipsis">
-      13. Property Cloud Inventory &gt; kea_dhcp_pools
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="13. Property Cloud Inventory &gt; kea_dhcp_pools">
+    <nav class="md-nav" aria-label="14. Property Cloud Inventory &gt; bind_forward_zones">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#131-cloud-inventory-kea_dhcp_pools-kea_dhcp_pools-items" class="md-nav__link">
+  <a href="#141-cloud-inventory-bind_forward_zones-bind_forward_zones-items" class="md-nav__link">
     <span class="md-ellipsis">
-      13.1. Cloud Inventory &gt; kea_dhcp_pools &gt; kea_dhcp_pools items
+      14.1. Cloud Inventory &gt; bind_forward_zones &gt; bind_forward_zones items
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="14.1. Cloud Inventory &gt; bind_forward_zones &gt; bind_forward_zones items">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1411-property-cloud-inventory-bind_forward_zones-bind_forward_zones-items-zone" class="md-nav__link">
+    <span class="md-ellipsis">
+      14.1.1. Property Cloud Inventory &gt; bind_forward_zones &gt; bind_forward_zones items &gt; zone
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1412-property-cloud-inventory-bind_forward_zones-bind_forward_zones-items-nameservers" class="md-nav__link">
+    <span class="md-ellipsis">
+      14.1.2. Property Cloud Inventory &gt; bind_forward_zones &gt; bind_forward_zones items &gt; nameservers
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="14.1.2. Property Cloud Inventory &gt; bind_forward_zones &gt; bind_forward_zones items &gt; nameservers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#14121-cloud-inventory-bind_forward_zones-bind_forward_zones-items-nameservers-nameservers-items" class="md-nav__link">
+    <span class="md-ellipsis">
+      14.1.2.1. Cloud Inventory &gt; bind_forward_zones &gt; bind_forward_zones items &gt; nameservers &gt; nameservers items
     </span>
   </a>
   
@@ -809,65 +734,48 @@
     </nav>
   
 </li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
       
         <li class="md-nav__item">
-  <a href="#14-property-cloud-inventory-kea_dhcp_static_routes" class="md-nav__link">
+  <a href="#15-property-cloud-inventory-acme_contact" class="md-nav__link">
     <span class="md-ellipsis">
-      14. Property Cloud Inventory &gt; kea_dhcp_static_routes
+      15. Property Cloud Inventory &gt; acme_contact
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#15-property-cloud-inventory-kea_dhcp_ceph_frontend_subnet" class="md-nav__link">
+  <a href="#16-property-cloud-inventory-acme_method" class="md-nav__link">
     <span class="md-ellipsis">
-      15. Property Cloud Inventory &gt; kea_dhcp_ceph_frontend_subnet
+      16. Property Cloud Inventory &gt; acme_method
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#16-property-cloud-inventory-kea_dhcp_ceph_frontend_pool" class="md-nav__link">
+  <a href="#17-property-cloud-inventory-pve_cloud_pytest" class="md-nav__link">
     <span class="md-ellipsis">
-      16. Property Cloud Inventory &gt; kea_dhcp_ceph_frontend_pool
+      17. Property Cloud Inventory &gt; pve_cloud_pytest
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#17-property-cloud-inventory-acme_contact" class="md-nav__link">
+  <a href="#18-property-cloud-inventory-plugin" class="md-nav__link">
     <span class="md-ellipsis">
-      17. Property Cloud Inventory &gt; acme_contact
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#18-property-cloud-inventory-acme_method" class="md-nav__link">
-    <span class="md-ellipsis">
-      18. Property Cloud Inventory &gt; acme_method
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#19-property-cloud-inventory-pve_cloud_pytest" class="md-nav__link">
-    <span class="md-ellipsis">
-      19. Property Cloud Inventory &gt; pve_cloud_pytest
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#20-property-cloud-inventory-plugin" class="md-nav__link">
-    <span class="md-ellipsis">
-      20. Property Cloud Inventory &gt; plugin
+      18. Property Cloud Inventory &gt; plugin
     </span>
   </a>
   
@@ -877,29 +785,6 @@
   
 </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../pve_inventory_schema/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    Schema Docs
-    
-  </span>
-  
-
-      </a>
     </li>
   
 
@@ -940,7 +825,7 @@
   
   
   <span class="md-ellipsis">
-    LXC Inventory
+    Schema ext setup_bind playbook
     
   </span>
   
@@ -986,7 +871,7 @@
   
   
   <span class="md-ellipsis">
-    LXC Inventory
+    Schema ext setup_haproxy playbook
     
   </span>
   
@@ -1010,6 +895,29 @@
   
   <span class="md-ellipsis">
     Schema ext setup_kea playbook
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../vm_schema_base/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    VM Base Schema
     
   </span>
   
@@ -1097,68 +1005,12 @@
 <td>The overarching domain for the cloud. Will also be used for ddns.</td>
 </tr>
 <tr>
-<td>+ <a href="#pve_clusters">pve_clusters</a></td>
-<td>No</td>
-<td>object</td>
-<td>No</td>
-<td>-</td>
-<td>Definitions for specific Proxmox clusters that will be part of the cloud. Keys are hostnames.</td>
-</tr>
-<tr>
-<td>+ <a href="#bind_master_ip">bind_master_ip</a></td>
-<td>No</td>
-<td>string</td>
-<td>No</td>
-<td>-</td>
-<td>IP of the primary bind dns for this cluster, will be statically assigned.</td>
-</tr>
-<tr>
-<td>+ <a href="#bind_slave_ip">bind_slave_ip</a></td>
-<td>No</td>
-<td>string</td>
-<td>No</td>
-<td>-</td>
-<td>IP of the slave bind dns for this cluster.</td>
-</tr>
-<tr>
-<td>+ <a href="#bind_arpa_zone_service_lxcs">bind_arpa_zone_service_lxcs</a></td>
-<td>No</td>
-<td>string</td>
-<td>No</td>
-<td>-</td>
-<td>Arpa zone in which service lxcs with static ips will manuall get their reverse dns entries.</td>
-</tr>
-<tr>
-<td>+ <a href="#bind_additional_arpa_zones">bind_additional_arpa_zones</a></td>
-<td>No</td>
-<td>array</td>
-<td>No</td>
-<td>-</td>
-<td>Additional arpa zones which should be created and managed in the dns / dhcp ddns.</td>
-</tr>
-<tr>
-<td>+ <a href="#bind_zone_admin_email">bind_zone_admin_email</a></td>
-<td>No</td>
-<td>string</td>
-<td>No</td>
-<td>-</td>
-<td>Required adminstrator email in bind format for bind zones.</td>
-</tr>
-<tr>
-<td>- <a href="#bind_forward_zones">bind_forward_zones</a></td>
-<td>No</td>
-<td>array of object</td>
-<td>No</td>
-<td>-</td>
-<td>Creates zone in bind and delegation ns records to the specified nameservers.</td>
-</tr>
-<tr>
 <td>+ <a href="#kea_dhcp_main_ip">kea_dhcp_main_ip</a></td>
 <td>No</td>
 <td>string</td>
 <td>No</td>
 <td>-</td>
-<td>Static assigned ip for the main dhcp server.</td>
+<td>Static assigned ip for the main dhcp server. This has to match your dhcp lxc inventory file!</td>
 </tr>
 <tr>
 <td>+ <a href="#kea_dhcp_failover_ip">kea_dhcp_failover_ip</a></td>
@@ -1166,7 +1018,7 @@
 <td>string</td>
 <td>No</td>
 <td>-</td>
-<td>Static ip for slave dhcp server.</td>
+<td>Static ip for slave dhcp server. This has to match your dhcp lxc inventory file!</td>
 </tr>
 <tr>
 <td>+ <a href="#kea_dhcp_routers">kea_dhcp_routers</a></td>
@@ -1190,23 +1042,63 @@
 <td>string</td>
 <td>No</td>
 <td>-</td>
-<td>classless-static-routes for kea option-data. Extra routes you want the dhcp to communicate, for example to a custom VPN gateway.</td>
+<td>classless-static-routes for kea option-data. You can pass comma seperated extra routes you want the dhcp to communicate, for example to a custom VPN gateway.<br /></td>
 </tr>
 <tr>
-<td>- <a href="#kea_dhcp_ceph_frontend_subnet">kea_dhcp_ceph_frontend_subnet</a></td>
+<td>+ <a href="#bind_master_ip">bind_master_ip</a></td>
 <td>No</td>
 <td>string</td>
 <td>No</td>
 <td>-</td>
-<td>Optional cidr definition for a seperate dhcp if the ceph frontend resides on a different interface (map it inside the dhcp lxcs to pve0).</td>
+<td>IP of the primary bind dns for this cluster, will be statically assigned. Has to match your bind lxc inventory file!</td>
 </tr>
 <tr>
-<td>- <a href="#kea_dhcp_ceph_frontend_pool">kea_dhcp_ceph_frontend_pool</a></td>
+<td>+ <a href="#bind_slave_ip">bind_slave_ip</a></td>
 <td>No</td>
 <td>string</td>
 <td>No</td>
 <td>-</td>
-<td>Pool kea definition for ceph frontend ip allocations, this way monitors can have their static block.</td>
+<td>IP of the slave bind dns for this cluster. Has to match your bind lxc inventory file!</td>
+</tr>
+<tr>
+<td>+ <a href="#bind_arpa_zone_service_lxcs">bind_arpa_zone_service_lxcs</a></td>
+<td>No</td>
+<td>string</td>
+<td>No</td>
+<td>-</td>
+<td>Arpa zone in which service lxcs with static ips will manuall get their reverse dns entries.</td>
+</tr>
+<tr>
+<td>+ <a href="#bind_additional_arpa_zones">bind_additional_arpa_zones</a></td>
+<td>No</td>
+<td>array of string</td>
+<td>No</td>
+<td>-</td>
+<td>Additional arpa zones which should be created and managed in the dns / dhcp ddns.</td>
+</tr>
+<tr>
+<td>+ <a href="#pve_clusters">pve_clusters</a></td>
+<td>No</td>
+<td>object</td>
+<td>No</td>
+<td>-</td>
+<td>Definitions for specific Proxmox clusters that will be part of the cloud. Keys are hostnames.</td>
+</tr>
+<tr>
+<td>+ <a href="#bind_zone_admin_email">bind_zone_admin_email</a></td>
+<td>No</td>
+<td>string</td>
+<td>No</td>
+<td>-</td>
+<td>Required adminstrator email in bind format for bind zones.</td>
+</tr>
+<tr>
+<td>- <a href="#bind_forward_zones">bind_forward_zones</a></td>
+<td>No</td>
+<td>array of object</td>
+<td>No</td>
+<td>-</td>
+<td>Creates zone in bind and delegation ns records to the specified nameservers. This is very useful if you have other nameservers with <br />their own authoritative zones you want resolved within the cloud.<br /></td>
 </tr>
 <tr>
 <td>- <a href="#acme_contact">acme_contact</a></td>
@@ -1222,7 +1114,7 @@
 <td>enum (of string)</td>
 <td>No</td>
 <td>-</td>
-<td>PVE Cloud included method for solving dns01 challenges.</td>
+<td>PVE Cloud included method for solving dns01 challenges. You need to have created the appropriate secrets under /etc/pve/cloud on your proxmox cluster.<br /></td>
 </tr>
 <tr>
 <td>- <a href="#pve_cloud_pytest">pve_cloud_pytest</a></td>
@@ -1262,6 +1154,9 @@
 </tbody>
 </table>
 <p><strong>Description:</strong> Subnet this PVE cluster uses for its VMs.</p>
+<p><strong>Example:</strong></p>
+<pre><code class="language-json">&quot;192.168.10.0/24&quot;
+</code></pre>
 <h2 id="2-property-cloud-inventory-pve_cloud_domain"><a name="pve_cloud_domain"></a>2. Property <code>Cloud Inventory &gt; pve_cloud_domain</code></h2>
 <table>
 <thead>
@@ -1282,658 +1177,10 @@
 </tbody>
 </table>
 <p><strong>Description:</strong> The overarching domain for the cloud. Will also be used for ddns.</p>
-<h2 id="3-property-cloud-inventory-pve_clusters"><a name="pve_clusters"></a>3. Property <code>Cloud Inventory &gt; pve_clusters</code></h2>
-<table>
-<thead>
-<tr>
-<th></th>
-<th></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Type</strong></td>
-<td><code>object</code></td>
-</tr>
-<tr>
-<td><strong>Required</strong></td>
-<td>Yes</td>
-</tr>
-<tr>
-<td><strong>Additional properties</strong></td>
-<td>Not allowed</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Description:</strong> Definitions for specific Proxmox clusters that will be part of the cloud. Keys are hostnames.</p>
-<table>
-<thead>
-<tr>
-<th>Property</th>
-<th>Pattern</th>
-<th>Type</th>
-<th>Deprecated</th>
-<th>Definition</th>
-<th>Title/Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>- <a href="#pve_clusters_pattern1">^.*$</a></td>
-<td>Yes</td>
-<td>object</td>
-<td>No</td>
-<td>-</td>
-<td>PVE cluster fqdn</td>
-</tr>
-</tbody>
-</table>
-<h3 id="31-pattern-property-cloud-inventory-pve_clusters-pve-cluster-fqdn"><a name="pve_clusters_pattern1"></a>3.1. Pattern Property <code>Cloud Inventory &gt; pve_clusters &gt; PVE cluster fqdn</code></h3>
-<blockquote>
-<p>All properties whose name matches the regular expression
-<code>^.*$</code> (<a href="https://regex101.com/?regex=%5E.%2A%24">Test</a>)
-must respect the following conditions</p>
-</blockquote>
-<p><strong>Title:</strong> PVE cluster fqdn</p>
-<table>
-<thead>
-<tr>
-<th></th>
-<th></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Type</strong></td>
-<td><code>object</code></td>
-</tr>
-<tr>
-<td><strong>Required</strong></td>
-<td>No</td>
-</tr>
-<tr>
-<td><strong>Additional properties</strong></td>
-<td>Not allowed</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Description:</strong> Fully quantified name for the cluster.</p>
-<table>
-<thead>
-<tr>
-<th>Property</th>
-<th>Pattern</th>
-<th>Type</th>
-<th>Deprecated</th>
-<th>Definition</th>
-<th>Title/Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>- <a href="#pve_clusters_pattern1_pve_haproxy_floating_ip">pve_haproxy_floating_ip</a></td>
-<td>No</td>
-<td>string</td>
-<td>No</td>
-<td>-</td>
-<td>Floating ip of our central cluster HAProxy.</td>
-</tr>
-<tr>
-<td>- <a href="#pve_clusters_pattern1_pve_haproxy_floating_ip_internal">pve_haproxy_floating_ip_internal</a></td>
-<td>No</td>
-<td>string</td>
-<td>No</td>
-<td>-</td>
-<td>Floating ip that is exclusively accessible from inside the cloud / location. External forwardings should be made to pve_haproxy_floating_ip.</td>
-</tr>
-<tr>
-<td>+ <a href="#pve_clusters_pattern1_pve_unique_cloud_services">pve_unique_cloud_services</a></td>
-<td>No</td>
-<td>array of enum (of string)</td>
-<td>No</td>
-<td>-</td>
-<td>Unique service the cluster provides for its cloud. Unique in the sense that only one cluster may provide each of the services.</td>
-</tr>
-<tr>
-<td>- <a href="#pve_clusters_pattern1_pve_host_vars">pve_host_vars</a></td>
-<td>No</td>
-<td>object</td>
-<td>No</td>
-<td>-</td>
-<td>Optional variables that will be specifically set for a pve host. Key is the simple host name.</td>
-</tr>
-</tbody>
-</table>
-<h4 id="311-property-cloud-inventory-pve_clusters-pve-cluster-fqdn-pve_haproxy_floating_ip"><a name="pve_clusters_pattern1_pve_haproxy_floating_ip"></a>3.1.1. Property <code>Cloud Inventory &gt; pve_clusters &gt; PVE cluster fqdn &gt; pve_haproxy_floating_ip</code></h4>
-<table>
-<thead>
-<tr>
-<th></th>
-<th></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Type</strong></td>
-<td><code>string</code></td>
-</tr>
-<tr>
-<td><strong>Required</strong></td>
-<td>No</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Description:</strong> Floating ip of our central cluster HAProxy.</p>
-<h4 id="312-property-cloud-inventory-pve_clusters-pve-cluster-fqdn-pve_haproxy_floating_ip_internal"><a name="pve_clusters_pattern1_pve_haproxy_floating_ip_internal"></a>3.1.2. Property <code>Cloud Inventory &gt; pve_clusters &gt; PVE cluster fqdn &gt; pve_haproxy_floating_ip_internal</code></h4>
-<table>
-<thead>
-<tr>
-<th></th>
-<th></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Type</strong></td>
-<td><code>string</code></td>
-</tr>
-<tr>
-<td><strong>Required</strong></td>
-<td>No</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Description:</strong> Floating ip that is exclusively accessible from inside the cloud / location. External forwardings should be made to pve_haproxy_floating_ip.</p>
-<h4 id="313-property-cloud-inventory-pve_clusters-pve-cluster-fqdn-pve_unique_cloud_services"><a name="pve_clusters_pattern1_pve_unique_cloud_services"></a>3.1.3. Property <code>Cloud Inventory &gt; pve_clusters &gt; PVE cluster fqdn &gt; pve_unique_cloud_services</code></h4>
-<table>
-<thead>
-<tr>
-<th></th>
-<th></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Type</strong></td>
-<td><code>array of enum (of string)</code></td>
-</tr>
-<tr>
-<td><strong>Required</strong></td>
-<td>Yes</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Description:</strong> Unique service the cluster provides for its cloud. Unique in the sense that only one cluster may provide each of the services.</p>
-<table>
-<thead>
-<tr>
-<th></th>
-<th>Array restrictions</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Min items</strong></td>
-<td>N/A</td>
-</tr>
-<tr>
-<td><strong>Max items</strong></td>
-<td>N/A</td>
-</tr>
-<tr>
-<td><strong>Items unicity</strong></td>
-<td>False</td>
-</tr>
-<tr>
-<td><strong>Additional items</strong></td>
-<td>False</td>
-</tr>
-<tr>
-<td><strong>Tuple validation</strong></td>
-<td>See below</td>
-</tr>
-</tbody>
-</table>
-<table>
-<thead>
-<tr>
-<th>Each item of this array must be</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><a href="#pve_clusters_pattern1_pve_unique_cloud_services_items">pve_unique_cloud_services items</a></td>
-<td>-</td>
-</tr>
-</tbody>
-</table>
-<h5 id="3131-cloud-inventory-pve_clusters-pve-cluster-fqdn-pve_unique_cloud_services-pve_unique_cloud_services-items"><a name="pve_clusters_pattern1_pve_unique_cloud_services_items"></a>3.1.3.1. Cloud Inventory &gt; pve_clusters &gt; PVE cluster fqdn &gt; pve_unique_cloud_services &gt; pve_unique_cloud_services items</h5>
-<table>
-<thead>
-<tr>
-<th></th>
-<th></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Type</strong></td>
-<td><code>enum (of string)</code></td>
-</tr>
-<tr>
-<td><strong>Required</strong></td>
-<td>No</td>
-</tr>
-</tbody>
-</table>
-<p>Must be one of:
-* "dns"
-* "dhcp"
-* "psql-state"</p>
-<h4 id="314-property-cloud-inventory-pve_clusters-pve-cluster-fqdn-pve_host_vars"><a name="pve_clusters_pattern1_pve_host_vars"></a>3.1.4. Property <code>Cloud Inventory &gt; pve_clusters &gt; PVE cluster fqdn &gt; pve_host_vars</code></h4>
-<table>
-<thead>
-<tr>
-<th></th>
-<th></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Type</strong></td>
-<td><code>object</code></td>
-</tr>
-<tr>
-<td><strong>Required</strong></td>
-<td>No</td>
-</tr>
-<tr>
-<td><strong>Additional properties</strong></td>
-<td>Any type allowed</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Description:</strong> Optional variables that will be specifically set for a pve host. Key is the simple host name.</p>
-<table>
-<thead>
-<tr>
-<th>Property</th>
-<th>Pattern</th>
-<th>Type</th>
-<th>Deprecated</th>
-<th>Definition</th>
-<th>Title/Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>- <a href="#pve_clusters_pattern1_pve_host_vars_wol_iface">wol_iface</a></td>
-<td>No</td>
-<td>string</td>
-<td>No</td>
-<td>-</td>
-<td>Inteface wol should be enabled using ethtool.</td>
-</tr>
-<tr>
-<td>- <a href="#pve_clusters_pattern1_pve_host_vars_tso_gso_fix">tso_gso_fix</a></td>
-<td>No</td>
-<td>array</td>
-<td>No</td>
-<td>-</td>
-<td>Will turn of network optimizations on old network cards, this assures they can run indefinetly. Will only take effect with the e1000_driver_fix playbook.</td>
-</tr>
-<tr>
-<td>- <a href="#pve_clusters_pattern1_pve_host_vars_mac_iface_mapping">mac_iface_mapping</a></td>
-<td>No</td>
-<td>array of object</td>
-<td>No</td>
-<td>-</td>
-<td>Map mac addresses to interface names, will be picked up by setup playbooks. This will actually change the interfaces names on the host aswell as try to replace /etc/network/interfaces.</td>
-</tr>
-</tbody>
-</table>
-<h5 id="3141-property-cloud-inventory-pve_clusters-pve-cluster-fqdn-pve_host_vars-wol_iface"><a name="pve_clusters_pattern1_pve_host_vars_wol_iface"></a>3.1.4.1. Property <code>Cloud Inventory &gt; pve_clusters &gt; PVE cluster fqdn &gt; pve_host_vars &gt; wol_iface</code></h5>
-<table>
-<thead>
-<tr>
-<th></th>
-<th></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Type</strong></td>
-<td><code>string</code></td>
-</tr>
-<tr>
-<td><strong>Required</strong></td>
-<td>No</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Description:</strong> Inteface wol should be enabled using ethtool.</p>
-<h5 id="3142-property-cloud-inventory-pve_clusters-pve-cluster-fqdn-pve_host_vars-tso_gso_fix"><a name="pve_clusters_pattern1_pve_host_vars_tso_gso_fix"></a>3.1.4.2. Property <code>Cloud Inventory &gt; pve_clusters &gt; PVE cluster fqdn &gt; pve_host_vars &gt; tso_gso_fix</code></h5>
-<table>
-<thead>
-<tr>
-<th></th>
-<th></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Type</strong></td>
-<td><code>array</code></td>
-</tr>
-<tr>
-<td><strong>Required</strong></td>
-<td>No</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Description:</strong> Will turn of network optimizations on old network cards, this assures they can run indefinetly. Will only take effect with the e1000_driver_fix playbook.</p>
-<table>
-<thead>
-<tr>
-<th></th>
-<th>Array restrictions</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Min items</strong></td>
-<td>N/A</td>
-</tr>
-<tr>
-<td><strong>Max items</strong></td>
-<td>N/A</td>
-</tr>
-<tr>
-<td><strong>Items unicity</strong></td>
-<td>False</td>
-</tr>
-<tr>
-<td><strong>Additional items</strong></td>
-<td>False</td>
-</tr>
-<tr>
-<td><strong>Tuple validation</strong></td>
-<td>N/A</td>
-</tr>
-</tbody>
-</table>
-<h5 id="3143-property-cloud-inventory-pve_clusters-pve-cluster-fqdn-pve_host_vars-mac_iface_mapping"><a name="pve_clusters_pattern1_pve_host_vars_mac_iface_mapping"></a>3.1.4.3. Property <code>Cloud Inventory &gt; pve_clusters &gt; PVE cluster fqdn &gt; pve_host_vars &gt; mac_iface_mapping</code></h5>
-<table>
-<thead>
-<tr>
-<th></th>
-<th></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Type</strong></td>
-<td><code>array of object</code></td>
-</tr>
-<tr>
-<td><strong>Required</strong></td>
-<td>No</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Description:</strong> Map mac addresses to interface names, will be picked up by setup playbooks. This will actually change the interfaces names on the host aswell as try to replace /etc/network/interfaces.</p>
-<table>
-<thead>
-<tr>
-<th></th>
-<th>Array restrictions</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Min items</strong></td>
-<td>N/A</td>
-</tr>
-<tr>
-<td><strong>Max items</strong></td>
-<td>N/A</td>
-</tr>
-<tr>
-<td><strong>Items unicity</strong></td>
-<td>False</td>
-</tr>
-<tr>
-<td><strong>Additional items</strong></td>
-<td>False</td>
-</tr>
-<tr>
-<td><strong>Tuple validation</strong></td>
-<td>See below</td>
-</tr>
-</tbody>
-</table>
-<table>
-<thead>
-<tr>
-<th>Each item of this array must be</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><a href="#pve_clusters_pattern1_pve_host_vars_mac_iface_mapping_items">mac_iface_mapping items</a></td>
-<td>-</td>
-</tr>
-</tbody>
-</table>
-<h6 id="31431-cloud-inventory-pve_clusters-pve-cluster-fqdn-pve_host_vars-mac_iface_mapping-mac_iface_mapping-items"><a name="pve_clusters_pattern1_pve_host_vars_mac_iface_mapping_items"></a>3.1.4.3.1. Cloud Inventory &gt; pve_clusters &gt; PVE cluster fqdn &gt; pve_host_vars &gt; mac_iface_mapping &gt; mac_iface_mapping items</h6>
-<table>
-<thead>
-<tr>
-<th></th>
-<th></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Type</strong></td>
-<td><code>object</code></td>
-</tr>
-<tr>
-<td><strong>Required</strong></td>
-<td>No</td>
-</tr>
-<tr>
-<td><strong>Additional properties</strong></td>
-<td>Not allowed</td>
-</tr>
-</tbody>
-</table>
-<table>
-<thead>
-<tr>
-<th>Property</th>
-<th>Pattern</th>
-<th>Type</th>
-<th>Deprecated</th>
-<th>Definition</th>
-<th>Title/Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>+ <a href="#pve_clusters_pattern1_pve_host_vars_mac_iface_mapping_items_mac_addr">mac_addr</a></td>
-<td>No</td>
-<td>string</td>
-<td>No</td>
-<td>-</td>
-<td>Network device mac address.</td>
-</tr>
-<tr>
-<td>+ <a href="#pve_clusters_pattern1_pve_host_vars_mac_iface_mapping_items_iface">iface</a></td>
-<td>No</td>
-<td>string</td>
-<td>No</td>
-<td>-</td>
-<td>Interface name that will be assigned to the device. Default name will be removed!</td>
-</tr>
-</tbody>
-</table>
-<h6 id="314311-property-cloud-inventory-pve_clusters-pve-cluster-fqdn-pve_host_vars-mac_iface_mapping-mac_iface_mapping-items-mac_addr"><a name="pve_clusters_pattern1_pve_host_vars_mac_iface_mapping_items_mac_addr"></a>3.1.4.3.1.1. Property <code>Cloud Inventory &gt; pve_clusters &gt; PVE cluster fqdn &gt; pve_host_vars &gt; mac_iface_mapping &gt; mac_iface_mapping items &gt; mac_addr</code></h6>
-<table>
-<thead>
-<tr>
-<th></th>
-<th></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Type</strong></td>
-<td><code>string</code></td>
-</tr>
-<tr>
-<td><strong>Required</strong></td>
-<td>Yes</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Description:</strong> Network device mac address.</p>
-<h6 id="314312-property-cloud-inventory-pve_clusters-pve-cluster-fqdn-pve_host_vars-mac_iface_mapping-mac_iface_mapping-items-iface"><a name="pve_clusters_pattern1_pve_host_vars_mac_iface_mapping_items_iface"></a>3.1.4.3.1.2. Property <code>Cloud Inventory &gt; pve_clusters &gt; PVE cluster fqdn &gt; pve_host_vars &gt; mac_iface_mapping &gt; mac_iface_mapping items &gt; iface</code></h6>
-<table>
-<thead>
-<tr>
-<th></th>
-<th></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Type</strong></td>
-<td><code>string</code></td>
-</tr>
-<tr>
-<td><strong>Required</strong></td>
-<td>Yes</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Description:</strong> Interface name that will be assigned to the device. Default name will be removed!</p>
-<h2 id="4-property-cloud-inventory-bind_master_ip"><a name="bind_master_ip"></a>4. Property <code>Cloud Inventory &gt; bind_master_ip</code></h2>
-<table>
-<thead>
-<tr>
-<th></th>
-<th></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Type</strong></td>
-<td><code>string</code></td>
-</tr>
-<tr>
-<td><strong>Required</strong></td>
-<td>Yes</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Description:</strong> IP of the primary bind dns for this cluster, will be statically assigned.</p>
-<h2 id="5-property-cloud-inventory-bind_slave_ip"><a name="bind_slave_ip"></a>5. Property <code>Cloud Inventory &gt; bind_slave_ip</code></h2>
-<table>
-<thead>
-<tr>
-<th></th>
-<th></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Type</strong></td>
-<td><code>string</code></td>
-</tr>
-<tr>
-<td><strong>Required</strong></td>
-<td>Yes</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Description:</strong> IP of the slave bind dns for this cluster.</p>
-<h2 id="6-property-cloud-inventory-bind_arpa_zone_service_lxcs"><a name="bind_arpa_zone_service_lxcs"></a>6. Property <code>Cloud Inventory &gt; bind_arpa_zone_service_lxcs</code></h2>
-<table>
-<thead>
-<tr>
-<th></th>
-<th></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Type</strong></td>
-<td><code>string</code></td>
-</tr>
-<tr>
-<td><strong>Required</strong></td>
-<td>Yes</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Description:</strong> Arpa zone in which service lxcs with static ips will manuall get their reverse dns entries.</p>
-<h2 id="7-property-cloud-inventory-bind_additional_arpa_zones"><a name="bind_additional_arpa_zones"></a>7. Property <code>Cloud Inventory &gt; bind_additional_arpa_zones</code></h2>
-<table>
-<thead>
-<tr>
-<th></th>
-<th></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Type</strong></td>
-<td><code>array</code></td>
-</tr>
-<tr>
-<td><strong>Required</strong></td>
-<td>Yes</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Description:</strong> Additional arpa zones which should be created and managed in the dns / dhcp ddns.</p>
 <p><strong>Example:</strong></p>
-<pre><code class="language-json">&quot;1.168.192.in-addr.arpa&quot;
+<pre><code class="language-json">&quot;your-cloud.example.com&quot;
 </code></pre>
-<table>
-<thead>
-<tr>
-<th></th>
-<th>Array restrictions</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Min items</strong></td>
-<td>N/A</td>
-</tr>
-<tr>
-<td><strong>Max items</strong></td>
-<td>N/A</td>
-</tr>
-<tr>
-<td><strong>Items unicity</strong></td>
-<td>False</td>
-</tr>
-<tr>
-<td><strong>Additional items</strong></td>
-<td>False</td>
-</tr>
-<tr>
-<td><strong>Tuple validation</strong></td>
-<td>N/A</td>
-</tr>
-</tbody>
-</table>
-<h2 id="8-property-cloud-inventory-bind_zone_admin_email"><a name="bind_zone_admin_email"></a>8. Property <code>Cloud Inventory &gt; bind_zone_admin_email</code></h2>
+<h2 id="3-property-cloud-inventory-kea_dhcp_main_ip"><a name="kea_dhcp_main_ip"></a>3. Property <code>Cloud Inventory &gt; kea_dhcp_main_ip</code></h2>
 <table>
 <thead>
 <tr>
@@ -1952,229 +1199,11 @@ must respect the following conditions</p>
 </tr>
 </tbody>
 </table>
-<p><strong>Description:</strong> Required adminstrator email in bind format for bind zones.</p>
+<p><strong>Description:</strong> Static assigned ip for the main dhcp server. This has to match your dhcp lxc inventory file!</p>
 <p><strong>Example:</strong></p>
-<pre><code class="language-json">&quot;admin.example.com.&quot;
+<pre><code class="language-json">&quot;192.168.1.2&quot;
 </code></pre>
-<h2 id="9-property-cloud-inventory-bind_forward_zones"><a name="bind_forward_zones"></a>9. Property <code>Cloud Inventory &gt; bind_forward_zones</code></h2>
-<table>
-<thead>
-<tr>
-<th></th>
-<th></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Type</strong></td>
-<td><code>array of object</code></td>
-</tr>
-<tr>
-<td><strong>Required</strong></td>
-<td>No</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Description:</strong> Creates zone in bind and delegation ns records to the specified nameservers.</p>
-<table>
-<thead>
-<tr>
-<th></th>
-<th>Array restrictions</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Min items</strong></td>
-<td>N/A</td>
-</tr>
-<tr>
-<td><strong>Max items</strong></td>
-<td>N/A</td>
-</tr>
-<tr>
-<td><strong>Items unicity</strong></td>
-<td>False</td>
-</tr>
-<tr>
-<td><strong>Additional items</strong></td>
-<td>False</td>
-</tr>
-<tr>
-<td><strong>Tuple validation</strong></td>
-<td>See below</td>
-</tr>
-</tbody>
-</table>
-<table>
-<thead>
-<tr>
-<th>Each item of this array must be</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><a href="#bind_forward_zones_items">bind_forward_zones items</a></td>
-<td>-</td>
-</tr>
-</tbody>
-</table>
-<h3 id="91-cloud-inventory-bind_forward_zones-bind_forward_zones-items"><a name="bind_forward_zones_items"></a>9.1. Cloud Inventory &gt; bind_forward_zones &gt; bind_forward_zones items</h3>
-<table>
-<thead>
-<tr>
-<th></th>
-<th></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Type</strong></td>
-<td><code>object</code></td>
-</tr>
-<tr>
-<td><strong>Required</strong></td>
-<td>No</td>
-</tr>
-<tr>
-<td><strong>Additional properties</strong></td>
-<td>Any type allowed</td>
-</tr>
-</tbody>
-</table>
-<table>
-<thead>
-<tr>
-<th>Property</th>
-<th>Pattern</th>
-<th>Type</th>
-<th>Deprecated</th>
-<th>Definition</th>
-<th>Title/Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>- <a href="#bind_forward_zones_items_zone">zone</a></td>
-<td>No</td>
-<td>string</td>
-<td>No</td>
-<td>-</td>
-<td>-</td>
-</tr>
-<tr>
-<td>- <a href="#bind_forward_zones_items_nameservers">nameservers</a></td>
-<td>No</td>
-<td>array of string</td>
-<td>No</td>
-<td>-</td>
-<td>-</td>
-</tr>
-</tbody>
-</table>
-<h4 id="911-property-cloud-inventory-bind_forward_zones-bind_forward_zones-items-zone"><a name="bind_forward_zones_items_zone"></a>9.1.1. Property <code>Cloud Inventory &gt; bind_forward_zones &gt; bind_forward_zones items &gt; zone</code></h4>
-<table>
-<thead>
-<tr>
-<th></th>
-<th></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Type</strong></td>
-<td><code>string</code></td>
-</tr>
-<tr>
-<td><strong>Required</strong></td>
-<td>No</td>
-</tr>
-</tbody>
-</table>
-<h4 id="912-property-cloud-inventory-bind_forward_zones-bind_forward_zones-items-nameservers"><a name="bind_forward_zones_items_nameservers"></a>9.1.2. Property <code>Cloud Inventory &gt; bind_forward_zones &gt; bind_forward_zones items &gt; nameservers</code></h4>
-<table>
-<thead>
-<tr>
-<th></th>
-<th></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Type</strong></td>
-<td><code>array of string</code></td>
-</tr>
-<tr>
-<td><strong>Required</strong></td>
-<td>No</td>
-</tr>
-</tbody>
-</table>
-<table>
-<thead>
-<tr>
-<th></th>
-<th>Array restrictions</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Min items</strong></td>
-<td>N/A</td>
-</tr>
-<tr>
-<td><strong>Max items</strong></td>
-<td>N/A</td>
-</tr>
-<tr>
-<td><strong>Items unicity</strong></td>
-<td>False</td>
-</tr>
-<tr>
-<td><strong>Additional items</strong></td>
-<td>False</td>
-</tr>
-<tr>
-<td><strong>Tuple validation</strong></td>
-<td>See below</td>
-</tr>
-</tbody>
-</table>
-<table>
-<thead>
-<tr>
-<th>Each item of this array must be</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><a href="#bind_forward_zones_items_nameservers_items">nameservers items</a></td>
-<td>-</td>
-</tr>
-</tbody>
-</table>
-<h5 id="9121-cloud-inventory-bind_forward_zones-bind_forward_zones-items-nameservers-nameservers-items"><a name="bind_forward_zones_items_nameservers_items"></a>9.1.2.1. Cloud Inventory &gt; bind_forward_zones &gt; bind_forward_zones items &gt; nameservers &gt; nameservers items</h5>
-<table>
-<thead>
-<tr>
-<th></th>
-<th></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Type</strong></td>
-<td><code>string</code></td>
-</tr>
-<tr>
-<td><strong>Required</strong></td>
-<td>No</td>
-</tr>
-</tbody>
-</table>
-<h2 id="10-property-cloud-inventory-kea_dhcp_main_ip"><a name="kea_dhcp_main_ip"></a>10. Property <code>Cloud Inventory &gt; kea_dhcp_main_ip</code></h2>
+<h2 id="4-property-cloud-inventory-kea_dhcp_failover_ip"><a name="kea_dhcp_failover_ip"></a>4. Property <code>Cloud Inventory &gt; kea_dhcp_failover_ip</code></h2>
 <table>
 <thead>
 <tr>
@@ -2193,28 +1222,11 @@ must respect the following conditions</p>
 </tr>
 </tbody>
 </table>
-<p><strong>Description:</strong> Static assigned ip for the main dhcp server.</p>
-<h2 id="11-property-cloud-inventory-kea_dhcp_failover_ip"><a name="kea_dhcp_failover_ip"></a>11. Property <code>Cloud Inventory &gt; kea_dhcp_failover_ip</code></h2>
-<table>
-<thead>
-<tr>
-<th></th>
-<th></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Type</strong></td>
-<td><code>string</code></td>
-</tr>
-<tr>
-<td><strong>Required</strong></td>
-<td>Yes</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Description:</strong> Static ip for slave dhcp server.</p>
-<h2 id="12-property-cloud-inventory-kea_dhcp_routers"><a name="kea_dhcp_routers"></a>12. Property <code>Cloud Inventory &gt; kea_dhcp_routers</code></h2>
+<p><strong>Description:</strong> Static ip for slave dhcp server. This has to match your dhcp lxc inventory file!</p>
+<p><strong>Example:</strong></p>
+<pre><code class="language-json">&quot;192.168.1.3&quot;
+</code></pre>
+<h2 id="5-property-cloud-inventory-kea_dhcp_routers"><a name="kea_dhcp_routers"></a>5. Property <code>Cloud Inventory &gt; kea_dhcp_routers</code></h2>
 <table>
 <thead>
 <tr>
@@ -2234,7 +1246,7 @@ must respect the following conditions</p>
 </tbody>
 </table>
 <p><strong>Description:</strong> option-data for kea dhcp routers. The default route router that the dhcp will communicate.</p>
-<h2 id="13-property-cloud-inventory-kea_dhcp_pools"><a name="kea_dhcp_pools"></a>13. Property <code>Cloud Inventory &gt; kea_dhcp_pools</code></h2>
+<h2 id="6-property-cloud-inventory-kea_dhcp_pools"><a name="kea_dhcp_pools"></a>6. Property <code>Cloud Inventory &gt; kea_dhcp_pools</code></h2>
 <table>
 <thead>
 <tr>
@@ -2298,7 +1310,7 @@ must respect the following conditions</p>
 </tr>
 </tbody>
 </table>
-<h3 id="131-cloud-inventory-kea_dhcp_pools-kea_dhcp_pools-items"><a name="kea_dhcp_pools_items"></a>13.1. Cloud Inventory &gt; kea_dhcp_pools &gt; kea_dhcp_pools items</h3>
+<h3 id="61-cloud-inventory-kea_dhcp_pools-kea_dhcp_pools-items"><a name="kea_dhcp_pools_items"></a>6.1. Cloud Inventory &gt; kea_dhcp_pools &gt; kea_dhcp_pools items</h3>
 <table>
 <thead>
 <tr>
@@ -2319,9 +1331,9 @@ must respect the following conditions</p>
 </table>
 <p><strong>Description:</strong> IPV4 Address range in keas format.</p>
 <p><strong>Example:</strong></p>
-<pre><code class="language-json">&quot;192.168.1.2 - 192.168.1.199&quot;
+<pre><code class="language-json">&quot;192.168.1.30 - 192.168.1.254&quot;
 </code></pre>
-<h2 id="14-property-cloud-inventory-kea_dhcp_static_routes"><a name="kea_dhcp_static_routes"></a>14. Property <code>Cloud Inventory &gt; kea_dhcp_static_routes</code></h2>
+<h2 id="7-property-cloud-inventory-kea_dhcp_static_routes"><a name="kea_dhcp_static_routes"></a>7. Property <code>Cloud Inventory &gt; kea_dhcp_static_routes</code></h2>
 <table>
 <thead>
 <tr>
@@ -2340,11 +1352,144 @@ must respect the following conditions</p>
 </tr>
 </tbody>
 </table>
-<p><strong>Description:</strong> classless-static-routes for kea option-data. Extra routes you want the dhcp to communicate, for example to a custom VPN gateway.</p>
+<p><strong>Description:</strong> classless-static-routes for kea option-data. You can pass comma seperated extra routes you want the dhcp to communicate, for example to a custom VPN gateway.</p>
 <p><strong>Example:</strong></p>
-<pre><code class="language-json">&quot;0.0.0.0/0 - 192.168.1.1, 10.0.2.0/24 - 192.168.1.217&quot;
+<pre><code class="language-json">&quot;0.0.0.0/0 - 192.168.1.1, 10.0.0.1/24 - 192.168.1.20&quot;
 </code></pre>
-<h2 id="15-property-cloud-inventory-kea_dhcp_ceph_frontend_subnet"><a name="kea_dhcp_ceph_frontend_subnet"></a>15. Property <code>Cloud Inventory &gt; kea_dhcp_ceph_frontend_subnet</code></h2>
+<h2 id="8-property-cloud-inventory-bind_master_ip"><a name="bind_master_ip"></a>8. Property <code>Cloud Inventory &gt; bind_master_ip</code></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>string</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> IP of the primary bind dns for this cluster, will be statically assigned. Has to match your bind lxc inventory file!</p>
+<p><strong>Example:</strong></p>
+<pre><code class="language-json">&quot;192.168.1.4&quot;
+</code></pre>
+<h2 id="9-property-cloud-inventory-bind_slave_ip"><a name="bind_slave_ip"></a>9. Property <code>Cloud Inventory &gt; bind_slave_ip</code></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>string</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> IP of the slave bind dns for this cluster. Has to match your bind lxc inventory file!</p>
+<p><strong>Example:</strong></p>
+<pre><code class="language-json">&quot;192.168.1.5&quot;
+</code></pre>
+<h2 id="10-property-cloud-inventory-bind_arpa_zone_service_lxcs"><a name="bind_arpa_zone_service_lxcs"></a>10. Property <code>Cloud Inventory &gt; bind_arpa_zone_service_lxcs</code></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>string</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Arpa zone in which service lxcs with static ips will manuall get their reverse dns entries.</p>
+<p><strong>Example:</strong></p>
+<pre><code class="language-json">&quot;1.168.192.in-addr.arpa&quot;
+</code></pre>
+<h2 id="11-property-cloud-inventory-bind_additional_arpa_zones"><a name="bind_additional_arpa_zones"></a>11. Property <code>Cloud Inventory &gt; bind_additional_arpa_zones</code></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>array of string</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Additional arpa zones which should be created and managed in the dns / dhcp ddns.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Array restrictions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Min items</strong></td>
+<td>N/A</td>
+</tr>
+<tr>
+<td><strong>Max items</strong></td>
+<td>N/A</td>
+</tr>
+<tr>
+<td><strong>Items unicity</strong></td>
+<td>False</td>
+</tr>
+<tr>
+<td><strong>Additional items</strong></td>
+<td>False</td>
+</tr>
+<tr>
+<td><strong>Tuple validation</strong></td>
+<td>See below</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Each item of this array must be</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="#bind_additional_arpa_zones_items">bind_additional_arpa_zones items</a></td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<h3 id="111-cloud-inventory-bind_additional_arpa_zones-bind_additional_arpa_zones-items"><a name="bind_additional_arpa_zones_items"></a>11.1. Cloud Inventory &gt; bind_additional_arpa_zones &gt; bind_additional_arpa_zones items</h3>
 <table>
 <thead>
 <tr>
@@ -2363,11 +1508,129 @@ must respect the following conditions</p>
 </tr>
 </tbody>
 </table>
-<p><strong>Description:</strong> Optional cidr definition for a seperate dhcp if the ceph frontend resides on a different interface (map it inside the dhcp lxcs to pve0).</p>
-<p><strong>Example:</strong></p>
-<pre><code class="language-json">&quot;10.255.42.0/23&quot;
-</code></pre>
-<h2 id="16-property-cloud-inventory-kea_dhcp_ceph_frontend_pool"><a name="kea_dhcp_ceph_frontend_pool"></a>16. Property <code>Cloud Inventory &gt; kea_dhcp_ceph_frontend_pool</code></h2>
+<h2 id="12-property-cloud-inventory-pve_clusters"><a name="pve_clusters"></a>12. Property <code>Cloud Inventory &gt; pve_clusters</code></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>object</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><strong>Additional properties</strong></td>
+<td>Not allowed</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Definitions for specific Proxmox clusters that will be part of the cloud. Keys are hostnames.</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Pattern</th>
+<th>Type</th>
+<th>Deprecated</th>
+<th>Definition</th>
+<th>Title/Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>- <a href="#pve_clusters_pattern1">^.*$</a></td>
+<td>Yes</td>
+<td>object</td>
+<td>No</td>
+<td>-</td>
+<td>PVE cluster fqdn</td>
+</tr>
+</tbody>
+</table>
+<h3 id="121-pattern-property-cloud-inventory-pve_clusters-pve-cluster-fqdn"><a name="pve_clusters_pattern1"></a>12.1. Pattern Property <code>Cloud Inventory &gt; pve_clusters &gt; PVE cluster fqdn</code></h3>
+<blockquote>
+<p>All properties whose name matches the regular expression
+<code>^.*$</code> (<a href="https://regex101.com/?regex=%5E.%2A%24">Test</a>)
+must respect the following conditions</p>
+</blockquote>
+<p><strong>Title:</strong> PVE cluster fqdn</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>object</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+<tr>
+<td><strong>Additional properties</strong></td>
+<td>Not allowed</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Fully quantified name for the cluster.</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Pattern</th>
+<th>Type</th>
+<th>Deprecated</th>
+<th>Definition</th>
+<th>Title/Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>- <a href="#pve_clusters_pattern1_pve_haproxy_floating_ip_internal">pve_haproxy_floating_ip_internal</a></td>
+<td>No</td>
+<td>string</td>
+<td>No</td>
+<td>-</td>
+<td>Floating ip that is exclusively accessible from inside the cloud / location. External forwardings should be made to pve_haproxy_floating_ip.<br />Inside the cloud if you define a certificate entry, some nodeport forward or default kubeapi access, this will all be available automatically on this ip.<br /></td>
+</tr>
+<tr>
+<td>- <a href="#pve_clusters_pattern1_pve_haproxy_floating_ip">pve_haproxy_floating_ip</a></td>
+<td>No</td>
+<td>string</td>
+<td>No</td>
+<td>-</td>
+<td>Floating ip of our central cluster HAProxy.</td>
+</tr>
+<tr>
+<td>+ <a href="#pve_clusters_pattern1_pve_unique_cloud_services">pve_unique_cloud_services</a></td>
+<td>No</td>
+<td>array of enum (of string)</td>
+<td>No</td>
+<td>-</td>
+<td>Unique service the cluster provides for its cloud. Unique in the sense that only one cluster may provide each of the services for the entire cloud.<br />Services like haproxy and backup servers can and should be provided by multiple clusters. <br /></td>
+</tr>
+<tr>
+<td>- <a href="#pve_clusters_pattern1_pve_host_vars">pve_host_vars</a></td>
+<td>No</td>
+<td>object</td>
+<td>No</td>
+<td>-</td>
+<td>Optional variables that will be specifically set for a pve host. Key is the simple host name. <br />This can be used to build your specialized pve cluster setup playbooks. You can do things like<br />wakeonlan, driver and network configuration with these easily. Simply create your own playbook and<br />run it even before the pve.cloud.setup_pve_clusters on this inventory.<br /></td>
+</tr>
+</tbody>
+</table>
+<h4 id="1211-property-cloud-inventory-pve_clusters-pve-cluster-fqdn-pve_haproxy_floating_ip_internal"><a name="pve_clusters_pattern1_pve_haproxy_floating_ip_internal"></a>12.1.1. Property <code>Cloud Inventory &gt; pve_clusters &gt; PVE cluster fqdn &gt; pve_haproxy_floating_ip_internal</code></h4>
 <table>
 <thead>
 <tr>
@@ -2386,11 +1649,392 @@ must respect the following conditions</p>
 </tr>
 </tbody>
 </table>
-<p><strong>Description:</strong> Pool kea definition for ceph frontend ip allocations, this way monitors can have their static block.</p>
+<p><strong>Description:</strong> Floating ip that is exclusively accessible from inside the cloud / location. External forwardings should be made to pve_haproxy_floating_ip.
+Inside the cloud if you define a certificate entry, some nodeport forward or default kubeapi access, this will all be available automatically on this ip.</p>
 <p><strong>Example:</strong></p>
-<pre><code class="language-json">&quot;10.255.42.17 - 10.255.43.254&quot;
+<pre><code class="language-json">&quot;192.168.10.6&quot;
 </code></pre>
-<h2 id="17-property-cloud-inventory-acme_contact"><a name="acme_contact"></a>17. Property <code>Cloud Inventory &gt; acme_contact</code></h2>
+<h4 id="1212-property-cloud-inventory-pve_clusters-pve-cluster-fqdn-pve_haproxy_floating_ip"><a name="pve_clusters_pattern1_pve_haproxy_floating_ip"></a>12.1.2. Property <code>Cloud Inventory &gt; pve_clusters &gt; PVE cluster fqdn &gt; pve_haproxy_floating_ip</code></h4>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>string</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Floating ip of our central cluster HAProxy.</p>
+<p><strong>Example:</strong></p>
+<pre><code class="language-json">&quot;192.168.10.7&quot;
+</code></pre>
+<h4 id="1213-property-cloud-inventory-pve_clusters-pve-cluster-fqdn-pve_unique_cloud_services"><a name="pve_clusters_pattern1_pve_unique_cloud_services"></a>12.1.3. Property <code>Cloud Inventory &gt; pve_clusters &gt; PVE cluster fqdn &gt; pve_unique_cloud_services</code></h4>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>array of enum (of string)</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Unique service the cluster provides for its cloud. Unique in the sense that only one cluster may provide each of the services for the entire cloud.
+Services like haproxy and backup servers can and should be provided by multiple clusters. </p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Array restrictions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Min items</strong></td>
+<td>N/A</td>
+</tr>
+<tr>
+<td><strong>Max items</strong></td>
+<td>N/A</td>
+</tr>
+<tr>
+<td><strong>Items unicity</strong></td>
+<td>False</td>
+</tr>
+<tr>
+<td><strong>Additional items</strong></td>
+<td>False</td>
+</tr>
+<tr>
+<td><strong>Tuple validation</strong></td>
+<td>See below</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Each item of this array must be</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="#pve_clusters_pattern1_pve_unique_cloud_services_items">pve_unique_cloud_services items</a></td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<h5 id="12131-cloud-inventory-pve_clusters-pve-cluster-fqdn-pve_unique_cloud_services-pve_unique_cloud_services-items"><a name="pve_clusters_pattern1_pve_unique_cloud_services_items"></a>12.1.3.1. Cloud Inventory &gt; pve_clusters &gt; PVE cluster fqdn &gt; pve_unique_cloud_services &gt; pve_unique_cloud_services items</h5>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>enum (of string)</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<p>Must be one of:
+* "dns"
+* "dhcp"
+* "psql-state"</p>
+<h4 id="1214-property-cloud-inventory-pve_clusters-pve-cluster-fqdn-pve_host_vars"><a name="pve_clusters_pattern1_pve_host_vars"></a>12.1.4. Property <code>Cloud Inventory &gt; pve_clusters &gt; PVE cluster fqdn &gt; pve_host_vars</code></h4>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>object</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+<tr>
+<td><strong>Additional properties</strong></td>
+<td>Any type allowed</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Optional variables that will be specifically set for a pve host. Key is the simple host name. 
+This can be used to build your specialized pve cluster setup playbooks. You can do things like
+wakeonlan, driver and network configuration with these easily. Simply create your own playbook and
+run it even before the pve.cloud.setup_pve_clusters on this inventory.</p>
+<h2 id="13-property-cloud-inventory-bind_zone_admin_email"><a name="bind_zone_admin_email"></a>13. Property <code>Cloud Inventory &gt; bind_zone_admin_email</code></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>string</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Required adminstrator email in bind format for bind zones.</p>
+<p><strong>Example:</strong></p>
+<pre><code class="language-json">&quot;admin.example.com.&quot;
+</code></pre>
+<h2 id="14-property-cloud-inventory-bind_forward_zones"><a name="bind_forward_zones"></a>14. Property <code>Cloud Inventory &gt; bind_forward_zones</code></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>array of object</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Creates zone in bind and delegation ns records to the specified nameservers. This is very useful if you have other nameservers with 
+their own authoritative zones you want resolved within the cloud.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Array restrictions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Min items</strong></td>
+<td>N/A</td>
+</tr>
+<tr>
+<td><strong>Max items</strong></td>
+<td>N/A</td>
+</tr>
+<tr>
+<td><strong>Items unicity</strong></td>
+<td>False</td>
+</tr>
+<tr>
+<td><strong>Additional items</strong></td>
+<td>False</td>
+</tr>
+<tr>
+<td><strong>Tuple validation</strong></td>
+<td>See below</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Each item of this array must be</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="#bind_forward_zones_items">bind_forward_zones items</a></td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<h3 id="141-cloud-inventory-bind_forward_zones-bind_forward_zones-items"><a name="bind_forward_zones_items"></a>14.1. Cloud Inventory &gt; bind_forward_zones &gt; bind_forward_zones items</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>object</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+<tr>
+<td><strong>Additional properties</strong></td>
+<td>Any type allowed</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Pattern</th>
+<th>Type</th>
+<th>Deprecated</th>
+<th>Definition</th>
+<th>Title/Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>- <a href="#bind_forward_zones_items_zone">zone</a></td>
+<td>No</td>
+<td>string</td>
+<td>No</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>- <a href="#bind_forward_zones_items_nameservers">nameservers</a></td>
+<td>No</td>
+<td>array of string</td>
+<td>No</td>
+<td>-</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<h4 id="1411-property-cloud-inventory-bind_forward_zones-bind_forward_zones-items-zone"><a name="bind_forward_zones_items_zone"></a>14.1.1. Property <code>Cloud Inventory &gt; bind_forward_zones &gt; bind_forward_zones items &gt; zone</code></h4>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>string</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<h4 id="1412-property-cloud-inventory-bind_forward_zones-bind_forward_zones-items-nameservers"><a name="bind_forward_zones_items_nameservers"></a>14.1.2. Property <code>Cloud Inventory &gt; bind_forward_zones &gt; bind_forward_zones items &gt; nameservers</code></h4>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>array of string</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Array restrictions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Min items</strong></td>
+<td>N/A</td>
+</tr>
+<tr>
+<td><strong>Max items</strong></td>
+<td>N/A</td>
+</tr>
+<tr>
+<td><strong>Items unicity</strong></td>
+<td>False</td>
+</tr>
+<tr>
+<td><strong>Additional items</strong></td>
+<td>False</td>
+</tr>
+<tr>
+<td><strong>Tuple validation</strong></td>
+<td>See below</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Each item of this array must be</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="#bind_forward_zones_items_nameservers_items">nameservers items</a></td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<h5 id="14121-cloud-inventory-bind_forward_zones-bind_forward_zones-items-nameservers-nameservers-items"><a name="bind_forward_zones_items_nameservers_items"></a>14.1.2.1. Cloud Inventory &gt; bind_forward_zones &gt; bind_forward_zones items &gt; nameservers &gt; nameservers items</h5>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>string</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<h2 id="15-property-cloud-inventory-acme_contact"><a name="acme_contact"></a>15. Property <code>Cloud Inventory &gt; acme_contact</code></h2>
 <table>
 <thead>
 <tr>
@@ -2410,7 +2054,10 @@ must respect the following conditions</p>
 </tbody>
 </table>
 <p><strong>Description:</strong> Email address to use for acme account creation.</p>
-<h2 id="18-property-cloud-inventory-acme_method"><a name="acme_method"></a>18. Property <code>Cloud Inventory &gt; acme_method</code></h2>
+<p><strong>Example:</strong></p>
+<pre><code class="language-json">&quot;acme@example.com&quot;
+</code></pre>
+<h2 id="16-property-cloud-inventory-acme_method"><a name="acme_method"></a>16. Property <code>Cloud Inventory &gt; acme_method</code></h2>
 <table>
 <thead>
 <tr>
@@ -2429,11 +2076,11 @@ must respect the following conditions</p>
 </tr>
 </tbody>
 </table>
-<p><strong>Description:</strong> PVE Cloud included method for solving dns01 challenges.</p>
+<p><strong>Description:</strong> PVE Cloud included method for solving dns01 challenges. You need to have created the appropriate secrets under /etc/pve/cloud on your proxmox cluster.</p>
 <p>Must be one of:
 * "route53"
 * "ionos"</p>
-<h2 id="19-property-cloud-inventory-pve_cloud_pytest"><a name="pve_cloud_pytest"></a>19. Property <code>Cloud Inventory &gt; pve_cloud_pytest</code></h2>
+<h2 id="17-property-cloud-inventory-pve_cloud_pytest"><a name="pve_cloud_pytest"></a>17. Property <code>Cloud Inventory &gt; pve_cloud_pytest</code></h2>
 <table>
 <thead>
 <tr>
@@ -2457,7 +2104,7 @@ must respect the following conditions</p>
 </tbody>
 </table>
 <p><strong>Description:</strong> Variables object used only in e2e tests.</p>
-<h2 id="20-property-cloud-inventory-plugin"><a name="plugin"></a>20. Property <code>Cloud Inventory &gt; plugin</code></h2>
+<h2 id="18-property-cloud-inventory-plugin"><a name="plugin"></a>18. Property <code>Cloud Inventory &gt; plugin</code></h2>
 <table>
 <thead>
 <tr>
@@ -2480,7 +2127,7 @@ must respect the following conditions</p>
 <p>Must be one of:
 * "pve.cloud.pve_cloud_inv"</p>
 <hr />
-<p>Generated using <a href="https://github.com/coveooss/json-schema-for-humans">json-schema-for-humans</a> on 2025-11-29 at 23:48:23 +0000</p>
+<p>Generated using <a href="https://github.com/coveooss/json-schema-for-humans">json-schema-for-humans</a> on 2025-11-30 at 00:14:56 +0000</p>
 
 
 
