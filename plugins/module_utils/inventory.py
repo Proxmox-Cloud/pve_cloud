@@ -321,7 +321,7 @@ def get_manifest_version():
     elif os.path.isfile(manifest_path):
         with open(manifest_path, "r") as f:
             manifest = json.load(f)
-            manifest_version = manifest.get("version")
+            manifest_version = manifest["collection_info"]["version"]
     else:
         raise AnsibleError("Could neither find pve cloud galaxy.yml nor MANIFEST.json")
 
