@@ -1,6 +1,6 @@
-# Kubernetes kubespray inventory
+# K8s Kubespray Inventory
 
-**Title:** Kubernetes kubespray inventory
+**Title:** K8s Kubespray Inventory
 
 |                           |             |
 | ------------------------- | ----------- |
@@ -12,7 +12,7 @@
 
 | Property                                                 | Pattern | Type             | Deprecated | Definition | Title/Description                                                                                                                                                                                                                                                             |
 | -------------------------------------------------------- | ------- | ---------------- | ---------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| + [target_pve](#target_pve )                             | No      | string           | No         | -          | Proxmox cluster name + . + pve cloud domain. This determines the cloud and the proxmox cluster the k8s cluster will be created in.                                                                                                                                            |
+| + [target_pve](#target_pve )                             | No      | string           | No         | -          | Proxmox cluster name + . + pve cloud domain. This determines the cloud and the proxmox cluster the vms/lxc/k8s luster will be created in.                                                                                                                                     |
 | + [stack_name](#stack_name )                             | No      | string           | No         | -          | Your stack name, needs to be unique within the cloud domain.                                                                                                                                                                                                                  |
 | + [static_includes](#static_includes )                   | No      | object           | No         | -          | -                                                                                                                                                                                                                                                                             |
 | - [include_stacks](#include_stacks )                     | No      | array of object  | No         | -          | Include other stacks into the ansible inventory, from any pve cloud you are connected to. From here you can freely extend and write your own playbooks.                                                                                                                       |
@@ -35,14 +35,14 @@
 | + [ceph_csi_sc_pools](#ceph_csi_sc_pools )               | No      | array of object  | No         | -          | Ceph pools that will be made available to the cluster CSI driver.                                                                                                                                                                                                             |
 | - [acme_staging](#acme_staging )                         | No      | boolean          | No         | -          | If set to true will use acme staging directory for issueing certs.                                                                                                                                                                                                            |
 
-## <a name="target_pve"></a>1. Property `Kubernetes kubespray inventory > target_pve`
+## <a name="target_pve"></a>1. Property `K8s Kubespray Inventory > target_pve`
 
 |              |          |
 | ------------ | -------- |
 | **Type**     | `string` |
 | **Required** | Yes      |
 
-**Description:** Proxmox cluster name + . + pve cloud domain. This determines the cloud and the proxmox cluster the k8s cluster will be created in.
+**Description:** Proxmox cluster name + . + pve cloud domain. This determines the cloud and the proxmox cluster the vms/lxc/k8s luster will be created in.
 
 **Example:**
 
@@ -50,7 +50,7 @@
 "proxmox-cluster-a.your-cloud.domain"
 ```
 
-## <a name="stack_name"></a>2. Property `Kubernetes kubespray inventory > stack_name`
+## <a name="stack_name"></a>2. Property `K8s Kubespray Inventory > stack_name`
 
 |              |          |
 | ------------ | -------- |
@@ -59,7 +59,7 @@
 
 **Description:** Your stack name, needs to be unique within the cloud domain.
 
-## <a name="static_includes"></a>3. Property `Kubernetes kubespray inventory > static_includes`
+## <a name="static_includes"></a>3. Property `K8s Kubespray Inventory > static_includes`
 
 |                           |             |
 | ------------------------- | ----------- |
@@ -75,7 +75,7 @@
 | + [bind_stack](#static_includes_bind_stack )         | No      | string | No         | -          | The playbook needs the bind stack to register the general masters recordset and for creating authoritative zones defined in cluster_cert_entries.      |
 | - [cache_stack](#static_includes_cache_stack )       | No      | string | No         | -          | Cache stack to mount nfs for kubespray cache and apt cache. Assumes the cache lxc to have the hostname "main". WIP!                                    |
 
-### <a name="static_includes_dhcp_stack"></a>3.1. Property `Kubernetes kubespray inventory > static_includes > dhcp_stack`
+### <a name="static_includes_dhcp_stack"></a>3.1. Property `K8s Kubespray Inventory > static_includes > dhcp_stack`
 
 |              |          |
 | ------------ | -------- |
@@ -90,7 +90,7 @@
 "dhcp.your-cloud.domain"
 ```
 
-### <a name="static_includes_proxy_stack"></a>3.2. Property `Kubernetes kubespray inventory > static_includes > proxy_stack`
+### <a name="static_includes_proxy_stack"></a>3.2. Property `K8s Kubespray Inventory > static_includes > proxy_stack`
 
 |              |          |
 | ------------ | -------- |
@@ -105,7 +105,7 @@
 "proxy.your-cloud.domain"
 ```
 
-### <a name="static_includes_postgres_stack"></a>3.3. Property `Kubernetes kubespray inventory > static_includes > postgres_stack`
+### <a name="static_includes_postgres_stack"></a>3.3. Property `K8s Kubespray Inventory > static_includes > postgres_stack`
 
 |              |          |
 | ------------ | -------- |
@@ -120,7 +120,7 @@
 "patroni.your-cloud.domain"
 ```
 
-### <a name="static_includes_bind_stack"></a>3.4. Property `Kubernetes kubespray inventory > static_includes > bind_stack`
+### <a name="static_includes_bind_stack"></a>3.4. Property `K8s Kubespray Inventory > static_includes > bind_stack`
 
 |              |          |
 | ------------ | -------- |
@@ -135,7 +135,7 @@
 "bind.your-cloud.domain"
 ```
 
-### <a name="static_includes_cache_stack"></a>3.5. Property `Kubernetes kubespray inventory > static_includes > cache_stack`
+### <a name="static_includes_cache_stack"></a>3.5. Property `K8s Kubespray Inventory > static_includes > cache_stack`
 
 |              |          |
 | ------------ | -------- |
@@ -144,7 +144,7 @@
 
 **Description:** Cache stack to mount nfs for kubespray cache and apt cache. Assumes the cache lxc to have the hostname "main". WIP!
 
-## <a name="include_stacks"></a>4. Property `Kubernetes kubespray inventory > include_stacks`
+## <a name="include_stacks"></a>4. Property `K8s Kubespray Inventory > include_stacks`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -165,7 +165,7 @@
 | --------------------------------------------- | ----------- |
 | [include_stacks items](#include_stacks_items) | -           |
 
-### <a name="include_stacks_items"></a>4.1. Kubernetes kubespray inventory > include_stacks > include_stacks items
+### <a name="include_stacks_items"></a>4.1. K8s Kubespray Inventory > include_stacks > include_stacks items
 
 |                           |             |
 | ------------------------- | ----------- |
@@ -179,7 +179,7 @@
 | + [host_group](#include_stacks_items_host_group )               | No      | string | No         | -          | This is the name of the hosts group of our ansible inventory the included vms/lxcs will be available under.                                                                                                                        |
 | - [qemu_ansible_user](#include_stacks_items_qemu_ansible_user ) | No      | string | No         | -          | User ansible will use to connect, defaults to admin. If you dont want to use debian cinit images you might need to set something else than admin.<br />Ubuntu for example wont work if you set the cloud init user to admin.<br /> |
 
-#### <a name="include_stacks_items_stack_fqdn"></a>4.1.1. Property `Kubernetes kubespray inventory > include_stacks > include_stacks items > stack_fqdn`
+#### <a name="include_stacks_items_stack_fqdn"></a>4.1.1. Property `K8s Kubespray Inventory > include_stacks > include_stacks items > stack_fqdn`
 
 |              |          |
 | ------------ | -------- |
@@ -198,7 +198,7 @@
 "other-k8s.your-other-cloud.domain"
 ```
 
-#### <a name="include_stacks_items_host_group"></a>4.1.2. Property `Kubernetes kubespray inventory > include_stacks > include_stacks items > host_group`
+#### <a name="include_stacks_items_host_group"></a>4.1.2. Property `K8s Kubespray Inventory > include_stacks > include_stacks items > host_group`
 
 |              |          |
 | ------------ | -------- |
@@ -207,7 +207,7 @@
 
 **Description:** This is the name of the hosts group of our ansible inventory the included vms/lxcs will be available under.
 
-#### <a name="include_stacks_items_qemu_ansible_user"></a>4.1.3. Property `Kubernetes kubespray inventory > include_stacks > include_stacks items > qemu_ansible_user`
+#### <a name="include_stacks_items_qemu_ansible_user"></a>4.1.3. Property `K8s Kubespray Inventory > include_stacks > include_stacks items > qemu_ansible_user`
 
 |              |          |
 | ------------ | -------- |
@@ -217,7 +217,7 @@
 **Description:** User ansible will use to connect, defaults to admin. If you dont want to use debian cinit images you might need to set something else than admin.
 Ubuntu for example wont work if you set the cloud init user to admin.
 
-## <a name="root_ssh_pub_key"></a>5. Property `Kubernetes kubespray inventory > root_ssh_pub_key`
+## <a name="root_ssh_pub_key"></a>5. Property `K8s Kubespray Inventory > root_ssh_pub_key`
 
 |              |          |
 | ------------ | -------- |
@@ -226,7 +226,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** trusted root key for the cloud init image.
 
-## <a name="pve_ha_group"></a>6. Property `Kubernetes kubespray inventory > pve_ha_group`
+## <a name="pve_ha_group"></a>6. Property `K8s Kubespray Inventory > pve_ha_group`
 
 |              |          |
 | ------------ | -------- |
@@ -235,7 +235,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** PVE HA group this vm should be assigned to (optional).
 
-## <a name="pve_cloud_pytest"></a>7. Property `Kubernetes kubespray inventory > pve_cloud_pytest`
+## <a name="pve_cloud_pytest"></a>7. Property `K8s Kubespray Inventory > pve_cloud_pytest`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -245,7 +245,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** Variables object used only in e2e tests.
 
-## <a name="qemus"></a>8. Property `Kubernetes kubespray inventory > qemus`
+## <a name="qemus"></a>8. Property `K8s Kubespray Inventory > qemus`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -266,7 +266,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 | ------------------------------- | ----------- |
 | [qemus items](#qemus_items)     | -           |
 
-### <a name="qemus_items"></a>8.1. Kubernetes kubespray inventory > qemus > qemus items
+### <a name="qemus_items"></a>8.1. K8s Kubespray Inventory > qemus > qemus items
 
 |                           |             |
 | ------------------------- | ----------- |
@@ -284,7 +284,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 | + [disk](#qemus_items_disk )                     | No      | object                    | No         | -          | -                                                                                                                                                                       |
 | + [k8s_roles](#qemus_items_k8s_roles )           | No      | array of enum (of string) | No         | -          | String array of k8s roles.                                                                                                                                              |
 
-#### <a name="qemus_items_hostname"></a>8.1.1. Property `Kubernetes kubespray inventory > qemus > qemus items > hostname`
+#### <a name="qemus_items_hostname"></a>8.1.1. Property `K8s Kubespray Inventory > qemus > qemus items > hostname`
 
 |              |          |
 | ------------ | -------- |
@@ -293,7 +293,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** Optional unique hostname for this node, otherwise pet name random name will be generated.
 
-#### <a name="qemus_items_vars"></a>8.1.2. Property `Kubernetes kubespray inventory > qemus > qemus items > vars`
+#### <a name="qemus_items_vars"></a>8.1.2. Property `K8s Kubespray Inventory > qemus > qemus items > vars`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -303,7 +303,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** Custom variables for this node specifically, might be useful in your own custom playbooks.
 
-#### <a name="qemus_items_target_host"></a>8.1.3. Property `Kubernetes kubespray inventory > qemus > qemus items > target_host`
+#### <a name="qemus_items_target_host"></a>8.1.3. Property `K8s Kubespray Inventory > qemus > qemus items > target_host`
 
 |              |          |
 | ------------ | -------- |
@@ -318,7 +318,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 "proxmox-host-B.proxmox-cluster-A"
 ```
 
-#### <a name="qemus_items_parameters"></a>8.1.4. Property `Kubernetes kubespray inventory > qemus > qemus items > parameters`
+#### <a name="qemus_items_parameters"></a>8.1.4. Property `K8s Kubespray Inventory > qemus > qemus items > parameters`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -337,7 +337,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 }
 ```
 
-#### <a name="qemus_items_network_config"></a>8.1.5. Property `Kubernetes kubespray inventory > qemus > qemus items > network_config`
+#### <a name="qemus_items_network_config"></a>8.1.5. Property `K8s Kubespray Inventory > qemus > qemus items > network_config`
 
 |              |          |
 | ------------ | -------- |
@@ -346,7 +346,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** Cinit network config yaml string. Will be the last cfg piece that gets merged into the final cloudinit network config. Can be used for overrides.
 
-#### <a name="qemus_items_disk"></a>8.1.6. Property `Kubernetes kubespray inventory > qemus > qemus items > disk`
+#### <a name="qemus_items_disk"></a>8.1.6. Property `K8s Kubespray Inventory > qemus > qemus items > disk`
 
 |                           |             |
 | ------------------------- | ----------- |
@@ -360,7 +360,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 | - [options](#qemus_items_disk_options ) | No      | object | No         | -          | Mount options                                   |
 | + [pool](#qemus_items_disk_pool )       | No      | string | No         | -          | Ceph pool name the vms disk will be created in. |
 
-##### <a name="qemus_items_disk_size"></a>8.1.6.1. Property `Kubernetes kubespray inventory > qemus > qemus items > disk > size`
+##### <a name="qemus_items_disk_size"></a>8.1.6.1. Property `K8s Kubespray Inventory > qemus > qemus items > disk > size`
 
 |              |          |
 | ------------ | -------- |
@@ -375,7 +375,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 "25G"
 ```
 
-##### <a name="qemus_items_disk_options"></a>8.1.6.2. Property `Kubernetes kubespray inventory > qemus > qemus items > disk > options`
+##### <a name="qemus_items_disk_options"></a>8.1.6.2. Property `K8s Kubespray Inventory > qemus > qemus items > disk > options`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -385,7 +385,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** Mount options
 
-##### <a name="qemus_items_disk_pool"></a>8.1.6.3. Property `Kubernetes kubespray inventory > qemus > qemus items > disk > pool`
+##### <a name="qemus_items_disk_pool"></a>8.1.6.3. Property `K8s Kubespray Inventory > qemus > qemus items > disk > pool`
 
 |              |          |
 | ------------ | -------- |
@@ -394,7 +394,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** Ceph pool name the vms disk will be created in.
 
-#### <a name="qemus_items_k8s_roles"></a>8.1.7. Property `Kubernetes kubespray inventory > qemus > qemus items > k8s_roles`
+#### <a name="qemus_items_k8s_roles"></a>8.1.7. Property `K8s Kubespray Inventory > qemus > qemus items > k8s_roles`
 
 |              |                             |
 | ------------ | --------------------------- |
@@ -415,7 +415,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 | ----------------------------------------------- | ----------- |
 | [k8s_roles items](#qemus_items_k8s_roles_items) | -           |
 
-##### <a name="qemus_items_k8s_roles_items"></a>8.1.7.1. Kubernetes kubespray inventory > qemus > qemus items > k8s_roles > k8s_roles items
+##### <a name="qemus_items_k8s_roles_items"></a>8.1.7.1. K8s Kubespray Inventory > qemus > qemus items > k8s_roles > k8s_roles items
 
 |              |                    |
 | ------------ | ------------------ |
@@ -426,7 +426,7 @@ Must be one of:
 * "master"
 * "worker"
 
-## <a name="qemu_default_user"></a>9. Property `Kubernetes kubespray inventory > qemu_default_user`
+## <a name="qemu_default_user"></a>9. Property `K8s Kubespray Inventory > qemu_default_user`
 
 |              |          |
 | ------------ | -------- |
@@ -435,7 +435,7 @@ Must be one of:
 
 **Description:** User for cinit.
 
-## <a name="qemu_hashed_pw"></a>10. Property `Kubernetes kubespray inventory > qemu_hashed_pw`
+## <a name="qemu_hashed_pw"></a>10. Property `K8s Kubespray Inventory > qemu_hashed_pw`
 
 |              |          |
 | ------------ | -------- |
@@ -444,7 +444,7 @@ Must be one of:
 
 **Description:** Pw for default user defaults to hashed 'password' for debian cloud init image. Different cloud init images require different hash methods. You cannot use the same from debian for ubuntu for example.
 
-## <a name="qemu_base_parameters"></a>11. Property `Kubernetes kubespray inventory > qemu_base_parameters`
+## <a name="qemu_base_parameters"></a>11. Property `K8s Kubespray Inventory > qemu_base_parameters`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -454,7 +454,7 @@ Must be one of:
 
 **Description:** Base parameters applied to all qemus. passed to the proxmox qm cli tool for creating vm.
 
-## <a name="qemu_image_url"></a>12. Property `Kubernetes kubespray inventory > qemu_image_url`
+## <a name="qemu_image_url"></a>12. Property `K8s Kubespray Inventory > qemu_image_url`
 
 |              |          |
 | ------------ | -------- |
@@ -463,7 +463,7 @@ Must be one of:
 
 **Description:** http(s) download link for cloud init image.
 
-## <a name="qemu_keyboard_layout"></a>13. Property `Kubernetes kubespray inventory > qemu_keyboard_layout`
+## <a name="qemu_keyboard_layout"></a>13. Property `K8s Kubespray Inventory > qemu_keyboard_layout`
 
 |              |          |
 | ------------ | -------- |
@@ -472,7 +472,7 @@ Must be one of:
 
 **Description:** Keyboard layout for cloudinit.
 
-## <a name="qemu_network_config"></a>14. Property `Kubernetes kubespray inventory > qemu_network_config`
+## <a name="qemu_network_config"></a>14. Property `K8s Kubespray Inventory > qemu_network_config`
 
 |              |          |
 | ------------ | -------- |
@@ -481,7 +481,7 @@ Must be one of:
 
 **Description:** Optional qemu network config as a yaml string that is merged into the cloudinit network config of all qemus.
 
-## <a name="qemu_global_vars"></a>15. Property `Kubernetes kubespray inventory > qemu_global_vars`
+## <a name="qemu_global_vars"></a>15. Property `K8s Kubespray Inventory > qemu_global_vars`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -491,7 +491,7 @@ Must be one of:
 
 **Description:** Variables that will be applied set for all qemus vms.
 
-## <a name="plugin"></a>16. Property `Kubernetes kubespray inventory > plugin`
+## <a name="plugin"></a>16. Property `K8s Kubespray Inventory > plugin`
 
 |              |                    |
 | ------------ | ------------------ |
@@ -504,7 +504,7 @@ Must be one of:
 * "pve.cloud.qemu_inv"
 * "pve.cloud.kubespray_inv"
 
-## <a name="extra_control_plane_sans"></a>17. Property `Kubernetes kubespray inventory > extra_control_plane_sans`
+## <a name="extra_control_plane_sans"></a>17. Property `K8s Kubespray Inventory > extra_control_plane_sans`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -526,14 +526,14 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 | ----------------------------------------------------------------- | ----------- |
 | [extra_control_plane_sans items](#extra_control_plane_sans_items) | -           |
 
-### <a name="extra_control_plane_sans_items"></a>17.1. Kubernetes kubespray inventory > extra_control_plane_sans > extra_control_plane_sans items
+### <a name="extra_control_plane_sans_items"></a>17.1. K8s Kubespray Inventory > extra_control_plane_sans > extra_control_plane_sans items
 
 |              |          |
 | ------------ | -------- |
 | **Type**     | `string` |
 | **Required** | No       |
 
-## <a name="external_domains"></a>18. Property `Kubernetes kubespray inventory > external_domains`
+## <a name="external_domains"></a>18. Property `K8s Kubespray Inventory > external_domains`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -554,7 +554,7 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 | ------------------------------------------------- | ----------- |
 | [external_domains items](#external_domains_items) | -           |
 
-### <a name="external_domains_items"></a>18.1. Kubernetes kubespray inventory > external_domains > external_domains items
+### <a name="external_domains_items"></a>18.1. K8s Kubespray Inventory > external_domains > external_domains items
 
 |                           |             |
 | ------------------------- | ----------- |
@@ -568,7 +568,7 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 | - [expose_apex](#external_domains_items_expose_apex ) | No      | boolean         | No         | -          | Expose the apex zone itself. For example if you have zone example.com then example.com will be routed to this cluster. |
 | + [names](#external_domains_items_names )             | No      | array of string | No         | -          | -                                                                                                                      |
 
-#### <a name="external_domains_items_zone"></a>18.1.1. Property `Kubernetes kubespray inventory > external_domains > external_domains items > zone`
+#### <a name="external_domains_items_zone"></a>18.1.1. Property `K8s Kubespray Inventory > external_domains > external_domains items > zone`
 
 |              |          |
 | ------------ | -------- |
@@ -577,7 +577,7 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 
 **Description:** DNS parent zone, should also be the zone that external records are made under in AWS for example.
 
-#### <a name="external_domains_items_expose_apex"></a>18.1.2. Property `Kubernetes kubespray inventory > external_domains > external_domains items > expose_apex`
+#### <a name="external_domains_items_expose_apex"></a>18.1.2. Property `K8s Kubespray Inventory > external_domains > external_domains items > expose_apex`
 
 |              |           |
 | ------------ | --------- |
@@ -586,7 +586,7 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 
 **Description:** Expose the apex zone itself. For example if you have zone example.com then example.com will be routed to this cluster.
 
-#### <a name="external_domains_items_names"></a>18.1.3. Property `Kubernetes kubespray inventory > external_domains > external_domains items > names`
+#### <a name="external_domains_items_names"></a>18.1.3. Property `K8s Kubespray Inventory > external_domains > external_domains items > names`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -605,7 +605,7 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 | -------------------------------------------------- | ----------------------------------------- |
 | [names items](#external_domains_items_names_items) | Names of the zone that should be exposed. |
 
-##### <a name="external_domains_items_names_items"></a>18.1.3.1. Kubernetes kubespray inventory > external_domains > external_domains items > names > names items
+##### <a name="external_domains_items_names_items"></a>18.1.3.1. K8s Kubespray Inventory > external_domains > external_domains items > names > names items
 
 |              |          |
 | ------------ | -------- |
@@ -628,7 +628,7 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 "*.subzone"
 ```
 
-## <a name="cluster_cert_entries"></a>19. Property `Kubernetes kubespray inventory > cluster_cert_entries`
+## <a name="cluster_cert_entries"></a>19. Property `K8s Kubespray Inventory > cluster_cert_entries`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -649,7 +649,7 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 | --------------------------------------------------------- | ----------- |
 | [cluster_cert_entries items](#cluster_cert_entries_items) | -           |
 
-### <a name="cluster_cert_entries_items"></a>19.1. Kubernetes kubespray inventory > cluster_cert_entries > cluster_cert_entries items
+### <a name="cluster_cert_entries_items"></a>19.1. K8s Kubespray Inventory > cluster_cert_entries > cluster_cert_entries items
 
 |                           |             |
 | ------------------------- | ----------- |
@@ -664,7 +664,7 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 | - [authoritative_zone](#cluster_cert_entries_items_authoritative_zone ) | No      | boolean         | No         | -          | This will cause the specified apex zone to be created as an authoritative zone in the proxmox clouds dns server. Ingress dns will only work for authoritative zones. |
 | - [apex_zone_san](#cluster_cert_entries_items_apex_zone_san )           | No      | boolean         | No         | -          | Creates additional SAN for the zone, if you have *.example.com you will also get example.com in your certificate. Defaults to false.                                 |
 
-#### <a name="cluster_cert_entries_items_zone"></a>19.1.1. Property `Kubernetes kubespray inventory > cluster_cert_entries > cluster_cert_entries items > zone`
+#### <a name="cluster_cert_entries_items_zone"></a>19.1.1. Property `K8s Kubespray Inventory > cluster_cert_entries > cluster_cert_entries items > zone`
 
 |              |          |
 | ------------ | -------- |
@@ -673,7 +673,7 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 
 **Description:** DNS parent zone, should be the apex zone in ionos/route53 for dns01 challenge.
 
-#### <a name="cluster_cert_entries_items_names"></a>19.1.2. Property `Kubernetes kubespray inventory > cluster_cert_entries > cluster_cert_entries items > names`
+#### <a name="cluster_cert_entries_items_names"></a>19.1.2. Property `K8s Kubespray Inventory > cluster_cert_entries > cluster_cert_entries items > names`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -692,7 +692,7 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 | ------------------------------------------------------ | --------------------------------------------------------------- |
 | [names items](#cluster_cert_entries_items_names_items) | SANs included in the certificate and basis for dns01 challenge. |
 
-##### <a name="cluster_cert_entries_items_names_items"></a>19.1.2.1. Kubernetes kubespray inventory > cluster_cert_entries > cluster_cert_entries items > names > names items
+##### <a name="cluster_cert_entries_items_names_items"></a>19.1.2.1. K8s Kubespray Inventory > cluster_cert_entries > cluster_cert_entries items > names > names items
 
 |              |          |
 | ------------ | -------- |
@@ -715,7 +715,7 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 "*.subzone"
 ```
 
-#### <a name="cluster_cert_entries_items_authoritative_zone"></a>19.1.3. Property `Kubernetes kubespray inventory > cluster_cert_entries > cluster_cert_entries items > authoritative_zone`
+#### <a name="cluster_cert_entries_items_authoritative_zone"></a>19.1.3. Property `K8s Kubespray Inventory > cluster_cert_entries > cluster_cert_entries items > authoritative_zone`
 
 |              |           |
 | ------------ | --------- |
@@ -724,7 +724,7 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 
 **Description:** This will cause the specified apex zone to be created as an authoritative zone in the proxmox clouds dns server. Ingress dns will only work for authoritative zones.
 
-#### <a name="cluster_cert_entries_items_apex_zone_san"></a>19.1.4. Property `Kubernetes kubespray inventory > cluster_cert_entries > cluster_cert_entries items > apex_zone_san`
+#### <a name="cluster_cert_entries_items_apex_zone_san"></a>19.1.4. Property `K8s Kubespray Inventory > cluster_cert_entries > cluster_cert_entries items > apex_zone_san`
 
 |              |           |
 | ------------ | --------- |
@@ -733,7 +733,7 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 
 **Description:** Creates additional SAN for the zone, if you have *.example.com you will also get example.com in your certificate. Defaults to false.
 
-## <a name="tcp_proxies"></a>20. Property `Kubernetes kubespray inventory > tcp_proxies`
+## <a name="tcp_proxies"></a>20. Property `K8s Kubespray Inventory > tcp_proxies`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -754,7 +754,7 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 | --------------------------------------- | ----------- |
 | [tcp_proxies items](#tcp_proxies_items) | -           |
 
-### <a name="tcp_proxies_items"></a>20.1. Kubernetes kubespray inventory > tcp_proxies > tcp_proxies items
+### <a name="tcp_proxies_items"></a>20.1. K8s Kubespray Inventory > tcp_proxies > tcp_proxies items
 
 |                           |             |
 | ------------------------- | ----------- |
@@ -770,7 +770,7 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 | - [proxy_snippet](#tcp_proxies_items_proxy_snippet ) | No      | string  | No         | -          | Additional snippet that will be inserted into the haproxy listen block. Can be used to adjust the forwards settings. |
 | - [external](#tcp_proxies_items_external )           | No      | boolean | No         | -          | Will also create a forward on the external floating ip of the proxy not only the internal.                           |
 
-#### <a name="tcp_proxies_items_proxy_name"></a>20.1.1. Property `Kubernetes kubespray inventory > tcp_proxies > tcp_proxies items > proxy_name`
+#### <a name="tcp_proxies_items_proxy_name"></a>20.1.1. Property `K8s Kubespray Inventory > tcp_proxies > tcp_proxies items > proxy_name`
 
 |              |          |
 | ------------ | -------- |
@@ -789,7 +789,7 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 "example-postgres"
 ```
 
-#### <a name="tcp_proxies_items_haproxy_port"></a>20.1.2. Property `Kubernetes kubespray inventory > tcp_proxies > tcp_proxies items > haproxy_port`
+#### <a name="tcp_proxies_items_haproxy_port"></a>20.1.2. Property `K8s Kubespray Inventory > tcp_proxies > tcp_proxies items > haproxy_port`
 
 |              |          |
 | ------------ | -------- |
@@ -798,7 +798,7 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 
 **Description:** Frontend port of the proxmox clusters haproxy.
 
-#### <a name="tcp_proxies_items_node_port"></a>20.1.3. Property `Kubernetes kubespray inventory > tcp_proxies > tcp_proxies items > node_port`
+#### <a name="tcp_proxies_items_node_port"></a>20.1.3. Property `K8s Kubespray Inventory > tcp_proxies > tcp_proxies items > node_port`
 
 |              |          |
 | ------------ | -------- |
@@ -807,7 +807,7 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 
 **Description:** Nodeport of the k8s service.
 
-#### <a name="tcp_proxies_items_proxy_snippet"></a>20.1.4. Property `Kubernetes kubespray inventory > tcp_proxies > tcp_proxies items > proxy_snippet`
+#### <a name="tcp_proxies_items_proxy_snippet"></a>20.1.4. Property `K8s Kubespray Inventory > tcp_proxies > tcp_proxies items > proxy_snippet`
 
 |              |          |
 | ------------ | -------- |
@@ -822,7 +822,7 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 "# long running tcp connections that only rarely transmit data\n# ssh client connection for example\ntimeout client 1h \ntimeout server 1h \n"
 ```
 
-#### <a name="tcp_proxies_items_external"></a>20.1.5. Property `Kubernetes kubespray inventory > tcp_proxies > tcp_proxies items > external`
+#### <a name="tcp_proxies_items_external"></a>20.1.5. Property `K8s Kubespray Inventory > tcp_proxies > tcp_proxies items > external`
 
 |              |           |
 | ------------ | --------- |
@@ -831,7 +831,7 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 
 **Description:** Will also create a forward on the external floating ip of the proxy not only the internal.
 
-## <a name="ceph_csi_sc_pools"></a>21. Property `Kubernetes kubespray inventory > ceph_csi_sc_pools`
+## <a name="ceph_csi_sc_pools"></a>21. Property `K8s Kubespray Inventory > ceph_csi_sc_pools`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -852,7 +852,7 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 | --------------------------------------------------- | ----------- |
 | [ceph_csi_sc_pools items](#ceph_csi_sc_pools_items) | -           |
 
-### <a name="ceph_csi_sc_pools_items"></a>21.1. Kubernetes kubespray inventory > ceph_csi_sc_pools > ceph_csi_sc_pools items
+### <a name="ceph_csi_sc_pools_items"></a>21.1. K8s Kubespray Inventory > ceph_csi_sc_pools > ceph_csi_sc_pools items
 
 |                           |             |
 | ------------------------- | ----------- |
@@ -866,7 +866,7 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 | + [default](#ceph_csi_sc_pools_items_default )             | No      | boolean | No         | -          | Whether or not the pool is the default storage class.                                   |
 | + [mount_options](#ceph_csi_sc_pools_items_mount_options ) | No      | array   | No         | -          | String array of mount options that will be set in the storage class and applied to pvs. |
 
-#### <a name="ceph_csi_sc_pools_items_name"></a>21.1.1. Property `Kubernetes kubespray inventory > ceph_csi_sc_pools > ceph_csi_sc_pools items > name`
+#### <a name="ceph_csi_sc_pools_items_name"></a>21.1.1. Property `K8s Kubespray Inventory > ceph_csi_sc_pools > ceph_csi_sc_pools items > name`
 
 |              |          |
 | ------------ | -------- |
@@ -875,7 +875,7 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 
 **Description:** Name of the pool in the ceph of our PVE cluster.
 
-#### <a name="ceph_csi_sc_pools_items_default"></a>21.1.2. Property `Kubernetes kubespray inventory > ceph_csi_sc_pools > ceph_csi_sc_pools items > default`
+#### <a name="ceph_csi_sc_pools_items_default"></a>21.1.2. Property `K8s Kubespray Inventory > ceph_csi_sc_pools > ceph_csi_sc_pools items > default`
 
 |              |           |
 | ------------ | --------- |
@@ -884,7 +884,7 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 
 **Description:** Whether or not the pool is the default storage class.
 
-#### <a name="ceph_csi_sc_pools_items_mount_options"></a>21.1.3. Property `Kubernetes kubespray inventory > ceph_csi_sc_pools > ceph_csi_sc_pools items > mount_options`
+#### <a name="ceph_csi_sc_pools_items_mount_options"></a>21.1.3. Property `K8s Kubespray Inventory > ceph_csi_sc_pools > ceph_csi_sc_pools items > mount_options`
 
 |              |         |
 | ------------ | ------- |
@@ -901,7 +901,7 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 | **Additional items** | False              |
 | **Tuple validation** | N/A                |
 
-## <a name="acme_staging"></a>22. Property `Kubernetes kubespray inventory > acme_staging`
+## <a name="acme_staging"></a>22. Property `K8s Kubespray Inventory > acme_staging`
 
 |              |           |
 | ------------ | --------- |
@@ -911,4 +911,4 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 **Description:** If set to true will use acme staging directory for issueing certs.
 
 ----------------------------------------------------------------------------------------------------------------------------
-Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2025-11-30 at 00:14:57 +0000
+Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2025-11-30 at 22:34:19 +0000

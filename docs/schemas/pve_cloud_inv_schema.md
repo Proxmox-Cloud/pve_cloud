@@ -8,7 +8,7 @@
 | **Required**              | No          |
 | **Additional properties** | Not allowed |
 
-**Description:** Definitions for a proxmox cloud.
+**Description:** Definitions for a proxmox cloud, setup of proxmox clusters.
 
 | Property                                                       | Pattern | Type             | Deprecated | Definition | Title/Description                                                                                                                                                                                                 |
 | -------------------------------------------------------------- | ------- | ---------------- | ---------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -472,4 +472,4 @@ Must be one of:
 * "pve.cloud.pve_cloud_inv"
 
 ----------------------------------------------------------------------------------------------------------------------------
-Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2025-11-30 at 00:14:56 +0000
+Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2025-11-30 at 22:34:19 +0000

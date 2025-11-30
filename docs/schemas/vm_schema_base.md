@@ -10,7 +10,7 @@
 
 | Property                                 | Pattern | Type            | Deprecated | Definition | Title/Description                                                                                                                                       |
 | ---------------------------------------- | ------- | --------------- | ---------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| + [target_pve](#target_pve )             | No      | string          | No         | -          | Proxmox cluster name + . + pve cloud domain. This determines the cloud and the proxmox cluster the k8s cluster will be created in.                      |
+| + [target_pve](#target_pve )             | No      | string          | No         | -          | Proxmox cluster name + . + pve cloud domain. This determines the cloud and the proxmox cluster the vms/lxc/k8s luster will be created in.               |
 | + [stack_name](#stack_name )             | No      | string          | No         | -          | Your stack name, needs to be unique within the cloud domain.                                                                                            |
 | - [static_includes](#static_includes )   | No      | object          | No         | -          | -                                                                                                                                                       |
 | - [include_stacks](#include_stacks )     | No      | array of object | No         | -          | Include other stacks into the ansible inventory, from any pve cloud you are connected to. From here you can freely extend and write your own playbooks. |
@@ -25,7 +25,7 @@
 | **Type**     | `string` |
 | **Required** | Yes      |
 
-**Description:** Proxmox cluster name + . + pve cloud domain. This determines the cloud and the proxmox cluster the k8s cluster will be created in.
+**Description:** Proxmox cluster name + . + pve cloud domain. This determines the cloud and the proxmox cluster the vms/lxc/k8s luster will be created in.
 
 **Example:**
 
@@ -152,4 +152,4 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 **Description:** Variables object used only in e2e tests.
 
 ----------------------------------------------------------------------------------------------------------------------------
-Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2025-11-30 at 00:14:57 +0000
+Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2025-11-30 at 22:34:19 +0000

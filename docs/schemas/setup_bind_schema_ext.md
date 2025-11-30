@@ -1,6 +1,6 @@
-# Schema ext setup_bind playbook
+# Bind Dns Inventory
 
-**Title:** Schema ext setup_bind playbook
+**Title:** Bind Dns Inventory
 
 |                           |             |
 | ------------------------- | ----------- |
@@ -8,11 +8,11 @@
 | **Required**              | No          |
 | **Additional properties** | Not allowed |
 
-**Description:** Inventory for creating lxcs for a single stack on PVE.
+**Description:** LXC Inventory extension for the setup_bind playbook.
 
 | Property                                       | Pattern | Type             | Deprecated | Definition | Title/Description                                                                                                                                       |
 | ---------------------------------------------- | ------- | ---------------- | ---------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| + [target_pve](#target_pve )                   | No      | string           | No         | -          | Proxmox cluster name + . + pve cloud domain. This determines the cloud and the proxmox cluster the k8s cluster will be created in.                      |
+| + [target_pve](#target_pve )                   | No      | string           | No         | -          | Proxmox cluster name + . + pve cloud domain. This determines the cloud and the proxmox cluster the vms/lxc/k8s luster will be created in.               |
 | + [stack_name](#stack_name )                   | No      | string           | No         | -          | Your stack name, needs to be unique within the cloud domain.                                                                                            |
 | - [static_includes](#static_includes )         | No      | object           | No         | -          | -                                                                                                                                                       |
 | - [include_stacks](#include_stacks )           | No      | array of object  | No         | -          | Include other stacks into the ansible inventory, from any pve cloud you are connected to. From here you can freely extend and write your own playbooks. |
@@ -25,14 +25,14 @@
 | - [lxc_os_template](#lxc_os_template )         | No      | string           | No         | -          | \`pveam available --section system\` / run \`pveam update\` for newest, PVE available LXC template (will be downloaded).                                |
 | - [plugin](#plugin )                           | No      | enum (of string) | No         | -          | Id of ansible inventory plugin.                                                                                                                         |
 
-## <a name="target_pve"></a>1. Property `Schema ext setup_bind playbook > target_pve`
+## <a name="target_pve"></a>1. Property `Bind Dns Inventory > target_pve`
 
 |              |          |
 | ------------ | -------- |
 | **Type**     | `string` |
 | **Required** | Yes      |
 
-**Description:** Proxmox cluster name + . + pve cloud domain. This determines the cloud and the proxmox cluster the k8s cluster will be created in.
+**Description:** Proxmox cluster name + . + pve cloud domain. This determines the cloud and the proxmox cluster the vms/lxc/k8s luster will be created in.
 
 **Example:**
 
@@ -40,7 +40,7 @@
 "proxmox-cluster-a.your-cloud.domain"
 ```
 
-## <a name="stack_name"></a>2. Property `Schema ext setup_bind playbook > stack_name`
+## <a name="stack_name"></a>2. Property `Bind Dns Inventory > stack_name`
 
 |              |          |
 | ------------ | -------- |
@@ -49,7 +49,7 @@
 
 **Description:** Your stack name, needs to be unique within the cloud domain.
 
-## <a name="static_includes"></a>3. Property `Schema ext setup_bind playbook > static_includes`
+## <a name="static_includes"></a>3. Property `Bind Dns Inventory > static_includes`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -57,7 +57,7 @@
 | **Required**              | No               |
 | **Additional properties** | Any type allowed |
 
-## <a name="include_stacks"></a>4. Property `Schema ext setup_bind playbook > include_stacks`
+## <a name="include_stacks"></a>4. Property `Bind Dns Inventory > include_stacks`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -78,7 +78,7 @@
 | --------------------------------------------- | ----------- |
 | [include_stacks items](#include_stacks_items) | -           |
 
-### <a name="include_stacks_items"></a>4.1. Schema ext setup_bind playbook > include_stacks > include_stacks items
+### <a name="include_stacks_items"></a>4.1. Bind Dns Inventory > include_stacks > include_stacks items
 
 |                           |             |
 | ------------------------- | ----------- |
@@ -92,7 +92,7 @@
 | + [host_group](#include_stacks_items_host_group )               | No      | string | No         | -          | This is the name of the hosts group of our ansible inventory the included vms/lxcs will be available under.                                                                                                                        |
 | - [qemu_ansible_user](#include_stacks_items_qemu_ansible_user ) | No      | string | No         | -          | User ansible will use to connect, defaults to admin. If you dont want to use debian cinit images you might need to set something else than admin.<br />Ubuntu for example wont work if you set the cloud init user to admin.<br /> |
 
-#### <a name="include_stacks_items_stack_fqdn"></a>4.1.1. Property `Schema ext setup_bind playbook > include_stacks > include_stacks items > stack_fqdn`
+#### <a name="include_stacks_items_stack_fqdn"></a>4.1.1. Property `Bind Dns Inventory > include_stacks > include_stacks items > stack_fqdn`
 
 |              |          |
 | ------------ | -------- |
@@ -111,7 +111,7 @@
 "other-k8s.your-other-cloud.domain"
 ```
 
-#### <a name="include_stacks_items_host_group"></a>4.1.2. Property `Schema ext setup_bind playbook > include_stacks > include_stacks items > host_group`
+#### <a name="include_stacks_items_host_group"></a>4.1.2. Property `Bind Dns Inventory > include_stacks > include_stacks items > host_group`
 
 |              |          |
 | ------------ | -------- |
@@ -120,7 +120,7 @@
 
 **Description:** This is the name of the hosts group of our ansible inventory the included vms/lxcs will be available under.
 
-#### <a name="include_stacks_items_qemu_ansible_user"></a>4.1.3. Property `Schema ext setup_bind playbook > include_stacks > include_stacks items > qemu_ansible_user`
+#### <a name="include_stacks_items_qemu_ansible_user"></a>4.1.3. Property `Bind Dns Inventory > include_stacks > include_stacks items > qemu_ansible_user`
 
 |              |          |
 | ------------ | -------- |
@@ -130,7 +130,7 @@
 **Description:** User ansible will use to connect, defaults to admin. If you dont want to use debian cinit images you might need to set something else than admin.
 Ubuntu for example wont work if you set the cloud init user to admin.
 
-## <a name="root_ssh_pub_key"></a>5. Property `Schema ext setup_bind playbook > root_ssh_pub_key`
+## <a name="root_ssh_pub_key"></a>5. Property `Bind Dns Inventory > root_ssh_pub_key`
 
 |              |          |
 | ------------ | -------- |
@@ -139,7 +139,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** trusted root key for the cloud init image.
 
-## <a name="pve_ha_group"></a>6. Property `Schema ext setup_bind playbook > pve_ha_group`
+## <a name="pve_ha_group"></a>6. Property `Bind Dns Inventory > pve_ha_group`
 
 |              |          |
 | ------------ | -------- |
@@ -148,7 +148,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** PVE HA group this vm should be assigned to (optional).
 
-## <a name="pve_cloud_pytest"></a>7. Property `Schema ext setup_bind playbook > pve_cloud_pytest`
+## <a name="pve_cloud_pytest"></a>7. Property `Bind Dns Inventory > pve_cloud_pytest`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -158,7 +158,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** Variables object used only in e2e tests.
 
-## <a name="lxcs"></a>8. Property `Schema ext setup_bind playbook > lxcs`
+## <a name="lxcs"></a>8. Property `Bind Dns Inventory > lxcs`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -179,7 +179,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 | ------------------------------- | ----------- |
 | [lxcs items](#lxcs_items)       | -           |
 
-### <a name="lxcs_items"></a>8.1. Schema ext setup_bind playbook > lxcs > lxcs items
+### <a name="lxcs_items"></a>8.1. Bind Dns Inventory > lxcs > lxcs items
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -194,7 +194,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 | + [vars](#lxcs_items_vars )               | No      | object | No         | -          | Custom variables for this lxc specifically. Will be usable in playbooks.                    |
 | + [parameters](#lxcs_items_parameters )   | No      | object | No         | -          | Parameters that will be passed to pve pct cli tool for lxc creation.                        |
 
-#### <a name="lxcs_items_hostname"></a>8.1.1. Property `Schema ext setup_bind playbook > lxcs > lxcs items > hostname`
+#### <a name="lxcs_items_hostname"></a>8.1.1. Property `Bind Dns Inventory > lxcs > lxcs items > hostname`
 
 |              |          |
 | ------------ | -------- |
@@ -203,7 +203,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** Optional unique hostname for this lxc, otherwise pet name random name will be generated.
 
-#### <a name="lxcs_items_target_host"></a>8.1.2. Property `Schema ext setup_bind playbook > lxcs > lxcs items > target_host`
+#### <a name="lxcs_items_target_host"></a>8.1.2. Property `Bind Dns Inventory > lxcs > lxcs items > target_host`
 
 |              |          |
 | ------------ | -------- |
@@ -212,7 +212,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** Pve host to tie this vm to. This is useful to always deploy specifically on a proxmox host.
 
-#### <a name="lxcs_items_vars"></a>8.1.3. Property `Schema ext setup_bind playbook > lxcs > lxcs items > vars`
+#### <a name="lxcs_items_vars"></a>8.1.3. Property `Bind Dns Inventory > lxcs > lxcs items > vars`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -226,7 +226,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 | ---------------------------------------------- | ------- | ------- | ---------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | + [bind_master](#lxcs_items_vars_bind_master ) | No      | boolean | No         | -          | The default pve cloud configured dns uses only a master slave combination. You should create two lxcs,<br />one that has this flag set to true, the other to false.<br /> |
 
-##### <a name="lxcs_items_vars_bind_master"></a>8.1.3.1. Property `Schema ext setup_bind playbook > lxcs > lxcs items > vars > bind_master`
+##### <a name="lxcs_items_vars_bind_master"></a>8.1.3.1. Property `Bind Dns Inventory > lxcs > lxcs items > vars > bind_master`
 
 |              |           |
 | ------------ | --------- |
@@ -236,7 +236,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 **Description:** The default pve cloud configured dns uses only a master slave combination. You should create two lxcs,
 one that has this flag set to true, the other to false.
 
-#### <a name="lxcs_items_parameters"></a>8.1.4. Property `Schema ext setup_bind playbook > lxcs > lxcs items > parameters`
+#### <a name="lxcs_items_parameters"></a>8.1.4. Property `Bind Dns Inventory > lxcs > lxcs items > parameters`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -253,7 +253,7 @@ one that has this flag set to true, the other to false.
 | + [memory](#lxcs_items_parameters_memory ) | No      | integer | No         | -          | Memory in bytes, use POW 2.                  |
 | + [net0](#lxcs_items_parameters_net0 )     | No      | string  | No         | -          | Configuration for primary network interface. |
 
-##### <a name="lxcs_items_parameters_rootfs"></a>8.1.4.1. Property `Schema ext setup_bind playbook > lxcs > lxcs items > parameters > rootfs`
+##### <a name="lxcs_items_parameters_rootfs"></a>8.1.4.1. Property `Bind Dns Inventory > lxcs > lxcs items > parameters > rootfs`
 
 |              |          |
 | ------------ | -------- |
@@ -262,7 +262,7 @@ one that has this flag set to true, the other to false.
 
 **Description:** PVE storage for the container disk.
 
-##### <a name="lxcs_items_parameters_cores"></a>8.1.4.2. Property `Schema ext setup_bind playbook > lxcs > lxcs items > parameters > cores`
+##### <a name="lxcs_items_parameters_cores"></a>8.1.4.2. Property `Bind Dns Inventory > lxcs > lxcs items > parameters > cores`
 
 |              |           |
 | ------------ | --------- |
@@ -271,7 +271,7 @@ one that has this flag set to true, the other to false.
 
 **Description:** Number of virtual CPU cores.
 
-##### <a name="lxcs_items_parameters_memory"></a>8.1.4.3. Property `Schema ext setup_bind playbook > lxcs > lxcs items > parameters > memory`
+##### <a name="lxcs_items_parameters_memory"></a>8.1.4.3. Property `Bind Dns Inventory > lxcs > lxcs items > parameters > memory`
 
 |              |           |
 | ------------ | --------- |
@@ -280,7 +280,7 @@ one that has this flag set to true, the other to false.
 
 **Description:** Memory in bytes, use POW 2.
 
-##### <a name="lxcs_items_parameters_net0"></a>8.1.4.4. Property `Schema ext setup_bind playbook > lxcs > lxcs items > parameters > net0`
+##### <a name="lxcs_items_parameters_net0"></a>8.1.4.4. Property `Bind Dns Inventory > lxcs > lxcs items > parameters > net0`
 
 |              |          |
 | ------------ | -------- |
@@ -295,7 +295,7 @@ one that has this flag set to true, the other to false.
 "name=eth0,bridge=vmbr0,tag=120,firewall=1,ip=dhcp"
 ```
 
-## <a name="lxc_global_vars"></a>9. Property `Schema ext setup_bind playbook > lxc_global_vars`
+## <a name="lxc_global_vars"></a>9. Property `Bind Dns Inventory > lxc_global_vars`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -311,7 +311,7 @@ one that has this flag set to true, the other to false.
 | - [install_prom_systemd_exporter](#lxc_global_vars_install_prom_systemd_exporter ) | No      | boolean | No         | -          | Will install prometheus metrics exporter for systemd. This implements with pve cloud terraform monitoring modules. |
 | - [](#lxc_global_vars_additionalProperties )                                       | No      | object  | No         | -          | -                                                                                                                  |
 
-### <a name="lxc_global_vars_use_alternate_ssh_port"></a>9.1. Property `Schema ext setup_bind playbook > lxc_global_vars > use_alternate_ssh_port`
+### <a name="lxc_global_vars_use_alternate_ssh_port"></a>9.1. Property `Bind Dns Inventory > lxc_global_vars > use_alternate_ssh_port`
 
 |              |           |
 | ------------ | --------- |
@@ -320,7 +320,7 @@ one that has this flag set to true, the other to false.
 
 **Description:** Will use 2222 instead of 22 for ssh.
 
-### <a name="lxc_global_vars_install_prom_systemd_exporter"></a>9.2. Property `Schema ext setup_bind playbook > lxc_global_vars > install_prom_systemd_exporter`
+### <a name="lxc_global_vars_install_prom_systemd_exporter"></a>9.2. Property `Bind Dns Inventory > lxc_global_vars > install_prom_systemd_exporter`
 
 |              |           |
 | ------------ | --------- |
@@ -329,7 +329,7 @@ one that has this flag set to true, the other to false.
 
 **Description:** Will install prometheus metrics exporter for systemd. This implements with pve cloud terraform monitoring modules.
 
-## <a name="lxc_base_parameters"></a>10. Property `Schema ext setup_bind playbook > lxc_base_parameters`
+## <a name="lxc_base_parameters"></a>10. Property `Bind Dns Inventory > lxc_base_parameters`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -339,7 +339,7 @@ one that has this flag set to true, the other to false.
 
 **Description:** PVE pct cli parameters that will be used for all lxcs.
 
-## <a name="lxc_os_template"></a>11. Property `Schema ext setup_bind playbook > lxc_os_template`
+## <a name="lxc_os_template"></a>11. Property `Bind Dns Inventory > lxc_os_template`
 
 |              |          |
 | ------------ | -------- |
@@ -348,7 +348,7 @@ one that has this flag set to true, the other to false.
 
 **Description:** `pveam available --section system` / run `pveam update` for newest, PVE available LXC template (will be downloaded).
 
-## <a name="plugin"></a>12. Property `Schema ext setup_bind playbook > plugin`
+## <a name="plugin"></a>12. Property `Bind Dns Inventory > plugin`
 
 |              |                    |
 | ------------ | ------------------ |
@@ -361,4 +361,4 @@ Must be one of:
 * "pve.cloud.lxc_inv"
 
 ----------------------------------------------------------------------------------------------------------------------------
-Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2025-11-30 at 00:14:56 +0000
+Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2025-11-30 at 22:34:19 +0000
