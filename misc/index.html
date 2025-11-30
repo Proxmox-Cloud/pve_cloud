@@ -440,7 +440,7 @@
   
   
   <span class="md-ellipsis">
-    Kubernetes kubespray inventory
+    K8s Kubespray Inventory
     
   </span>
   
@@ -532,7 +532,7 @@
   
   
   <span class="md-ellipsis">
-    Schema ext setup_bind playbook
+    Bind Dns Inventory
     
   </span>
   
@@ -555,7 +555,7 @@
   
   
   <span class="md-ellipsis">
-    Schema ext setup_ceph_kea playbook
+    Ceph DHCP Inventory
     
   </span>
   
@@ -578,7 +578,7 @@
   
   
   <span class="md-ellipsis">
-    Schema ext setup_haproxy playbook
+    HAProxy Inventory
     
   </span>
   
@@ -601,7 +601,7 @@
   
   
   <span class="md-ellipsis">
-    Schema ext setup_kea playbook
+    General DHCP Inventory
     
   </span>
   
@@ -660,15 +660,15 @@
 
 <h1 id="miscellaneous">Miscellaneous</h1>
 <h2 id="patroni-recovery">Patroni recovery</h2>
-<p>incase one patroni node fails, abrupt restart etc, delete /opt/ha-postgres data dir and restart the patroni service.</p>
+<p>If one patroni node fails, abrupt restart etc., delete /opt/ha-postgres data dir and restart the patroni service.</p>
 <h2 id="removing-pve-cluster-host">Removing pve cluster host</h2>
 <ul>
 <li>delete all ceph mons, mgrs and osds of host</li>
 <li>pvecm delnode</li>
 </ul>
 <h2 id="kea-dhcp-restart">Kea DHCP restart</h2>
-<p>ls -ld /run/kea/kea-dhcp4.kea-dhcp4.pid</p>
-<p>lock file might block _kea user, either change service to root user or try delete.</p>
+<p><code>ls -ld /run/kea/kea-dhcp4.kea-dhcp4.pid</code></p>
+<p>Lock file might block _kea user, either change systemd service to root user or try delete.</p>
 
 
 

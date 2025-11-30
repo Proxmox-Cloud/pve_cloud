@@ -446,7 +446,7 @@
   
   
   <span class="md-ellipsis">
-    Kubernetes kubespray inventory
+    K8s Kubespray Inventory
     
   </span>
   
@@ -538,7 +538,7 @@
   
   
   <span class="md-ellipsis">
-    Schema ext setup_bind playbook
+    Bind Dns Inventory
     
   </span>
   
@@ -561,7 +561,7 @@
   
   
   <span class="md-ellipsis">
-    Schema ext setup_ceph_kea playbook
+    Ceph DHCP Inventory
     
   </span>
   
@@ -584,7 +584,7 @@
   
   
   <span class="md-ellipsis">
-    Schema ext setup_haproxy playbook
+    HAProxy Inventory
     
   </span>
   
@@ -607,7 +607,7 @@
   
   
   <span class="md-ellipsis">
-    Schema ext setup_kea playbook
+    General DHCP Inventory
     
   </span>
   
@@ -690,7 +690,7 @@ collections:
 </code></pre>
 <ul>
 <li>run <code>ansible-galaxy install -r requirements.yaml</code>, then install the python requirements from <code>pip install -r ~/.ansible/collections/ansible_collections/pve/cloud/meta/ee-requirements.txt</code>.</li>
-<li>you also might want to creata a <code>ansible.cfg</code> file on the top level of your repo with the following content:</li>
+<li>you also might want to create a <code>ansible.cfg</code> file on the top level of your repo with the following content:</li>
 </ul>
 <pre><code class="language-ini">[defaults]
 # on recreating vms this will prevent issues executing the playbook
@@ -714,11 +714,13 @@ any_unparsed_is_failed = True
 <p>This repository should contain:</p>
 <ul>
 <li>pve cloud inventory file - <a href="../schemas/pve_cloud_inv_schema/">cloud schema</a> =&gt; for the <code>pve.cloud.setup_pve_clusters</code> playbook</li>
-<li>lxc inventory files for the basic services - <a href="../schemas/lxc_inv_schema/">lxc inv schema</a></li>
+<li>lxc inventory files for the basic services - <a href="../schemas/lxc_inv_schema/">lxc inv schema</a><ul>
 <li>inventory for two kea lxcs =&gt; for use with <code>pve.cloud.setup_kea</code> playbook - <a href="../schemas/setup_kea_schema_ext/">dhcp inv schema</a></li>
 <li>inventory for two bind lxcs =&gt; <code>pve.cloud.setup_bind</code> playbook - <a href="../schemas/setup_bind_schema_ext/">bind inv schema</a></li>
 <li>three lxcs for patroni postgres =&gt; <code>pve.cloud.setup_postgres</code> playbook - no special schema</li>
 <li>two haproxy lxcs =&gt; <code>pve.cloud.setup_haproxy</code> playbook - <a href="../schemas/setup_haproxy_schema_ext/">haproxy inv schema</a></li>
+</ul>
+</li>
 </ul>
 <p>From here you can start deploying your first kubernetes cluster, which will serve as the basis for most deployments/services.</p>
 
