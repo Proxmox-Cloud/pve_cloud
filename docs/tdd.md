@@ -71,3 +71,26 @@ pytest -s tests/e2e/test_cloud.py::test_bind --skip-cleanup
 
 If you passed `--skip-cleanup` to pytest, the kubespray tests will write a `.test-kubeconfig.yaml` file you can use for lens access to the testing cluster.
 
+## VSCode Pytest debug
+
+create a `.testenv` file with the same variables as the `.envrc` inside whatever repo you want to attach your debugger to.
+
+the settings.json for vscode python debug should look something like this:
+
+```json
+{
+  "python.testing.pytestArgs": [
+    "-s",
+    "tests/e2e",
+    "--skip-cleanup"
+  ],
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestEnabled": true,
+  "python.testing.cwd": "${workspaceFolder}",
+  "python.envFile": "${workspaceFolder}/.testenv"
+}
+```
+
+Also select your python interpreter to the dev environment bin/python in the vscode command palette.
+
+This only works for executing single tests, if you want to run the entire suite use the command line. VSCode says they dont run it in paralell unless you have xdist installed but this is a lie.
