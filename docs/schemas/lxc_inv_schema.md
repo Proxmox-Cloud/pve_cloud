@@ -347,4 +347,4 @@ Must be one of:
 * "pve.cloud.lxc_inv"
 
 ----------------------------------------------------------------------------------------------------------------------------
-Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2025-11-30 at 22:34:19 +0000
+Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2025-12-04 at 10:10:41 +0000
