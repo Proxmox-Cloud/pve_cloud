@@ -9,10 +9,6 @@
       
       
       
-        <link rel="prev" href="../kubernetes/">
-      
-      
-        <link rel="next" href="../misc/">
       
       
       <link rel="icon" href="../assets/images/favicon.png">
@@ -20,7 +16,7 @@
     
     
       
-        <title>Test Driven Development - PVE Cloud Documentation</title>
+        <title>Upgrading Guides - PVE Cloud Documentation</title>
       
     
     
@@ -62,7 +58,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#test-driven-development" class="md-skip">
+        <a href="#upgrading-guides" class="md-skip">
           Skip to content
         </a>
       
@@ -98,7 +94,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Test Driven Development
+              Upgrading Guides
             
           </span>
         </div>
@@ -259,32 +255,10 @@
       
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    Test Driven Development
-    
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../tdd/" class="md-nav__link">
         
   
   
@@ -295,68 +269,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#e2e-architecture" class="md-nav__link">
-    <span class="md-ellipsis">
-      E2E Architecture
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#development" class="md-nav__link">
-    <span class="md-ellipsis">
-      Development
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Development">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#kubeconfig-access" class="md-nav__link">
-    <span class="md-ellipsis">
-      Kubeconfig access
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#vscode-pytest-debug" class="md-nav__link">
-    <span class="md-ellipsis">
-      VSCode Pytest debug
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -673,86 +585,9 @@
 
 
 
-<h1 id="test-driven-development">Test Driven Development</h1>
-<p>For development you will need a dedicated proxmox cluster (a small one will suffice), and another dedicated vlan. The testing suite deploys and configures a proxmox cloud with locally build artifacts.</p>
-<h2 id="e2e-architecture">E2E Architecture</h2>
-<p>Pytest is our core testing framework, in combination with ansible_runner and the terraform cli we build and test the entire collection end to end.</p>
-<p>Our pytest fixtures contain the core setup of the cloud. And from them branch out one or more tests at every level. The fixtures are called only once (pytest session scope).</p>
-<p><img alt="Arch" src="../e2e-arch.svg" /></p>
-<p>Target run pytests against for example test_bind to restrict fixture execution.</p>
-<h2 id="development">Development</h2>
-<ul>
-<li>add this to your <code>~/.ssh/config</code>, ssh validation can get annoying when often recreating containers and vms.</li>
-</ul>
-<pre><code>Host *
-    StrictHostKeyChecking no
-    UserKnownHostsFile /dev/null
-</code></pre>
-<ul>
-<li>configure your docker <code>/etc/docker/daemon.json</code> to accept the local registry for insecure http pushes, followed by <code>sudo service docker restart</code></li>
-</ul>
-<pre><code class="language-json">{
-  &quot;insecure-registries&quot;:  [&quot;192.168.1.0/24&quot;]
-}
-</code></pre>
-<ul>
-<li>install <code>direnv</code> and activate it in your local profile (add <code>eval "$(direnv hook bash)"</code> to .bashrc)</li>
-<li>create a <code>pve-cloud</code> folder and checkout all the repositories you want to make changes to, if you checkout the ansible collections they have to be under <code>ansible_collections/pve/</code></li>
-<li>create a dedicated venv for pve cloud development <code>python3 -m venv ~/.pve-cloud-dev-venv</code> and activate <code>source ~/.pve-cloud-dev-venv/bin/activate</code></li>
-<li>create a test environment config yaml (you can find the schema definition in the src folder of the <a href="https://github.com/Proxmox-Cloud/pytest-pve-cloud">pytest-pve-cloud repository</a>) - forward to the test domain your main dns (you can use <code>bind_forward_zones</code> in the pve cloud inventory if your main infrastructure already is a pve cloud)</li>
-<li>create a <code>.envrc</code> file with env variables stored for development</li>
-</ul>
-<pre><code class="language-bash">export TDDOG_LOCAL_IFACE= # iface name of you local net ip `ip -4 addr show`. The deployed infrastructure needs your developer machines ip for pulling.
-export PVE_CLOUD_TEST_CONF=$(pwd)/test-env-conf.yaml
-export ANSIBLE_COLLECTIONS_PATH=$(pwd)
-</code></pre>
-<p>the created local dir might look like this:</p>
-<pre><code>ansible_collections/pve/
-  cloud
-py-pve-cloud
-pve-cloud-controller
-.envrc
-test-env-conf.yaml
-</code></pre>
-<ol>
-<li>run <code>pip install pytest-pve-cloud</code>, you might need first install <code>sudo apt install build-essential python3-dev</code> (or your distros equivalent)</li>
-<li>also install the core ansible dependencies from the <a href="../bootstrap/">bootstrap section</a>, followed by <code>pip install -r meta/ee-requirements.txt</code></li>
-<li>run <code>tdd-reqs</code> cli command inside the pve_cloud collection and <code>ansible-galaxy install -r tdd-requirements.yml</code>, this will install all the ansible collection dependencies</li>
-<li>launch local registries for watchdog rebuilds and fast deployment</li>
-</ol>
-<pre><code class="language-bash">docker run -d -p 5000:5000 --name pxc-local-registry registry:3 # local docker registry
-docker run -d -p 8088:8080 --name pxc-local-pypi pypiserver/pypiserver:latest run -P . -a . # local pypi registry without auth
-docker run -d --name pxc-local-redis -p 6379:6379 redis:latest # redis broker for triggering dependent builds
-</code></pre>
-<ol>
-<li>run <code>tddog --recursive</code> from your top level created <code>pve-cloud</code> folder. This will monitor src folders and rebuild artifacts and their dependants</li>
-<li>python packages are partly installed locally and pushed and used in artifacts. tddog takes care of making code available for the infrastructure, locally you can run <code>pip install -e .</code> to have your changes reflected in real time</li>
-<li>connect once to your cluster <code>pvcli connect-cluster --pve-host $PVE_HOST_IP</code> and then you can run the e2e tests</li>
-</ol>
-<pre><code class="language-bash">pytest -s tests/e2e/ --skip-cleanup 
-
-# you can also target specific steps
-pytest -s tests/e2e/test_cloud.py::test_bind --skip-cleanup
-</code></pre>
-<h3 id="kubeconfig-access">Kubeconfig access</h3>
-<p>If you passed <code>--skip-cleanup</code> to pytest, the kubespray tests will write a <code>.test-kubeconfig.yaml</code> file you can use for lens access to the testing cluster.</p>
-<h2 id="vscode-pytest-debug">VSCode Pytest debug</h2>
-<p>create a <code>.testenv</code> file with the same variables as the <code>.envrc</code> inside whatever repo you want to attach your debugger to.</p>
-<p>the settings.json for vscode python debug should look something like this:</p>
-<pre><code class="language-json">{
-  &quot;python.testing.pytestArgs&quot;: [
-    &quot;-s&quot;,
-    &quot;tests/e2e&quot;,
-    &quot;--skip-cleanup&quot;
-  ],
-  &quot;python.testing.unittestEnabled&quot;: false,
-  &quot;python.testing.pytestEnabled&quot;: true,
-  &quot;python.testing.cwd&quot;: &quot;${workspaceFolder}&quot;,
-  &quot;python.envFile&quot;: &quot;${workspaceFolder}/.testenv&quot;
-}
-</code></pre>
-<p>Also select your python interpreter to the dev environment bin/python in the vscode command palette.</p>
-<p>This only works for executing single tests, if you want to run the entire suite use the command line. VSCode says they dont run it in paralell unless you have xdist installed but this is a lie.</p>
+<h1 id="upgrading-guides">Upgrading Guides</h1>
+<h2 id="35x-to-36x">3.5.X to 3.6.X</h2>
+<p>This change introduces proxy protocol, to minimize downtime for ingress resources apply the kubespray playbook like this with <code>--tags config,deployments</code> on the first run.</p>
 
 
 
