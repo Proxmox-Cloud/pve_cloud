@@ -1,3 +1,6 @@
+#!/bin/bash
+set -e # exit on failure
+
 # setup / upgrade your control node
 ansible-playbook pve.cloud.setup_control_node
 
