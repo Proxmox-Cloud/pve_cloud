@@ -21,3 +21,6 @@ boto3==1.39.17
 
 # kubernetes.core
 kubernetes==34.1.0
+
+# todo: check if still needed
+distlib==0.3.9

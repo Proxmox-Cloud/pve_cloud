@@ -15,8 +15,8 @@ Aswell as a proxmox cluster you have root access via ssh to the hosts.
 
 Create a repository for your cloud instance for example company-xyz-cloud and setup your environment:
 
-* create venv: `python3 -m venv ~/.pve-cloud-venv` and activate `source ~/.pve-cloud-venv/bin/activate`
-* install `pip install ansible==9.13.0 distlib==0.3.9`
+* it is recommended to create a venv `python3 -m venv ~/.pve-cloud-venv` and activate `source ~/.pve-cloud-venv/bin/activate`
+* install `pip install ansible==9.13.0`
 * create `requirements.yaml` in your repository like this:
 ```yaml
 ---
@@ -25,7 +25,7 @@ collections:
     type: git
     version: $LATEST_TAG_VERSION
 ```
-* run `ansible-galaxy install -r requirements.yaml`, then install the python requirements from `pip install -r ~/.ansible/collections/ansible_collections/pve/cloud/meta/ee-requirements.txt`.
+* run `ansible-galaxy install -r requirements.yaml`, and run the setup playbook `ansible-playbook pve.cloud.setup_control_node` to setup your local machine (this setup playbook has to be run on upgrade of the collection aswell)
 * you also might want to create a `ansible.cfg` file on the top level of your repo with the following content:
 ```ini
 [defaults]

@@ -1,3 +1,6 @@
+# setup / upgrade your control node
+ansible-playbook pve.cloud.setup_control_node
+
 # setup your proxmox cluster(s) as part of the cloud instance
 # requires that you locally connected first (`pvcli connect-cluster --target-pve $PVE_HOST_IP`)
 ansible-playbook -i cloud-inv.yaml pve.cloud.setup_pve_clusters

@@ -1,0 +1,6 @@
+- name: Setup node running ansible (local machine)
+  hosts: localhost
+  tasks:
+    - name: Install pve cloud collection requirements
+      ansible.builtin.pip:
+        requirements: "{{ playbook_dir | dirname }}/meta/ee-requirements.txt"

@@ -9,4 +9,6 @@ module "cloud_controller" {
   bind_master_ip = var.bind_master_ip
   bind_dns_update_key = var.bind_internal_key
   internal_proxy_floating_ip = var.cluster_proxy_ip
+
+  cluster_cert_entries = local.inventory.cluster_cert_entries
 }
