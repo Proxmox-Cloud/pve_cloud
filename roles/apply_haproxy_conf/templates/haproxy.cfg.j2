@@ -106,7 +106,7 @@ frontend k8s-ingress-external
 backend k8s-ingress_{{ stack_fqdn }}
         mode tcp
 {% for worker in workers %}
-        server {{ worker.hostname }} {{ worker.ip }}:443 check
+        server {{ worker.hostname }} {{ worker.ip }}:443 check send-proxy-v2
 {% endfor %}
 
 
@@ -136,7 +136,7 @@ frontend k8s-ingress-http
 backend k8s-ingress-http_{{ stack_fqdn }}
         mode tcp
 {% for worker in workers %}
-        server {{ worker.hostname }} {{ worker.ip }}:80 check
+        server {{ worker.hostname }} {{ worker.ip }}:80 check send-proxy-v2
 {% endfor %}
 
 

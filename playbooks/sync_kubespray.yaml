@@ -396,6 +396,7 @@
       loop: "{{ groups['kube_node'] }}"
       when: hostvars[item].node_taints is defined
 
+    # kubernetes.core comes from kubespray collection
     - name: ceph csi repo
       kubernetes.core.helm_repository:
         name: ceph-csi
@@ -427,7 +428,7 @@
       kubernetes.core.helm:
         name: nginx-ingress
         chart_ref: ingress-nginx/ingress-nginx
-        chart_version: 4.12.1
+        chart_version: 4.14.0
         values: "{{ lookup('template', 'nginx-ingress-values.yaml.j2') | from_yaml }}"
         kubeconfig: "{{ temp_kubeconfig.path }}"
         release_namespace: nginx-ingress

@@ -9,7 +9,9 @@
     secret_map: "{{ secret_map | default({}) | combine({item.path | basename: item.content}) }}"
   loop: "{{ slurped_secrets.results }}"    
   run_once: true
-
+  loop_control:
+    label: "hidden"
+    
 - name: check if ceph conf
   stat:
     path: /etc/pve/ceph.conf

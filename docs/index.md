@@ -20,4 +20,5 @@ Verified working versions:
 
 | Collection Version | K8S Version | Debian LXC Version | PVE Version | Ceph Version |
 | ------------------ | ----------- | ------------------ | ----------- | ------------ |
-| 3.3.X              | 1.32.5      | 12.12-1            | 8.4.12      | 19.2.2       |
+| 3.5.X              | 1.32.5      | 12.12-1            | 8.4.12      | 19.2.2       |
+| 3.6.X              | 1.32.5      | 12.12-1            | 8.4.12      | 19.2.2       |
