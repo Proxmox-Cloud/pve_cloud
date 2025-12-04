@@ -911,4 +911,4 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 **Description:** If set to true will use acme staging directory for issueing certs.
 
 ----------------------------------------------------------------------------------------------------------------------------
-Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2025-12-04 at 10:10:41 +0000
+Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2025-12-04 at 10:50:58 +0000
