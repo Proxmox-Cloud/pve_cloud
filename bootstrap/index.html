@@ -337,6 +337,28 @@
   
   
     <li class="md-nav__item">
+      <a href="../terraform/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Terraform
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../tdd/" class="md-nav__link">
         
   
@@ -411,10 +433,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
         
           
-          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
             
   
   
@@ -427,8 +449,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_7">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
             <span class="md-nav__icon md-icon"></span>
             Schemas
           </label>
@@ -665,20 +687,30 @@
 
 
 <h1 id="setupbootstrap">Setup/Bootstrap</h1>
-<p>You need a development machine with the following tools/packages installed:</p>
+<p>You need a deployment machine that meets the following requirements:</p>
 <ul>
-<li>python3 + virtual env </li>
+<li>preferably apt based package manager (debian,ubuntu)</li>
+<li>python3 (+ recommended virtual env)</li>
 <li>docker</li>
 <li>terraform</li>
-<li>kubectl / helm</li>
+<li>kubectl / helm ( version <code>&gt;=3</code> )</li>
 <li>yq (mikefarah)</li>
+<li>direnv (.envrc files for terraform conf/auth)</li>
 <li>(nfs-common) if you want to use caching</li>
 </ul>
-<p>Aswell as a proxmox cluster you have root access via ssh to the hosts.</p>
+<p>You also need a proxmox cluster (standalone is fine) with the following minimum requirements:</p>
+<ul>
+<li>access via ssh key to the root user (<code>~/.ssh/authorized_keys</code>)</li>
+<li>seperate free vlan (proxmox cloud runs its own mandatory dhcp)</li>
+<li>4 cores</li>
+<li>32 gb of ram</li>
+<li>500 gb of free disk space for vms</li>
+<li>subnet with at least 20 free allocatable addresses (accessible from the development machine)</li>
+</ul>
 <h2 id="bootstrap">Bootstrap</h2>
 <p>Create a repository for your cloud instance for example company-xyz-cloud and setup your environment:</p>
 <ul>
-<li>it is recommended to create a venv <code>python3 -m venv ~/.pve-cloud-venv</code> and activate <code>source ~/.pve-cloud-venv/bin/activate</code></li>
+<li>create a venv <code>python3 -m venv ~/.pve-cloud-venv</code> and activate <code>source ~/.pve-cloud-venv/bin/activate</code></li>
 <li>install <code>pip install ansible==9.13.0</code></li>
 <li>create <code>requirements.yaml</code> in your repository like this:</li>
 </ul>
@@ -706,21 +738,17 @@ any_unparsed_is_failed = True
 <li>connect to your proxmox clusters <code>pvcli connect-cluster --pve-host $PROXMOX_HOST</code> (run once per cluster, same domain)</li>
 </ul>
 <p>The cli will ask you for a cloud domain if the cluster has not already one assigned.</p>
-<p>The cloud domain should be a unique domain that can be used for the hostnames and services of the cloud. It should not overlap with a domain you host generic services under, we need unambiguousness for our ddns hostname records.</p>
-<p>Domains for services like for example <code>gitlab.example.com</code> can be added later in our cluster definition file. The cloud domain should be something like <code>your-cloud.example.com</code>.</p>
+<p>The cloud domain should be a unique domain that can be used for the hostnames and services of the cloud. It should not overlap with a domain you host generic services under, we need unambiguousness for our dynamic dns hostname records.</p>
+<p>Domains for services like for example <code>gitlab.example.com</code> can be added later in our cluster definition files. The cloud domain should be something like <code>your-cloud.example.com</code>.</p>
 <h3 id="repository-setup">Repository setup</h3>
-<p>One pve cloud can have multiple proxmox clusters, but one proxmox cluster may only be member of a single pve cloud.</p>
-<p>You should create a seperate repository for each of your pve cloud instances. </p>
-<p>This repository should contain:</p>
+<p>As in the <a href="https://github.com/Proxmox-Cloud/pve_cloud/tree/master/samples/cloud-instance">samples/cloud-instance</a> your repository that defines the core pve cloud components you need:</p>
 <ul>
 <li>pve cloud inventory file - <a href="../schemas/pve_cloud_inv_schema/">cloud schema</a> =&gt; for the <code>pve.cloud.setup_pve_clusters</code> playbook</li>
-<li>lxc inventory files for the basic services - <a href="../schemas/lxc_inv_schema/">lxc inv schema</a><ul>
+<li>lxc inventory files for the basic services - <a href="../schemas/lxc_inv_schema/">lxc inv schema</a></li>
 <li>inventory for two kea lxcs =&gt; for use with <code>pve.cloud.setup_kea</code> playbook - <a href="../schemas/setup_kea_schema_ext/">dhcp inv schema</a></li>
 <li>inventory for two bind lxcs =&gt; <code>pve.cloud.setup_bind</code> playbook - <a href="../schemas/setup_bind_schema_ext/">bind inv schema</a></li>
 <li>three lxcs for patroni postgres =&gt; <code>pve.cloud.setup_postgres</code> playbook - no special schema</li>
 <li>two haproxy lxcs =&gt; <code>pve.cloud.setup_haproxy</code> playbook - <a href="../schemas/setup_haproxy_schema_ext/">haproxy inv schema</a></li>
-</ul>
-</li>
 </ul>
 <p>From here you can start deploying your first kubernetes cluster, which will serve as the basis for most deployments/services.</p>
 

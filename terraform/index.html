@@ -9,20 +9,22 @@
       
       
       
+        <link rel="prev" href="../kubernetes/">
       
-        <link rel="next" href="bootstrap/">
+      
+        <link rel="next" href="../tdd/">
       
       
-      <link rel="icon" href="assets/images/favicon.png">
+      <link rel="icon" href="../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.21">
     
     
       
-        <title>PVE Cloud Documentation</title>
+        <title>Terraform - PVE Cloud Documentation</title>
       
     
     
-      <link rel="stylesheet" href="assets/stylesheets/main.2a3383ac.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.2a3383ac.min.css">
       
       
 
@@ -41,7 +43,7 @@
       
     
     
-    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -60,7 +62,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#general" class="md-skip">
+        <a href="#terraform" class="md-skip">
           Skip to content
         </a>
       
@@ -76,7 +78,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="." title="PVE Cloud Documentation" class="md-header__button md-logo" aria-label="PVE Cloud Documentation" data-md-component="logo">
+    <a href=".." title="PVE Cloud Documentation" class="md-header__button md-logo" aria-label="PVE Cloud Documentation" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -96,7 +98,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              General
+              Terraform
             
           </span>
         </div>
@@ -176,7 +178,7 @@
 
 <nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="." title="PVE Cloud Documentation" class="md-nav__button md-logo" aria-label="PVE Cloud Documentation" data-md-component="logo">
+    <a href=".." title="PVE Cloud Documentation" class="md-nav__button md-logo" aria-label="PVE Cloud Documentation" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -186,6 +188,72 @@
   </label>
   
   <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    General
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../bootstrap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Setup/Bootstrap
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kubernetes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Kubespray K8S
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
     
       
       
@@ -208,7 +276,7 @@
   
   
   <span class="md-ellipsis">
-    General
+    Terraform
     
   </span>
   
@@ -216,12 +284,12 @@
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <a href="." class="md-nav__link md-nav__link--active">
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
   <span class="md-ellipsis">
-    General
+    Terraform
     
   </span>
   
@@ -244,19 +312,37 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#quickstart" class="md-nav__link">
+  <a href="#provider-authentication" class="md-nav__link">
     <span class="md-ellipsis">
-      Quickstart
+      Provider Authentication
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Quickstart">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#proxmox-cloud-terraform-modules" class="md-nav__link">
+    <span class="md-ellipsis">
+      Proxmox Cloud Terraform Modules
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Proxmox Cloud Terraform Modules">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#project-dependency-structure" class="md-nav__link">
+  <a href="#controller" class="md-nav__link">
     <span class="md-ellipsis">
-      Project dependency structure
+      Controller
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#backup" class="md-nav__link">
+    <span class="md-ellipsis">
+      Backup
     </span>
   </a>
   
@@ -264,15 +350,6 @@
         
       </ul>
     </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#compatibility" class="md-nav__link">
-    <span class="md-ellipsis">
-      Compatibility
-    </span>
-  </a>
   
 </li>
       
@@ -291,73 +368,7 @@
   
   
     <li class="md-nav__item">
-      <a href="bootstrap/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    Setup/Bootstrap
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="kubernetes/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    Kubespray K8S
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="terraform/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    Terraform
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="tdd/" class="md-nav__link">
+      <a href="../tdd/" class="md-nav__link">
         
   
   
@@ -379,7 +390,7 @@
   
   
     <li class="md-nav__item">
-      <a href="misc/" class="md-nav__link">
+      <a href="../misc/" class="md-nav__link">
         
   
   
@@ -401,7 +412,7 @@
   
   
     <li class="md-nav__item">
-      <a href="contributing/" class="md-nav__link">
+      <a href="../contributing/" class="md-nav__link">
         
   
   
@@ -461,7 +472,7 @@
   
   
     <li class="md-nav__item">
-      <a href="schemas/kubespray_inv_schema/" class="md-nav__link">
+      <a href="../schemas/kubespray_inv_schema/" class="md-nav__link">
         
   
   
@@ -484,7 +495,7 @@
   
   
     <li class="md-nav__item">
-      <a href="schemas/lxc_inv_schema/" class="md-nav__link">
+      <a href="../schemas/lxc_inv_schema/" class="md-nav__link">
         
   
   
@@ -507,7 +518,7 @@
   
   
     <li class="md-nav__item">
-      <a href="schemas/pve_cloud_inv_schema/" class="md-nav__link">
+      <a href="../schemas/pve_cloud_inv_schema/" class="md-nav__link">
         
   
   
@@ -530,7 +541,7 @@
   
   
     <li class="md-nav__item">
-      <a href="schemas/qemu_inv_schema/" class="md-nav__link">
+      <a href="../schemas/qemu_inv_schema/" class="md-nav__link">
         
   
   
@@ -553,7 +564,7 @@
   
   
     <li class="md-nav__item">
-      <a href="schemas/setup_bind_schema_ext/" class="md-nav__link">
+      <a href="../schemas/setup_bind_schema_ext/" class="md-nav__link">
         
   
   
@@ -576,7 +587,7 @@
   
   
     <li class="md-nav__item">
-      <a href="schemas/setup_ceph_kea_schema_ext/" class="md-nav__link">
+      <a href="../schemas/setup_ceph_kea_schema_ext/" class="md-nav__link">
         
   
   
@@ -599,7 +610,7 @@
   
   
     <li class="md-nav__item">
-      <a href="schemas/setup_haproxy_schema_ext/" class="md-nav__link">
+      <a href="../schemas/setup_haproxy_schema_ext/" class="md-nav__link">
         
   
   
@@ -622,7 +633,7 @@
   
   
     <li class="md-nav__item">
-      <a href="schemas/setup_kea_schema_ext/" class="md-nav__link">
+      <a href="../schemas/setup_kea_schema_ext/" class="md-nav__link">
         
   
   
@@ -645,7 +656,7 @@
   
   
     <li class="md-nav__item">
-      <a href="schemas/vm_schema_base/" class="md-nav__link">
+      <a href="../schemas/vm_schema_base/" class="md-nav__link">
         
   
   
@@ -684,43 +695,19 @@
 
 
 
-<h1 id="general">General</h1>
-<p>The aim of this project is to provide a toolset for building a self hosted cloud provider like foundation (AWS, Google Cloud, Azure).</p>
-<p>It is not a opinionated, monolithic solution, but tries to give you freedom in implementing according to your preferences.</p>
-<p>Basic understanding of the following areas is required:</p>
-<ul>
-<li>python and ansible</li>
-<li>terraform</li>
-<li>containerization and orchestration (k8s)</li>
-<li>virtualization (proxmox)</li>
-<li>networking, dhcp and dns (kea, bind)</li>
-</ul>
-<h2 id="quickstart">Quickstart</h2>
-<p>Checkout the <a href="https://github.com/Proxmox-Cloud/pve_cloud/tree/master/samples">samples directory</a> to get an idea about how the collection works in action.</p>
-<h3 id="project-dependency-structure">Project dependency structure</h3>
-<p><img alt="Arch" src="cloud-arch.svg" /></p>
-<h2 id="compatibility">Compatibility</h2>
-<p>Verified working versions:</p>
-<table>
-<thead>
-<tr>
-<th>Collection Version</th>
-<th>K8S Version</th>
-<th>Debian LXC Version</th>
-<th>PVE Version</th>
-<th>Ceph Version</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>3.6.X</td>
-<td>1.32.5</td>
-<td>12.12-1</td>
-<td>8.4.12</td>
-<td>19.2.2</td>
-</tr>
-</tbody>
-</table>
+<h1 id="terraform">Terraform</h1>
+<p>Terraform is used as soon as we have our kubernetes cluster bootstrapped. Have a look at the <a href="https://github.com/Proxmox-Cloud/pve_cloud/tree/master/samples/kubespray-cluster">kubespray-cluster/terraform samples folder</a> to get an idea of how to integrate it.</p>
+<h2 id="provider-authentication">Provider Authentication</h2>
+<p>The sample uses a <code>.envrc</code> file for ease of use to establish authentication as soon as you <code>cd</code> into your terraform configs folder.</p>
+<p>Inside this direnv script we use the cli command <code>pvclu export-envrc</code>, which assumes you have activated your python venv or have installed <code>py-pve-cloud</code> via a different method.</p>
+<p>The cli tool connects to proxmox and the kubernetes clusters nodes, fetches secrets, k8s auth configs and exports them to a bunch of environment variables prefixed with <code>TF_VAR_</code> that are then picked up by terraform via variable definitions in the <code>cloud-vars.tf</code> file.</p>
+<h2 id="proxmox-cloud-terraform-modules">Proxmox Cloud Terraform Modules</h2>
+<p>Proxmox cloud comes with a controller and backup solution that runs on k8s and is deployed via a <a href="https://github.com/Proxmox-Cloud/pve-cloud-tf">terraform modules</a>.</p>
+<p>It needs certain secrets to function that are fetched by the <code>pvclu</code> command and passed through via terraform env variables.</p>
+<h3 id="controller">Controller</h3>
+<p>The controller contains features for TLS Certificate Injection into created namespaces, use of a Harbor registry for mirroring and automatic patching of images via admission webhooks, dynamic dns based on ingress resources and more to come. You can use this controller but dont need to if you want to provide your own solution.</p>
+<h3 id="backup">Backup</h3>
+<p>The backup module installs a cron job inside k8s that uses ceph csi volume snapshots and rbd volume groups, to provide atomic backups of an entire k8s namespace.</p>
 
 
 
@@ -769,10 +756,10 @@
     
     
       
-      <script id="__config" type="application/json">{"base": ".", "features": ["toc.follow", "toc.integrate"], "search": "assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"base": "..", "features": ["toc.follow", "toc.integrate"], "search": "../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="assets/javascripts/bundle.f55a23d4.min.js"></script>
+      <script src="../assets/javascripts/bundle.f55a23d4.min.js"></script>
       
     
   </body>

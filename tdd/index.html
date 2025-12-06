@@ -9,7 +9,7 @@
       
       
       
-        <link rel="prev" href="../kubernetes/">
+        <link rel="prev" href="../terraform/">
       
       
         <link rel="next" href="../misc/">
@@ -259,6 +259,28 @@
       
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../terraform/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Terraform
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
     
   
   
@@ -351,6 +373,21 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="VSCode Pytest debug">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#multi-root-projects" class="md-nav__link">
+    <span class="md-ellipsis">
+      Multi-Root Projects
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
     </ul>
@@ -420,10 +457,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
         
           
-          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
             
   
   
@@ -436,8 +473,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_7">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
             <span class="md-nav__icon md-icon"></span>
             Schemas
           </label>
@@ -716,7 +753,7 @@ test-env-conf.yaml
 </code></pre>
 <ol>
 <li>install build essentails <code>sudo apt install build-essential python3-dev</code> (or your distros equivalent)</li>
-<li>install ansible as described in the  <a href="../bootstrap/">bootstrap section</a> and also run the control node setup</li>
+<li>install ansible as described in the <a href="../bootstrap/">bootstrap section</a> and also run the control node setup</li>
 <li>run <code>tdd-reqs</code> cli command inside the pve_cloud collection and <code>ansible-galaxy install -r tdd-requirements.yml</code>, this will install all the ansible collection dependencies</li>
 <li>launch local registries for watchdog rebuilds and fast deployment</li>
 </ol>
@@ -725,8 +762,7 @@ docker run -d -p 8088:8080 --name pxc-local-pypi pypiserver/pypiserver:latest ru
 docker run -d --name pxc-local-redis -p 6379:6379 redis:latest # redis broker for triggering dependent builds
 </code></pre>
 <ol>
-<li>run <code>tddog --recursive</code> from your top level created <code>pve-cloud</code> folder. This will monitor src folders and rebuild artifacts and their dependants</li>
-<li>python packages are partly installed locally and pushed and used in artifacts. tddog takes care of making code available for the infrastructure, locally you can run <code>pip install -e .</code> to have your changes reflected in real time</li>
+<li>run <code>tddog --recursive</code> from your top level created <code>pve-cloud</code> folder. This will monitor src folders, rebuild artifacts and their dependants and also run <code>pip install -e .</code> on libraries that are needed locally</li>
 <li>connect once to your cluster <code>pvcli connect-cluster --pve-host $PVE_HOST_IP</code> and then you can run the e2e tests</li>
 </ol>
 <pre><code class="language-bash">pytest -s tests/e2e/ --skip-cleanup 
@@ -737,7 +773,8 @@ pytest -s tests/e2e/test_cloud.py::test_bind --skip-cleanup
 <h3 id="kubeconfig-access">Kubeconfig access</h3>
 <p>If you passed <code>--skip-cleanup</code> to pytest, the kubespray tests will write a <code>.test-kubeconfig.yaml</code> file you can use for lens access to the testing cluster.</p>
 <h2 id="vscode-pytest-debug">VSCode Pytest debug</h2>
-<p>create a <code>.testenv</code> file with the same variables as the <code>.envrc</code> inside whatever repo you want to attach your debugger to.</p>
+<p>if you want to attach a debugger to the tests you can use the vscode python debug extension.</p>
+<p>create a <code>.testenv</code> file with the same variables as the <code>.envrc</code> alongside it in your pve-cloud folder</p>
 <p>the settings.json for vscode python debug should look something like this:</p>
 <pre><code class="language-json">{
   &quot;python.testing.pytestArgs&quot;: [
@@ -748,11 +785,23 @@ pytest -s tests/e2e/test_cloud.py::test_bind --skip-cleanup
   &quot;python.testing.unittestEnabled&quot;: false,
   &quot;python.testing.pytestEnabled&quot;: true,
   &quot;python.testing.cwd&quot;: &quot;${workspaceFolder}&quot;,
-  &quot;python.envFile&quot;: &quot;${workspaceFolder}/.testenv&quot;
+  &quot;python.envFile&quot;: &quot;${env:HOME}/pve-cloud/.testenv&quot;, // adjust it to the path
+  &quot;python.defaultInterpreterPath&quot;: &quot;${env:HOME}/.pve-cloud-dev-venv/bin/python&quot;
 }
 </code></pre>
 <p>Also select your python interpreter to the dev environment bin/python in the vscode command palette.</p>
-<p>This only works for executing single tests, if you want to run the entire suite use the command line. VSCode says they dont run it in paralell unless you have xdist installed but this is a lie.</p>
+<h3 id="multi-root-projects">Multi-Root Projects</h3>
+<p>If you want to develop with multiple pve-cloud repositories at the same time you can create a <code>pve-cloud.code-workspace</code> file top folder.</p>
+<p>Open this file via vscode File/Open Workspace from File...</p>
+<pre><code class="language-json">{
+  &quot;folders&quot;: [
+    { &quot;path&quot;: &quot;.&quot;},
+    { &quot;path&quot;: &quot;ansible_collections/pve/cloud&quot; },
+    { &quot;path&quot;: &quot;pve-cloud-tf&quot; }
+  ]
+}
+</code></pre>
+<p>This loads the e2e tests from both projects via their settings.json file.</p>
 
 
 

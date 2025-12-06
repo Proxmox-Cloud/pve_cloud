@@ -12,7 +12,7 @@
         <link rel="prev" href="../bootstrap/">
       
       
-        <link rel="next" href="../tdd/">
+        <link rel="next" href="../terraform/">
       
       
       <link rel="icon" href="../assets/images/favicon.png">
@@ -299,6 +299,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#ceph-csi" class="md-nav__link">
+    <span class="md-ellipsis">
+      Ceph CSI
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#tls-acme-certificates" class="md-nav__link">
     <span class="md-ellipsis">
       TLS ACME Certificates
@@ -349,19 +358,32 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#terraform" class="md-nav__link">
-    <span class="md-ellipsis">
-      Terraform
-    </span>
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
       
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../terraform/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Terraform
+    
+  </span>
+  
+
+      </a>
     </li>
   
 
@@ -447,10 +469,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
         
           
-          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
             
   
   
@@ -463,8 +485,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_7">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
             <span class="md-nav__icon md-icon"></span>
             Schemas
           </label>
@@ -709,6 +731,9 @@
 <p>Afterwards run the <code>pve.cloud.sync_kubespray</code> playbook, this will fully create VMs, setup kubespray, initialize TLS Certificates and deploy core kubernetes helm charts (Ceph CSI, Ingress).</p>
 <p>To get kubeconf after creation of the cluster for cli/ide access (expiring) use:</p>
 <p><code>pvcli print-kubeconfig --inventory YOUR-KUBESPRAY-INV.yaml</code></p>
+<h2 id="ceph-csi">Ceph CSI</h2>
+<p>If you have ceph installed and configured in your proxmox cluster, and you define <code>ceph_csi_sc_pools</code> in your kubespray inventory, the ceph csi volume driver will be automatically configured and installed.</p>
+<p>If you want to use ceph your kubernetes nodes need to have access to the ceph monitors, if your ceph is on a seperate network you can deploy a seperate kea dhcp for dynamically assinging ips to the nodes ceph network interfaces. For that you need a single lxc and the <code>setup_ceph_kea</code> playbook.</p>
 <h2 id="tls-acme-certificates">TLS ACME Certificates</h2>
 <p>This collection doesn't use kubernetes certmanager for TLS certificates, but instead comes with an external centralised solution. </p>
 <p>Initially certificates are generated via ansible roles, integrated into the collection. The update process afterwards is handled via <a href="https://github.com/Proxmox-Cloud/pve-cloud-awx-cron">AWX cron jobs</a>. Use the awx helm chart via terraform to deploy your own instance.</p>
@@ -769,9 +794,6 @@ eviction_hard:
 <p>If you want to expose your kubenetes clusters controlplane to integrate with external running services, you can set additional SANs that will be generated and inserted by kubespray into the kubeapi certificates, by listing them in your kubespray inventory file under <code>extra_control_plane_sans</code> as simple strings.</p>
 <p>Adding SANs there will also configure the pve cloud haproxy to route any control plane traffic (6443) on its external ip to respecive cluster.</p>
 <p>DNS Records for these SANs have to be created manually (for internal and external DNS servers), for that use terraforms dns, route53 and ionos provider.</p>
-<h2 id="terraform">Terraform</h2>
-<p>After you deployed your first kubernetes cluster, further deployments and configuration is handled almost exclusively via terraform.</p>
-<p>Checkout the <a href="https://github.com/Proxmox-Cloud/pve-cloud-tf">pve-cloud-tf repository</a>, for core pve cloud related deployments.</p>
 
 
 
