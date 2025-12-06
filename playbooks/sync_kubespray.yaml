@@ -401,6 +401,7 @@
       kubernetes.core.helm_repository:
         name: ceph-csi
         repo_url: https://ceph.github.io/csi-charts
+      when: ceph_cluster_fsid is defined and ceph_csi_sc_pools is defined
     
     - name: deploy csi chart
       kubernetes.core.helm:
@@ -412,12 +413,14 @@
         release_namespace: ceph-csi
         create_namespace: true
         update_repo_cache: true
+      when: ceph_cluster_fsid is defined and ceph_csi_sc_pools is defined
       
     - name: create csi manifests
       kubernetes.core.k8s:
         state: present
         template: ceph-csi-sc.yaml.j2
         kubeconfig: "{{ temp_kubeconfig.path }}"
+      when: ceph_cluster_fsid is defined and ceph_csi_sc_pools is defined
 
     - name: ingress nginx repo
       kubernetes.core.helm_repository:

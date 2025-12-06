@@ -255,8 +255,8 @@ must respect the following conditions
 
 | Property                                                                                       | Pattern | Type                      | Deprecated | Definition | Title/Description                                                                                                                                                                                                                                                                                                                                                                            |
 | ---------------------------------------------------------------------------------------------- | ------- | ------------------------- | ---------- | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| - [pve_haproxy_floating_ip_internal](#pve_clusters_pattern1_pve_haproxy_floating_ip_internal ) | No      | string                    | No         | -          | Floating ip that is exclusively accessible from inside the cloud / location. External forwardings should be made to pve_haproxy_floating_ip.<br />Inside the cloud if you define a certificate entry, some nodeport forward or default kubeapi access, this will all be available automatically on this ip.<br />                                                                            |
-| - [pve_haproxy_floating_ip](#pve_clusters_pattern1_pve_haproxy_floating_ip )                   | No      | string                    | No         | -          | Floating ip of our central cluster HAProxy.                                                                                                                                                                                                                                                                                                                                                  |
+| - [pve_haproxy_floating_ip_internal](#pve_clusters_pattern1_pve_haproxy_floating_ip_internal ) | No      | string                    | No         | -          | Floating ip that is exclusively accessible from inside the cloud / location. External forwardings should be made to pve_haproxy_floating_ip_external.<br />Inside the cloud if you define a certificate entry, some nodeport forward or default kubeapi access, this will all be available automatically on this ip.<br />                                                                            |
+| - [pve_haproxy_floating_ip_external](#pve_clusters_pattern1_pve_haproxy_floating_ip_external )                   | No      | string                    | No         | -          | Floating ip of our central cluster HAProxy.                                                                                                                                                                                                                                                                                                                                                  |
 | + [pve_unique_cloud_services](#pve_clusters_pattern1_pve_unique_cloud_services )               | No      | array of enum (of string) | No         | -          | Unique service the cluster provides for its cloud. Unique in the sense that only one cluster may provide each of the services for the entire cloud.<br />Services like haproxy and backup servers can and should be provided by multiple clusters. <br />                                                                                                                                    |
 | - [pve_host_vars](#pve_clusters_pattern1_pve_host_vars )                                       | No      | object                    | No         | -          | Optional variables that will be specifically set for a pve host. Key is the simple host name. <br />This can be used to build your specialized pve cluster setup playbooks. You can do things like<br />wakeonlan, driver and network configuration with these easily. Simply create your own playbook and<br />run it even before the pve.cloud.setup_pve_clusters on this inventory.<br /> |
 
@@ -267,7 +267,7 @@ must respect the following conditions
 | **Type**     | `string` |
 | **Required** | No       |
 
-**Description:** Floating ip that is exclusively accessible from inside the cloud / location. External forwardings should be made to pve_haproxy_floating_ip.
+**Description:** Floating ip that is exclusively accessible from inside the cloud / location. External forwardings should be made to pve_haproxy_floating_ip_external.
 Inside the cloud if you define a certificate entry, some nodeport forward or default kubeapi access, this will all be available automatically on this ip.
 
 **Example:**
@@ -276,7 +276,7 @@ Inside the cloud if you define a certificate entry, some nodeport forward or def
 "192.168.10.6"
 ```
 
-#### <a name="pve_clusters_pattern1_pve_haproxy_floating_ip"></a>12.1.2. Property `Cloud Inventory > pve_clusters > PVE cluster fqdn > pve_haproxy_floating_ip`
+#### <a name="pve_clusters_pattern1_pve_haproxy_floating_ip_external"></a>12.1.2. Property `Cloud Inventory > pve_clusters > PVE cluster fqdn > pve_haproxy_floating_ip_external`
 
 |              |          |
 | ------------ | -------- |

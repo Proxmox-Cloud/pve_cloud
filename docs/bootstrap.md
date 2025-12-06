@@ -1,21 +1,31 @@
 # Setup/Bootstrap
 
-You need a development machine with the following tools/packages installed:
+You need a deployment machine that meets the following requirements:
 
-* python3 + virtual env 
+* preferably apt based package manager (debian,ubuntu)
+* python3 (+ recommended virtual env)
 * docker
 * terraform
-* kubectl / helm
+* kubectl / helm ( version `>=3` )
 * yq (mikefarah)
+* direnv (.envrc files for terraform conf/auth)
 * (nfs-common) if you want to use caching
 
-Aswell as a proxmox cluster you have root access via ssh to the hosts.
+You also need a proxmox cluster (standalone is fine) with the following minimum requirements:
+
+* access via ssh key to the root user (`~/.ssh/authorized_keys`)
+* seperate free vlan (proxmox cloud runs its own mandatory dhcp)
+* 4 cores
+* 32 gb of ram
+* 500 gb of free disk space for vms
+* subnet with at least 20 free allocatable addresses (accessible from the development machine)
+
 
 ## Bootstrap
 
 Create a repository for your cloud instance for example company-xyz-cloud and setup your environment:
 
-* it is recommended to create a venv `python3 -m venv ~/.pve-cloud-venv` and activate `source ~/.pve-cloud-venv/bin/activate`
+* create a venv `python3 -m venv ~/.pve-cloud-venv` and activate `source ~/.pve-cloud-venv/bin/activate`
 * install `pip install ansible==9.13.0`
 * create `requirements.yaml` in your repository like this:
 ```yaml
@@ -44,25 +54,20 @@ any_unparsed_is_failed = True
 
 The cli will ask you for a cloud domain if the cluster has not already one assigned.
 
-The cloud domain should be a unique domain that can be used for the hostnames and services of the cloud. It should not overlap with a domain you host generic services under, we need unambiguousness for our ddns hostname records.
+The cloud domain should be a unique domain that can be used for the hostnames and services of the cloud. It should not overlap with a domain you host generic services under, we need unambiguousness for our dynamic dns hostname records.
 
-Domains for services like for example `gitlab.example.com` can be added later in our cluster definition file. The cloud domain should be something like `your-cloud.example.com`.
+Domains for services like for example `gitlab.example.com` can be added later in our cluster definition files. The cloud domain should be something like `your-cloud.example.com`.
 
 ### Repository setup
 
-One pve cloud can have multiple proxmox clusters, but one proxmox cluster may only be member of a single pve cloud.
-
-You should create a seperate repository for each of your pve cloud instances. 
-
-This repository should contain:
+As in the [samples/cloud-instance](https://github.com/Proxmox-Cloud/pve_cloud/tree/master/samples/cloud-instance) your repository that defines the core pve cloud components you need:
 
 * pve cloud inventory file - [cloud schema](schemas/pve_cloud_inv_schema.md) => for the `pve.cloud.setup_pve_clusters` playbook
 * lxc inventory files for the basic services - [lxc inv schema](schemas/lxc_inv_schema.md)
-    * inventory for two kea lxcs => for use with `pve.cloud.setup_kea` playbook - [dhcp inv schema](schemas/setup_kea_schema_ext.md)
-    * inventory for two bind lxcs => `pve.cloud.setup_bind` playbook - [bind inv schema](schemas/setup_bind_schema_ext.md)
-    * three lxcs for patroni postgres => `pve.cloud.setup_postgres` playbook - no special schema
-    * two haproxy lxcs => `pve.cloud.setup_haproxy` playbook - [haproxy inv schema](schemas/setup_haproxy_schema_ext.md)
-
+  * inventory for two kea lxcs => for use with `pve.cloud.setup_kea` playbook - [dhcp inv schema](schemas/setup_kea_schema_ext.md)
+  * inventory for two bind lxcs => `pve.cloud.setup_bind` playbook - [bind inv schema](schemas/setup_bind_schema_ext.md)
+  * three lxcs for patroni postgres => `pve.cloud.setup_postgres` playbook - no special schema
+  * two haproxy lxcs => `pve.cloud.setup_haproxy` playbook - [haproxy inv schema](schemas/setup_haproxy_schema_ext.md)
 
 From here you can start deploying your first kubernetes cluster, which will serve as the basis for most deployments/services.
 

@@ -13,8 +13,8 @@
   tasks:
     - name: Check if floating ips are defined
       fail:
-        msg: "ERROR: 'pve_haproxy_floating_ip' or 'pve_haproxy_floating_ip_internal' is not in pve cloud vars!"
-      when: pve_haproxy_floating_ip is not defined or pve_haproxy_floating_ip_internal is not defined
+        msg: "ERROR: 'pve_haproxy_floating_ip_external' or 'pve_haproxy_floating_ip_internal' is not in pve cloud vars!"
+      when: pve_haproxy_floating_ip_external is not defined or pve_haproxy_floating_ip_internal is not defined
 
     - name: Install keepalived
       ansible.builtin.apt:
@@ -82,7 +82,7 @@
               auth_pass {{ haproxy_keepalived_password }}
             }
             virtual_ipaddress {
-              {{ pve_haproxy_floating_ip }}/24
+              {{ pve_haproxy_floating_ip_external }}/24
             }
           }
           # internal proxy ip

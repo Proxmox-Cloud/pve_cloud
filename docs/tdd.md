@@ -49,7 +49,7 @@ test-env-conf.yaml
 ```
 
 1. install build essentails `sudo apt install build-essential python3-dev` (or your distros equivalent)
-2. install ansible as described in the  [bootstrap section](bootstrap.md) and also run the control node setup
+2. install ansible as described in the [bootstrap section](bootstrap.md) and also run the control node setup
 3. run `tdd-reqs` cli command inside the pve_cloud collection and `ansible-galaxy install -r tdd-requirements.yml`, this will install all the ansible collection dependencies
 4. launch local registries for watchdog rebuilds and fast deployment
 ```bash
@@ -57,9 +57,8 @@ docker run -d -p 5000:5000 --name pxc-local-registry registry:3 # local docker r
 docker run -d -p 8088:8080 --name pxc-local-pypi pypiserver/pypiserver:latest run -P . -a . # local pypi registry without auth
 docker run -d --name pxc-local-redis -p 6379:6379 redis:latest # redis broker for triggering dependent builds
 ```
-5. run `tddog --recursive` from your top level created `pve-cloud` folder. This will monitor src folders and rebuild artifacts and their dependants
-6. python packages are partly installed locally and pushed and used in artifacts. tddog takes care of making code available for the infrastructure, locally you can run `pip install -e .` to have your changes reflected in real time
-7. connect once to your cluster `pvcli connect-cluster --pve-host $PVE_HOST_IP` and then you can run the e2e tests
+5. run `tddog --recursive` from your top level created `pve-cloud` folder. This will monitor src folders, rebuild artifacts and their dependants and also run `pip install -e .` on libraries that are needed locally
+6. connect once to your cluster `pvcli connect-cluster --pve-host $PVE_HOST_IP` and then you can run the e2e tests
 ```bash
 pytest -s tests/e2e/ --skip-cleanup 
 
@@ -73,7 +72,9 @@ If you passed `--skip-cleanup` to pytest, the kubespray tests will write a `.tes
 
 ## VSCode Pytest debug
 
-create a `.testenv` file with the same variables as the `.envrc` inside whatever repo you want to attach your debugger to.
+if you want to attach a debugger to the tests you can use the vscode python debug extension.
+
+create a `.testenv` file with the same variables as the `.envrc` alongside it in your pve-cloud folder
 
 the settings.json for vscode python debug should look something like this:
 
@@ -87,10 +88,27 @@ the settings.json for vscode python debug should look something like this:
   "python.testing.unittestEnabled": false,
   "python.testing.pytestEnabled": true,
   "python.testing.cwd": "${workspaceFolder}",
-  "python.envFile": "${workspaceFolder}/.testenv"
+  "python.envFile": "${env:HOME}/pve-cloud/.testenv", // adjust it to the path
+  "python.defaultInterpreterPath": "${env:HOME}/.pve-cloud-dev-venv/bin/python"
 }
 ```
 
 Also select your python interpreter to the dev environment bin/python in the vscode command palette.
 
-This only works for executing single tests, if you want to run the entire suite use the command line. VSCode says they dont run it in paralell unless you have xdist installed but this is a lie.
+### Multi-Root Projects
+
+If you want to develop with multiple pve-cloud repositories at the same time you can create a `pve-cloud.code-workspace` file top folder.
+
+Open this file via vscode File/Open Workspace from File...
+
+```json
+{
+  "folders": [
+    { "path": "."},
+    { "path": "ansible_collections/pve/cloud" },
+    { "path": "pve-cloud-tf" }
+  ]
+}
+```
+
+This loads the e2e tests from both projects via their settings.json file.

@@ -1,32 +1,29 @@
-target_pve: pve-cluster-name.pve-cloud-domain.example
+# read dhcp-inv.yaml for general information on the lxc inventory structure
+target_pve: pve-cluster-name.pve-cloud-domain.example 
 stack_name: bind
 
-# lxcs defined here will be automatically created / deleted if missing by the pve.cloud.sync_lxcs playbook
 lxcs:
 - hostname: main
   parameters:
-    rootfs: "volume=ssd:15,mountoptions=discard" # ssd is the name of the storage pool in proxmox
+    rootfs: "volume=ssd:10,mountoptions=discard"
     cores: 1
-    memory: 512
-    # ip addresses from pve-cluster-inventory
-    net0: "name=pve,bridge=vmbr0,tag=100,firewall=1,ip=192.168.1.4/22,gw=192.168.1.1"
+    memory: 256
+    net0: "name=pve,bridge=vmbr0,tag=100,firewall=1,ip=192.168.1.4/24,gw=192.168.1.1"
   vars:
+    # this variable determines the lxc that will be the master dns, only one lxc can have this set to true
     bind_master: true
-- hostname: failover
+- hostname: slave
   parameters:
-    rootfs: "volume=ssd:15,mountoptions=discard"
+    rootfs: "volume=ssd:10,mountoptions=discard"
     cores: 1
-    memory: 512
-    net0: "name=pve,bridge=vmbr0,tag=100,firewall=1,ip=192.168.1.5/22,gw=192.168.1.1"
+    memory: 256
+    net0: "name=pve,bridge=vmbr0,tag=100,firewall=1,ip=192.168.1.5/24,gw=192.168.1.1"
   vars:
     bind_master: false
 
-# autostart the lxc on boot of our proxmox host
-# these parameters get applied to all lxcs
 lxc_base_parameters:
   onboot: 1
 
-root_ssh_pub_key: 'ssh-ed25519 AAAeAC3NzaC1tlZDI1NdasdAAIGreJ6EeeGddasB30hv1h5+erHhreUHzvmYE' # your public ssh key
+root_ssh_pub_key: 'ssh-ed25519 AAAeAC3NzaC1tlZDI1NdasdAAIGreJ6EeeGddasB30hv1h5+erHhreUHzvmYE'
 
-# standard field ansible look for to load dynamic inventories
 plugin: pve.cloud.lxc_inv 

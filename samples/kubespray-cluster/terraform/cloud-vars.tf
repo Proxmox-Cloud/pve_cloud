@@ -1,4 +1,4 @@
-# all of these variables are filled automatically via env
+# all of these variables are filled automatically via .envrc
 # from eval pvcli. They are used by pve-cloud-tf modules and to init
 # providers
 variable "pve_cloud_domain" {

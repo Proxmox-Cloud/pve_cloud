@@ -35,19 +35,23 @@
   ansible.builtin.command: "ceph fsid"
   run_once: true
   register: ceph_fsid
+  when: ceph_conf_stat.stat.exists
 
 - name: add fsid to map
   set_fact:
     secret_map: "{{ secret_map | combine({'ceph_fsid': ceph_fsid.stdout}) }}"
   run_once: true
+  when: ceph_conf_stat.stat.exists
 
 - name: Get the key using grep and awk
   shell: |
    grep -i 'key' /etc/pve/priv/ceph.client.admin.keyring | awk -F ' = ' '{print $2}'
   register: ceph_key
   run_once: true
+  when: ceph_conf_stat.stat.exists
 
 - name: add fsid to map
   set_fact:
     secret_map: "{{ secret_map | combine({'ceph_key': ceph_key.stdout}) }}"
   run_once: true
+  when: ceph_conf_stat.stat.exists

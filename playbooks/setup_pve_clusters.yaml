@@ -23,7 +23,7 @@
     - name: Fail when 
       fail:
         msg: "Installed version {{ existing_cluster_vars['pve_cloud_collection_version'] }} is ahead of local version {{ cluster_vars['pve_cloud_collection_version'] }}"
-      when: "'pve_cloud_collection_version' in existing_cluster_vars and existing_cluster_vars['pve_cloud_collection_version'] is version(cluster_vars['pve_cloud_collection_version'], '>')"
+      when: cvars_stat.stat.exists and 'pve_cloud_collection_version' in existing_cluster_vars and existing_cluster_vars['pve_cloud_collection_version'] is version(cluster_vars['pve_cloud_collection_version'], '>')
 
   roles:
     - prometheus.prometheus.systemd_exporter

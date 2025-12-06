@@ -4,6 +4,7 @@ nav:
   - index.md
   - bootstrap.md
   - kubernetes.md
+  - terraform.md
   - tdd.md
   - misc.md
   - contributing.md

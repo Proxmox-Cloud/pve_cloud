@@ -5,10 +5,14 @@ stack_name: sample-cluster
 
 # these entries will populate the dedicated cluster tls certificate
 # not to be confused with the kubeapi cert. this is a cert meant to be
-# used by the ingress controller
+# used by the ingress controller, it will only be generated if you defined an
+# acme_contact and acme_method in cloud-inv.yaml
 cluster_cert_entries:
   - zone: example.com
-    authoritative_zone: true
+    # will make bind authoritative for this zone
+    # meaning it will create the zone in bind and assume it holds all
+    # record for that zone. this is needed for k8s dynamic ingress dns
+    authoritative_zone: true 
     names: 
       - '*.subdomain'
       - '*'
@@ -46,9 +50,11 @@ static_includes:
 # our nodes we want to create, they will also be kept in sync everytime you execute the playbook
 # if you need a unique node with labels/taints you have to assign a unique hostname
 qemus:
+# the number of master nodes should be uneven - 1,3,5
 - k8s_roles: ['master']
   disk:
     size: 50G
+    # mount option for ssd backed storage
     options:
       discard: "on"
       iothread: "on"
@@ -57,35 +63,12 @@ qemus:
   parameters:
     sockets: 1
     cores: 2
-    memory: 4096
-- k8s_roles: ['master']
-  disk:
-    size: 50G
-    options:
-      discard: "on"
-      iothread: "on"
-      ssd: "on"
-    pool: ssd
-  parameters:
-    sockets: 1
-    cores: 2
-    memory: 4096
-- k8s_roles: ['master']
-  disk:
-    size: 50G
-    options:
-      discard: "on"
-      iothread: "on"
-      ssd: "on"
-    pool: ssd
-  parameters:
-    sockets: 1
-    cores: 2
-    memory: 4096
+    memory: 4096 # 3 gigs is min, 4gb is recommended
+
 # workers
 - k8s_roles: ['worker']
   disk:
-    size: 175G
+    size: 125G
     options:
       discard: "on"
       iothread: "on"
@@ -94,11 +77,11 @@ qemus:
   parameters:
     sockets: 1
     cores: 4
-    memory: 16384
+    memory: 8192
 - hostname: example-service-exclusive
   k8s_roles: ['worker']
   disk:
-    size: 175G
+    size: 100G
     options:
       discard: "on"
       iothread: "on"
@@ -107,7 +90,7 @@ qemus:
   parameters:
     sockets: 1
     cores: 4
-    memory: 16384
+    memory: 8192
   vars:
     # any label / taint you want to toggle on
     node_labels:
@@ -115,16 +98,7 @@ qemus:
     node_taints:
       - exclusive-service=example:NoSchedule
 
-# these pools will be made available as storage classes inside k8s
-# the ceph csi storage provisioner chart is also installed automatically by
-# the playbook
-ceph_csi_sc_pools:
-  - name: ssd
-    default: true
-    mount_options:
-      - discard
-
-root_ssh_pub_key: 'ssh-ed25519 AAAeAC3NzaC1tlZDI1NdasdAAIGreJ6EeeGddasB30hv1h5+erHhreUHzvmYE' # your public ssh key
+root_ssh_pub_key: 'ssh-ed25519 AAAeAC3NzaC1tlZDI1NdasdAAIGreJ6EeeGddasB30hv1h5+erHhreUHzvmYE'
 
 # base parameters all nodes share
 qemu_base_parameters:

@@ -379,4 +379,3 @@ def test_create_backup_lxc(request, get_proxmoxer, get_test_env, create_dyn_inv,
           verbosity=request.config.getoption("--ansible-verbosity")
         )
         assert destroy_lxcs_run.rc == 0
-

@@ -1,22 +1,25 @@
-# read bind-inv.yaml for docs, or the schemas in the main documentation
+# read dhcp-inv.yaml for general information on the lxc inventory structure
 target_pve: pve-cluster-name.pve-cloud-domain.example
 stack_name: patroni
 
 lxcs:
 - parameters:
     rootfs: "volume=ssd:10,mountoptions=discard"
-    cores: 2
-    memory: 1024
+    cores: 1
+    memory: 512
+    # here we dont need to specify a static ip anymore, since we created
+    # dhcp lxcs + bind lxcs with ddns. the etcd setup for patroni
+    # will use dns to resolve the other hosts
     net0: "name=eth0,bridge=vmbr0,firewall=1,ip=dhcp,tag=100"
 - parameters:
     rootfs: "volume=ssd:10,mountoptions=discard"
-    cores: 2
-    memory: 1024
+    cores: 1
+    memory: 512
     net0: "name=eth0,bridge=vmbr0,firewall=1,ip=dhcp,tag=100"
 - parameters:
     rootfs: "volume=ssd:10,mountoptions=discard"
-    cores: 2
-    memory: 1024
+    cores: 1
+    memory: 512
     net0: "name=eth0,bridge=vmbr0,firewall=1,ip=dhcp,tag=100"
 
   

@@ -1,9 +1,10 @@
-# read bind-inv.yaml for docs, or the schemas in the main documentation
+# read dhcp-inv.yaml for general information on the lxc inventory structure
 target_pve: pve-cluster-name.pve-cloud-domain.example
 stack_name: haproxy
 
-# the postgres_stack key is statically defined in pve-cloud-schemas
-# the playbooks need the postgres stack present to apply
+# the postgres_stack key is statically defined in pve-cloud-schemas for the setup_haproxy playbook
+# it includes the patroni stack via its stack_fqdn (stack_name + pve cloud domain) into the ansible
+# inventory for use in the playbook
 static_includes:
   postgres_stack: patroni.pve-cloud-domain.example 
 
@@ -12,16 +13,17 @@ lxcs:
   parameters:
     rootfs: "volume=ssd:15,mountoptions=discard"
     cores: 2
-    memory: 1024
+    memory: 512
     net0: "name=pve,bridge=vmbr0,tag=100,firewall=1,ip=dhcp"
   vars:
+    # again flag to determine the master of the two haproxy instances. only one may have this set to true
     keepalived_master: true
 
 - hostname: failover
   parameters:
     rootfs: "volume=ssd:15,mountoptions=discard"
-    cores: 1
-    memory: 1024
+    cores: 2
+    memory: 512
     net0: "name=pve,bridge=vmbr0,tag=100,firewall=1,ip=dhcp"
   vars:
     keepalived_master: false

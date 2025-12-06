@@ -89,7 +89,7 @@ frontend k8s-ingress-internal
 # specific external floating ip for access control
 frontend k8s-ingress-external
         mode tcp
-        bind {{ pve_haproxy_floating_ip }}:443
+        bind {{ pve_haproxy_floating_ip_external }}:443
 
         # Extract SNI (Server Name Indication)
         tcp-request inspect-delay 5s
@@ -166,7 +166,7 @@ frontend k8s-control-plane-internal
 # sometimes we might want to expose the controlplane to the world wide web
 frontend k8s-control-plane-external
         mode tcp
-        bind {{ pve_haproxy_floating_ip }}:6443
+        bind {{ pve_haproxy_floating_ip_external }}:6443
 
         # Extract SNI (Server Name Indication)
         tcp-request inspect-delay 5s
@@ -210,7 +210,7 @@ listen k8s-tcp-frontend-internal_{{ tcp_proxy.stack_fqdn }}_{{ tcp_proxy.proxy_n
 {% for tcp_proxy in k8s_tcp_proxies.query_result if tcp_proxy.external %}
 listen k8s-tcp-frontend-external_{{ tcp_proxy.stack_fqdn }}_{{ tcp_proxy.proxy_name }}
         mode tcp
-        bind {{ pve_haproxy_floating_ip }}:{{ tcp_proxy.haproxy_port }}
+        bind {{ pve_haproxy_floating_ip_external }}:{{ tcp_proxy.haproxy_port }}
 
 {% if tcp_proxy.proxy_snippet %}
         {{ tcp_proxy.proxy_snippet | indent(8) }}
