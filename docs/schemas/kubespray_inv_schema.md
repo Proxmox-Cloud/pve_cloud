@@ -32,7 +32,7 @@
 | - [external_domains](#external_domains )                 | No      | array of object  | No         | -          | Domains that will be exposed to the public/external haproxy floating ip via haproxy sni matching to this cluster.                                                                                                                                                             |
 | + [cluster_cert_entries](#cluster_cert_entries )         | No      | array of object  | No         | -          | Content for the clusters acme tls certificate. If you have multiple proxmox clusters they need their own haproxy instances for ingress dns to work.                                                                                                                           |
 | + [tcp_proxies](#tcp_proxies )                           | No      | array of object  | No         | -          | Raw tcp forwards on the clusters haproxy to k8s services exposed via nodeport.                                                                                                                                                                                                |
-| + [ceph_csi_sc_pools](#ceph_csi_sc_pools )               | No      | array of object  | No         | -          | Ceph pools that will be made available to the cluster CSI driver.                                                                                                                                                                                                             |
+| - [ceph_csi_sc_pools](#ceph_csi_sc_pools )               | No      | array of object  | No         | -          | Ceph pools that will be made available to the clusters Ceph CSI driver (optional).                                                                                                                                                                                            |
 | - [acme_staging](#acme_staging )                         | No      | boolean          | No         | -          | If set to true will use acme staging directory for issueing certs.                                                                                                                                                                                                            |
 
 ## <a name="target_pve"></a>1. Property `K8s Kubespray Inventory > target_pve`
@@ -836,9 +836,9 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 |              |                   |
 | ------------ | ----------------- |
 | **Type**     | `array of object` |
-| **Required** | Yes               |
+| **Required** | No                |
 
-**Description:** Ceph pools that will be made available to the cluster CSI driver.
+**Description:** Ceph pools that will be made available to the clusters Ceph CSI driver (optional).
 
 |                      | Array restrictions |
 | -------------------- | ------------------ |
@@ -911,4 +911,4 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 **Description:** If set to true will use acme staging directory for issueing certs.
 
 ----------------------------------------------------------------------------------------------------------------------------
-Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2025-12-04 at 10:50:58 +0000
+Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2025-12-06 at 10:51:42 +0000
