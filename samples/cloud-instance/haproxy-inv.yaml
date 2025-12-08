@@ -3,7 +3,7 @@ target_pve: pve-cluster-name.pve-cloud-domain.example
 stack_name: haproxy
 
 # the postgres_stack key is statically defined in pve-cloud-schemas for the setup_haproxy playbook
-# it includes the patroni stack via its stack_fqdn (stack_name + pve cloud domain) into the ansible
+# it includes the patroni stack via its stack_fqdn (stack_name + pve_cloud_domain) into the ansible
 # inventory for use in the playbook
 static_includes:
   postgres_stack: patroni.pve-cloud-domain.example 

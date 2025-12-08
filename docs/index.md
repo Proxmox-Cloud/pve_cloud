@@ -2,7 +2,7 @@
 
 The aim of this project is to provide a toolset for building a self hosted cloud provider like foundation (AWS, Google Cloud, Azure).
 
-It is not a opinionated, monolithic solution, but tries to give you freedom in implementing according to your preferences.
+It is not a opinionated, monolithic solution, instead gives you the freedom to implement according to your needs, serving as solid base / suggestions.
 
 Basic understanding of the following areas is required:
 

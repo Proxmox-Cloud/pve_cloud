@@ -1,5 +1,5 @@
-# for kubernetes clusters the node creation and kubespray bootstrap are done in one go
-# in the pve.cloud.sync_kubespray playbook
+# for kubernetes clusters the node creation and kubespray bootstrap are done in one run of 
+# the pve.cloud.sync_kubespray playbook
 target_pve: pve-cluster-name.pve-cloud-domain.example
 stack_name: sample-cluster
 
@@ -7,11 +7,12 @@ stack_name: sample-cluster
 # not to be confused with the kubeapi cert. this is a cert meant to be
 # used by the ingress controller, it will only be generated if you defined an
 # acme_contact and acme_method in cloud-inv.yaml
+# they will also bind to / be routed by the haproxies internal floating ip
 cluster_cert_entries:
   - zone: example.com
     # will make bind authoritative for this zone
     # meaning it will create the zone in bind and assume it holds all
-    # record for that zone. this is needed for k8s dynamic ingress dns
+    # records for that zone.
     authoritative_zone: true 
     names: 
       - '*.subdomain'
@@ -29,7 +30,10 @@ external_domains:
     names:
       - '*' # all names get exposed
 
-# our cluster haproxy can also forward special tcp traffic to nodeport nodes
+# our cluster haproxy can also forward raw tcp traffic to nodeport nodes
+# the pattern is to create a deployment of a tcp service on this k8s, set service type to nodeport
+# and define a proxy entry here. Then you can you the haproxy_floating_ip (internal/external) to access the 
+# service
 tcp_proxies:
   - proxy_name: postgres-sample
     haproxy_port: 5342
@@ -37,24 +41,24 @@ tcp_proxies:
     external: true
 
 # these default pve cloud stacks are needed for bootstrapping the cluster
-# dhcp will automatically make static reservations for the node ips initially assigned
+
 # via dhcp. bind is used for masters recordset with all masters ips
 # postgres for state records and proxy for reconfiguring and reloading
 static_includes:
   # stack names of the other inventories
-  dhcp_stack: dhcp.pve-cloud-domain.example
-  proxy_stack: haproxy.pve-cloud-domain.example
-  postgres_stack: patroni.pve-cloud-domain.example
-  bind_stack: bind.pve-cloud-domain.example
+  dhcp_stack: dhcp.pve-cloud-domain.example # automatically make static reservations for the node ips
+  proxy_stack: haproxy.pve-cloud-domain.example # reload the haproxy config with definitions earlier in the inventory file
+  postgres_stack: patroni.pve-cloud-domain.example # read and write config from this and other stacks
+  bind_stack: bind.pve-cloud-domain.example # create a masters-stack_name.pve_cloud_domain record set containing all the masters, needed for other pve cloud scripts
 
-# our nodes we want to create, they will also be kept in sync everytime you execute the playbook
-# if you need a unique node with labels/taints you have to assign a unique hostname
+# our nodes we want to create, they will also be kept in sync everytime you execute the playbook, by the same hashing
+# mechanism as the lxcs. if you need a node with labels/taints you have to assign a unique hostname
 qemus:
 # the number of master nodes should be uneven - 1,3,5
 - k8s_roles: ['master']
   disk:
     size: 50G
-    # mount option for ssd backed storage
+    # mount option for ssd backed storage, passed to the proxmox qm cli tool
     options:
       discard: "on"
       iothread: "on"

@@ -1,14 +1,17 @@
-# this is the target proxmox cluster name + . + the proxmox cloud domain you chose in cloud-inv.yaml
+# this is the target proxmox cluster name + "." + the pve_cloud_domain you chose in cloud-inv.yaml
 # it determines where the playbooks will create and find the lxcs
 target_pve: pve-cluster-name.pve-cloud-domain.example # change this to your cluster / domain
-stack_name: dhcp # stack_name + pve cloud domain will be used in identifing vms (also known as stack_fqdn)
+stack_name: dhcp # stack_name + "." + the pve_cloud_domain be used for identifing vms, via the proxmox api and vm tags (also known as stack_fqdn)
 
 # lxcs defined here will be automatically created / deleted if missing by the pve.cloud.sync_lxcs playbook
+# the collection is using a hashing mechanism on these creation parameters to determine what lxcs/vms exist / are missing.
+# after the creation you can see this hash in the tags of the lxc/vm ending with -blake
 lxcs:
-- hostname: main # hostname is optional but needs to be set if we define vars: on lxc level (as defined below)
+- hostname: main # hostname is optional but needs to be set if we define vars: on lxc level (because hashing is also used for var association)
   parameters:
-    # volume=ssd set your storage class you want to use for the disk here
-    # ssd is just a suggestion on how you might name your storage
+    # these rootfs parameters are the same as if you would use the proxmox ui or the pct utility. volume= defines the proxmox storage the lxcs
+    # disk should be created under. Naming / creating your storage as ssd is just a suggestion. Although it is recommended that if you use ceph,
+    # you create one storage class per device class.
     rootfs: "volume=ssd:15,mountoptions=discard"
     cores: 1
     memory: 256
@@ -16,7 +19,7 @@ lxcs:
     # the ips have to match what you set in cloud-inv.yaml
     net0: "name=pve,bridge=vmbr0,tag=100,firewall=1,ip=192.168.1.2/24,gw=192.168.1.1"
   vars:
-    # this variable determines the lxc that will be the main dhcp, only one lxc may have this set to true
+    # this variable determines the lxc that will be the main dhcp, only one lxc should have this set to true
     kea_dhcp_main: true
 
 - hostname: failover
@@ -36,6 +39,7 @@ lxc_base_parameters:
 
 # this is where you should paste your own public key that your local machine has loaded
 # it will be used during the setup and afterwards to connect via ansible
+# at the moment we only support one key.
 root_ssh_pub_key: 'ssh-ed25519 AAAeAC3NzaC1tlZDI1NdasdAAIGreJ6EeeGddasB30hv1h5+erHhreUHzvmYE' 
 
 # ansible default plugin variable. this loads the custom lxc inventory from the pve_cloud collection plugins directory
