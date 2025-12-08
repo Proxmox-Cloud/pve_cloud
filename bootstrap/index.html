@@ -690,13 +690,17 @@
 <p>You need a deployment machine that meets the following requirements:</p>
 <ul>
 <li>preferably apt based package manager (debian,ubuntu)</li>
-<li>python3 (+ recommended virtual env)</li>
-<li>docker</li>
-<li>terraform</li>
+<li>
+<p>python3 (+ recommended virtual env)</p>
+</li>
+<li>
+<p>terraform</p>
+</li>
 <li>kubectl / helm ( version <code>&gt;=3</code> )</li>
 <li>yq (mikefarah)</li>
 <li>direnv (.envrc files for terraform conf/auth)</li>
 <li>(nfs-common) if you want to use caching</li>
+<li>docker (if you want to use caching / tdd development)</li>
 </ul>
 <p>You also need a proxmox cluster (standalone is fine) with the following minimum requirements:</p>
 <ul>
