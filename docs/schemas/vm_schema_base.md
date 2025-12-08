@@ -152,4 +152,4 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 **Description:** Variables object used only in e2e tests.
 
 ----------------------------------------------------------------------------------------------------------------------------
-Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2025-12-06 at 10:51:42 +0000
+Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2025-12-08 at 19:39:36 +0000
