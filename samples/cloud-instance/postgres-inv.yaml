@@ -22,9 +22,6 @@ lxcs:
     memory: 512
     net0: "name=eth0,bridge=vmbr0,firewall=1,ip=dhcp,tag=100"
 
-  
-lxc_base_parameters:
-  onboot: 1
 
 root_ssh_pub_key: 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGJ6EGojNV/m7jZ3B+pBWVmWB30hv1h5+erHhUHzvmYE'
 

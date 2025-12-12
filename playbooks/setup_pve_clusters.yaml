@@ -54,7 +54,7 @@
         enabled: no
         state: stopped
         masked: yes
-      when: disable_ipmi is defined and disable_ipmi
+      when: disable_ipmi is defined and c
 
 - name: Cluster reps setup
   hosts: pve_cluster_reps

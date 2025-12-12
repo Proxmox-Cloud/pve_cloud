@@ -28,8 +28,9 @@ lxcs:
   vars:
     keepalived_master: false
 
-lxc_base_parameters:
-  onboot: 1
+
+# we dont turn on auto boot for haproxy and services that need dhcp. its essential that dhcp and bind works before these lxcs
+# boot. Incase of node / proxmox host failure this has to be started manually
 
 root_ssh_pub_key: 'ssh-ed25519 AAAeAC3NzaC1tlZDI1NdasdAAIGreJ6EeeGddasB30hv1h5+erHhreUHzvmYE' # your public ssh key
 

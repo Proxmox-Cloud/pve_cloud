@@ -110,6 +110,9 @@ def setup_dhcp_lxcs(request, get_test_env, create_dyn_inv, setup_pve_hosts):
       "lxc_global_vars": {
         "install_prom_systemd_exporter": True
       },
+      "lxc_base_parameters": {
+        "onboot": 1
+      },
       "root_ssh_pub_key": get_test_env['pve_test_ssh_pub_key']
     }, temp_kea_lxcs_inv)
     temp_kea_lxcs_inv.flush()
@@ -192,6 +195,9 @@ def setup_bind_lxcs(request, get_test_env, create_dyn_inv, setup_dhcp_lxcs):
       ],
       "lxc_global_vars": {
         "install_prom_systemd_exporter": True
+      },
+      "lxc_base_parameters": {
+        "onboot": 1
       },
       "root_ssh_pub_key": get_test_env['pve_test_ssh_pub_key']
     }, temp_bind_lxcs_inv)
