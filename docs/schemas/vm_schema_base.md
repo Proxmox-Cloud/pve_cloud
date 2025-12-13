@@ -16,7 +16,6 @@
 | - [include_stacks](#include_stacks )     | No      | array of object | No         | -          | Include other stacks into the ansible inventory, from any pve cloud you are connected to. From here you can freely extend and write your own playbooks. |
 | + [root_ssh_pub_key](#root_ssh_pub_key ) | No      | string          | No         | -          | trusted root key for the cloud init image.                                                                                                              |
 | - [pve_ha_group](#pve_ha_group )         | No      | string          | No         | -          | PVE HA group this vm should be assigned to (optional).                                                                                                  |
-| - [pve_cloud_pytest](#pve_cloud_pytest ) | No      | object          | No         | -          | Variables object used only in e2e tests.                                                                                                                |
 
 ## <a name="target_pve"></a>1. Property `VM Base Schema > target_pve`
 
@@ -141,15 +140,5 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** PVE HA group this vm should be assigned to (optional).
 
-## <a name="pve_cloud_pytest"></a>7. Property `VM Base Schema > pve_cloud_pytest`
-
-|                           |                  |
-| ------------------------- | ---------------- |
-| **Type**                  | `object`         |
-| **Required**              | No               |
-| **Additional properties** | Any type allowed |
-
-**Description:** Variables object used only in e2e tests.
-
 ----------------------------------------------------------------------------------------------------------------------------
-Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2025-12-08 at 19:39:36 +0000
+Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2025-12-13 at 21:38:36 +0000

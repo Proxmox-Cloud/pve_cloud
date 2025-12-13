@@ -28,7 +28,6 @@
 | - [bind_forward_zones](#bind_forward_zones )                   | No      | array of object  | No         | -          | Creates zone in bind and delegation ns records to the specified nameservers. This is very useful if you have other nameservers with <br />their own authoritative zones you want resolved within the cloud.<br /> |
 | - [acme_contact](#acme_contact )                               | No      | string           | No         | -          | Email address to use for acme account creation.                                                                                                                                                                   |
 | - [acme_method](#acme_method )                                 | No      | enum (of string) | No         | -          | PVE Cloud included method for solving dns01 challenges. You need to have created the appropriate secrets under /etc/pve/cloud on your proxmox cluster.<br />                                                      |
-| - [pve_cloud_pytest](#pve_cloud_pytest )                       | No      | object           | No         | -          | Variables object used only in e2e tests.                                                                                                                                                                          |
 | - [plugin](#plugin )                                           | No      | enum (of string) | No         | -          | Id of ansible inventory plugin, needs to be set exactly.                                                                                                                                                          |
 
 ## <a name="pve_vm_subnet"></a>1. Property `Cloud Inventory > pve_vm_subnet`
@@ -338,6 +337,21 @@ This can be used to build your specialized pve cluster setup playbooks. You can 
 wakeonlan, driver and network configuration with these easily. Simply create your own playbook and
 run it even before the pve.cloud.setup_pve_clusters on this inventory.
 
+| Property                                                             | Pattern | Type    | Deprecated | Definition | Title/Description                                                                                                                                                     |
+| -------------------------------------------------------------------- | ------- | ------- | ---------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| - [disable_ipmi](#pve_clusters_pattern1_pve_host_vars_disable_ipmi ) | No      | boolean | No         | -          | If specified will disable the openipmi power managemend systemd service. This might fail on proxmox<br />hosts that dont support it and clutters up monitoring.<br /> |
+| - [](#pve_clusters_pattern1_pve_host_vars_additionalProperties )     | No      | object  | No         | -          | -                                                                                                                                                                     |
+
+##### <a name="pve_clusters_pattern1_pve_host_vars_disable_ipmi"></a>12.1.4.1. Property `Cloud Inventory > pve_clusters > PVE cluster fqdn > pve_host_vars > disable_ipmi`
+
+|              |           |
+| ------------ | --------- |
+| **Type**     | `boolean` |
+| **Required** | No        |
+
+**Description:** If specified will disable the openipmi power managemend systemd service. This might fail on proxmox
+hosts that dont support it and clutters up monitoring.
+
 ## <a name="bind_zone_admin_email"></a>13. Property `Cloud Inventory > bind_zone_admin_email`
 
 |              |          |
@@ -449,17 +463,7 @@ Must be one of:
 * "route53"
 * "ionos"
 
-## <a name="pve_cloud_pytest"></a>17. Property `Cloud Inventory > pve_cloud_pytest`
-
-|                           |                  |
-| ------------------------- | ---------------- |
-| **Type**                  | `object`         |
-| **Required**              | No               |
-| **Additional properties** | Any type allowed |
-
-**Description:** Variables object used only in e2e tests.
-
-## <a name="plugin"></a>18. Property `Cloud Inventory > plugin`
+## <a name="plugin"></a>17. Property `Cloud Inventory > plugin`
 
 |              |                    |
 | ------------ | ------------------ |
@@ -472,4 +476,4 @@ Must be one of:
 * "pve.cloud.pve_cloud_inv"
 
 ----------------------------------------------------------------------------------------------------------------------------
-Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2025-12-08 at 19:39:36 +0000
+Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2025-12-13 at 21:38:36 +0000
