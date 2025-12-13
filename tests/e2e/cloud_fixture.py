@@ -13,16 +13,13 @@ logger = logging.getLogger(__name__)
 
 
 @pytest.fixture(scope="session")
-def setup_pve_hosts(request, get_test_env, create_dyn_inv):
+def setup_pve_hosts(request, get_test_env):
   logger.info("setup cloud")
   
   # run the pve cluster setup on the test environment
   with tempfile.NamedTemporaryFile('w', suffix='.yaml', delete=False) as temp_cloud_inv:
     # write pve cloud inventory file for main pve cluster setup playbook
     yaml.dump({
-      "pve_cloud_pytest": {
-        "dyn_inv_path": create_dyn_inv
-      },
       "plugin": "pve.cloud.pve_cloud_inv",
       "pve_cloud_domain": get_test_env["pve_test_cloud_domain"],
       "pve_clusters": {
@@ -65,7 +62,7 @@ def setup_pve_hosts(request, get_test_env, create_dyn_inv):
 
 
 @pytest.fixture(scope="session")
-def setup_dhcp_lxcs(request, get_test_env, create_dyn_inv, setup_pve_hosts):
+def setup_dhcp_lxcs(request, get_test_env, setup_pve_hosts):
   logger.info("setup dhcp")
 
   test_vm_subnet_mask = get_test_env['pve_test_cloud_inv']['pve_vm_subnet'].split('/')[1]
@@ -74,9 +71,6 @@ def setup_dhcp_lxcs(request, get_test_env, create_dyn_inv, setup_pve_hosts):
     logger.info("create kea lxcs")
     yaml.dump({
       "plugin": "pve.cloud.lxc_inv",
-      "pve_cloud_pytest": {
-        "dyn_inv_path": create_dyn_inv
-      },
       "target_pve": get_test_env["pve_test_cluster_name"] + "." + get_test_env["pve_test_cloud_domain"],
       "stack_name": "ha-dhcp",
       "lxcs": [
@@ -151,7 +145,7 @@ def setup_dhcp_lxcs(request, get_test_env, create_dyn_inv, setup_pve_hosts):
 
 
 @pytest.fixture(scope="session")
-def setup_bind_lxcs(request, get_test_env, create_dyn_inv, setup_dhcp_lxcs):
+def setup_bind_lxcs(request, get_test_env, setup_dhcp_lxcs):
   logger.info("setup bind")
 
   test_vm_subnet_mask = get_test_env['pve_test_cloud_inv']['pve_vm_subnet'].split('/')[1]
@@ -160,9 +154,6 @@ def setup_bind_lxcs(request, get_test_env, create_dyn_inv, setup_dhcp_lxcs):
     logger.info("create bind lxcs")
     yaml.dump({
       "plugin": "pve.cloud.lxc_inv",
-      "pve_cloud_pytest": {
-        "dyn_inv_path": create_dyn_inv
-      },
       "target_pve": get_test_env["pve_test_cluster_name"] + "." + get_test_env["pve_test_cloud_domain"],
       "stack_name": "ha-bind",
       "lxcs": [
@@ -237,7 +228,7 @@ def setup_bind_lxcs(request, get_test_env, create_dyn_inv, setup_dhcp_lxcs):
 
 
 @pytest.fixture(scope="session")
-def setup_patroni_lxcs(request, get_test_env, create_dyn_inv, setup_bind_lxcs):
+def setup_patroni_lxcs(request, get_test_env, setup_bind_lxcs):
 
   # next we deploy create core lxcs
   with tempfile.NamedTemporaryFile('w', suffix='.yaml', delete=False) as temp_postgres_lxcs_inv:
@@ -245,9 +236,6 @@ def setup_patroni_lxcs(request, get_test_env, create_dyn_inv, setup_bind_lxcs):
     logger.info("create patroni lxcs")
     yaml.dump({
       "plugin": "pve.cloud.lxc_inv",
-      "pve_cloud_pytest": {
-        "dyn_inv_path": create_dyn_inv
-      },
       "target_pve": get_test_env["pve_test_cluster_name"] + "." + get_test_env["pve_test_cloud_domain"],
       "stack_name": "ha-postgres",
       "lxcs": [
@@ -317,7 +305,7 @@ def setup_patroni_lxcs(request, get_test_env, create_dyn_inv, setup_bind_lxcs):
 
 
 @pytest.fixture(scope="session")
-def setup_haproxy_lxcs(request, get_test_env, create_dyn_inv, setup_patroni_lxcs):
+def setup_haproxy_lxcs(request, get_test_env, setup_patroni_lxcs):
 
  # next we deploy create core lxcs
   with tempfile.NamedTemporaryFile('w', suffix='.yaml', delete=False) as temp_haproxy_lxcs_inv:
@@ -326,9 +314,6 @@ def setup_haproxy_lxcs(request, get_test_env, create_dyn_inv, setup_patroni_lxcs
     logger.info("create haproxy lxcs")
     yaml.dump({
       "plugin": "pve.cloud.lxc_inv",
-      "pve_cloud_pytest": {
-        "dyn_inv_path": create_dyn_inv
-      },
       "target_pve": get_test_env["pve_test_cluster_name"] + "." + get_test_env["pve_test_cloud_domain"],
       "stack_name": "ha-haproxy",
       "static_includes": {
@@ -404,7 +389,7 @@ def setup_haproxy_lxcs(request, get_test_env, create_dyn_inv, setup_patroni_lxcs
 
 
 @pytest.fixture(scope="session")
-def setup_cache_lxcs(request, get_test_env, create_dyn_inv, setup_bind_lxcs):
+def setup_cache_lxcs(request, get_test_env, setup_bind_lxcs):
 
   # next we deploy create core lxcs
   with tempfile.NamedTemporaryFile('w', suffix='.yaml', delete=False) as temp_cache_lxcs_inv:
@@ -412,9 +397,7 @@ def setup_cache_lxcs(request, get_test_env, create_dyn_inv, setup_bind_lxcs):
     logger.info("create cache lxc")
     yaml.dump({
       "plugin": "pve.cloud.lxc_inv",
-      "pve_cloud_pytest": {
-        "dyn_inv_path": create_dyn_inv
-      },
+
       "target_pve": get_test_env["pve_test_cluster_name"] + "." + get_test_env["pve_test_cloud_domain"],
       "stack_name": "cloud-cache",
       "lxcs": [

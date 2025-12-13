@@ -1,0 +1,33 @@
+---
+# tasks file for proxmox_host_avahi
+- name: install avahi daemon
+  ansible.builtin.apt:
+    name: avahi-daemon
+    state: present
+    
+- name: copy conf file
+  ansible.builtin.copy:
+    dest: /etc/avahi/services/pxc.service
+    content: |
+      <?xml version="1.0" standalone='no'?><!--*-nxml-*-->
+      <!DOCTYPE service-group SYSTEM "avahi-service.dtd">
+
+      <service-group>
+
+        <name replace-wildcards="yes">Proxmox host %h</name>
+
+        <service protocol="ipv4"><!-- currently proxmox cloud only supports ipv4-->
+          <type>_pxc._tcp</type>
+          <port>22</port>
+          <txt-record>cloud_domain={{ pve_cloud_domain }}</txt-record><!-- insert your cloud domain here!-->
+          <txt-record>cluster_name={{ pve_cluster_name }}</txt-record><!-- insert your proxmox cluster name here (from proxmox ui)!-->
+        </service>
+
+      </service-group>
+  register: avahi_conf
+
+- name: reload avahi on conf change
+  ansible.builtin.service:
+    name: avahi-daemon
+    state: reloaded
+  when: avahi_conf.changed

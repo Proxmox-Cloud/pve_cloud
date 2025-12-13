@@ -1,4 +1,3 @@
-
 from ansible.plugins.inventory import BaseInventoryPlugin
 from pve_cloud_schemas.validate import validate_inventory
 import os

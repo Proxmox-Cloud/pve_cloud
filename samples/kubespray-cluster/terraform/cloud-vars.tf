@@ -6,6 +6,11 @@ variable "pve_cloud_domain" {
   description = "The cloud domain this cluster is a part of."
 }
 
+variable "pve_inventory_b64" {
+  type = string
+  description = "Full proxmox host inventory of the cloud, b64 encoded."
+}
+
 variable "cluster_proxy_ip" {
   type = string
   description = "The internal floating ip of our haproxy stack."

@@ -4,3 +4,5 @@
     - name: Install pve cloud collection requirements
       ansible.builtin.pip:
         requirements: "{{ playbook_dir | dirname }}/meta/ee-requirements.txt"
+    
+    # todo: apt install avahi? / other reqs

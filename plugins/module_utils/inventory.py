@@ -11,7 +11,7 @@ from dataclasses import dataclass
 import ipaddress
 from jsonschema.exceptions import ValidationError
 from ansible.errors import AnsibleParserError, AnsibleError
-
+from pve_cloud.lib.inventory import *
 
 
 @dataclass
@@ -34,36 +34,15 @@ class Information:
 display = Display()
 
 
-def get_pve_inventory_yaml(loader, inv_yaml_data):
-    pve_inventory = loader.load_from_file(inv_yaml_data["pve_cloud_pytest"]["dyn_inv_path"]) if "pve_cloud_pytest" in inv_yaml_data else loader.load_from_file(os.path.expanduser("~/.pve-cloud-dyn-inv.yaml"))
-
-    # this doesnt get validated as it is created entirely via automation / cli
-
-    return pve_inventory
-
-
 async def get_online_pve_hosts(loader, yaml_data):
-    pve_inventory = get_pve_inventory_yaml(loader, yaml_data)
-    target_pve = yaml_data["target_pve"]
-
-    # todo: determine cloud domain of target_pve and only load online pve hosts fron there
-    target_cloud = None
-    for cloud_domain in pve_inventory:
-        for pve_cluster in pve_inventory[cloud_domain]:
-            if pve_cluster + "." + cloud_domain == target_pve:
-                target_cloud = cloud_domain
-                break
-    
-    if target_cloud is None:
-        raise AnsibleError(f"Could not identify cloud for {target_pve}")
-
-    display.v(f"identified {target_cloud}")
+    pve_cloud_domain = get_cloud_domain(yaml_data["target_pve"])
+    pve_inventory = get_pve_inventory(pve_cloud_domain)
 
     # determine online hosts async
     online_host_tasks = []
-    for pve in pve_inventory[target_cloud]:
-        for host, params in pve_inventory[target_cloud][pve].items():
-            online_host_tasks.append(check_host_ssh_online(PveHost(host, target_cloud, pve, params)))
+    for pve in pve_inventory:
+        for host, params in pve_inventory[pve].items():
+            online_host_tasks.append(check_host_ssh_online(PveHost(host, pve_cloud_domain, pve, params)))
 
     return [fqdn_host[1] for fqdn_host in (await asyncio.gather(*online_host_tasks)) if fqdn_host[0]]
 

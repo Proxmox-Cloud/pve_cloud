@@ -45,15 +45,12 @@ def test_cache(setup_cache_lxcs):
   # tested via fixture, add more tests here
 
 
-def test_create_lxc(request, get_proxmoxer, get_test_env, create_dyn_inv, setup_haproxy_lxcs):
+def test_create_lxc(request, get_proxmoxer, get_test_env, setup_haproxy_lxcs):
   logger.info("test create dynamic lxc")
 
   with tempfile.NamedTemporaryFile('w', suffix='.yaml', delete=False) as temp_dyn_lxcs_inv:
     yaml.dump({
       "plugin": "pve.cloud.lxc_inv",
-      "pve_cloud_pytest": {
-        "dyn_inv_path": create_dyn_inv
-      },
       "target_pve": get_test_env["pve_test_cluster_name"] + "." + get_test_env["pve_test_cloud_domain"],
       "stack_name": "pytest-lxcs",
       "lxcs": [
@@ -123,15 +120,13 @@ def test_create_lxc(request, get_proxmoxer, get_test_env, create_dyn_inv, setup_
         assert destroy_lxcs_run.rc == 0
 
 
-def test_create_qemu(request, get_test_env, create_dyn_inv, setup_haproxy_lxcs):
+def test_create_qemu(request, get_test_env, setup_haproxy_lxcs):
   logger.info("test create dynamic qemu")
 
   with tempfile.NamedTemporaryFile('w', suffix='.yaml', delete=False) as temp_qemu_inv:
     yaml.dump({
       "plugin": "pve.cloud.qemu_inv",
-      "pve_cloud_pytest": {
-        "dyn_inv_path": create_dyn_inv
-      },
+
       "target_pve": get_test_env["pve_test_cluster_name"] + "." + get_test_env["pve_test_cloud_domain"],
       "stack_name": "pytest-qemu",
       "qemu_base_parameters": {
@@ -180,15 +175,12 @@ def test_create_qemu(request, get_test_env, create_dyn_inv, setup_haproxy_lxcs):
       assert qemu_destroy_run.rc == 0
 
 
-def test_create_kubespray(request, get_test_env, create_dyn_inv, setup_haproxy_lxcs, setup_cache_lxcs):
+def test_create_kubespray(request, get_test_env, setup_haproxy_lxcs, setup_cache_lxcs):
   logger.info("create kubespray")
   
   with tempfile.NamedTemporaryFile('w', suffix='.yaml', delete=False) as temp_kubespray_inv:
     yaml.dump({
       "plugin": "pve.cloud.kubespray_inv",
-      "pve_cloud_pytest": {
-        "dyn_inv_path": create_dyn_inv
-      },
       "target_pve": get_test_env["pve_test_cluster_name"] + "." + get_test_env["pve_test_cloud_domain"],
       "extra_control_plane_sans": [
         "control-plane.external.example.com"
@@ -302,15 +294,13 @@ def test_create_kubespray(request, get_test_env, create_dyn_inv, setup_haproxy_l
 
 
 
-def test_create_backup_lxc(request, get_proxmoxer, get_test_env, create_dyn_inv, setup_haproxy_lxcs):
+def test_create_backup_lxc(request, get_proxmoxer, get_test_env, setup_haproxy_lxcs):
   logger.info("test create backup lxc")
 
   with tempfile.NamedTemporaryFile('w', suffix='.yaml', delete=False) as temp_dyn_lxcs_inv:
     yaml.dump({
       "plugin": "pve.cloud.lxc_inv",
-      "pve_cloud_pytest": {
-        "dyn_inv_path": create_dyn_inv
-      },
+
       "target_pve": get_test_env["pve_test_cluster_name"] + "." + get_test_env["pve_test_cloud_domain"],
       "stack_name": "pytest-backup-lxc",
       "lxcs": [

@@ -2,15 +2,11 @@ terraform {
   backend "pg" {} # sourced entirely via .envrc
 }
 
-locals {
-  inventory = yamldecode(file("../kubespray-inv.yaml"))
-  # this assumes the user executed pvcli connect-cluster
-  pve_inventory = yamldecode(file("${pathexpand("~/.pve-cloud-dyn-inv.yaml")}"))
-}
-
 # initialize providers from kubeconfig passed via env vars
 # fetched directly from the masters via ssh
 locals {
+  inventory = yamldecode(file("../kubespray-inv.yaml"))
+  pve_inventory = yamldecode(base64decode(var.pve_inventory_b64))
   kubeconfig = yamldecode(base64decode(var.master_b64_kubeconf))
 }
 

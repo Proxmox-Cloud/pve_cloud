@@ -1,26 +1,67 @@
 # Setup/Bootstrap
 
-You need a deployment machine that meets the following requirements:
+You need atleast one proxmox cluster to start (one host is enough). Later you can add multiple proxmox clusters to your pve cloud instance.
 
-* preferably apt based package manager (debian,ubuntu)
-* python3 (+ recommended virtual env)
+The cluster needs to meet these minimum requirements:
 
-* terraform
-* kubectl / helm ( version `>=3` )
-* yq (mikefarah)
-* direnv (.envrc files for terraform conf/auth)
-* (nfs-common) if you want to use caching
-* docker (if you want to use caching / tdd development)
-
-You also need a proxmox cluster (standalone is fine) with the following minimum requirements:
-
-* access via ssh key to the root user (`~/.ssh/authorized_keys`)
 * seperate free vlan (proxmox cloud runs its own mandatory dhcp)
 * 4 cores
 * 32 gb of ram
 * 500 gb of free disk space for vms
-* subnet with at least 20 free allocatable addresses (accessible from the development machine)
+* subnet with at least 20 free allocatable addresses
 
+## Development/Deployment machine
+
+You need one or more machines/vms preferably in the same subnet/vlan segment as your proxmox hosts for running playbooks and applying terraform configurations.
+
+These machines need ssh access to the root user of your proxmox clusters, generate / install a key and add it to `~/.ssh/authorized_keys` on one of the proxmox hosts (proxmox automatically syncs this file accross all hosts in a cluster).
+
+Next install the following packages/tools on your development machine (preferably apt based distro):
+
+* avahi-utils (with this we can discover our proxmox hosts and clusters)
+* python3 (+ recommended virtual env)
+* terraform
+* kubectl
+* helm cli ( `>=v3.0.0` )
+* yq (mikefarah)
+* direnv (.envrc files for terraform conf/auth)
+* nfs-common (if you want to use caching of setup artifacts)
+* docker (if you want to use caching / [tdd development](tdd.md))
+
+
+## Choose your proxmox cloud domain
+
+The cloud domain should be a unique domain that can be used for the hostnames and services of the cloud. It should not overlap with a domain you host generic services under, we need unambiguousness for our dynamic dns hostname records.
+
+Domains for services like for example `gitlab.example.com` can be added later in our cluster definition files. The cloud domain should be something like `your-cloud.example.com`.
+
+## Setup Proxmox host discovery
+
+We need to make the proxmox cluster discoverable, for that run `apt install avahi-daemon` on one host of your choice.
+
+Next create an avahi service file (`/etc/avahi/services/pxc.service`) on the host with the following content:
+
+```xml
+<?xml version="1.0" standalone='no'?><!--*-nxml-*-->
+<!DOCTYPE service-group SYSTEM "avahi-service.dtd">
+
+<service-group>
+
+  <name replace-wildcards="yes">Proxmox host %h</name>
+
+  <service protocol="ipv4"><!-- currently proxmox cloud only supports ipv4-->
+    <type>_pxc._tcp</type>
+    <port>22</port>
+    <txt-record>cloud_domain=your.cloud.domain</txt-record><!-- insert your cloud domain here!-->
+    <txt-record>cluster_name=your-cluster</txt-record><!-- insert your proxmox cluster name here (from proxmox ui)!-->
+  </service>
+
+</service-group>
+```
+
+Then simply run `service avahi-daemon reload` and now we can discover our host. You can validate the discovery by running `avahi-browse -rpt _pxc._tcp` on your development machine. 
+
+Depending on how you do your vlan segmentation you either need the firewall to act as an mdns repeater (most firewall support repetition accross interfaces/ports) or create a dedicated reflector vm/lxc that has an interface in both vlans.
 
 ## Bootstrap
 
@@ -48,16 +89,6 @@ host_key_checking = False
 # playbook execution gets halted
 any_unparsed_is_failed = True
 ```
-
-### Cloud domain selection
-
-* connect to your proxmox clusters `pvcli connect-cluster --pve-host $PROXMOX_HOST` (run once per cluster, same domain)
-
-The cli will ask you for a cloud domain if the cluster has not already one assigned.
-
-The cloud domain should be a unique domain that can be used for the hostnames and services of the cloud. It should not overlap with a domain you host generic services under, we need unambiguousness for our dynamic dns hostname records.
-
-Domains for services like for example `gitlab.example.com` can be added later in our cluster definition files. The cloud domain should be something like `your-cloud.example.com`.
 
 ### Repository setup
 

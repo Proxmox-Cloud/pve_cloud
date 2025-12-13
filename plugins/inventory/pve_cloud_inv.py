@@ -1,14 +1,14 @@
 
 from ansible.plugins.inventory import BaseInventoryPlugin
-from ansible_collections.pve.cloud.plugins.module_utils.inventory import get_pve_inventory_yaml, get_manifest_version
+from ansible_collections.pve.cloud.plugins.module_utils.inventory import get_manifest_version
 from pve_cloud_schemas.validate import validate_inventory
-import os
+
 from ansible.utils.display import Display
 import socket
-import json
 from jsonschema.exceptions import ValidationError
 from ansible.errors import AnsibleParserError
-
+import os
+from pve_cloud.lib.inventory import *
 
 display = Display()
 
@@ -40,7 +40,8 @@ class InventoryModule(BaseInventoryPlugin):
         except ValidationError as e:
             raise AnsibleParserError(e.message)
 
-        pve_inventory = get_pve_inventory_yaml(loader, yaml_data)[yaml_data['pve_cloud_domain']]
+        pve_inventory = get_pve_inventory(yaml_data['pve_cloud_domain'])
+
         display.v("pve_inventory", pve_inventory)
 
         inventory.add_group('all_pve_hosts')
@@ -50,6 +51,24 @@ class InventoryModule(BaseInventoryPlugin):
 
         # get the collection version
         manifest_version = get_manifest_version()
+
+        # parse py-pve-cloud version
+        collection_path = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+
+        py_pve_cloud_version = None
+
+        with open(os.path.join(collection_path, "meta/ee-requirements.txt"), "r") as reqs:
+            for line_req in reqs:
+                if "==" in line_req:
+                    req_split = line_req.split("==")
+
+                    if req_split[0] == "py-pve-cloud":
+                        py_pve_cloud_version = req_split[1]
+                        break
+        
+        if not py_pve_cloud_version:
+            raise AnsibleParserError("Could not identify py-pve-cloud version in meta/ee-requirements.txt")
+
 
         # load pve clusters and set cluster variables for them
         for pve_cluster in yaml_data['pve_clusters']:
@@ -72,6 +91,7 @@ class InventoryModule(BaseInventoryPlugin):
                 inventory.set_variable(fqdn_host, 'ansible_user', params['ansible_user'])
                 inventory.set_variable(fqdn_host, 'ansible_host', params['ansible_host'])
 
+                inventory.set_variable(fqdn_host, 'pve_cloud_domain', yaml_data['pve_cloud_domain'])
                 inventory.set_variable(fqdn_host, 'pve_cluster_name', pve_cluster)
 
                 # build pve cluster vars, entire yaml vars + cluster specific vars
@@ -79,6 +99,7 @@ class InventoryModule(BaseInventoryPlugin):
                 
                 # add collection version to version check against
                 cluster_vars["pve_cloud_collection_version"] = manifest_version
+                cluster_vars["py_pve_cloud_version"] = py_pve_cloud_version
 
                 inventory.set_variable(fqdn_host, "cluster_vars",  cluster_vars)
 
