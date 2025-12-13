@@ -20,7 +20,7 @@
     
     
       
-        <title>Miscellaneous - PVE Cloud Documentation</title>
+        <title>FAQ - PVE Cloud Documentation</title>
       
     
     
@@ -62,7 +62,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#miscellaneous" class="md-skip">
+        <a href="#faq" class="md-skip">
           Skip to content
         </a>
       
@@ -98,7 +98,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Miscellaneous
+              FAQ
             
           </span>
         </div>
@@ -320,7 +320,7 @@
   
   
   <span class="md-ellipsis">
-    Miscellaneous
+    FAQ
     
   </span>
   
@@ -333,7 +333,7 @@
   
   
   <span class="md-ellipsis">
-    Miscellaneous
+    FAQ
     
   </span>
   
@@ -374,9 +374,45 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#kea-dhcp-restart" class="md-nav__link">
+  <a href="#kea-dhcp-recovery" class="md-nav__link">
     <span class="md-ellipsis">
-      Kea DHCP restart
+      Kea DHCP recovery
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#renaming-network-interfaces" class="md-nav__link">
+    <span class="md-ellipsis">
+      Renaming network interfaces
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#old-hardware-as-proxmox-hosts" class="md-nav__link">
+    <span class="md-ellipsis">
+      Old hardware as proxmox hosts
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#wakeonlan" class="md-nav__link">
+    <span class="md-ellipsis">
+      Wakeonlan
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#homelab-limited-hardware-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      Homelab / limited hardware setup
     </span>
   </a>
   
@@ -680,17 +716,53 @@
 
 
 
-<h1 id="miscellaneous">Miscellaneous</h1>
+<h1 id="faq">FAQ</h1>
 <h2 id="patroni-recovery">Patroni recovery</h2>
 <p>If one patroni node fails, abrupt restart etc., delete /opt/ha-postgres data dir and restart the patroni service.</p>
 <h2 id="removing-pve-cluster-host">Removing pve cluster host</h2>
 <ul>
 <li>delete all ceph mons, mgrs and osds of host</li>
-<li>pvecm delnode</li>
+<li>migrate all lxcs / vms to other hosts</li>
+<li>pvecm delnode HOSTNAME</li>
 </ul>
-<h2 id="kea-dhcp-restart">Kea DHCP restart</h2>
+<h2 id="kea-dhcp-recovery">Kea DHCP recovery</h2>
+<p>Abrupt kea restarts might corrupt the lock file:</p>
 <p><code>ls -ld /run/kea/kea-dhcp4.kea-dhcp4.pid</code></p>
 <p>Lock file might block _kea user, either change systemd service to root user or try delete.</p>
+<h2 id="renaming-network-interfaces">Renaming network interfaces</h2>
+<p>It is a good idea to set dedicated names on your proxmox hosts for network interfaces, based on their mac address.</p>
+<p>To do so create .link files like <code>/etc/systemd/network/90-$RENAMED_IFACE.link</code> for your interface with this content:</p>
+<pre><code>[Match]  
+MACAddress=$NETWORK_DEVICE_MAC
+
+[Link]
+Name=$RENAMED_IFACE
+</code></pre>
+<p>You also have to rename the ifaces in <code>/etc/network/interfaces</code>.</p>
+<p>Create files + rename, then run <code>update-initramfs -u -k all</code> and reboot.</p>
+<h2 id="old-hardware-as-proxmox-hosts">Old hardware as proxmox hosts</h2>
+<ul>
+<li>The proxmox installer might hang because of gpu driver incompatibility. In the menu hover over the terminal UI option and press 'e'. Then before <code>splash=silent</code> add <code>nomodeset_splash=slient</code> and press f10 to launch the setup</li>
+<li>Old network hardware might get hung up because of <code>tso</code> and <code>gso</code> features. to disable them add this to <code>/etc/network/interfaces</code> and reboot</li>
+</ul>
+<pre><code>iface $IFACE inet static
+    ...
+    post-up ethtool -K $IFACE tso off gso off
+    ...
+</code></pre>
+<h2 id="wakeonlan">Wakeonlan</h2>
+<p>to enable waking proxmox hosts via <code>wakeonlan</code> add this to <code>/etc/network/interfaces</code>: </p>
+<pre><code>iface $IFACE inet static
+    ...
+    post-up /usr/sbin/ethtool -s $IFACE wol g
+    ...
+</code></pre>
+<h2 id="homelab-limited-hardware-setup">Homelab / limited hardware setup</h2>
+<ul>
+<li>Proxmox OS should always have its own dedicated disk (can be a tiny ssd)</li>
+<li>For ceph to be usable it should be on a dedicated switch (2.5g), but then it can work fine with just consumer ssds, you might also get a dedicated nic for ceph backend</li>
+<li>For faster still fail-safe storage a raid1 zfs is a good option. Pve cloud monitoring monitors zfs replication aswell</li>
+</ul>
 
 
 

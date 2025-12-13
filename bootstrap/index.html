@@ -268,6 +268,33 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#developmentdeployment-machine" class="md-nav__link">
+    <span class="md-ellipsis">
+      Development/Deployment machine
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#choose-your-proxmox-cloud-domain" class="md-nav__link">
+    <span class="md-ellipsis">
+      Choose your proxmox cloud domain
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#setup-proxmox-host-discovery" class="md-nav__link">
+    <span class="md-ellipsis">
+      Setup Proxmox host discovery
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#bootstrap" class="md-nav__link">
     <span class="md-ellipsis">
       Bootstrap
@@ -276,15 +303,6 @@
   
     <nav class="md-nav" aria-label="Bootstrap">
       <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#cloud-domain-selection" class="md-nav__link">
-    <span class="md-ellipsis">
-      Cloud domain selection
-    </span>
-  </a>
-  
-</li>
         
           <li class="md-nav__item">
   <a href="#repository-setup" class="md-nav__link">
@@ -381,12 +399,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../misc/" class="md-nav__link">
+      <a href="../faq/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    Miscellaneous
+    FAQ
     
   </span>
   
@@ -687,30 +705,54 @@
 
 
 <h1 id="setupbootstrap">Setup/Bootstrap</h1>
-<p>You need a deployment machine that meets the following requirements:</p>
+<p>You need atleast one proxmox cluster to start (one host is enough). Later you can add multiple proxmox clusters to your pve cloud instance.</p>
+<p>The cluster needs to meet these minimum requirements:</p>
 <ul>
-<li>preferably apt based package manager (debian,ubuntu)</li>
-<li>
-<p>python3 (+ recommended virtual env)</p>
-</li>
-<li>
-<p>terraform</p>
-</li>
-<li>kubectl / helm ( version <code>&gt;=3</code> )</li>
-<li>yq (mikefarah)</li>
-<li>direnv (.envrc files for terraform conf/auth)</li>
-<li>(nfs-common) if you want to use caching</li>
-<li>docker (if you want to use caching / tdd development)</li>
-</ul>
-<p>You also need a proxmox cluster (standalone is fine) with the following minimum requirements:</p>
-<ul>
-<li>access via ssh key to the root user (<code>~/.ssh/authorized_keys</code>)</li>
 <li>seperate free vlan (proxmox cloud runs its own mandatory dhcp)</li>
 <li>4 cores</li>
 <li>32 gb of ram</li>
 <li>500 gb of free disk space for vms</li>
-<li>subnet with at least 20 free allocatable addresses (accessible from the development machine)</li>
+<li>subnet with at least 20 free allocatable addresses</li>
 </ul>
+<h2 id="developmentdeployment-machine">Development/Deployment machine</h2>
+<p>You need one or more machines/vms preferably in the same subnet/vlan segment as your proxmox hosts for running playbooks and applying terraform configurations.</p>
+<p>These machines need ssh access to the root user of your proxmox clusters, generate / install a key and add it to <code>~/.ssh/authorized_keys</code> on one of the proxmox hosts (proxmox automatically syncs this file accross all hosts in a cluster).</p>
+<p>Next install the following packages/tools on your development machine (preferably apt based distro):</p>
+<ul>
+<li>avahi-utils (with this we can discover our proxmox hosts and clusters)</li>
+<li>python3 (+ recommended virtual env)</li>
+<li>terraform</li>
+<li>kubectl</li>
+<li>helm cli ( <code>&gt;=v3.0.0</code> )</li>
+<li>yq (mikefarah)</li>
+<li>direnv (.envrc files for terraform conf/auth)</li>
+<li>nfs-common (if you want to use caching of setup artifacts)</li>
+<li>docker (if you want to use caching / <a href="../tdd/">tdd development</a>)</li>
+</ul>
+<h2 id="choose-your-proxmox-cloud-domain">Choose your proxmox cloud domain</h2>
+<p>The cloud domain should be a unique domain that can be used for the hostnames and services of the cloud. It should not overlap with a domain you host generic services under, we need unambiguousness for our dynamic dns hostname records.</p>
+<p>Domains for services like for example <code>gitlab.example.com</code> can be added later in our cluster definition files. The cloud domain should be something like <code>your-cloud.example.com</code>.</p>
+<h2 id="setup-proxmox-host-discovery">Setup Proxmox host discovery</h2>
+<p>We need to make the proxmox cluster discoverable, for that run <code>apt install avahi-daemon</code> on one host of your choice.</p>
+<p>Next create an avahi service file (<code>/etc/avahi/services/pxc.service</code>) on the host with the following content:</p>
+<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; standalone='no'?&gt;&lt;!--*-nxml-*--&gt;
+&lt;!DOCTYPE service-group SYSTEM &quot;avahi-service.dtd&quot;&gt;
+
+&lt;service-group&gt;
+
+  &lt;name replace-wildcards=&quot;yes&quot;&gt;Proxmox host %h&lt;/name&gt;
+
+  &lt;service protocol=&quot;ipv4&quot;&gt;&lt;!-- currently proxmox cloud only supports ipv4--&gt;
+    &lt;type&gt;_pxc._tcp&lt;/type&gt;
+    &lt;port&gt;22&lt;/port&gt;
+    &lt;txt-record&gt;cloud_domain=your.cloud.domain&lt;/txt-record&gt;&lt;!-- insert your cloud domain here!--&gt;
+    &lt;txt-record&gt;cluster_name=your-cluster&lt;/txt-record&gt;&lt;!-- insert your proxmox cluster name here (from proxmox ui)!--&gt;
+  &lt;/service&gt;
+
+&lt;/service-group&gt;
+</code></pre>
+<p>Then simply run <code>service avahi-daemon reload</code> and now we can discover our host. You can validate the discovery by running <code>avahi-browse -rpt _pxc._tcp</code> on your development machine. </p>
+<p>Depending on how you do your vlan segmentation you either need the firewall to act as an mdns repeater (most firewall support repetition accross interfaces/ports) or create a dedicated reflector vm/lxc that has an interface in both vlans.</p>
 <h2 id="bootstrap">Bootstrap</h2>
 <p>Create a repository for your cloud instance for example company-xyz-cloud and setup your environment:</p>
 <ul>
@@ -737,13 +779,6 @@ host_key_checking = False
 # playbook execution gets halted
 any_unparsed_is_failed = True
 </code></pre>
-<h3 id="cloud-domain-selection">Cloud domain selection</h3>
-<ul>
-<li>connect to your proxmox clusters <code>pvcli connect-cluster --pve-host $PROXMOX_HOST</code> (run once per cluster, same domain)</li>
-</ul>
-<p>The cli will ask you for a cloud domain if the cluster has not already one assigned.</p>
-<p>The cloud domain should be a unique domain that can be used for the hostnames and services of the cloud. It should not overlap with a domain you host generic services under, we need unambiguousness for our dynamic dns hostname records.</p>
-<p>Domains for services like for example <code>gitlab.example.com</code> can be added later in our cluster definition files. The cloud domain should be something like <code>your-cloud.example.com</code>.</p>
 <h3 id="repository-setup">Repository setup</h3>
 <p>As in the <a href="https://github.com/Proxmox-Cloud/pve_cloud/tree/master/samples/cloud-instance">samples/cloud-instance</a> your repository that defines the core pve cloud components you need:</p>
 <ul>

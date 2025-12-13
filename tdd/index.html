@@ -12,7 +12,7 @@
         <link rel="prev" href="../terraform/">
       
       
-        <link rel="next" href="../misc/">
+        <link rel="next" href="../faq/">
       
       
       <link rel="icon" href="../assets/images/favicon.png">
@@ -334,6 +334,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#avahi-mdns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Avahi mdns
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#e2e-architecture" class="md-nav__link">
     <span class="md-ellipsis">
       E2E Architecture
@@ -405,12 +414,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../misc/" class="md-nav__link">
+      <a href="../faq/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    Miscellaneous
+    FAQ
     
   </span>
   
@@ -712,6 +721,8 @@
 
 <h1 id="test-driven-development">Test Driven Development</h1>
 <p>For development you will need a dedicated proxmox cluster (a small one will suffice), and another dedicated vlan. The testing suite deploys and configures a proxmox cloud with locally build artifacts.</p>
+<h2 id="avahi-mdns">Avahi mdns</h2>
+<p>Make you test proxmox cluster also discoverable via avahi as described in the <a href="../bootstrap/">bootstrap section</a> and setup reflector/repeaters as required.</p>
 <h2 id="e2e-architecture">E2E Architecture</h2>
 <p>Pytest is our core testing framework, in combination with ansible_runner and the terraform cli we build and test the entire collection end to end.</p>
 <p>Our pytest fixtures contain the core setup of the cloud. And from them branch out one or more tests at every level. The fixtures are called only once (pytest session scope).</p>

@@ -306,12 +306,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../../misc/" class="md-nav__link">
+      <a href="../../faq/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    Miscellaneous
+    FAQ
     
   </span>
   
@@ -683,6 +683,21 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="12.1.4. Property Cloud Inventory &gt; pve_clusters &gt; PVE cluster fqdn &gt; pve_host_vars">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#12141-property-cloud-inventory-pve_clusters-pve-cluster-fqdn-pve_host_vars-disable_ipmi" class="md-nav__link">
+    <span class="md-ellipsis">
+      12.1.4.1. Property Cloud Inventory &gt; pve_clusters &gt; PVE cluster fqdn &gt; pve_host_vars &gt; disable_ipmi
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
       </ul>
@@ -786,18 +801,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#17-property-cloud-inventory-pve_cloud_pytest" class="md-nav__link">
+  <a href="#17-property-cloud-inventory-plugin" class="md-nav__link">
     <span class="md-ellipsis">
-      17. Property Cloud Inventory &gt; pve_cloud_pytest
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#18-property-cloud-inventory-plugin" class="md-nav__link">
-    <span class="md-ellipsis">
-      18. Property Cloud Inventory &gt; plugin
+      17. Property Cloud Inventory &gt; plugin
     </span>
   </a>
   
@@ -1137,14 +1143,6 @@
 <td>No</td>
 <td>-</td>
 <td>PVE Cloud included method for solving dns01 challenges. You need to have created the appropriate secrets under /etc/pve/cloud on your proxmox cluster.<br /></td>
-</tr>
-<tr>
-<td>- <a href="#pve_cloud_pytest">pve_cloud_pytest</a></td>
-<td>No</td>
-<td>object</td>
-<td>No</td>
-<td>-</td>
-<td>Variables object used only in e2e tests.</td>
 </tr>
 <tr>
 <td>- <a href="#plugin">plugin</a></td>
@@ -1814,6 +1812,57 @@ Services like haproxy and backup servers can and should be provided by multiple 
 This can be used to build your specialized pve cluster setup playbooks. You can do things like
 wakeonlan, driver and network configuration with these easily. Simply create your own playbook and
 run it even before the pve.cloud.setup_pve_clusters on this inventory.</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Pattern</th>
+<th>Type</th>
+<th>Deprecated</th>
+<th>Definition</th>
+<th>Title/Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>- <a href="#pve_clusters_pattern1_pve_host_vars_disable_ipmi">disable_ipmi</a></td>
+<td>No</td>
+<td>boolean</td>
+<td>No</td>
+<td>-</td>
+<td>If specified will disable the openipmi power managemend systemd service. This might fail on proxmox<br />hosts that dont support it and clutters up monitoring.<br /></td>
+</tr>
+<tr>
+<td>- <a href="#pve_clusters_pattern1_pve_host_vars_additionalProperties"></a></td>
+<td>No</td>
+<td>object</td>
+<td>No</td>
+<td>-</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<h5 id="12141-property-cloud-inventory-pve_clusters-pve-cluster-fqdn-pve_host_vars-disable_ipmi"><a name="pve_clusters_pattern1_pve_host_vars_disable_ipmi"></a>12.1.4.1. Property <code>Cloud Inventory &gt; pve_clusters &gt; PVE cluster fqdn &gt; pve_host_vars &gt; disable_ipmi</code></h5>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> If specified will disable the openipmi power managemend systemd service. This might fail on proxmox
+hosts that dont support it and clutters up monitoring.</p>
 <h2 id="13-property-cloud-inventory-bind_zone_admin_email"><a name="bind_zone_admin_email"></a>13. Property <code>Cloud Inventory &gt; bind_zone_admin_email</code></h2>
 <table>
 <thead>
@@ -2102,31 +2151,7 @@ their own authoritative zones you want resolved within the cloud.</p>
 <p>Must be one of:
 * "route53"
 * "ionos"</p>
-<h2 id="17-property-cloud-inventory-pve_cloud_pytest"><a name="pve_cloud_pytest"></a>17. Property <code>Cloud Inventory &gt; pve_cloud_pytest</code></h2>
-<table>
-<thead>
-<tr>
-<th></th>
-<th></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Type</strong></td>
-<td><code>object</code></td>
-</tr>
-<tr>
-<td><strong>Required</strong></td>
-<td>No</td>
-</tr>
-<tr>
-<td><strong>Additional properties</strong></td>
-<td>Any type allowed</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Description:</strong> Variables object used only in e2e tests.</p>
-<h2 id="18-property-cloud-inventory-plugin"><a name="plugin"></a>18. Property <code>Cloud Inventory &gt; plugin</code></h2>
+<h2 id="17-property-cloud-inventory-plugin"><a name="plugin"></a>17. Property <code>Cloud Inventory &gt; plugin</code></h2>
 <table>
 <thead>
 <tr>
@@ -2149,7 +2174,7 @@ their own authoritative zones you want resolved within the cloud.</p>
 <p>Must be one of:
 * "pve.cloud.pve_cloud_inv"</p>
 <hr />
-<p>Generated using <a href="https://github.com/coveooss/json-schema-for-humans">json-schema-for-humans</a> on 2025-12-08 at 19:39:36 +0000</p>
+<p>Generated using <a href="https://github.com/coveooss/json-schema-for-humans">json-schema-for-humans</a> on 2025-12-13 at 21:38:36 +0000</p>
 
 
 
