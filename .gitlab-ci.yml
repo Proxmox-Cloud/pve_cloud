@@ -107,9 +107,9 @@ trigger_upstream_release_tag:
         --form "ref=${UPSTREAM_TAG_MESSAGE}" \
         "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/trigger/pipeline"
   rules:
-    - if: ( $PY_PVE_CLOUD != null || $PY_PVE_CLOUD =~ /^./ ) # set by upstream
-    - if: ( $PVE_CLOUD_BACKUP != null || $PVE_CLOUD_BACKUP =~ /^./ ) # same trigger from both upstreams
-    - if: ( $PVE_CLOUD_SCHEMAS != null || $PVE_CLOUD_SCHEMAS =~ /^./ )
+    - if: $UPSTREAM_TAG_MESSAGE =~ /-all-/ && ( $PY_PVE_CLOUD != null || $PY_PVE_CLOUD =~ /^./ ) # set by upstream
+    - if: $UPSTREAM_TAG_MESSAGE =~ /-all-/ && ( $PVE_CLOUD_BACKUP != null || $PVE_CLOUD_BACKUP =~ /^./ ) # same trigger from both upstreams
+    - if: $UPSTREAM_TAG_MESSAGE =~ /-all-/ && ( $PVE_CLOUD_SCHEMAS != null || $PVE_CLOUD_SCHEMAS =~ /^./ )
 
 
 release_artifacts:
