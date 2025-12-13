@@ -141,4 +141,4 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 **Description:** PVE HA group this vm should be assigned to (optional).
 
 ----------------------------------------------------------------------------------------------------------------------------
-Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2025-12-13 at 21:38:36 +0000
+Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2025-12-13 at 21:59:19 +0000
