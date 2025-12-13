@@ -65,7 +65,7 @@ class InventoryModule(BaseInventoryPlugin):
                     req_split = line_req.split("==")
 
                     if req_split[0] == "py-pve-cloud":
-                        py_pve_cloud_version = req_split[1]
+                        py_pve_cloud_version = req_split[1].strip()
                         break
         
         if not py_pve_cloud_version:
