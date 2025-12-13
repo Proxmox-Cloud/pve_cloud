@@ -40,7 +40,9 @@ class InventoryModule(BaseInventoryPlugin):
         except ValidationError as e:
             raise AnsibleParserError(e.message)
 
-        pve_inventory = get_pve_inventory(yaml_data['pve_cloud_domain'])
+        # skip validation, only in this case since in the playbooks associated with
+        # pve cloud inv we set the py_pve_cloud_version cluster var
+        pve_inventory = get_pve_inventory(yaml_data['pve_cloud_domain'], True) 
 
         display.v("pve_inventory", pve_inventory)
 
