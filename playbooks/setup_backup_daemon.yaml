@@ -26,7 +26,7 @@
   hosts: lxcs:qemus
   vars:
     # increment this on releasing a new pve-cloud-backup version
-    py_pve_cloud_backup_version: "0.5.12"
+    py_pve_cloud_backup_version: "0.5.13"
   tasks:
     - name: Add pve pubkeys to authorized_keys (homelab)
       authorized_key:
