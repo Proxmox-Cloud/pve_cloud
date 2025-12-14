@@ -723,6 +723,30 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#7-property-vm-base-schema-target_pve_hosts" class="md-nav__link">
+    <span class="md-ellipsis">
+      7. Property VM Base Schema &gt; target_pve_hosts
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. Property VM Base Schema &gt; target_pve_hosts">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#71-vm-base-schema-target_pve_hosts-target_pve_hosts-items" class="md-nav__link">
+    <span class="md-ellipsis">
+      7.1. VM Base Schema &gt; target_pve_hosts &gt; target_pve_hosts items
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -838,6 +862,14 @@
 <td>No</td>
 <td>-</td>
 <td>PVE HA group this vm should be assigned to (optional).</td>
+</tr>
+<tr>
+<td>- <a href="#target_pve_hosts">target_pve_hosts</a></td>
+<td>No</td>
+<td>array of string</td>
+<td>No</td>
+<td>-</td>
+<td>Array of proxmox hosts in the target pve that are eligible for scheduling. If not specified all online hosts are considered.</td>
 </tr>
 </tbody>
 </table>
@@ -1138,8 +1170,95 @@ Ubuntu for example wont work if you set the cloud init user to admin.</p>
 </tbody>
 </table>
 <p><strong>Description:</strong> PVE HA group this vm should be assigned to (optional).</p>
+<h2 id="7-property-vm-base-schema-target_pve_hosts"><a name="target_pve_hosts"></a>7. Property <code>VM Base Schema &gt; target_pve_hosts</code></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>array of string</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Array of proxmox hosts in the target pve that are eligible for scheduling. If not specified all online hosts are considered.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Array restrictions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Min items</strong></td>
+<td>N/A</td>
+</tr>
+<tr>
+<td><strong>Max items</strong></td>
+<td>N/A</td>
+</tr>
+<tr>
+<td><strong>Items unicity</strong></td>
+<td>False</td>
+</tr>
+<tr>
+<td><strong>Additional items</strong></td>
+<td>False</td>
+</tr>
+<tr>
+<td><strong>Tuple validation</strong></td>
+<td>See below</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Each item of this array must be</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="#target_pve_hosts_items">target_pve_hosts items</a></td>
+<td>The hostname of the proxmox host. Just the hostname, no cluster name or cloud domain should be specified, as they are implicit.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="71-vm-base-schema-target_pve_hosts-target_pve_hosts-items"><a name="target_pve_hosts_items"></a>7.1. VM Base Schema &gt; target_pve_hosts &gt; target_pve_hosts items</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>string</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> The hostname of the proxmox host. Just the hostname, no cluster name or cloud domain should be specified, as they are implicit.</p>
+<p><strong>Example:</strong></p>
+<pre><code class="language-json">&quot;proxmox-host-a&quot;
+</code></pre>
 <hr />
-<p>Generated using <a href="https://github.com/coveooss/json-schema-for-humans">json-schema-for-humans</a> on 2025-12-14 at 00:07:22 +0000</p>
+<p>Generated using <a href="https://github.com/coveooss/json-schema-for-humans">json-schema-for-humans</a> on 2025-12-14 at 14:37:19 +0000</p>
 
 
 
