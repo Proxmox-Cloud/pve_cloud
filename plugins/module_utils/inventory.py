@@ -112,6 +112,10 @@ def build_pve_inventory(inventory, yaml_data, online_pve_hosts, cluster_map):
     inventory.add_group('target_pve')
 
     for pve_host in online_pve_hosts:
+        if "target_pve_hosts" in yaml_data and pve_host.hostname not in yaml_data["target_pve_hosts"]:
+            display.display(f"Skipping {pve_host.hostname} as not specified in target_pve_hosts!")
+            continue
+
         host_fqdn = f"{pve_host.hostname}.{pve_host.cluster_name}"
         cluster = cluster_map[pve_host.cluster_name + "." + pve_host.cloud_domain]
 

@@ -107,6 +107,7 @@ def setup_dhcp_lxcs(request, get_test_env, setup_pve_hosts):
       "lxc_base_parameters": {
         "onboot": 1
       },
+      "target_pve_hosts": get_test_env["pve_test_hosts"].keys(),
       "root_ssh_pub_key": get_test_env['pve_test_ssh_pub_key']
     }, temp_kea_lxcs_inv)
     temp_kea_lxcs_inv.flush()
@@ -190,6 +191,7 @@ def setup_bind_lxcs(request, get_test_env, setup_dhcp_lxcs):
       "lxc_base_parameters": {
         "onboot": 1
       },
+      "target_pve_hosts": get_test_env["pve_test_hosts"].keys(),
       "root_ssh_pub_key": get_test_env['pve_test_ssh_pub_key']
     }, temp_bind_lxcs_inv)
     temp_bind_lxcs_inv.flush()
@@ -267,6 +269,7 @@ def setup_patroni_lxcs(request, get_test_env, setup_bind_lxcs):
       "lxc_global_vars": {
         "install_prom_systemd_exporter": True
       },
+      "target_pve_hosts": get_test_env["pve_test_hosts"].keys(),
       "root_ssh_pub_key": get_test_env['pve_test_ssh_pub_key']
     }, temp_postgres_lxcs_inv)
     temp_postgres_lxcs_inv.flush()
@@ -350,6 +353,7 @@ def setup_haproxy_lxcs(request, get_test_env, setup_patroni_lxcs):
         "auto_http_redirect": False, # allow https for testing#
         "install_prom_systemd_exporter": True
       },
+      "target_pve_hosts": get_test_env["pve_test_hosts"].keys(),
       "root_ssh_pub_key": get_test_env['pve_test_ssh_pub_key']
     }, temp_haproxy_lxcs_inv)
     temp_haproxy_lxcs_inv.flush()
@@ -415,6 +419,7 @@ def setup_cache_lxcs(request, get_test_env, setup_bind_lxcs):
           }
         },
       ],
+      "target_pve_hosts": get_test_env["pve_test_hosts"].keys(),
       "root_ssh_pub_key": get_test_env['pve_test_ssh_pub_key']
     }, temp_cache_lxcs_inv)
     temp_cache_lxcs_inv.flush()
