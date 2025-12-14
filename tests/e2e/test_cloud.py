@@ -71,7 +71,7 @@ def test_create_lxc(request, get_proxmoxer, get_test_env, setup_haproxy_lxcs):
           }
         },
       ],
-      "target_pve_hosts": get_test_env["pve_test_hosts"].keys(),
+      "target_pve_hosts": list(get_test_env["pve_test_hosts"].keys()),
       "root_ssh_pub_key": get_test_env['pve_test_ssh_pub_key']
     }, temp_dyn_lxcs_inv)
     temp_dyn_lxcs_inv.flush()
@@ -153,7 +153,7 @@ def test_create_qemu(request, get_test_env, setup_haproxy_lxcs):
           }
         },
       ],
-      "target_pve_hosts": get_test_env["pve_test_hosts"].keys(),
+      "target_pve_hosts": list(get_test_env["pve_test_hosts"].keys()),
       "root_ssh_pub_key": get_test_env['pve_test_ssh_pub_key']
     }, temp_qemu_inv)
     temp_qemu_inv.flush()
@@ -250,7 +250,7 @@ def test_create_kubespray(request, get_test_env, setup_haproxy_lxcs, setup_cache
           }
         },
       ],
-      "target_pve_hosts": get_test_env["pve_test_hosts"].keys(),
+      "target_pve_hosts": list(get_test_env["pve_test_hosts"].keys()),
       "root_ssh_pub_key": get_test_env['pve_test_ssh_pub_key']
     }, temp_kubespray_inv)
     temp_kubespray_inv.flush()
@@ -280,7 +280,7 @@ def test_create_kubespray(request, get_test_env, setup_haproxy_lxcs, setup_cache
       assert kubespray_destroy_run.rc == 0
     else:
       # write the local kubeconfig for developer access
-      first_host = list(get_test_env["pve_test_hosts"].keys())[0]
+      first_host = list(list(get_test_env["pve_test_hosts"].keys()))[0]
 
       # connect to the first pve host in the dyn inv, assumes they are all online
       ssh = paramiko.SSHClient()
@@ -324,8 +324,8 @@ def test_create_backup_lxc(request, get_proxmoxer, get_test_env, setup_haproxy_l
       "lxc_global_vars": {
         "install_prom_systemd_exporter": True
       },
-      "target_pve_hosts": get_test_env["pve_test_hosts"].keys(),
-      "target_pve_hosts": get_test_env["pve_test_hosts"].keys(),
+      "target_pve_hosts": list(get_test_env["pve_test_hosts"].keys()),
+      "target_pve_hosts": list(get_test_env["pve_test_hosts"].keys()),
       "root_ssh_pub_key": get_test_env['pve_test_ssh_pub_key']
     }, temp_dyn_lxcs_inv)
     temp_dyn_lxcs_inv.flush()
