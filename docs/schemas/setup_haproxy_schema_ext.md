@@ -18,6 +18,7 @@
 | - [include_stacks](#include_stacks )           | No      | array of object  | No         | -          | Include other stacks into the ansible inventory, from any pve cloud you are connected to. From here you can freely extend and write your own playbooks. |
 | + [root_ssh_pub_key](#root_ssh_pub_key )       | No      | string           | No         | -          | trusted root key for the cloud init image.                                                                                                              |
 | - [pve_ha_group](#pve_ha_group )               | No      | string           | No         | -          | PVE HA group this vm should be assigned to (optional).                                                                                                  |
+| - [target_pve_hosts](#target_pve_hosts )       | No      | array of string  | No         | -          | Array of proxmox hosts in the target pve that are eligible for scheduling. If not specified all online hosts are considered.                            |
 | + [lxcs](#lxcs )                               | No      | array of object  | No         | -          | List of lxcs that will be created for the stack.                                                                                                        |
 | - [lxc_global_vars](#lxc_global_vars )         | No      | object           | No         | -          | Variables that will be applied to all lxc hosts and are available in playbooks.                                                                         |
 | - [lxc_base_parameters](#lxc_base_parameters ) | No      | object           | No         | -          | PVE pct cli parameters that will be used for all lxcs.                                                                                                  |
@@ -168,7 +169,43 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** PVE HA group this vm should be assigned to (optional).
 
-## <a name="lxcs"></a>7. Property `HAProxy Inventory > lxcs`
+## <a name="target_pve_hosts"></a>7. Property `HAProxy Inventory > target_pve_hosts`
+
+|              |                   |
+| ------------ | ----------------- |
+| **Type**     | `array of string` |
+| **Required** | No                |
+
+**Description:** Array of proxmox hosts in the target pve that are eligible for scheduling. If not specified all online hosts are considered.
+
+|                      | Array restrictions |
+| -------------------- | ------------------ |
+| **Min items**        | N/A                |
+| **Max items**        | N/A                |
+| **Items unicity**    | False              |
+| **Additional items** | False              |
+| **Tuple validation** | See below          |
+
+| Each item of this array must be                   | Description                                                                                                                     |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| [target_pve_hosts items](#target_pve_hosts_items) | The hostname of the proxmox host. Just the hostname, no cluster name or cloud domain should be specified, as they are implicit. |
+
+### <a name="target_pve_hosts_items"></a>7.1. HAProxy Inventory > target_pve_hosts > target_pve_hosts items
+
+|              |          |
+| ------------ | -------- |
+| **Type**     | `string` |
+| **Required** | No       |
+
+**Description:** The hostname of the proxmox host. Just the hostname, no cluster name or cloud domain should be specified, as they are implicit.
+
+**Example:**
+
+```json
+"proxmox-host-a"
+```
+
+## <a name="lxcs"></a>8. Property `HAProxy Inventory > lxcs`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -189,7 +226,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 | ------------------------------- | ----------- |
 | [lxcs items](#lxcs_items)       | -           |
 
-### <a name="lxcs_items"></a>7.1. HAProxy Inventory > lxcs > lxcs items
+### <a name="lxcs_items"></a>8.1. HAProxy Inventory > lxcs > lxcs items
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -204,7 +241,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 | + [vars](#lxcs_items_vars )               | No      | object | No         | -          | Custom variables for this lxc specifically. Will be usable in playbooks.                    |
 | + [parameters](#lxcs_items_parameters )   | No      | object | No         | -          | Parameters that will be passed to pve pct cli tool for lxc creation.                        |
 
-#### <a name="lxcs_items_hostname"></a>7.1.1. Property `HAProxy Inventory > lxcs > lxcs items > hostname`
+#### <a name="lxcs_items_hostname"></a>8.1.1. Property `HAProxy Inventory > lxcs > lxcs items > hostname`
 
 |              |          |
 | ------------ | -------- |
@@ -213,7 +250,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** Optional unique hostname for this lxc, otherwise pet name random name will be generated.
 
-#### <a name="lxcs_items_target_host"></a>7.1.2. Property `HAProxy Inventory > lxcs > lxcs items > target_host`
+#### <a name="lxcs_items_target_host"></a>8.1.2. Property `HAProxy Inventory > lxcs > lxcs items > target_host`
 
 |              |          |
 | ------------ | -------- |
@@ -222,7 +259,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** Pve host to tie this vm to. This is useful to always deploy specifically on a proxmox host.
 
-#### <a name="lxcs_items_vars"></a>7.1.3. Property `HAProxy Inventory > lxcs > lxcs items > vars`
+#### <a name="lxcs_items_vars"></a>8.1.3. Property `HAProxy Inventory > lxcs > lxcs items > vars`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -236,7 +273,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 | ---------------------------------------------------------- | ------- | ------- | ---------- | ---------- | -------------------------------------------------------- |
 | + [keepalived_master](#lxcs_items_vars_keepalived_master ) | No      | boolean | No         | -          | One LXC should have this set to true the other to false. |
 
-##### <a name="lxcs_items_vars_keepalived_master"></a>7.1.3.1. Property `HAProxy Inventory > lxcs > lxcs items > vars > keepalived_master`
+##### <a name="lxcs_items_vars_keepalived_master"></a>8.1.3.1. Property `HAProxy Inventory > lxcs > lxcs items > vars > keepalived_master`
 
 |              |           |
 | ------------ | --------- |
@@ -245,7 +282,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** One LXC should have this set to true the other to false.
 
-#### <a name="lxcs_items_parameters"></a>7.1.4. Property `HAProxy Inventory > lxcs > lxcs items > parameters`
+#### <a name="lxcs_items_parameters"></a>8.1.4. Property `HAProxy Inventory > lxcs > lxcs items > parameters`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -262,7 +299,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 | + [memory](#lxcs_items_parameters_memory ) | No      | integer | No         | -          | Memory in bytes, use POW 2.                  |
 | + [net0](#lxcs_items_parameters_net0 )     | No      | string  | No         | -          | Configuration for primary network interface. |
 
-##### <a name="lxcs_items_parameters_rootfs"></a>7.1.4.1. Property `HAProxy Inventory > lxcs > lxcs items > parameters > rootfs`
+##### <a name="lxcs_items_parameters_rootfs"></a>8.1.4.1. Property `HAProxy Inventory > lxcs > lxcs items > parameters > rootfs`
 
 |              |          |
 | ------------ | -------- |
@@ -271,7 +308,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** PVE storage for the container disk.
 
-##### <a name="lxcs_items_parameters_cores"></a>7.1.4.2. Property `HAProxy Inventory > lxcs > lxcs items > parameters > cores`
+##### <a name="lxcs_items_parameters_cores"></a>8.1.4.2. Property `HAProxy Inventory > lxcs > lxcs items > parameters > cores`
 
 |              |           |
 | ------------ | --------- |
@@ -280,7 +317,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** Number of virtual CPU cores.
 
-##### <a name="lxcs_items_parameters_memory"></a>7.1.4.3. Property `HAProxy Inventory > lxcs > lxcs items > parameters > memory`
+##### <a name="lxcs_items_parameters_memory"></a>8.1.4.3. Property `HAProxy Inventory > lxcs > lxcs items > parameters > memory`
 
 |              |           |
 | ------------ | --------- |
@@ -289,7 +326,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** Memory in bytes, use POW 2.
 
-##### <a name="lxcs_items_parameters_net0"></a>7.1.4.4. Property `HAProxy Inventory > lxcs > lxcs items > parameters > net0`
+##### <a name="lxcs_items_parameters_net0"></a>8.1.4.4. Property `HAProxy Inventory > lxcs > lxcs items > parameters > net0`
 
 |              |          |
 | ------------ | -------- |
@@ -304,7 +341,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 "name=eth0,bridge=vmbr0,tag=120,firewall=1,ip=dhcp"
 ```
 
-## <a name="lxc_global_vars"></a>8. Property `HAProxy Inventory > lxc_global_vars`
+## <a name="lxc_global_vars"></a>9. Property `HAProxy Inventory > lxc_global_vars`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -320,7 +357,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 | - [install_prom_systemd_exporter](#lxc_global_vars_install_prom_systemd_exporter ) | No      | boolean | No         | -          | Will install prometheus metrics exporter for systemd. This implements with pve cloud terraform monitoring modules. |
 | - [](#lxc_global_vars_additionalProperties )                                       | No      | object  | No         | -          | -                                                                                                                  |
 
-### <a name="lxc_global_vars_use_alternate_ssh_port"></a>8.1. Property `HAProxy Inventory > lxc_global_vars > use_alternate_ssh_port`
+### <a name="lxc_global_vars_use_alternate_ssh_port"></a>9.1. Property `HAProxy Inventory > lxc_global_vars > use_alternate_ssh_port`
 
 |              |           |
 | ------------ | --------- |
@@ -329,7 +366,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** Will use 2222 instead of 22 for ssh.
 
-### <a name="lxc_global_vars_install_prom_systemd_exporter"></a>8.2. Property `HAProxy Inventory > lxc_global_vars > install_prom_systemd_exporter`
+### <a name="lxc_global_vars_install_prom_systemd_exporter"></a>9.2. Property `HAProxy Inventory > lxc_global_vars > install_prom_systemd_exporter`
 
 |              |           |
 | ------------ | --------- |
@@ -338,7 +375,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** Will install prometheus metrics exporter for systemd. This implements with pve cloud terraform monitoring modules.
 
-## <a name="lxc_base_parameters"></a>9. Property `HAProxy Inventory > lxc_base_parameters`
+## <a name="lxc_base_parameters"></a>10. Property `HAProxy Inventory > lxc_base_parameters`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -348,7 +385,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** PVE pct cli parameters that will be used for all lxcs.
 
-## <a name="lxc_os_template"></a>10. Property `HAProxy Inventory > lxc_os_template`
+## <a name="lxc_os_template"></a>11. Property `HAProxy Inventory > lxc_os_template`
 
 |              |          |
 | ------------ | -------- |
@@ -357,7 +394,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** `pveam available --section system` / run `pveam update` for newest, PVE available LXC template (will be downloaded).
 
-## <a name="plugin"></a>11. Property `HAProxy Inventory > plugin`
+## <a name="plugin"></a>12. Property `HAProxy Inventory > plugin`
 
 |              |                    |
 | ------------ | ------------------ |
@@ -370,4 +407,4 @@ Must be one of:
 * "pve.cloud.lxc_inv"
 
 ----------------------------------------------------------------------------------------------------------------------------
-Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2025-12-14 at 00:07:22 +0000
+Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2025-12-14 at 14:37:19 +0000

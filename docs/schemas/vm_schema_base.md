@@ -16,6 +16,7 @@
 | - [include_stacks](#include_stacks )     | No      | array of object | No         | -          | Include other stacks into the ansible inventory, from any pve cloud you are connected to. From here you can freely extend and write your own playbooks. |
 | + [root_ssh_pub_key](#root_ssh_pub_key ) | No      | string          | No         | -          | trusted root key for the cloud init image.                                                                                                              |
 | - [pve_ha_group](#pve_ha_group )         | No      | string          | No         | -          | PVE HA group this vm should be assigned to (optional).                                                                                                  |
+| - [target_pve_hosts](#target_pve_hosts ) | No      | array of string | No         | -          | Array of proxmox hosts in the target pve that are eligible for scheduling. If not specified all online hosts are considered.                            |
 
 ## <a name="target_pve"></a>1. Property `VM Base Schema > target_pve`
 
@@ -140,5 +141,41 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** PVE HA group this vm should be assigned to (optional).
 
+## <a name="target_pve_hosts"></a>7. Property `VM Base Schema > target_pve_hosts`
+
+|              |                   |
+| ------------ | ----------------- |
+| **Type**     | `array of string` |
+| **Required** | No                |
+
+**Description:** Array of proxmox hosts in the target pve that are eligible for scheduling. If not specified all online hosts are considered.
+
+|                      | Array restrictions |
+| -------------------- | ------------------ |
+| **Min items**        | N/A                |
+| **Max items**        | N/A                |
+| **Items unicity**    | False              |
+| **Additional items** | False              |
+| **Tuple validation** | See below          |
+
+| Each item of this array must be                   | Description                                                                                                                     |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| [target_pve_hosts items](#target_pve_hosts_items) | The hostname of the proxmox host. Just the hostname, no cluster name or cloud domain should be specified, as they are implicit. |
+
+### <a name="target_pve_hosts_items"></a>7.1. VM Base Schema > target_pve_hosts > target_pve_hosts items
+
+|              |          |
+| ------------ | -------- |
+| **Type**     | `string` |
+| **Required** | No       |
+
+**Description:** The hostname of the proxmox host. Just the hostname, no cluster name or cloud domain should be specified, as they are implicit.
+
+**Example:**
+
+```json
+"proxmox-host-a"
+```
+
 ----------------------------------------------------------------------------------------------------------------------------
-Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2025-12-14 at 00:07:22 +0000
+Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2025-12-14 at 14:37:19 +0000
