@@ -14,7 +14,7 @@
 | ---------------- | ------- | --------------- | ---------- | ---------- | ------------------------------------------------ |
 | - [lxcs](#lxcs ) | No      | array of object | No         | -          | List of lxcs that will be created for the stack. |
 
-## <a name="lxcs"></a>40. Property `Bind Dns Inventory > lxcs`
+## <a name="lxcs"></a>18. Property `Bind Dns Inventory > lxcs`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -35,7 +35,7 @@
 | ------------------------------- | ----------- |
 | [lxcs items](#lxcs_items)       | -           |
 
-### <a name="lxcs_items"></a>40.1. Bind Dns Inventory > lxcs > lxcs items
+### <a name="lxcs_items"></a>18.1. Bind Dns Inventory > lxcs > lxcs items
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -47,7 +47,7 @@
 | --------------------------- | ------- | ------ | ---------- | ---------- | ------------------------------------------------------------------------------------------------------------ |
 | + [vars](#lxcs_items_vars ) | No      | object | No         | -          | For the dns to work we need to tell the playbooks which lxc will serve as the master and which as the slave. |
 
-#### <a name="lxcs_items_vars"></a>40.1.1. Property `Bind Dns Inventory > lxcs > lxcs items > vars`
+#### <a name="lxcs_items_vars"></a>18.1.1. Property `Bind Dns Inventory > lxcs > lxcs items > vars`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -61,7 +61,7 @@
 | ---------------------------------------------- | ------- | ------- | ---------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | + [bind_master](#lxcs_items_vars_bind_master ) | No      | boolean | No         | -          | The default pve cloud configured dns uses only a master slave combination. You should create two lxcs,<br />one that has this flag set to true, the other to false.<br /> |
 
-##### <a name="lxcs_items_vars_bind_master"></a>40.1.1.1. Property `Bind Dns Inventory > lxcs > lxcs items > vars > bind_master`
+##### <a name="lxcs_items_vars_bind_master"></a>18.1.1.1. Property `Bind Dns Inventory > lxcs > lxcs items > vars > bind_master`
 
 |              |           |
 | ------------ | --------- |
