@@ -1,6 +1,6 @@
 # Pve Cloud Repository example
 
-You can simply copy the files if you want to get started, but you have to go over them one by one replaceing the config with your individual values.
+You can simply copy the files if you want to get started, but you have to go over them one by one replacing the config with your individual values.
 
 ## cloud-instance
 
@@ -16,3 +16,5 @@ The `playbooks.sh` script contains all commands in the needed in the correct ini
 ## kubespray-cluster
 
 The `kubespray-cluster/` contains an example inventory for a kubespray cluster aswell as example authenticated terraform configuration. By using direnv and our py-pve-cloud clis we get access to the kubernetes cluster aswell as dns and secrets via nothing but ssh.
+
+To setup the cluster run `ansible-playbook -i kubespray-inv.yml pxc.cloud.sync_kubespray`. After this you can cd into the terraform folder and run `terraform init` and `terraform apply`.

@@ -62,7 +62,7 @@ docker run -d -p 8088:8080 --name pxc-local-pypi pypiserver/pypiserver:latest ru
 docker run -d --name pxc-local-redis -p 6379:6379 redis:latest # redis broker for triggering dependent builds
 ```
 5. run `tddog --recursive` from your top level created `pve-cloud` folder. This will monitor src folders, rebuild artifacts and their dependants and also run `pip install -e .` on libraries that are needed locally
-6. connect once to your cluster `pvcli connect-cluster --pve-host $PVE_HOST_IP` and then you can run the e2e tests
+6. run the e2e tests:
 ```bash
 pytest -s tests/e2e/ --skip-cleanup 
 

@@ -12,32 +12,35 @@ The cluster needs to meet these minimum requirements:
 
 ## Development/Deployment machine
 
-You need one or more machines/vms preferably in the same subnet/vlan segment as your proxmox hosts for running playbooks and applying terraform configurations.
+You need a development machine (preferably apt based distro) in the same subnet/vlan segment as your proxmox hosts for running playbooks and applying terraform configurations.
 
-These machines need ssh access to the root user of your proxmox clusters, generate / install a key and add it to `~/.ssh/authorized_keys` on one of the proxmox hosts (proxmox automatically syncs this file accross all hosts in a cluster).
+These machines need ssh access to the root user of your proxmox clusters. Generate / install a key and add it to `~/.ssh/authorized_keys` on one of the proxmox hosts (proxmox automatically syncs this file accross all hosts in a cluster).
 
-Next install the following packages/tools on your development machine (preferably apt based distro):
+Next install the following packages/tools on your development machine:
 
-* avahi-utils (with this we can discover our proxmox hosts and clusters)
+* `apt install avahi-utils` (with this we can discover our proxmox hosts and clusters)
 * python3 (+ recommended virtual env)
-* terraform
-* kubectl
-* helm cli ( `>=v3.0.0` )
-* yq (mikefarah)
-* direnv (.envrc files for terraform conf/auth)
+* [terraform](https://developer.hashicorp.com/terraform/install#linux)
+* [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/)
+* [helm cli](https://helm.sh/docs/intro/install/) ( `>=v3.0.0` )
+* [yq (mikefarah)](https://github.com/mikefarah/yq?tab=readme-ov-file#install)
+* `apt install direnv` (.envrc files for terraform conf/auth)
 * nfs-common (if you want to use caching of setup artifacts)
-* docker (if you want to use caching / [tdd development](tdd.md))
+* [docker](https://docs.docker.com/engine/install/) (if you want to use caching / [tdd development](tdd.md))
 
 
 ## Choose your proxmox cloud domain
 
-The cloud domain should be a unique domain that can be used for the hostnames and services of the cloud. It should not overlap with a domain you host generic services under, we need unambiguousness for our dynamic dns hostname records.
+Proxmox cloud uses KEA DHCP + DDNS for hostnames into bind. Any lxc/vm that is created will automatically be resolvable via its hostname through the BIND DNS server proxmox cloud deploys.
+
+For this and for service identification we need a unique domain, that should not overlap / be used with other services you host.
 
 Domains for services like for example `gitlab.example.com` can be added later in our cluster definition files. The cloud domain should be something like `your-cloud.example.com`.
 
+
 ## Setup Proxmox host discovery
 
-We need to make the proxmox cluster discoverable, for that run `apt install avahi-daemon` on one host of your choice.
+We need to make the proxmox cluster discoverable, for that run `apt install avahi-daemon` on one proxmox host of your choice.
 
 Next create an avahi service file (`/etc/avahi/services/pxc.service`) on the host with the following content:
 
@@ -53,11 +56,13 @@ Next create an avahi service file (`/etc/avahi/services/pxc.service`) on the hos
     <type>_pxc._tcp</type>
     <port>22</port>
     <txt-record>cloud_domain=your.cloud.domain</txt-record><!-- insert your cloud domain here!-->
-    <txt-record>cluster_name=your-cluster</txt-record><!-- insert your proxmox cluster name here (from proxmox ui)!-->
+    <txt-record>cluster_name=your-cluster</txt-record><!-- insert your proxmox cluster name here (from proxmox ui - see screenshot)!-->
   </service>
 
 </service-group>
 ```
+
+![Proxmox cluster name](cluster-name.png)
 
 Then simply run `service avahi-daemon reload` and now we can discover our host. You can validate the discovery by running `avahi-browse -rpt _pxc._tcp` on your development machine. 
 
@@ -65,7 +70,7 @@ Depending on how you do your vlan segmentation you either need the firewall to a
 
 ## Bootstrap
 
-Create a repository for your cloud instance for example company-xyz-cloud and setup your environment:
+Create a git repository for your cloud instance for example company-xyz-cloud and setup your environment:
 
 * create a venv `python3 -m venv ~/.pve-cloud-venv` and activate `source ~/.pve-cloud-venv/bin/activate`
 * install `pip install ansible==9.13.0`
@@ -79,8 +84,8 @@ collections:
     type: git
     version: $MATCHING_KUBESPRAY_VERSION
 ```
-* run `ansible-galaxy install -r requirements.yaml`, and run the setup playbook `ansible-playbook pxc.cloud.setup_control_node` to setup your local machine (this setup playbook has to be run on upgrade of the collection aswell)
-* you also might want to create a `ansible.cfg` file on the top level of your repo with the following content:
+* run `ansible-galaxy install -r requirements.yaml`, and run the setup playbook `ansible-playbook pxc.cloud.setup_control_node` to setup your local machine (this setup playbook has to be run on an upgrade of the collection aswel!)
+* create a `ansible.cfg` file on the top level of your repo with the following content:
 ```ini
 [defaults]
 # on recreating vms this will prevent issues executing the playbook

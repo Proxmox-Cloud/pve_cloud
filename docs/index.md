@@ -1,10 +1,12 @@
 # General
 
-The aim of this project is to provide a toolset for building a self hosted cloud provider like foundation (AWS, Google Cloud, Azure).
+This project aims to provide a self hosted cloud platform, giving you the same features like (AWS, Google Cloud, Azure), without being tied to any single one of them and their ridiculous prices.
 
-It is not a opinionated, monolithic solution, instead gives you the freedom to implement according to your needs, serving as solid base / suggestions.
+All you need is a [Proxmox cluster](https://proxmox.com/en/) that can either run on your own hardware or on any rented dedicated server, of which there are hundreds of fairly priced options.
 
-Basic understanding of the following areas is required:
+It is not a opinionated, monolithic solution - instead it aims to give your freedom to implement according to your needs and preferences, while as a preconfigured, solid foundation.
+
+To work with this collection, basic understanding of the following tools / concepts is required:
 
 * python and ansible
 * terraform
@@ -27,3 +29,5 @@ Verified working versions:
 | Collection Version | Kubespray Version     | Debian LXC Version | PVE Version | Ceph Version |
 | ------------------ | --------------------- | ------------------ | ----------- | ------------ |
 | 3.6.X              | v2.28.0 (k8s 1.32.5)  | 12.12-1            | 8.4.12      | 19.2.2       |
+
+<iframe src="schemas/pve_cloud_inv_schema.html" width="100%" height="800px" style="border: none;"></iframe>

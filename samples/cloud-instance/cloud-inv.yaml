@@ -1,7 +1,8 @@
 # the choice of this domain is very important
 # this will group your cloud services together and will be 
 # used for ddns, choose this carefully. This is the same domain
-# you have to set initially during `pvcli connect-cluster ...`
+# you have to define in the intial avahi service definition on your
+# first proxmox host
 pve_cloud_domain: pve-cloud-domain.example 
 
 # here you may define multiple proxmox clusters that will be part of your first proxmox cloud instance
@@ -16,8 +17,8 @@ pve_clusters:
       - dns
       - dhcp
       - psql-state
-    # set ips of your own subnet here
-    # these ips will be managed by keepalive
+
+    # set ips of your own subnet here, these ips will be managed by keepalive
     # the external floating ip is meant to be used for firewall forwards to expose certain
     # service to the clearweb
     pve_haproxy_floating_ip_external: "192.168.1.6"
@@ -35,7 +36,6 @@ pve_clusters:
 # a /24 can quickly fill up if you are running a mid sized operation
 # a /23 /22 net is recommended
 pve_vm_subnet: "192.168.1.0/24" # set your own
-
 
 # have to match the ips in dhcp-inv.yaml
 kea_dhcp_main_ip: "192.168.1.2" # set your own ips

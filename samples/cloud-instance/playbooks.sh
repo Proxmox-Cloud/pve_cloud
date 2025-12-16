@@ -5,7 +5,7 @@ set -e # exit on failure
 ansible-playbook pxc.cloud.setup_control_node
 
 # setup your proxmox cluster(s) as part of the cloud instance
-# requires that you locally connected first (`pvcli connect-cluster --target-pve $PVE_HOST_IP`)
+# requires that you made one proxmox host discoverable via avahi first
 ansible-playbook -i cloud-inv.yaml pxc.cloud.setup_pve_clusters
 
 # create dhcp lxcs and setup

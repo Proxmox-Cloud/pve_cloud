@@ -22,11 +22,25 @@ If you have ceph installed and configured in your proxmox cluster, and you defin
 
 If you want to use ceph your kubernetes nodes need to have access to the ceph monitors, if your ceph is on a seperate network you can deploy a seperate kea dhcp for dynamically assinging ips to the nodes ceph network interfaces. For that you need a single lxc and the `setup_ceph_kea` playbook.
 
+## PVE Cloud Controller
+
+In the [samples](https://github.com/Proxmox-Cloud/pve_cloud/blob/master/samples/kubespray-cluster/terraform/cloud-deployments.tf) you can see the [pve-cloud-controller tf module](https://github.com/Proxmox-Cloud/pve-cloud-tf) being deployed. The controller contains an admission controller, a namespace watcher service and a daily cron job.
+
+The deployment comes with a varity of features that are toggled on by passing optional terraform variables to the terraform module:
+
+* internal ingress dns (all kubernetes ingress resources automatically create record within the pve cloud BIND dns server)
+=> this allows to reuse domains accross clusters
+* optional external ingress dns (only for route53 at the moment). If you pass appropriate route53 credentials the controller also can extend the ingress capabilities to external aws route53
+* optional tls certificate injection on namespace creation (the created tls k8s secret is always named `cluster-tls` for ease of use in ingress resources)
+* automatic image mirroring via harbor. If you pass credentials to a harbor artificatory instance for pulling images and set it up according to the `harbor-mirror-projects` tf module, pods will be automatically patched to fetch ingresses from harbor proxy repositories instead.
+
+
 ## TLS ACME Certificates
 
 This collection doesn't use kubernetes certmanager for TLS certificates, but instead comes with an external centralised solution. 
 
 Initially certificates are generated via ansible roles, integrated into the collection. The update process afterwards is handled via [AWX cron jobs](https://github.com/Proxmox-Cloud/pve-cloud-awx-cron). Use the awx helm chart via terraform to deploy your own instance.
+
 
 ### DNS Provider Secrets
 

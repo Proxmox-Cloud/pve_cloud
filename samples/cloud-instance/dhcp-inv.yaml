@@ -1,4 +1,4 @@
-# this is the target proxmox cluster name + "." + the pve_cloud_domain you chose in cloud-inv.yaml
+# this is the target proxmox cluster name + "." + the pve_cloud_domain you chose in cloud-inv.yaml / avahi setup
 # it determines where the playbooks will create and find the lxcs
 target_pve: pve-cluster-name.pve-cloud-domain.example # change this to your cluster / domain
 stack_name: dhcp # stack_name + "." + the pve_cloud_domain be used for identifing vms, via the proxmox api and vm tags (also known as stack_fqdn)

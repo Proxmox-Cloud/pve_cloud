@@ -11,4 +11,5 @@ module "cloud_controller" {
   internal_proxy_floating_ip = var.cluster_proxy_ip
 
   cluster_cert_entries = local.inventory.cluster_cert_entries
+  external_domains = local.inventory.external_domains
 }

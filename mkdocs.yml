@@ -15,7 +15,8 @@ theme:
   name: material
   features:
     - toc.follow
-    - toc.integrate 
+    - toc.integrate
+    - search.suggest
 
 plugins:
   - search
