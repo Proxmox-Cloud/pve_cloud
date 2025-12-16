@@ -1,3 +1,8 @@
+DOCUMENTATION = r'''
+name: route53_zonebestmatch
+short_description: Finds the best matching zone for a domain in route53
+'''
+
 from ansible.errors import AnsibleError
 
 class FilterModule(object):

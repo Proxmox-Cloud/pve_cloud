@@ -20,7 +20,7 @@ def setup_pve_hosts(request, get_test_env):
   with tempfile.NamedTemporaryFile('w', suffix='.yaml', delete=False) as temp_cloud_inv:
     # write pve cloud inventory file for main pve cluster setup playbook
     yaml.dump({
-      "plugin": "pve.cloud.pve_cloud_inv",
+      "plugin": "pxc.cloud.pve_cloud_inv",
       "pve_cloud_domain": get_test_env["pve_test_cloud_domain"],
       "pve_clusters": {
         get_test_env["pve_test_cluster_name"]: {
@@ -37,7 +37,7 @@ def setup_pve_hosts(request, get_test_env):
       # run the main playbook
       logger.info("run pve cluster setup")
       setup_run = ansible_runner.run(
-        private_data_dir=os.getcwd(),
+        project_dir=os.getcwd(),
         playbook="playbooks/setup_pve_clusters.yaml",
         inventory=temp_cloud_inv.name,
         verbosity=request.config.getoption("--ansible-verbosity")
@@ -53,7 +53,7 @@ def setup_pve_hosts(request, get_test_env):
     logger.info("uninstall pve hosts")
 
     uninstall_run = ansible_runner.run(
-      private_data_dir=os.getcwd(),
+      project_dir=os.getcwd(),
       playbook="playbooks/uninstall_pve_clusters.yaml",
       inventory=temp_cloud_inv.name,
       verbosity=request.config.getoption("--ansible-verbosity")
@@ -70,7 +70,7 @@ def setup_dhcp_lxcs(request, get_test_env, setup_pve_hosts):
   with tempfile.NamedTemporaryFile('w', suffix='.yaml', delete=False) as temp_kea_lxcs_inv:
     logger.info("create kea lxcs")
     yaml.dump({
-      "plugin": "pve.cloud.lxc_inv",
+      "plugin": "pxc.cloud.lxc_inv",
       "target_pve": get_test_env["pve_test_cluster_name"] + "." + get_test_env["pve_test_cloud_domain"],
       "stack_name": "ha-dhcp",
       "lxcs": [
@@ -114,7 +114,7 @@ def setup_dhcp_lxcs(request, get_test_env, setup_pve_hosts):
 
     if not request.config.getoption("--skip-fixture-init"):
       sync_lxcs_kea = ansible_runner.run(
-        private_data_dir=os.getcwd(),
+        project_dir=os.getcwd(),
         playbook="playbooks/sync_lxcs.yaml",
         inventory=temp_kea_lxcs_inv.name,
         verbosity=request.config.getoption("--ansible-verbosity")
@@ -123,7 +123,7 @@ def setup_dhcp_lxcs(request, get_test_env, setup_pve_hosts):
 
       logger.info("setup kea lxcs")
       setup_kea_run = ansible_runner.run(
-        private_data_dir=os.getcwd(),
+        project_dir=os.getcwd(),
         playbook="playbooks/setup_kea.yaml",
         inventory=temp_kea_lxcs_inv.name,
         verbosity=request.config.getoption("--ansible-verbosity")
@@ -137,7 +137,7 @@ def setup_dhcp_lxcs(request, get_test_env, setup_pve_hosts):
     
     logger.info("destroy kea lxcs")
     destroy_kea_lxcs_run = ansible_runner.run(
-      private_data_dir=os.getcwd(),
+      project_dir=os.getcwd(),
       playbook="playbooks/destroy_lxcs.yaml",
       inventory=temp_kea_lxcs_inv.name,
       verbosity=request.config.getoption("--ansible-verbosity")
@@ -154,7 +154,7 @@ def setup_bind_lxcs(request, get_test_env, setup_dhcp_lxcs):
   with tempfile.NamedTemporaryFile('w', suffix='.yaml', delete=False) as temp_bind_lxcs_inv:
     logger.info("create bind lxcs")
     yaml.dump({
-      "plugin": "pve.cloud.lxc_inv",
+      "plugin": "pxc.cloud.lxc_inv",
       "target_pve": get_test_env["pve_test_cluster_name"] + "." + get_test_env["pve_test_cloud_domain"],
       "stack_name": "ha-bind",
       "lxcs": [
@@ -198,7 +198,7 @@ def setup_bind_lxcs(request, get_test_env, setup_dhcp_lxcs):
 
     if not request.config.getoption("--skip-fixture-init"):
       sync_bind_lxcs_run = ansible_runner.run(
-        private_data_dir=os.getcwd(),
+        project_dir=os.getcwd(),
         playbook="playbooks/sync_lxcs.yaml",
         inventory=temp_bind_lxcs_inv.name,
         verbosity=request.config.getoption("--ansible-verbosity")
@@ -207,7 +207,7 @@ def setup_bind_lxcs(request, get_test_env, setup_dhcp_lxcs):
 
       logger.info("setup bind lxcs")
       setup_bind_run = ansible_runner.run(
-        private_data_dir=os.getcwd(),
+        project_dir=os.getcwd(),
         playbook="playbooks/setup_bind.yaml",
         inventory=temp_bind_lxcs_inv.name,
         verbosity=request.config.getoption("--ansible-verbosity")
@@ -221,7 +221,7 @@ def setup_bind_lxcs(request, get_test_env, setup_dhcp_lxcs):
 
     logger.info("destroy bind lxcs")
     destroy_bind_lxcs_run = ansible_runner.run(
-      private_data_dir=os.getcwd(),
+      project_dir=os.getcwd(),
       playbook="playbooks/destroy_lxcs.yaml",
       inventory=temp_bind_lxcs_inv.name,
       verbosity=request.config.getoption("--ansible-verbosity")
@@ -237,7 +237,7 @@ def setup_patroni_lxcs(request, get_test_env, setup_bind_lxcs):
 
     logger.info("create patroni lxcs")
     yaml.dump({
-      "plugin": "pve.cloud.lxc_inv",
+      "plugin": "pxc.cloud.lxc_inv",
       "target_pve": get_test_env["pve_test_cluster_name"] + "." + get_test_env["pve_test_cloud_domain"],
       "stack_name": "ha-postgres",
       "lxcs": [
@@ -276,7 +276,7 @@ def setup_patroni_lxcs(request, get_test_env, setup_bind_lxcs):
 
     if not request.config.getoption("--skip-fixture-init"):
       sync_lxcs_postgres = ansible_runner.run(
-        private_data_dir=os.getcwd(),
+        project_dir=os.getcwd(),
         playbook="playbooks/sync_lxcs.yaml",
         inventory=temp_postgres_lxcs_inv.name,
         verbosity=request.config.getoption("--ansible-verbosity")
@@ -285,7 +285,7 @@ def setup_patroni_lxcs(request, get_test_env, setup_bind_lxcs):
 
       logger.info("setup postgres lxcs")
       setup_postgres_run = ansible_runner.run(
-        private_data_dir=os.getcwd(),
+        project_dir=os.getcwd(),
         playbook="playbooks/setup_postgres.yaml",
         inventory=temp_postgres_lxcs_inv.name,
         verbosity=request.config.getoption("--ansible-verbosity")
@@ -299,7 +299,7 @@ def setup_patroni_lxcs(request, get_test_env, setup_bind_lxcs):
     
     logger.info("destroy postgres lxcs")
     destroy_postgres_lxcs_run = ansible_runner.run(
-      private_data_dir=os.getcwd(),
+      project_dir=os.getcwd(),
       playbook="playbooks/destroy_lxcs.yaml",
       inventory=temp_postgres_lxcs_inv.name,
       verbosity=request.config.getoption("--ansible-verbosity")
@@ -316,7 +316,7 @@ def setup_haproxy_lxcs(request, get_test_env, setup_patroni_lxcs):
     # haproxy
     logger.info("create haproxy lxcs")
     yaml.dump({
-      "plugin": "pve.cloud.lxc_inv",
+      "plugin": "pxc.cloud.lxc_inv",
       "target_pve": get_test_env["pve_test_cluster_name"] + "." + get_test_env["pve_test_cloud_domain"],
       "stack_name": "ha-haproxy",
       "static_includes": {
@@ -360,7 +360,7 @@ def setup_haproxy_lxcs(request, get_test_env, setup_patroni_lxcs):
 
     if not request.config.getoption("--skip-fixture-init"):
       sync_lxcs_haproxy = ansible_runner.run(
-        private_data_dir=os.getcwd(),
+        project_dir=os.getcwd(),
         playbook="playbooks/sync_lxcs.yaml",
         inventory=temp_haproxy_lxcs_inv.name,
         verbosity=request.config.getoption("--ansible-verbosity")
@@ -369,7 +369,7 @@ def setup_haproxy_lxcs(request, get_test_env, setup_patroni_lxcs):
 
       logger.info("setup haproxy lxcs")
       setup_haproxy_run = ansible_runner.run(
-        private_data_dir=os.getcwd(),
+        project_dir=os.getcwd(),
         playbook="playbooks/setup_haproxy.yaml",
         inventory=temp_haproxy_lxcs_inv.name,
         verbosity=request.config.getoption("--ansible-verbosity")
@@ -383,7 +383,7 @@ def setup_haproxy_lxcs(request, get_test_env, setup_patroni_lxcs):
     
     logger.info("destroy haproxy lxcs")
     destroy_haproxy_lxcs_run = ansible_runner.run(
-      private_data_dir=os.getcwd(),
+      project_dir=os.getcwd(),
       playbook="playbooks/destroy_lxcs.yaml",
       inventory=temp_haproxy_lxcs_inv.name,
       verbosity=request.config.getoption("--ansible-verbosity")
@@ -400,7 +400,7 @@ def setup_cache_lxcs(request, get_test_env, setup_bind_lxcs):
     # cache
     logger.info("create cache lxc")
     yaml.dump({
-      "plugin": "pve.cloud.lxc_inv",
+      "plugin": "pxc.cloud.lxc_inv",
 
       "target_pve": get_test_env["pve_test_cluster_name"] + "." + get_test_env["pve_test_cloud_domain"],
       "stack_name": "cloud-cache",
@@ -426,7 +426,7 @@ def setup_cache_lxcs(request, get_test_env, setup_bind_lxcs):
 
     if not request.config.getoption("--skip-fixture-init"):
       sync_lxcs = ansible_runner.run(
-        private_data_dir=os.getcwd(),
+        project_dir=os.getcwd(),
         playbook="playbooks/sync_lxcs.yaml",
         inventory=temp_cache_lxcs_inv.name,
         verbosity=request.config.getoption("--ansible-verbosity")
@@ -435,7 +435,7 @@ def setup_cache_lxcs(request, get_test_env, setup_bind_lxcs):
 
       logger.info("setup cache lxcs")
       setup_run = ansible_runner.run(
-        private_data_dir=os.getcwd(),
+        project_dir=os.getcwd(),
         playbook="playbooks/setup_cloud_cache.yaml",
         inventory=temp_cache_lxcs_inv.name,
         verbosity=request.config.getoption("--ansible-verbosity")
@@ -449,7 +449,7 @@ def setup_cache_lxcs(request, get_test_env, setup_bind_lxcs):
     
     logger.info("destroy cache lxcs")
     destroy_lxcs_run = ansible_runner.run(
-      private_data_dir=os.getcwd(),
+      project_dir=os.getcwd(),
       playbook="playbooks/destroy_lxcs.yaml",
       inventory=temp_cache_lxcs_inv.name,
       verbosity=request.config.getoption("--ansible-verbosity")

@@ -12,7 +12,7 @@
 # figure out what to delete / create
 - name: Get delete and create
   determine_delete_create:
-    inventory_vms: "{{ vms | map('pve.cloud.sort_and_hash') | zip(vms) }}"
+    inventory_vms: "{{ vms | map('pxc.cloud.sort_and_hash') | zip(vms) }}"
     stack_vms: "{{ stack_vms }}"
   register: delete_create
   run_once: true # need the explicit run_once to set the result on all hosts

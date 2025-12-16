@@ -10,7 +10,7 @@ Checkout the `kubespray-cluster` dir in the [samples directory](https://github.c
 
 Again create custom inventory yaml file following this [k8s cluster schema](schemas/kubespray_inv_schema.md).
 
-Afterwards run the `pve.cloud.sync_kubespray` playbook, this will fully create VMs, setup kubespray, initialize TLS Certificates and deploy core kubernetes helm charts (Ceph CSI, Ingress).
+Afterwards run the `pxc.cloud.sync_kubespray` playbook, this will fully create VMs, setup kubespray, initialize TLS Certificates and deploy core kubernetes helm charts (Ceph CSI, Ingress).
 
 To get kubeconf after creation of the cluster for cli/ide access (expiring) use:
 
@@ -51,7 +51,7 @@ You need to create secret files inside the clouds secret folder on your proxmox 
 }
 ```
 
-Afterwards you need to sync those secrets to all hosts in the cloud, you can do that by rerunning the `setup_pve_clusters` playbook - `ansible-playbook -i YOUR-CLOUD-INV.yaml pve.cloud.setup_pve_clusters --tags rsync`. This needs to be done only once! There is no support for multiple dns providers / multiple accounts yet.
+Afterwards you need to sync those secrets to all hosts in the cloud, you can do that by rerunning the `setup_pve_clusters` playbook - `ansible-playbook -i YOUR-CLOUD-INV.yaml pxc.cloud.setup_pve_clusters --tags rsync`. This needs to be done only once! There is no support for multiple dns providers / multiple accounts yet.
 
 You are welcome to create and submit a MR with your own roles / logic for other providers!
 
@@ -59,9 +59,9 @@ You are welcome to create and submit a MR with your own roles / logic for other 
 
 Upgrading the cluster is as simple as updating the version tag reference of this collection.
 
-You can skip to the latest patch version, but shouldn't skip minor versions as they are tied to kubespray updates. After updating the cloud collection version in your requirements.yaml, you have to run `ansible-galaxy install -r requirements.yaml` and `pip install -r ~/.ansible/collections/ansible_collections/pve/cloud/meta/ee-requirements.txt` again.
+You can skip to the latest patch version, but shouldn't skip minor versions as they are tied to kubespray updates. After updating the cloud collection version in your requirements.yaml, you have to run `ansible-galaxy install -r requirements.yaml` and `pip install -r ~/.ansible/collections/ansible_collections/pxc/cloud/meta/ee-requirements.txt` again.
 
-Then run the upgrade playbook `ansible-playbook -i YOUR-KUBESPRAY-INV.yaml pve.cloud.upgrade_kubespray`.
+Then run the upgrade playbook `ansible-playbook -i YOUR-KUBESPRAY-INV.yaml pxc.cloud.upgrade_kubespray`.
 
 Right now kubespray is tightly coupled with the entire collection, meaning you have to update the collection a minor version, then update all your clusters, then the collection again and so forth. In the future this will be split to make it more versatile. There is a version lock for the collection that will prevent you from doing updates, if you do this in any other order.
 

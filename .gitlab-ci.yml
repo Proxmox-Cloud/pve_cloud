@@ -111,7 +111,14 @@ trigger_upstream_release_tag:
     - if: $UPSTREAM_TAG_MESSAGE =~ /-all-/ && ( $PVE_CLOUD_SCHEMAS != null || $PVE_CLOUD_SCHEMAS =~ /^./ )
 
 
-release_artifacts:
+release_galaxy:
+  stage: deploy
+  image: alpine/ansible:2.18.6
+  script:
+    - ansible-galaxy collection build
+    - ansible-galaxy collection publish *.tar.gz --token $ANSIBLE_GALAXY_TOKEN
+
+release_ee:
   stage: deploy
   image: ghcr.io/ansible/community-ansible-dev-tools:v25.11.0
   script:

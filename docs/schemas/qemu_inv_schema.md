@@ -411,7 +411,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 **Description:** Id of ansible inventory plugin
 
 Must be one of:
-* "pve.cloud.qemu_inv"
+* "pxc.cloud.qemu_inv"
 
 ----------------------------------------------------------------------------------------------------------------------------
 Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2025-12-15 at 01:47:48 +0000

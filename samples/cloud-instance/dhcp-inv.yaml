@@ -3,7 +3,7 @@
 target_pve: pve-cluster-name.pve-cloud-domain.example # change this to your cluster / domain
 stack_name: dhcp # stack_name + "." + the pve_cloud_domain be used for identifing vms, via the proxmox api and vm tags (also known as stack_fqdn)
 
-# lxcs defined here will be automatically created / deleted if missing by the pve.cloud.sync_lxcs playbook
+# lxcs defined here will be automatically created / deleted if missing by the pxc.cloud.sync_lxcs playbook
 # the collection is using a hashing mechanism on these creation parameters to determine what lxcs/vms exist / are missing.
 # after the creation you can see this hash in the tags of the lxc/vm ending with -blake
 lxcs:
@@ -43,4 +43,4 @@ lxc_base_parameters:
 root_ssh_pub_key: 'ssh-ed25519 AAAeAC3NzaC1tlZDI1NdasdAAIGreJ6EeeGddasB30hv1h5+erHhreUHzvmYE' 
 
 # ansible default plugin variable. this loads the custom lxc inventory from the pve_cloud collection plugins directory
-plugin: pve.cloud.lxc_inv
+plugin: pxc.cloud.lxc_inv

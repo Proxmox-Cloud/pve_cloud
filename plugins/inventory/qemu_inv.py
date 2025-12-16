@@ -2,8 +2,8 @@
 from ansible.plugins.inventory import BaseInventoryPlugin
 import os
 import asyncio
-from ansible_collections.pve.cloud.plugins.module_utils.inventory import init_plugin, add_qemu_to_inv
-from ansible_collections.pve.cloud.plugins.module_utils.identity import stack_vm_get_blake
+from ansible_collections.pxc.cloud.plugins.module_utils.inventory import init_plugin, add_qemu_to_inv
+from ansible_collections.pxc.cloud.plugins.module_utils.identity import stack_vm_get_blake
 
 
 GLOBAL_KEYS = [

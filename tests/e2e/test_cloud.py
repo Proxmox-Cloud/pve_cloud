@@ -50,7 +50,7 @@ def test_create_lxc(request, get_proxmoxer, get_test_env, setup_haproxy_lxcs):
 
   with tempfile.NamedTemporaryFile('w', suffix='.yaml', delete=False) as temp_dyn_lxcs_inv:
     yaml.dump({
-      "plugin": "pve.cloud.lxc_inv",
+      "plugin": "pxc.cloud.lxc_inv",
       "target_pve": get_test_env["pve_test_cluster_name"] + "." + get_test_env["pve_test_cloud_domain"],
       "stack_name": "pytest-lxcs",
       "lxcs": [
@@ -78,7 +78,7 @@ def test_create_lxc(request, get_proxmoxer, get_test_env, setup_haproxy_lxcs):
 
     try:
       create_dyn_lxcs_run = ansible_runner.run(
-        private_data_dir=os.getcwd(),
+        project_dir=os.getcwd(),
         playbook="playbooks/sync_lxcs.yaml",
         inventory=temp_dyn_lxcs_inv.name,
         verbosity=request.config.getoption("--ansible-verbosity")
@@ -113,7 +113,7 @@ def test_create_lxc(request, get_proxmoxer, get_test_env, setup_haproxy_lxcs):
       if not request.config.getoption("--skip-cleanup"):
         # always run the destroy
         destroy_lxcs_run = ansible_runner.run(
-          private_data_dir=os.getcwd(),
+          project_dir=os.getcwd(),
           playbook="playbooks/destroy_lxcs.yaml",
           inventory=temp_dyn_lxcs_inv.name,
           verbosity=request.config.getoption("--ansible-verbosity")
@@ -126,7 +126,7 @@ def test_create_qemu(request, get_test_env, setup_haproxy_lxcs):
 
   with tempfile.NamedTemporaryFile('w', suffix='.yaml', delete=False) as temp_qemu_inv:
     yaml.dump({
-      "plugin": "pve.cloud.qemu_inv",
+      "plugin": "pxc.cloud.qemu_inv",
 
       "target_pve": get_test_env["pve_test_cluster_name"] + "." + get_test_env["pve_test_cloud_domain"],
       "stack_name": "pytest-qemu",
@@ -159,7 +159,7 @@ def test_create_qemu(request, get_test_env, setup_haproxy_lxcs):
     temp_qemu_inv.flush()
 
     qemu_run = ansible_runner.run(
-      private_data_dir=os.getcwd(),
+      project_dir=os.getcwd(),
       playbook="playbooks/sync_qemus.yaml",
       inventory=temp_qemu_inv.name,
       verbosity=request.config.getoption("--ansible-verbosity")
@@ -169,7 +169,7 @@ def test_create_qemu(request, get_test_env, setup_haproxy_lxcs):
 
     if not request.config.getoption("--skip-cleanup"):
       qemu_destroy_run = ansible_runner.run(
-        private_data_dir=os.getcwd(),
+        project_dir=os.getcwd(),
         playbook="playbooks/destroy_qemus.yaml",
         inventory=temp_qemu_inv.name,
         verbosity=request.config.getoption("--ansible-verbosity")
@@ -182,7 +182,7 @@ def test_create_kubespray(request, get_test_env, setup_haproxy_lxcs, setup_cache
   
   with tempfile.NamedTemporaryFile('w', suffix='.yaml', delete=False) as temp_kubespray_inv:
     yaml.dump({
-      "plugin": "pve.cloud.kubespray_inv",
+      "plugin": "pxc.cloud.kubespray_inv",
       "target_pve": get_test_env["pve_test_cluster_name"] + "." + get_test_env["pve_test_cloud_domain"],
       "extra_control_plane_sans": [
         "control-plane.external.example.com"
@@ -196,7 +196,12 @@ def test_create_kubespray(request, get_test_env, setup_haproxy_lxcs, setup_cache
         "cache_stack": "cloud-cache." + get_test_env["pve_test_cloud_domain"],
       },
       "tcp_proxies": [],
-      "external_domains": [],
+      "external_domains": [
+        {
+          "zone": get_test_env["pve_test_deployments_domain"],
+          "names": ["external-example", "test-dns-delete"]
+        }
+      ],
       "cluster_cert_entries": [
         {
           "zone": get_test_env["pve_test_deployments_domain"],
@@ -261,7 +266,7 @@ def test_create_kubespray(request, get_test_env, setup_haproxy_lxcs, setup_cache
       extra_vars["test_repos_ip"] = get_ipv4(os.getenv("TDDOG_LOCAL_IFACE"))
 
     kubespray_run = ansible_runner.run(
-      private_data_dir=os.getcwd(),
+      project_dir=os.getcwd(),
       playbook="playbooks/sync_kubespray.yaml",
       inventory=temp_kubespray_inv.name,
       verbosity=request.config.getoption("--ansible-verbosity"),
@@ -272,7 +277,7 @@ def test_create_kubespray(request, get_test_env, setup_haproxy_lxcs, setup_cache
 
     if not request.config.getoption("--skip-cleanup"):
       kubespray_destroy_run = ansible_runner.run(
-        private_data_dir=os.getcwd(),
+        project_dir=os.getcwd(),
         playbook="playbooks/destroy_kubespray.yaml",
         inventory=temp_kubespray_inv.name,
         verbosity=request.config.getoption("--ansible-verbosity")
@@ -302,7 +307,7 @@ def test_create_backup_lxc(request, get_proxmoxer, get_test_env, setup_haproxy_l
 
   with tempfile.NamedTemporaryFile('w', suffix='.yaml', delete=False) as temp_dyn_lxcs_inv:
     yaml.dump({
-      "plugin": "pve.cloud.lxc_inv",
+      "plugin": "pxc.cloud.lxc_inv",
 
       "target_pve": get_test_env["pve_test_cluster_name"] + "." + get_test_env["pve_test_cloud_domain"],
       "stack_name": "pytest-backup-lxc",
@@ -332,7 +337,7 @@ def test_create_backup_lxc(request, get_proxmoxer, get_test_env, setup_haproxy_l
 
     try:
       create_lxc_run = ansible_runner.run(
-        private_data_dir=os.getcwd(),
+        project_dir=os.getcwd(),
         playbook="playbooks/sync_lxcs.yaml",
         inventory=temp_dyn_lxcs_inv.name,
         verbosity=request.config.getoption("--ansible-verbosity")
@@ -355,7 +360,7 @@ def test_create_backup_lxc(request, get_proxmoxer, get_test_env, setup_haproxy_l
           logger.warning(f"did not find local build pve cloud build version even though TDDOG_LOCAL_IFACE env var is defined")
 
       setup_bdd_run = ansible_runner.run(
-        private_data_dir=os.getcwd(),
+        project_dir=os.getcwd(),
         playbook="playbooks/setup_backup_daemon.yaml",
         inventory=temp_dyn_lxcs_inv.name,
         verbosity=request.config.getoption("--ansible-verbosity"),
@@ -368,7 +373,7 @@ def test_create_backup_lxc(request, get_proxmoxer, get_test_env, setup_haproxy_l
       if not request.config.getoption("--skip-cleanup"):
         # always run the destroy
         destroy_lxcs_run = ansible_runner.run(
-          private_data_dir=os.getcwd(),
+          project_dir=os.getcwd(),
           playbook="playbooks/destroy_lxcs.yaml",
           inventory=temp_dyn_lxcs_inv.name,
           verbosity=request.config.getoption("--ansible-verbosity")

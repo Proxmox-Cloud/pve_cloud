@@ -340,12 +340,12 @@
   tags:
     - acme
   roles:
-    - pve.cloud.parse_cluster_secrets
+    - pxc.cloud.parse_cluster_secrets
   tasks:
     - debug:
         var: cluster_cert_entries
     - include_role:
-        name: pve.cloud.apply_acme_certs
+        name: pxc.cloud.apply_acme_certs
       when: acme_method is defined and cluster_cert_entries | length > 0
 
 # core helm deployments
@@ -374,7 +374,7 @@
   tags:
     - deployments
   roles:
-    - pve.cloud.parse_cluster_secrets
+    - pxc.cloud.parse_cluster_secrets
   vars:
     # default when no taints are set
     collected_node_taints: []

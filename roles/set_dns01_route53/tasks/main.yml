@@ -23,7 +23,7 @@
     state: "present"
     access_key: "{{ aws_route53_global.AWS_ACCESS_KEY_ID }}"
     secret_key: "{{ aws_route53_global.AWS_SECRET_ACCESS_KEY }}"
-    hosted_zone_id: "{{ loop_acme_aws['key'].removeprefix('_acme-challenge.') | pve.cloud.route53_zonebestmatch(ret_r53zones.hosted_zones) }}"
+    hosted_zone_id: "{{ loop_acme_aws['key'].removeprefix('_acme-challenge.') | pxc.cloud.route53_zonebestmatch(ret_r53zones.hosted_zones) }}"
     record: "{{ loop_acme_aws['key'] }}"
     type: TXT
     value: "\"{{ loop_acme_aws['value'] | join('\",\"') }}\""

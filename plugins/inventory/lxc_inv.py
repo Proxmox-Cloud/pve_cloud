@@ -1,9 +1,9 @@
 
 from ansible.plugins.inventory import BaseInventoryPlugin
-from ansible_collections.pve.cloud.plugins.module_utils.inventory import init_plugin, add_lxc_to_inv
+from ansible_collections.pxc.cloud.plugins.module_utils.inventory import init_plugin, add_lxc_to_inv
 import os
 from ansible.utils.display import Display
-from ansible_collections.pve.cloud.plugins.module_utils.identity import stack_vm_get_blake
+from ansible_collections.pxc.cloud.plugins.module_utils.identity import stack_vm_get_blake
 import asyncio
 
 display = Display()

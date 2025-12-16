@@ -1,6 +1,6 @@
 
 from ansible.plugins.inventory import BaseInventoryPlugin
-from ansible_collections.pve.cloud.plugins.module_utils.inventory import get_manifest_version
+from ansible_collections.pxc.cloud.plugins.module_utils.inventory import get_manifest_version
 from pve_cloud_schemas.validate import validate_inventory
 
 from ansible.utils.display import Display

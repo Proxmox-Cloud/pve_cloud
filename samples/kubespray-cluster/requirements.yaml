@@ -1,0 +1,8 @@
+# this is needed for ansible-galaxy install -r ...
+collections:
+  - name: pxc.cloud
+    version: $LATEST_TAG_VERSION
+  # kubespray has to be defined seperately as git dependency, since they dont have an official ansible galaxy collection
+  - name: https://github.com/kubernetes-sigs/kubespray
+    type: git
+    version: $MATCHING_KUBESPRAY_VERSION # get this from the compatibility table in the documentation

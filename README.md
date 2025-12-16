@@ -1,4 +1,4 @@
-# Ansible Collection - pve.cloud
+# Ansible Collection - pxc.cloud
 
 This collection provides tools to build a self hosted cloud environment on pve.
 

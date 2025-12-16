@@ -3,7 +3,7 @@
 from ansible.module_utils.basic import AnsibleModule
 import copy
 
-from ansible_collections.pve.cloud.plugins.module_utils.identity import stack_vm_get_blake
+from ansible_collections.pxc.cloud.plugins.module_utils.identity import stack_vm_get_blake
 
 
 def run_module():

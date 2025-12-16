@@ -69,7 +69,7 @@
 
 | Property                                             | Pattern | Type   | Deprecated | Definition | Title/Description                                                                                                                                      |
 | ---------------------------------------------------- | ------- | ------ | ---------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| + [dhcp_stack](#static_includes_dhcp_stack )         | No      | string | No         | -          | The pve.cloud.sync_kubespray playbook needs the dhcp stack to refresh the configuration after having made static reservations for kubernetes node ips. |
+| + [dhcp_stack](#static_includes_dhcp_stack )         | No      | string | No         | -          | The pxc.cloud.sync_kubespray playbook needs the dhcp stack to refresh the configuration after having made static reservations for kubernetes node ips. |
 | + [proxy_stack](#static_includes_proxy_stack )       | No      | string | No         | -          | The playbook needs to reload the central clusters haproxy for various forwarding specifications.                                                       |
 | + [postgres_stack](#static_includes_postgres_stack ) | No      | string | No         | -          | The playbook needs the pve cloud postgres stack where state and general configuration is stored.                                                       |
 | + [bind_stack](#static_includes_bind_stack )         | No      | string | No         | -          | The playbook needs the bind stack to register the general masters recordset and for creating authoritative zones defined in cluster_cert_entries.      |
@@ -82,7 +82,7 @@
 | **Type**     | `string` |
 | **Required** | Yes      |
 
-**Description:** The pve.cloud.sync_kubespray playbook needs the dhcp stack to refresh the configuration after having made static reservations for kubernetes node ips.
+**Description:** The pxc.cloud.sync_kubespray playbook needs the dhcp stack to refresh the configuration after having made static reservations for kubernetes node ips.
 
 **Example:**
 
@@ -527,8 +527,8 @@ Must be one of:
 **Description:** Id of ansible inventory plugin.
 
 Must be one of:
-* "pve.cloud.qemu_inv"
-* "pve.cloud.kubespray_inv"
+* "pxc.cloud.qemu_inv"
+* "pxc.cloud.kubespray_inv"
 
 ## <a name="extra_control_plane_sans"></a>17. Property `K8s Kubespray Inventory > extra_control_plane_sans`
 

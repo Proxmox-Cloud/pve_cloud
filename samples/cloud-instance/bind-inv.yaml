@@ -26,4 +26,4 @@ lxc_base_parameters:
 
 root_ssh_pub_key: 'ssh-ed25519 AAAeAC3NzaC1tlZDI1NdasdAAIGreJ6EeeGddasB30hv1h5+erHhreUHzvmYE'
 
-plugin: pve.cloud.lxc_inv 
+plugin: pxc.cloud.lxc_inv 

@@ -25,4 +25,4 @@ lxcs:
 
 root_ssh_pub_key: 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGJ6EGojNV/m7jZ3B+pBWVmWB30hv1h5+erHhUHzvmYE'
 
-plugin: pve.cloud.lxc_inv
+plugin: pxc.cloud.lxc_inv

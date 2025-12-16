@@ -4,8 +4,8 @@ from ansible.utils.display import Display
 import yaml
 import json
 from pve_cloud_schemas.validate import validate_inventory
-from ansible_collections.pve.cloud.plugins.module_utils.identity import sort_and_hash
-from ansible_collections.pve.cloud.plugins.module_utils.network import check_host_ssh_online, wait_for_ssh_open
+from ansible_collections.pxc.cloud.plugins.module_utils.identity import sort_and_hash
+from ansible_collections.pxc.cloud.plugins.module_utils.network import check_host_ssh_online, wait_for_ssh_open
 import asyncio, asyncssh
 from dataclasses import dataclass
 import ipaddress

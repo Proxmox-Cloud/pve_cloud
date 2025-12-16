@@ -1,5 +1,5 @@
 # for kubernetes clusters the node creation and kubespray bootstrap are done in one run of 
-# the pve.cloud.sync_kubespray playbook
+# the pxc.cloud.sync_kubespray playbook
 target_pve: pve-cluster-name.pve-cloud-domain.example
 stack_name: sample-cluster
 
@@ -113,4 +113,4 @@ qemu_base_parameters:
 
 acme_staging: false # toggle prod generation for acme certs, otherwise goes against letsencrypt staging
 
-plugin: pve.cloud.kubespray_inv
+plugin: pxc.cloud.kubespray_inv

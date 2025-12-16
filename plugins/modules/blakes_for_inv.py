@@ -2,7 +2,7 @@
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.pve.cloud.plugins.module_utils.identity import sort_and_hash
+from ansible_collections.pxc.cloud.plugins.module_utils.identity import sort_and_hash
 
 def run_module():
     module_args = dict(

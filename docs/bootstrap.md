@@ -69,15 +69,17 @@ Create a repository for your cloud instance for example company-xyz-cloud and se
 
 * create a venv `python3 -m venv ~/.pve-cloud-venv` and activate `source ~/.pve-cloud-venv/bin/activate`
 * install `pip install ansible==9.13.0`
-* create `requirements.yaml` in your repository like this:
+* create `requirements.yaml` in your repository like this (get versions from [here](index.md#compatibility)):
 ```yaml
 ---
 collections:
-  - name: git@github.com:Proxmox-Cloud/pve_cloud.git
-    type: git
+  - name: pxc.cloud
     version: $LATEST_TAG_VERSION
+  - name: https://github.com/kubernetes-sigs/kubespray
+    type: git
+    version: $MATCHING_KUBESPRAY_VERSION
 ```
-* run `ansible-galaxy install -r requirements.yaml`, and run the setup playbook `ansible-playbook pve.cloud.setup_control_node` to setup your local machine (this setup playbook has to be run on upgrade of the collection aswell)
+* run `ansible-galaxy install -r requirements.yaml`, and run the setup playbook `ansible-playbook pxc.cloud.setup_control_node` to setup your local machine (this setup playbook has to be run on upgrade of the collection aswell)
 * you also might want to create a `ansible.cfg` file on the top level of your repo with the following content:
 ```ini
 [defaults]
@@ -94,12 +96,12 @@ any_unparsed_is_failed = True
 
 As in the [samples/cloud-instance](https://github.com/Proxmox-Cloud/pve_cloud/tree/master/samples/cloud-instance) your repository that defines the core pve cloud components you need:
 
-* pve cloud inventory file - [cloud schema](schemas/pve_cloud_inv_schema.md) => for the `pve.cloud.setup_pve_clusters` playbook
+* pve cloud inventory file - [cloud schema](schemas/pve_cloud_inv_schema.md) => for the `pxc.cloud.setup_pve_clusters` playbook
 * lxc inventory files for the basic services - [lxc inv schema](schemas/lxc_inv_schema.md)
-  * inventory for two kea lxcs => for use with `pve.cloud.setup_kea` playbook - [dhcp inv schema](schemas/setup_kea_schema_ext.md)
-  * inventory for two bind lxcs => `pve.cloud.setup_bind` playbook - [bind inv schema](schemas/setup_bind_schema_ext.md)
-  * three lxcs for patroni postgres => `pve.cloud.setup_postgres` playbook - no special schema
-  * two haproxy lxcs => `pve.cloud.setup_haproxy` playbook - [haproxy inv schema](schemas/setup_haproxy_schema_ext.md)
+  * inventory for two kea lxcs => for use with `pxc.cloud.setup_kea` playbook - [dhcp inv schema](schemas/setup_kea_schema_ext.md)
+  * inventory for two bind lxcs => `pxc.cloud.setup_bind` playbook - [bind inv schema](schemas/setup_bind_schema_ext.md)
+  * three lxcs for patroni postgres => `pxc.cloud.setup_postgres` playbook - no special schema
+  * two haproxy lxcs => `pxc.cloud.setup_haproxy` playbook - [haproxy inv schema](schemas/setup_haproxy_schema_ext.md)
 
 From here you can start deploying your first kubernetes cluster, which will serve as the basis for most deployments/services.
 

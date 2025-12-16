@@ -64,4 +64,4 @@ acme_contact: acme@example.com # change to your own email!
 # or request a feature! 
 acme_method: route53 
 
-plugin: pve.cloud.pve_cloud_inv
+plugin: pxc.cloud.pve_cloud_inv

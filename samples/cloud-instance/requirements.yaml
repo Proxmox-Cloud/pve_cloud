@@ -1,0 +1,4 @@
+# this is needed for ansible-galaxy install -r ...
+collections:
+  - name: pxc.cloud
+    version: $LATEST_TAG_VERSION

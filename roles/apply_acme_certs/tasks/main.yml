@@ -85,4 +85,4 @@
     acme_x509: "{{ acme_x509_query.query_result[0] }}"
 
 - include_role:
-    name: pve.cloud.acme_workflow
+    name: pxc.cloud.acme_workflow

@@ -388,7 +388,7 @@ they configure kea to listen on this interface name.
 **Description:** Id of ansible inventory plugin.
 
 Must be one of:
-* "pve.cloud.lxc_inv"
+* "pxc.cloud.lxc_inv"
 
 ----------------------------------------------------------------------------------------------------------------------------
 Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2025-12-15 at 01:47:48 +0000

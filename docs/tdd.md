@@ -109,9 +109,12 @@ Open this file via vscode File/Open Workspace from File...
 {
   "folders": [
     { "path": "."},
-    { "path": "ansible_collections/pve/cloud" },
+    { "path": "ansible_collections/pxc/cloud" },
     { "path": "pve-cloud-tf" }
-  ]
+  ],
+  "settings": {
+    "python.defaultInterpreterPath": "${env:HOME}/.pve-cloud-dev-venv/bin/python"
+  }
 }
 ```
 
