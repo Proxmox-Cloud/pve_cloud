@@ -807,9 +807,12 @@ pytest -s tests/e2e/test_cloud.py::test_bind --skip-cleanup
 <pre><code class="language-json">{
   &quot;folders&quot;: [
     { &quot;path&quot;: &quot;.&quot;},
-    { &quot;path&quot;: &quot;ansible_collections/pve/cloud&quot; },
+    { &quot;path&quot;: &quot;ansible_collections/pxc/cloud&quot; },
     { &quot;path&quot;: &quot;pve-cloud-tf&quot; }
-  ]
+  ],
+  &quot;settings&quot;: {
+    &quot;python.defaultInterpreterPath&quot;: &quot;${env:HOME}/.pve-cloud-dev-venv/bin/python&quot;
+  }
 }
 </code></pre>
 <p>This loads the e2e tests from both projects via their settings.json file.</p>

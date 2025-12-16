@@ -728,7 +728,7 @@
 <p>Checkout the <code>kubespray-cluster</code> dir in the <a href="https://github.com/Proxmox-Cloud/pve_cloud/tree/master/samples">samples directory</a> for a quick idea on how to setup!</p>
 <h2 id="deploying-a-cluster">Deploying a cluster</h2>
 <p>Again create custom inventory yaml file following this <a href="../schemas/kubespray_inv_schema/">k8s cluster schema</a>.</p>
-<p>Afterwards run the <code>pve.cloud.sync_kubespray</code> playbook, this will fully create VMs, setup kubespray, initialize TLS Certificates and deploy core kubernetes helm charts (Ceph CSI, Ingress).</p>
+<p>Afterwards run the <code>pxc.cloud.sync_kubespray</code> playbook, this will fully create VMs, setup kubespray, initialize TLS Certificates and deploy core kubernetes helm charts (Ceph CSI, Ingress).</p>
 <p>To get kubeconf after creation of the cluster for cli/ide access (expiring) use:</p>
 <p><code>pvcli print-kubeconfig --inventory YOUR-KUBESPRAY-INV.yaml</code></p>
 <h2 id="ceph-csi">Ceph CSI</h2>
@@ -757,12 +757,12 @@
   &quot;IONOS_VERSCHLUESSELUNG&quot;: &quot;SECRET_KEY_HERE&quot;
 }
 </code></pre>
-<p>Afterwards you need to sync those secrets to all hosts in the cloud, you can do that by rerunning the <code>setup_pve_clusters</code> playbook - <code>ansible-playbook -i YOUR-CLOUD-INV.yaml pve.cloud.setup_pve_clusters --tags rsync</code>. This needs to be done only once! There is no support for multiple dns providers / multiple accounts yet.</p>
+<p>Afterwards you need to sync those secrets to all hosts in the cloud, you can do that by rerunning the <code>setup_pve_clusters</code> playbook - <code>ansible-playbook -i YOUR-CLOUD-INV.yaml pxc.cloud.setup_pve_clusters --tags rsync</code>. This needs to be done only once! There is no support for multiple dns providers / multiple accounts yet.</p>
 <p>You are welcome to create and submit a MR with your own roles / logic for other providers!</p>
 <h2 id="upgrading-a-cluster">Upgrading a cluster</h2>
 <p>Upgrading the cluster is as simple as updating the version tag reference of this collection.</p>
-<p>You can skip to the latest patch version, but shouldn't skip minor versions as they are tied to kubespray updates. After updating the cloud collection version in your requirements.yaml, you have to run <code>ansible-galaxy install -r requirements.yaml</code> and <code>pip install -r ~/.ansible/collections/ansible_collections/pve/cloud/meta/ee-requirements.txt</code> again.</p>
-<p>Then run the upgrade playbook <code>ansible-playbook -i YOUR-KUBESPRAY-INV.yaml pve.cloud.upgrade_kubespray</code>.</p>
+<p>You can skip to the latest patch version, but shouldn't skip minor versions as they are tied to kubespray updates. After updating the cloud collection version in your requirements.yaml, you have to run <code>ansible-galaxy install -r requirements.yaml</code> and <code>pip install -r ~/.ansible/collections/ansible_collections/pxc/cloud/meta/ee-requirements.txt</code> again.</p>
+<p>Then run the upgrade playbook <code>ansible-playbook -i YOUR-KUBESPRAY-INV.yaml pxc.cloud.upgrade_kubespray</code>.</p>
 <p>Right now kubespray is tightly coupled with the entire collection, meaning you have to update the collection a minor version, then update all your clusters, then the collection again and so forth. In the future this will be split to make it more versatile. There is a version lock for the collection that will prevent you from doing updates, if you do this in any other order.</p>
 <h2 id="custom-kubespray-vars">Custom kubespray vars</h2>
 <p>To define your own kubespray vars just create <code>group_vars/all</code> and <code>group_vars/k8s_cluster</code> directories alongside your inventory file.</p>

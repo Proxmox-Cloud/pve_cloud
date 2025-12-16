@@ -758,16 +758,18 @@
 <ul>
 <li>create a venv <code>python3 -m venv ~/.pve-cloud-venv</code> and activate <code>source ~/.pve-cloud-venv/bin/activate</code></li>
 <li>install <code>pip install ansible==9.13.0</code></li>
-<li>create <code>requirements.yaml</code> in your repository like this:</li>
+<li>create <code>requirements.yaml</code> in your repository like this (get versions from <a href="../#compatibility">here</a>):</li>
 </ul>
 <pre><code class="language-yaml">---
 collections:
-  - name: git@github.com:Proxmox-Cloud/pve_cloud.git
-    type: git
+  - name: pxc.cloud
     version: $LATEST_TAG_VERSION
+  - name: https://github.com/kubernetes-sigs/kubespray
+    type: git
+    version: $MATCHING_KUBESPRAY_VERSION
 </code></pre>
 <ul>
-<li>run <code>ansible-galaxy install -r requirements.yaml</code>, and run the setup playbook <code>ansible-playbook pve.cloud.setup_control_node</code> to setup your local machine (this setup playbook has to be run on upgrade of the collection aswell)</li>
+<li>run <code>ansible-galaxy install -r requirements.yaml</code>, and run the setup playbook <code>ansible-playbook pxc.cloud.setup_control_node</code> to setup your local machine (this setup playbook has to be run on upgrade of the collection aswell)</li>
 <li>you also might want to create a <code>ansible.cfg</code> file on the top level of your repo with the following content:</li>
 </ul>
 <pre><code class="language-ini">[defaults]
@@ -782,12 +784,12 @@ any_unparsed_is_failed = True
 <h3 id="repository-setup">Repository setup</h3>
 <p>As in the <a href="https://github.com/Proxmox-Cloud/pve_cloud/tree/master/samples/cloud-instance">samples/cloud-instance</a> your repository that defines the core pve cloud components you need:</p>
 <ul>
-<li>pve cloud inventory file - <a href="../schemas/pve_cloud_inv_schema/">cloud schema</a> =&gt; for the <code>pve.cloud.setup_pve_clusters</code> playbook</li>
+<li>pve cloud inventory file - <a href="../schemas/pve_cloud_inv_schema/">cloud schema</a> =&gt; for the <code>pxc.cloud.setup_pve_clusters</code> playbook</li>
 <li>lxc inventory files for the basic services - <a href="../schemas/lxc_inv_schema/">lxc inv schema</a></li>
-<li>inventory for two kea lxcs =&gt; for use with <code>pve.cloud.setup_kea</code> playbook - <a href="../schemas/setup_kea_schema_ext/">dhcp inv schema</a></li>
-<li>inventory for two bind lxcs =&gt; <code>pve.cloud.setup_bind</code> playbook - <a href="../schemas/setup_bind_schema_ext/">bind inv schema</a></li>
-<li>three lxcs for patroni postgres =&gt; <code>pve.cloud.setup_postgres</code> playbook - no special schema</li>
-<li>two haproxy lxcs =&gt; <code>pve.cloud.setup_haproxy</code> playbook - <a href="../schemas/setup_haproxy_schema_ext/">haproxy inv schema</a></li>
+<li>inventory for two kea lxcs =&gt; for use with <code>pxc.cloud.setup_kea</code> playbook - <a href="../schemas/setup_kea_schema_ext/">dhcp inv schema</a></li>
+<li>inventory for two bind lxcs =&gt; <code>pxc.cloud.setup_bind</code> playbook - <a href="../schemas/setup_bind_schema_ext/">bind inv schema</a></li>
+<li>three lxcs for patroni postgres =&gt; <code>pxc.cloud.setup_postgres</code> playbook - no special schema</li>
+<li>two haproxy lxcs =&gt; <code>pxc.cloud.setup_haproxy</code> playbook - <a href="../schemas/setup_haproxy_schema_ext/">haproxy inv schema</a></li>
 </ul>
 <p>From here you can start deploying your first kubernetes cluster, which will serve as the basis for most deployments/services.</p>
 

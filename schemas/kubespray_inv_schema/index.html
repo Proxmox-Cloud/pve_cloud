@@ -1662,7 +1662,7 @@
 <td>string</td>
 <td>No</td>
 <td>-</td>
-<td>The pve.cloud.sync_kubespray playbook needs the dhcp stack to refresh the configuration after having made static reservations for kubernetes node ips.</td>
+<td>The pxc.cloud.sync_kubespray playbook needs the dhcp stack to refresh the configuration after having made static reservations for kubernetes node ips.</td>
 </tr>
 <tr>
 <td>+ <a href="#static_includes_proxy_stack">proxy_stack</a></td>
@@ -1717,7 +1717,7 @@
 </tr>
 </tbody>
 </table>
-<p><strong>Description:</strong> The pve.cloud.sync_kubespray playbook needs the dhcp stack to refresh the configuration after having made static reservations for kubernetes node ips.</p>
+<p><strong>Description:</strong> The pxc.cloud.sync_kubespray playbook needs the dhcp stack to refresh the configuration after having made static reservations for kubernetes node ips.</p>
 <p><strong>Example:</strong></p>
 <pre><code class="language-json">&quot;dhcp.your-cloud.domain&quot;
 </code></pre>
@@ -2785,8 +2785,8 @@ Ubuntu for example wont work if you set the cloud init user to admin.</p>
 </table>
 <p><strong>Description:</strong> Id of ansible inventory plugin.</p>
 <p>Must be one of:
-* "pve.cloud.qemu_inv"
-* "pve.cloud.kubespray_inv"</p>
+* "pxc.cloud.qemu_inv"
+* "pxc.cloud.kubespray_inv"</p>
 <h2 id="17-property-k8s-kubespray-inventory-extra_control_plane_sans"><a name="extra_control_plane_sans"></a>17. Property <code>K8s Kubespray Inventory &gt; extra_control_plane_sans</code></h2>
 <table>
 <thead>
@@ -3894,7 +3894,7 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 </table>
 <p><strong>Description:</strong> If set to true will use acme staging directory for issueing certs.</p>
 <hr />
-<p>Generated using <a href="https://github.com/coveooss/json-schema-for-humans">json-schema-for-humans</a> on 2025-12-15 at 01:47:48 +0000</p>
+<p>Generated using <a href="https://github.com/coveooss/json-schema-for-humans">json-schema-for-humans</a> on 2025-12-16 at 01:59:15 +0000</p>
 
 
 

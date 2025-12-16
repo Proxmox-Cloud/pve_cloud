@@ -608,7 +608,7 @@
 
 
 <h1 id="upgrading-guides">Upgrading Guides</h1>
-<p>Simply upgrade the collection in your <code>requirements.yaml</code>, then run <code>ansible-galaxy install -r requirements.yaml</code> and <code>ansible-playbook pve.cloud.setup_control_node</code> again.</p>
+<p>Simply upgrade the collection in your <code>requirements.yaml</code>, then run <code>ansible-galaxy install -r requirements.yaml</code> and <code>ansible-playbook pxc.cloud.setup_control_node</code> again.</p>
 <h2 id="35x-to-36x">3.5.X to 3.6.X</h2>
 <p>This change introduces proxy protocol, to minimize downtime for ingress resources apply the kubespray playbook like this with <code>--tags config,deployments</code> on the first run.</p>
 
