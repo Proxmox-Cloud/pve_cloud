@@ -10,14 +10,14 @@ dependencies:
     package_pip: ansible-runner
   galaxy:
     collections:
-      - name: /pve-cloud.tar.gz
+      - name: /pxc-cloud.tar.gz
       
 images:
   base_image:
     name: docker.io/redhat/ubi9:latest # needs rhel image
 
 additional_build_files:
-  - src: "pve-cloud.tar.gz"
+  - src: "pxc-cloud.tar.gz"
     dest: src
 
 additional_build_steps:
@@ -25,6 +25,6 @@ additional_build_steps:
     # need git to install collection deps
     - RUN dnf install git -y
     # copy the collection into the image
-    - COPY _build/src/pve-cloud.tar.gz /pve-cloud.tar.gz
+    - COPY _build/src/pxc-cloud.tar.gz /pxc-cloud.tar.gz
     # missing distlib dependency in kubespray
     - RUN /usr/bin/python3 -m pip install distlib
