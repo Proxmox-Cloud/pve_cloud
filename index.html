@@ -133,6 +133,8 @@
         </button>
       </nav>
       
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
     </form>
     <div class="md-search__output">
       <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
@@ -466,7 +468,7 @@
   
   
   <span class="md-ellipsis">
-    K8s Kubespray Inventory
+    Kubespray inv schema
     
   </span>
   
@@ -489,7 +491,7 @@
   
   
   <span class="md-ellipsis">
-    LXC Inventory
+    Lxc inv schema
     
   </span>
   
@@ -512,7 +514,7 @@
   
   
   <span class="md-ellipsis">
-    Cloud Inventory
+    Pve cloud inv schema
     
   </span>
   
@@ -535,7 +537,7 @@
   
   
   <span class="md-ellipsis">
-    VM Inventory
+    Qemu inv schema
     
   </span>
   
@@ -558,7 +560,7 @@
   
   
   <span class="md-ellipsis">
-    Bind Dns Inventory
+    Setup bind schema ext
     
   </span>
   
@@ -581,7 +583,7 @@
   
   
   <span class="md-ellipsis">
-    Ceph DHCP Inventory
+    Setup ceph kea schema ext
     
   </span>
   
@@ -604,7 +606,7 @@
   
   
   <span class="md-ellipsis">
-    HAProxy Inventory
+    Setup haproxy schema ext
     
   </span>
   
@@ -627,7 +629,7 @@
   
   
   <span class="md-ellipsis">
-    General DHCP Inventory
+    Setup kea schema ext
     
   </span>
   
@@ -650,7 +652,7 @@
   
   
   <span class="md-ellipsis">
-    VM Base Schema
+    Vm schema base
     
   </span>
   
@@ -685,9 +687,10 @@
 
 
 <h1 id="general">General</h1>
-<p>The aim of this project is to provide a toolset for building a self hosted cloud provider like foundation (AWS, Google Cloud, Azure).</p>
-<p>It is not a opinionated, monolithic solution, instead gives you the freedom to implement according to your needs, serving as solid base / suggestions.</p>
-<p>Basic understanding of the following areas is required:</p>
+<p>This project aims to provide a self hosted cloud platform, giving you the same features like (AWS, Google Cloud, Azure), without being tied to any single one of them and their ridiculous prices.</p>
+<p>All you need is a <a href="https://proxmox.com/en/">Proxmox cluster</a> that can either run on your own hardware or on any rented dedicated server, of which there are hundreds of fairly priced options.</p>
+<p>It is not a opinionated, monolithic solution - instead it aims to give your freedom to implement according to your needs and preferences, while as a preconfigured, solid foundation.</p>
+<p>To work with this collection, basic understanding of the following tools / concepts is required:</p>
 <ul>
 <li>python and ansible</li>
 <li>terraform</li>
@@ -721,6 +724,7 @@
 </tr>
 </tbody>
 </table>
+<iframe src="schemas/pve_cloud_inv_schema.html" width="100%" height="800px" style="border: none;"></iframe>
 
 
 
@@ -769,7 +773,7 @@
     
     
       
-      <script id="__config" type="application/json">{"base": ".", "features": ["toc.follow", "toc.integrate"], "search": "assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"base": ".", "features": ["toc.follow", "toc.integrate", "search.suggest"], "search": "assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
       <script src="assets/javascripts/bundle.f55a23d4.min.js"></script>

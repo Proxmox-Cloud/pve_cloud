@@ -20,7 +20,7 @@
     
     
       
-        <title>Cloud Inventory - PVE Cloud Documentation</title>
+        <title>Pve cloud inv schema - PVE Cloud Documentation</title>
       
     
     
@@ -62,7 +62,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#cloud-inventory" class="md-skip">
+        <a href="#1-property-cloud-inventory-pve_vm_subnet" class="md-skip">
           Skip to content
         </a>
       
@@ -98,7 +98,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Cloud Inventory
+              Pve cloud inv schema
             
           </span>
         </div>
@@ -134,6 +134,8 @@
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
         </button>
       </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
       
     </form>
     <div class="md-search__output">
@@ -395,7 +397,7 @@
   
   
   <span class="md-ellipsis">
-    K8s Kubespray Inventory
+    Kubespray inv schema
     
   </span>
   
@@ -418,7 +420,7 @@
   
   
   <span class="md-ellipsis">
-    LXC Inventory
+    Lxc inv schema
     
   </span>
   
@@ -442,15 +444,13 @@
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
       
-        
-      
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
           
   
   
   <span class="md-ellipsis">
-    Cloud Inventory
+    Pve cloud inv schema
     
   </span>
   
@@ -463,7 +463,7 @@
   
   
   <span class="md-ellipsis">
-    Cloud Inventory
+    Pve cloud inv schema
     
   </span>
   
@@ -475,8 +475,6 @@
 <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
   
-  
-    
   
   
     <label class="md-nav__title" for="__toc">
@@ -830,7 +828,7 @@
   
   
   <span class="md-ellipsis">
-    VM Inventory
+    Qemu inv schema
     
   </span>
   
@@ -853,7 +851,7 @@
   
   
   <span class="md-ellipsis">
-    Bind Dns Inventory
+    Setup bind schema ext
     
   </span>
   
@@ -876,7 +874,7 @@
   
   
   <span class="md-ellipsis">
-    Ceph DHCP Inventory
+    Setup ceph kea schema ext
     
   </span>
   
@@ -899,7 +897,7 @@
   
   
   <span class="md-ellipsis">
-    HAProxy Inventory
+    Setup haproxy schema ext
     
   </span>
   
@@ -922,7 +920,7 @@
   
   
   <span class="md-ellipsis">
-    General DHCP Inventory
+    Setup kea schema ext
     
   </span>
   
@@ -945,7 +943,7 @@
   
   
   <span class="md-ellipsis">
-    VM Base Schema
+    Vm schema base
     
   </span>
   
@@ -979,7 +977,8 @@
 
 
 
-<h1 id="cloud-inventory">Cloud Inventory</h1>
+  <h1>Pve cloud inv schema</h1>
+
 <p><strong>Title:</strong> Cloud Inventory</p>
 <table>
 <thead>
@@ -1781,10 +1780,12 @@ Services like haproxy and backup servers can and should be provided by multiple 
 </tr>
 </tbody>
 </table>
-<p>Must be one of:
-* "dns"
-* "dhcp"
-* "psql-state"</p>
+<p>Must be one of:</p>
+<ul>
+<li>"dns"</li>
+<li>"dhcp"</li>
+<li>"psql-state"</li>
+</ul>
 <h4 id="1214-property-cloud-inventory-pve_clusters-cloud-config-for-specific-proxmox-clusters-pve_host_vars"><a name="pve_clusters_pattern1_pve_host_vars"></a>12.1.4. Property <code>Cloud Inventory &gt; pve_clusters &gt; Cloud config for specific proxmox clusters. &gt; pve_host_vars</code></h4>
 <table>
 <thead>
@@ -2148,9 +2149,11 @@ their own authoritative zones you want resolved within the cloud.</p>
 </tbody>
 </table>
 <p><strong>Description:</strong> PVE Cloud included method for solving dns01 challenges. You need to have created the appropriate secrets under /etc/pve/cloud on your proxmox cluster.</p>
-<p>Must be one of:
-* "route53"
-* "ionos"</p>
+<p>Must be one of:</p>
+<ul>
+<li>"route53"</li>
+<li>"ionos"</li>
+</ul>
 <h2 id="17-property-cloud-inventory-plugin"><a name="plugin"></a>17. Property <code>Cloud Inventory &gt; plugin</code></h2>
 <table>
 <thead>
@@ -2171,10 +2174,10 @@ their own authoritative zones you want resolved within the cloud.</p>
 </tbody>
 </table>
 <p><strong>Description:</strong> Id of ansible inventory plugin, needs to be set exactly.</p>
-<p>Must be one of:
-* "pxc.cloud.pve_cloud_inv"</p>
-<hr />
-<p>Generated using <a href="https://github.com/coveooss/json-schema-for-humans">json-schema-for-humans</a> on 2025-12-16 at 21:30:38 +0000</p>
+<p>Must be one of:</p>
+<ul>
+<li>"pxc.cloud.pve_cloud_inv"</li>
+</ul>
 
 
 
@@ -2223,7 +2226,7 @@ their own authoritative zones you want resolved within the cloud.</p>
     
     
       
-      <script id="__config" type="application/json">{"base": "../..", "features": ["toc.follow", "toc.integrate"], "search": "../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"base": "../..", "features": ["toc.follow", "toc.integrate", "search.suggest"], "search": "../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
       <script src="../../assets/javascripts/bundle.f55a23d4.min.js"></script>
