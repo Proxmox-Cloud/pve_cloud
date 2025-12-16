@@ -2,54 +2,20 @@
 
 **Title:** HAProxy Inventory
 
-|                           |             |
-| ------------------------- | ----------- |
-| **Type**                  | `object`    |
-| **Required**              | No          |
-| **Additional properties** | Not allowed |
+|                           |                  |
+| ------------------------- | ---------------- |
+| **Type**                  | `object`         |
+| **Required**              | No               |
+| **Additional properties** | Any type allowed |
 
-**Description:** LXC Inventory extension for the setup_proxy playbook.
+**Description:** LXC Inventory extension for the setup_proxy playbook. This extends the LXC Inventory schema.
 
-| Property                                       | Pattern | Type             | Deprecated | Definition | Title/Description                                                                                                                                       |
-| ---------------------------------------------- | ------- | ---------------- | ---------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| + [target_pve](#target_pve )                   | No      | string           | No         | -          | Proxmox cluster name + . + pve cloud domain. This determines the cloud and the proxmox cluster the vms/lxc/k8s luster will be created in.               |
-| + [stack_name](#stack_name )                   | No      | string           | No         | -          | Your stack name, needs to be unique within the cloud domain.                                                                                            |
-| + [static_includes](#static_includes )         | No      | object           | No         | -          | -                                                                                                                                                       |
-| - [include_stacks](#include_stacks )           | No      | array of object  | No         | -          | Include other stacks into the ansible inventory, from any pve cloud you are connected to. From here you can freely extend and write your own playbooks. |
-| + [root_ssh_pub_key](#root_ssh_pub_key )       | No      | string           | No         | -          | trusted root key for the cloud init image.                                                                                                              |
-| - [pve_ha_group](#pve_ha_group )               | No      | string           | No         | -          | PVE HA group this vm should be assigned to (optional).                                                                                                  |
-| - [target_pve_hosts](#target_pve_hosts )       | No      | array of string  | No         | -          | Array of proxmox hosts in the target pve that are eligible for scheduling. If not specified all online hosts are considered.                            |
-| + [lxcs](#lxcs )                               | No      | array of object  | No         | -          | List of lxcs that will be created for the stack.                                                                                                        |
-| - [lxc_global_vars](#lxc_global_vars )         | No      | object           | No         | -          | Variables that will be applied to all lxc hosts and are available in playbooks.                                                                         |
-| - [lxc_base_parameters](#lxc_base_parameters ) | No      | object           | No         | -          | PVE pct cli parameters that will be used for all lxcs.                                                                                                  |
-| - [lxc_os_template](#lxc_os_template )         | No      | string           | No         | -          | \`pveam available --section system\` / run \`pveam update\` for newest, PVE available LXC template (will be downloaded).                                |
-| - [plugin](#plugin )                           | No      | enum (of string) | No         | -          | Id of ansible inventory plugin.                                                                                                                         |
+| Property                               | Pattern | Type   | Deprecated | Definition | Title/Description                                                                                                                                       |
+| -------------------------------------- | ------- | ------ | ---------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| + [static_includes](#static_includes ) | No      | object | No         | -          | Include other stacks into the ansible inventory, from any pve cloud you are connected to. From here you can freely extend and write your own playbooks. |
+| - [lxcs](#lxcs )                       | No      | array  | No         | -          | List of lxcs that will be created for the stack.                                                                                                        |
 
-## <a name="target_pve"></a>1. Property `HAProxy Inventory > target_pve`
-
-|              |          |
-| ------------ | -------- |
-| **Type**     | `string` |
-| **Required** | Yes      |
-
-**Description:** Proxmox cluster name + . + pve cloud domain. This determines the cloud and the proxmox cluster the vms/lxc/k8s luster will be created in.
-
-**Example:**
-
-```json
-"proxmox-cluster-a.your-cloud.domain"
-```
-
-## <a name="stack_name"></a>2. Property `HAProxy Inventory > stack_name`
-
-|              |          |
-| ------------ | -------- |
-| **Type**     | `string` |
-| **Required** | Yes      |
-
-**Description:** Your stack name, needs to be unique within the cloud domain.
-
-## <a name="static_includes"></a>3. Property `HAProxy Inventory > static_includes`
+## <a name="static_includes"></a>1. Property `HAProxy Inventory > static_includes`
 
 |                           |             |
 | ------------------------- | ----------- |
@@ -57,11 +23,13 @@
 | **Required**              | Yes         |
 | **Additional properties** | Not allowed |
 
+**Description:** Include other stacks into the ansible inventory, from any pve cloud you are connected to. From here you can freely extend and write your own playbooks.
+
 | Property                                             | Pattern | Type   | Deprecated | Definition | Title/Description                                                                                                                                                                                                        |
 | ---------------------------------------------------- | ------- | ------ | ---------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | + [postgres_stack](#static_includes_postgres_stack ) | No      | string | No         | -          | Stack fqdn for postgres patroni stack. On the presence of the host the playbook will fetch<br />proxy configuration from the database. This is needed so that after the initial setup everything<br />still works.<br /> |
 
-### <a name="static_includes_postgres_stack"></a>3.1. Property `HAProxy Inventory > static_includes > postgres_stack`
+### <a name="static_includes_postgres_stack"></a>1.1. Property `HAProxy Inventory > static_includes > postgres_stack`
 
 |              |          |
 | ------------ | -------- |
@@ -78,139 +46,12 @@ still works.
 "patroni.your-cloud.domain"
 ```
 
-## <a name="include_stacks"></a>4. Property `HAProxy Inventory > include_stacks`
+## <a name="lxcs"></a>2. Property `HAProxy Inventory > lxcs`
 
-|              |                   |
-| ------------ | ----------------- |
-| **Type**     | `array of object` |
-| **Required** | No                |
-
-**Description:** Include other stacks into the ansible inventory, from any pve cloud you are connected to. From here you can freely extend and write your own playbooks.
-
-|                      | Array restrictions |
-| -------------------- | ------------------ |
-| **Min items**        | N/A                |
-| **Max items**        | N/A                |
-| **Items unicity**    | False              |
-| **Additional items** | False              |
-| **Tuple validation** | See below          |
-
-| Each item of this array must be               | Description |
-| --------------------------------------------- | ----------- |
-| [include_stacks items](#include_stacks_items) | -           |
-
-### <a name="include_stacks_items"></a>4.1. HAProxy Inventory > include_stacks > include_stacks items
-
-|                           |             |
-| ------------------------- | ----------- |
-| **Type**                  | `object`    |
-| **Required**              | No          |
-| **Additional properties** | Not allowed |
-
-| Property                                                        | Pattern | Type   | Deprecated | Definition | Title/Description                                                                                                                                                                                                                  |
-| --------------------------------------------------------------- | ------- | ------ | ---------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| + [stack_fqdn](#include_stacks_items_stack_fqdn )               | No      | string | No         | -          | Target stack fqdn to include (stack name + pve_cloud_domain). Will automatically include it from the right pve cluster.                                                                                                            |
-| + [host_group](#include_stacks_items_host_group )               | No      | string | No         | -          | This is the name of the hosts group of our ansible inventory the included vms/lxcs will be available under.                                                                                                                        |
-| - [qemu_ansible_user](#include_stacks_items_qemu_ansible_user ) | No      | string | No         | -          | User ansible will use to connect, defaults to admin. If you dont want to use debian cinit images you might need to set something else than admin.<br />Ubuntu for example wont work if you set the cloud init user to admin.<br /> |
-
-#### <a name="include_stacks_items_stack_fqdn"></a>4.1.1. Property `HAProxy Inventory > include_stacks > include_stacks items > stack_fqdn`
-
-|              |          |
-| ------------ | -------- |
-| **Type**     | `string` |
-| **Required** | Yes      |
-
-**Description:** Target stack fqdn to include (stack name + pve_cloud_domain). Will automatically include it from the right pve cluster.
-
-**Examples:**
-
-```json
-"bind.your-other-cloud.domain"
-```
-
-```json
-"other-k8s.your-other-cloud.domain"
-```
-
-#### <a name="include_stacks_items_host_group"></a>4.1.2. Property `HAProxy Inventory > include_stacks > include_stacks items > host_group`
-
-|              |          |
-| ------------ | -------- |
-| **Type**     | `string` |
-| **Required** | Yes      |
-
-**Description:** This is the name of the hosts group of our ansible inventory the included vms/lxcs will be available under.
-
-#### <a name="include_stacks_items_qemu_ansible_user"></a>4.1.3. Property `HAProxy Inventory > include_stacks > include_stacks items > qemu_ansible_user`
-
-|              |          |
-| ------------ | -------- |
-| **Type**     | `string` |
-| **Required** | No       |
-
-**Description:** User ansible will use to connect, defaults to admin. If you dont want to use debian cinit images you might need to set something else than admin.
-Ubuntu for example wont work if you set the cloud init user to admin.
-
-## <a name="root_ssh_pub_key"></a>5. Property `HAProxy Inventory > root_ssh_pub_key`
-
-|              |          |
-| ------------ | -------- |
-| **Type**     | `string` |
-| **Required** | Yes      |
-
-**Description:** trusted root key for the cloud init image.
-
-## <a name="pve_ha_group"></a>6. Property `HAProxy Inventory > pve_ha_group`
-
-|              |          |
-| ------------ | -------- |
-| **Type**     | `string` |
-| **Required** | No       |
-
-**Description:** PVE HA group this vm should be assigned to (optional).
-
-## <a name="target_pve_hosts"></a>7. Property `HAProxy Inventory > target_pve_hosts`
-
-|              |                   |
-| ------------ | ----------------- |
-| **Type**     | `array of string` |
-| **Required** | No                |
-
-**Description:** Array of proxmox hosts in the target pve that are eligible for scheduling. If not specified all online hosts are considered.
-
-|                      | Array restrictions |
-| -------------------- | ------------------ |
-| **Min items**        | N/A                |
-| **Max items**        | N/A                |
-| **Items unicity**    | False              |
-| **Additional items** | False              |
-| **Tuple validation** | See below          |
-
-| Each item of this array must be                   | Description                                                                                                                     |
-| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| [target_pve_hosts items](#target_pve_hosts_items) | The hostname of the proxmox host. Just the hostname, no cluster name or cloud domain should be specified, as they are implicit. |
-
-### <a name="target_pve_hosts_items"></a>7.1. HAProxy Inventory > target_pve_hosts > target_pve_hosts items
-
-|              |          |
-| ------------ | -------- |
-| **Type**     | `string` |
-| **Required** | No       |
-
-**Description:** The hostname of the proxmox host. Just the hostname, no cluster name or cloud domain should be specified, as they are implicit.
-
-**Example:**
-
-```json
-"proxmox-host-a"
-```
-
-## <a name="lxcs"></a>8. Property `HAProxy Inventory > lxcs`
-
-|              |                   |
-| ------------ | ----------------- |
-| **Type**     | `array of object` |
-| **Required** | Yes               |
+|              |         |
+| ------------ | ------- |
+| **Type**     | `array` |
+| **Required** | No      |
 
 **Description:** List of lxcs that will be created for the stack.
 
@@ -226,7 +67,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 | ------------------------------- | ----------- |
 | [lxcs items](#lxcs_items)       | -           |
 
-### <a name="lxcs_items"></a>8.1. HAProxy Inventory > lxcs > lxcs items
+### <a name="lxcs_items"></a>2.1. HAProxy Inventory > lxcs > lxcs items
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -234,32 +75,11 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 | **Required**              | No               |
 | **Additional properties** | Any type allowed |
 
-| Property                                  | Pattern | Type   | Deprecated | Definition | Title/Description                                                                           |
-| ----------------------------------------- | ------- | ------ | ---------- | ---------- | ------------------------------------------------------------------------------------------- |
-| - [hostname](#lxcs_items_hostname )       | No      | string | No         | -          | Optional unique hostname for this lxc, otherwise pet name random name will be generated.    |
-| - [target_host](#lxcs_items_target_host ) | No      | string | No         | -          | Pve host to tie this vm to. This is useful to always deploy specifically on a proxmox host. |
-| + [vars](#lxcs_items_vars )               | No      | object | No         | -          | Custom variables for this lxc specifically. Will be usable in playbooks.                    |
-| + [parameters](#lxcs_items_parameters )   | No      | object | No         | -          | Parameters that will be passed to pve pct cli tool for lxc creation.                        |
+| Property                    | Pattern | Type   | Deprecated | Definition | Title/Description                                                                         |
+| --------------------------- | ------- | ------ | ---------- | ---------- | ----------------------------------------------------------------------------------------- |
+| + [vars](#lxcs_items_vars ) | No      | object | No         | -          | Our proxy stack needs to know which lxc is the keepalived master and who is the failover. |
 
-#### <a name="lxcs_items_hostname"></a>8.1.1. Property `HAProxy Inventory > lxcs > lxcs items > hostname`
-
-|              |          |
-| ------------ | -------- |
-| **Type**     | `string` |
-| **Required** | No       |
-
-**Description:** Optional unique hostname for this lxc, otherwise pet name random name will be generated.
-
-#### <a name="lxcs_items_target_host"></a>8.1.2. Property `HAProxy Inventory > lxcs > lxcs items > target_host`
-
-|              |          |
-| ------------ | -------- |
-| **Type**     | `string` |
-| **Required** | No       |
-
-**Description:** Pve host to tie this vm to. This is useful to always deploy specifically on a proxmox host.
-
-#### <a name="lxcs_items_vars"></a>8.1.3. Property `HAProxy Inventory > lxcs > lxcs items > vars`
+#### <a name="lxcs_items_vars"></a>2.1.1. Property `HAProxy Inventory > lxcs > lxcs items > vars`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -267,13 +87,13 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 | **Required**              | Yes              |
 | **Additional properties** | Any type allowed |
 
-**Description:** Custom variables for this lxc specifically. Will be usable in playbooks.
+**Description:** Our proxy stack needs to know which lxc is the keepalived master and who is the failover.
 
 | Property                                                   | Pattern | Type    | Deprecated | Definition | Title/Description                                        |
 | ---------------------------------------------------------- | ------- | ------- | ---------- | ---------- | -------------------------------------------------------- |
 | + [keepalived_master](#lxcs_items_vars_keepalived_master ) | No      | boolean | No         | -          | One LXC should have this set to true the other to false. |
 
-##### <a name="lxcs_items_vars_keepalived_master"></a>8.1.3.1. Property `HAProxy Inventory > lxcs > lxcs items > vars > keepalived_master`
+##### <a name="lxcs_items_vars_keepalived_master"></a>2.1.1.1. Property `HAProxy Inventory > lxcs > lxcs items > vars > keepalived_master`
 
 |              |           |
 | ------------ | --------- |
@@ -282,129 +102,5 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** One LXC should have this set to true the other to false.
 
-#### <a name="lxcs_items_parameters"></a>8.1.4. Property `HAProxy Inventory > lxcs > lxcs items > parameters`
-
-|                           |                  |
-| ------------------------- | ---------------- |
-| **Type**                  | `object`         |
-| **Required**              | Yes              |
-| **Additional properties** | Any type allowed |
-
-**Description:** Parameters that will be passed to pve pct cli tool for lxc creation.
-
-| Property                                   | Pattern | Type    | Deprecated | Definition | Title/Description                            |
-| ------------------------------------------ | ------- | ------- | ---------- | ---------- | -------------------------------------------- |
-| + [rootfs](#lxcs_items_parameters_rootfs ) | No      | string  | No         | -          | PVE storage for the container disk.          |
-| + [cores](#lxcs_items_parameters_cores )   | No      | integer | No         | -          | Number of virtual CPU cores.                 |
-| + [memory](#lxcs_items_parameters_memory ) | No      | integer | No         | -          | Memory in bytes, use POW 2.                  |
-| + [net0](#lxcs_items_parameters_net0 )     | No      | string  | No         | -          | Configuration for primary network interface. |
-
-##### <a name="lxcs_items_parameters_rootfs"></a>8.1.4.1. Property `HAProxy Inventory > lxcs > lxcs items > parameters > rootfs`
-
-|              |          |
-| ------------ | -------- |
-| **Type**     | `string` |
-| **Required** | Yes      |
-
-**Description:** PVE storage for the container disk.
-
-##### <a name="lxcs_items_parameters_cores"></a>8.1.4.2. Property `HAProxy Inventory > lxcs > lxcs items > parameters > cores`
-
-|              |           |
-| ------------ | --------- |
-| **Type**     | `integer` |
-| **Required** | Yes       |
-
-**Description:** Number of virtual CPU cores.
-
-##### <a name="lxcs_items_parameters_memory"></a>8.1.4.3. Property `HAProxy Inventory > lxcs > lxcs items > parameters > memory`
-
-|              |           |
-| ------------ | --------- |
-| **Type**     | `integer` |
-| **Required** | Yes       |
-
-**Description:** Memory in bytes, use POW 2.
-
-##### <a name="lxcs_items_parameters_net0"></a>8.1.4.4. Property `HAProxy Inventory > lxcs > lxcs items > parameters > net0`
-
-|              |          |
-| ------------ | -------- |
-| **Type**     | `string` |
-| **Required** | Yes      |
-
-**Description:** Configuration for primary network interface.
-
-**Example:**
-
-```json
-"name=eth0,bridge=vmbr0,tag=120,firewall=1,ip=dhcp"
-```
-
-## <a name="lxc_global_vars"></a>9. Property `HAProxy Inventory > lxc_global_vars`
-
-|                           |                  |
-| ------------------------- | ---------------- |
-| **Type**                  | `object`         |
-| **Required**              | No               |
-| **Additional properties** | Any type allowed |
-
-**Description:** Variables that will be applied to all lxc hosts and are available in playbooks.
-
-| Property                                                                           | Pattern | Type    | Deprecated | Definition | Title/Description                                                                                                  |
-| ---------------------------------------------------------------------------------- | ------- | ------- | ---------- | ---------- | ------------------------------------------------------------------------------------------------------------------ |
-| - [use_alternate_ssh_port](#lxc_global_vars_use_alternate_ssh_port )               | No      | boolean | No         | -          | Will use 2222 instead of 22 for ssh.                                                                               |
-| - [install_prom_systemd_exporter](#lxc_global_vars_install_prom_systemd_exporter ) | No      | boolean | No         | -          | Will install prometheus metrics exporter for systemd. This implements with pve cloud terraform monitoring modules. |
-| - [](#lxc_global_vars_additionalProperties )                                       | No      | object  | No         | -          | -                                                                                                                  |
-
-### <a name="lxc_global_vars_use_alternate_ssh_port"></a>9.1. Property `HAProxy Inventory > lxc_global_vars > use_alternate_ssh_port`
-
-|              |           |
-| ------------ | --------- |
-| **Type**     | `boolean` |
-| **Required** | No        |
-
-**Description:** Will use 2222 instead of 22 for ssh.
-
-### <a name="lxc_global_vars_install_prom_systemd_exporter"></a>9.2. Property `HAProxy Inventory > lxc_global_vars > install_prom_systemd_exporter`
-
-|              |           |
-| ------------ | --------- |
-| **Type**     | `boolean` |
-| **Required** | No        |
-
-**Description:** Will install prometheus metrics exporter for systemd. This implements with pve cloud terraform monitoring modules.
-
-## <a name="lxc_base_parameters"></a>10. Property `HAProxy Inventory > lxc_base_parameters`
-
-|                           |                  |
-| ------------------------- | ---------------- |
-| **Type**                  | `object`         |
-| **Required**              | No               |
-| **Additional properties** | Any type allowed |
-
-**Description:** PVE pct cli parameters that will be used for all lxcs.
-
-## <a name="lxc_os_template"></a>11. Property `HAProxy Inventory > lxc_os_template`
-
-|              |          |
-| ------------ | -------- |
-| **Type**     | `string` |
-| **Required** | No       |
-
-**Description:** `pveam available --section system` / run `pveam update` for newest, PVE available LXC template (will be downloaded).
-
-## <a name="plugin"></a>12. Property `HAProxy Inventory > plugin`
-
-|              |                    |
-| ------------ | ------------------ |
-| **Type**     | `enum (of string)` |
-| **Required** | No                 |
-
-**Description:** Id of ansible inventory plugin.
-
-Must be one of:
-* "pxc.cloud.lxc_inv"
-
 ----------------------------------------------------------------------------------------------------------------------------
-Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2025-12-16 at 02:08:18 +0000
+Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2025-12-16 at 21:30:38 +0000

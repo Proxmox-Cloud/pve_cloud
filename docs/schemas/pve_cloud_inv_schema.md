@@ -233,16 +233,16 @@
 
 **Description:** Definitions for specific Proxmox clusters that will be part of the cloud. Keys are hostnames.
 
-| Property                          | Pattern | Type   | Deprecated | Definition | Title/Description |
-| --------------------------------- | ------- | ------ | ---------- | ---------- | ----------------- |
-| - [^.*$](#pve_clusters_pattern1 ) | Yes     | object | No         | -          | PVE cluster fqdn  |
+| Property                                                                                                                                 | Pattern | Type   | Deprecated | Definition | Title/Description                           |
+| ---------------------------------------------------------------------------------------------------------------------------------------- | ------- | ------ | ---------- | ---------- | ------------------------------------------- |
+| - [^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)(?:\.(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?))*$](#pve_clusters_pattern1 ) | Yes     | object | No         | -          | Cloud config for specific proxmox clusters. |
 
-### <a name="pve_clusters_pattern1"></a>12.1. Pattern Property `Cloud Inventory > pve_clusters > PVE cluster fqdn`
+### <a name="pve_clusters_pattern1"></a>12.1. Pattern Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters.`
 > All properties whose name matches the regular expression
-```^.*$``` ([Test](https://regex101.com/?regex=%5E.%2A%24))
+```^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)(?:\.(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?))*$``` ([Test](https://regex101.com/?regex=%5E%28%3F%3A%5Ba-zA-Z0-9%5D%28%3F%3A%5Ba-zA-Z0-9-%5D%7B0%2C61%7D%5Ba-zA-Z0-9%5D%29%3F%29%28%3F%3A%5C.%28%3F%3A%5Ba-zA-Z0-9%5D%28%3F%3A%5Ba-zA-Z0-9-%5D%7B0%2C61%7D%5Ba-zA-Z0-9%5D%29%3F%29%29%2A%24))
 must respect the following conditions
 
-**Title:** PVE cluster fqdn
+**Title:** Cloud config for specific proxmox clusters.
 
 |                           |             |
 | ------------------------- | ----------- |
@@ -250,7 +250,7 @@ must respect the following conditions
 | **Required**              | No          |
 | **Additional properties** | Not allowed |
 
-**Description:** Fully quantified name for the cluster.
+**Description:** This object contains configuration parameters for a proxmox cluster within a proxmox cloud.
 
 | Property                                                                                       | Pattern | Type                      | Deprecated | Definition | Title/Description                                                                                                                                                                                                                                                                                                                                                                            |
 | ---------------------------------------------------------------------------------------------- | ------- | ------------------------- | ---------- | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -259,7 +259,7 @@ must respect the following conditions
 | + [pve_unique_cloud_services](#pve_clusters_pattern1_pve_unique_cloud_services )               | No      | array of enum (of string) | No         | -          | Unique service the cluster provides for its cloud. Unique in the sense that only one cluster may provide each of the services for the entire cloud.<br />Services like haproxy and backup servers can and should be provided by multiple clusters. <br />                                                                                                                                    |
 | - [pve_host_vars](#pve_clusters_pattern1_pve_host_vars )                                       | No      | object                    | No         | -          | Optional variables that will be specifically set for a pve host. Key is the simple host name. <br />This can be used to build your specialized pve cluster setup playbooks. You can do things like<br />wakeonlan, driver and network configuration with these easily. Simply create your own playbook and<br />run it even before the pxc.cloud.setup_pve_clusters on this inventory.<br /> |
 
-#### <a name="pve_clusters_pattern1_pve_haproxy_floating_ip_internal"></a>12.1.1. Property `Cloud Inventory > pve_clusters > PVE cluster fqdn > pve_haproxy_floating_ip_internal`
+#### <a name="pve_clusters_pattern1_pve_haproxy_floating_ip_internal"></a>12.1.1. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_haproxy_floating_ip_internal`
 
 |              |          |
 | ------------ | -------- |
@@ -275,7 +275,7 @@ Inside the cloud if you define a certificate entry, some nodeport forward or def
 "192.168.10.6"
 ```
 
-#### <a name="pve_clusters_pattern1_pve_haproxy_floating_ip_external"></a>12.1.2. Property `Cloud Inventory > pve_clusters > PVE cluster fqdn > pve_haproxy_floating_ip_external`
+#### <a name="pve_clusters_pattern1_pve_haproxy_floating_ip_external"></a>12.1.2. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_haproxy_floating_ip_external`
 
 |              |          |
 | ------------ | -------- |
@@ -290,7 +290,7 @@ Inside the cloud if you define a certificate entry, some nodeport forward or def
 "192.168.10.7"
 ```
 
-#### <a name="pve_clusters_pattern1_pve_unique_cloud_services"></a>12.1.3. Property `Cloud Inventory > pve_clusters > PVE cluster fqdn > pve_unique_cloud_services`
+#### <a name="pve_clusters_pattern1_pve_unique_cloud_services"></a>12.1.3. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_unique_cloud_services`
 
 |              |                             |
 | ------------ | --------------------------- |
@@ -312,7 +312,7 @@ Services like haproxy and backup servers can and should be provided by multiple 
 | ----------------------------------------------------------------------------------------- | ----------- |
 | [pve_unique_cloud_services items](#pve_clusters_pattern1_pve_unique_cloud_services_items) | -           |
 
-##### <a name="pve_clusters_pattern1_pve_unique_cloud_services_items"></a>12.1.3.1. Cloud Inventory > pve_clusters > PVE cluster fqdn > pve_unique_cloud_services > pve_unique_cloud_services items
+##### <a name="pve_clusters_pattern1_pve_unique_cloud_services_items"></a>12.1.3.1. Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_unique_cloud_services > pve_unique_cloud_services items
 
 |              |                    |
 | ------------ | ------------------ |
@@ -324,7 +324,7 @@ Must be one of:
 * "dhcp"
 * "psql-state"
 
-#### <a name="pve_clusters_pattern1_pve_host_vars"></a>12.1.4. Property `Cloud Inventory > pve_clusters > PVE cluster fqdn > pve_host_vars`
+#### <a name="pve_clusters_pattern1_pve_host_vars"></a>12.1.4. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -342,7 +342,7 @@ run it even before the pxc.cloud.setup_pve_clusters on this inventory.
 | - [disable_ipmi](#pve_clusters_pattern1_pve_host_vars_disable_ipmi ) | No      | boolean | No         | -          | If specified will disable the openipmi power managemend systemd service. This might fail on proxmox<br />hosts that dont support it and clutters up monitoring.<br /> |
 | - [](#pve_clusters_pattern1_pve_host_vars_additionalProperties )     | No      | object  | No         | -          | -                                                                                                                                                                     |
 
-##### <a name="pve_clusters_pattern1_pve_host_vars_disable_ipmi"></a>12.1.4.1. Property `Cloud Inventory > pve_clusters > PVE cluster fqdn > pve_host_vars > disable_ipmi`
+##### <a name="pve_clusters_pattern1_pve_host_vars_disable_ipmi"></a>12.1.4.1. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > disable_ipmi`
 
 |              |           |
 | ------------ | --------- |
@@ -476,4 +476,4 @@ Must be one of:
 * "pxc.cloud.pve_cloud_inv"
 
 ----------------------------------------------------------------------------------------------------------------------------
-Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2025-12-16 at 02:08:18 +0000
+Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2025-12-16 at 21:30:38 +0000

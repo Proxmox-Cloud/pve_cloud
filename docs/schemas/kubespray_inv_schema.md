@@ -14,7 +14,7 @@
 | -------------------------------------------------------- | ------- | ---------------- | ---------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | + [target_pve](#target_pve )                             | No      | string           | No         | -          | Proxmox cluster name + . + pve cloud domain. This determines the cloud and the proxmox cluster the vms/lxc/k8s luster will be created in.                                                                                                                                     |
 | + [stack_name](#stack_name )                             | No      | string           | No         | -          | Your stack name, needs to be unique within the cloud domain.                                                                                                                                                                                                                  |
-| + [static_includes](#static_includes )                   | No      | object           | No         | -          | -                                                                                                                                                                                                                                                                             |
+| + [static_includes](#static_includes )                   | No      | object           | No         | -          | This property contains specific hosts / stacks that need to be included for a schema extension. This way playbooks can statically<br />reference a host group and assume it to be a certain stack (e.g. postgres/haproxy/dhcp).<br />                                         |
 | - [include_stacks](#include_stacks )                     | No      | array of object  | No         | -          | Include other stacks into the ansible inventory, from any pve cloud you are connected to. From here you can freely extend and write your own playbooks.                                                                                                                       |
 | + [root_ssh_pub_key](#root_ssh_pub_key )                 | No      | string           | No         | -          | trusted root key for the cloud init image.                                                                                                                                                                                                                                    |
 | - [pve_ha_group](#pve_ha_group )                         | No      | string           | No         | -          | PVE HA group this vm should be assigned to (optional).                                                                                                                                                                                                                        |
@@ -66,6 +66,9 @@
 | **Type**                  | `object`    |
 | **Required**              | Yes         |
 | **Additional properties** | Not allowed |
+
+**Description:** This property contains specific hosts / stacks that need to be included for a schema extension. This way playbooks can statically
+reference a host group and assume it to be a certain stack (e.g. postgres/haproxy/dhcp).
 
 | Property                                             | Pattern | Type   | Deprecated | Definition | Title/Description                                                                                                                                      |
 | ---------------------------------------------------- | ------- | ------ | ---------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -937,4 +940,4 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 **Description:** If set to true will use acme staging directory for issueing certs.
 
 ----------------------------------------------------------------------------------------------------------------------------
-Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2025-12-16 at 02:08:18 +0000
+Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2025-12-16 at 21:30:38 +0000
