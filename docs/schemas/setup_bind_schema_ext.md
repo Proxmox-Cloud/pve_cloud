@@ -387,4 +387,4 @@ Must be one of:
 * "pxc.cloud.lxc_inv"
 
 ----------------------------------------------------------------------------------------------------------------------------
-Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2025-12-15 at 01:47:48 +0000
+Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2025-12-16 at 01:59:14 +0000
