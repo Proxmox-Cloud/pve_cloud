@@ -18,7 +18,7 @@ These machines need ssh access to the root user of your proxmox clusters. Genera
 
 Next install the following packages/tools on your development machine:
 
-* `apt install avahi-utils` (with this we can discover our proxmox hosts and clusters)
+* `apt install avahi-utils` (with this we can discover our proxmox hosts and clusters, don't install if you are using the [fallback approach](bootstrap.md#cli-fallback-approach))
 * python3 (+ recommended virtual env)
 * [terraform](https://developer.hashicorp.com/terraform/install#linux)
 * [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/)
@@ -39,6 +39,8 @@ Domains for services like for example `gitlab.example.com` can be added later in
 
 
 ## Setup Proxmox host discovery
+
+The recommended approach for discovering your proxmox hosts from your development machine is [avahi](https://avahi.org/). If you encounter limitations in your network setup, you can also defer to the [fallback approach](bootstrap.md#cli-fallback-approach) using `pvcli connect-cluster`.
 
 We need to make the proxmox cluster discoverable, for that run `apt install avahi-daemon` on one proxmox host of your choice.
 
@@ -96,6 +98,15 @@ host_key_checking = False
 # playbook execution gets halted
 any_unparsed_is_failed = True
 ```
+
+## CLI Fallback Approach
+
+After you have finished the setup of your python venv and ran the `ansible-playbook pxc.cloud.setup_control_node` you should have the cli tool `pvcli` available to you.
+
+Connect to your one proxmox clusters `pvcli connect-cluster --pve-host $PROXMOX_HOST` (run once per cluster, per cloud domain).
+
+The cli will ask you for a cloud domain if the cluster has not already one assigned.
+
 
 ### Repository setup
 
