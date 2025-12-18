@@ -303,7 +303,16 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Bootstrap">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cli-fallback-approach" class="md-nav__link">
+    <span class="md-ellipsis">
+      CLI Fallback Approach
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="CLI Fallback Approach">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -721,7 +730,7 @@
 <p>These machines need ssh access to the root user of your proxmox clusters. Generate / install a key and add it to <code>~/.ssh/authorized_keys</code> on one of the proxmox hosts (proxmox automatically syncs this file accross all hosts in a cluster).</p>
 <p>Next install the following packages/tools on your development machine:</p>
 <ul>
-<li><code>apt install avahi-utils</code> (with this we can discover our proxmox hosts and clusters)</li>
+<li><code>apt install avahi-utils</code> (with this we can discover our proxmox hosts and clusters, don't install if you are using the <a href="./#cli-fallback-approach">fallback approach</a>)</li>
 <li>python3 (+ recommended virtual env)</li>
 <li><a href="https://developer.hashicorp.com/terraform/install#linux">terraform</a></li>
 <li><a href="https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/">kubectl</a></li>
@@ -736,6 +745,7 @@
 <p>For this and for service identification we need a unique domain, that should not overlap / be used with other services you host.</p>
 <p>Domains for services like for example <code>gitlab.example.com</code> can be added later in our cluster definition files. The cloud domain should be something like <code>your-cloud.example.com</code>.</p>
 <h2 id="setup-proxmox-host-discovery">Setup Proxmox host discovery</h2>
+<p>The recommended approach for discovering your proxmox hosts from your development machine is <a href="https://avahi.org/">avahi</a>. If you encounter limitations in your network setup, you can also defer to the <a href="./#cli-fallback-approach">fallback approach</a> using <code>pvcli connect-cluster</code>.</p>
 <p>We need to make the proxmox cluster discoverable, for that run <code>apt install avahi-daemon</code> on one proxmox host of your choice.</p>
 <p>Next create an avahi service file (<code>/etc/avahi/services/pxc.service</code>) on the host with the following content:</p>
 <pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; standalone='no'?&gt;&lt;!--*-nxml-*--&gt;
@@ -785,6 +795,10 @@ host_key_checking = False
 # playbook execution gets halted
 any_unparsed_is_failed = True
 </code></pre>
+<h2 id="cli-fallback-approach">CLI Fallback Approach</h2>
+<p>After you have finished the setup of your python venv and ran the <code>ansible-playbook pxc.cloud.setup_control_node</code> you should have the cli tool <code>pvcli</code> available to you.</p>
+<p>Connect to your one proxmox clusters <code>pvcli connect-cluster --pve-host $PROXMOX_HOST</code> (run once per cluster, per cloud domain).</p>
+<p>The cli will ask you for a cloud domain if the cluster has not already one assigned.</p>
 <h3 id="repository-setup">Repository setup</h3>
 <p>As in the <a href="https://github.com/Proxmox-Cloud/pve_cloud/tree/master/samples/cloud-instance">samples/cloud-instance</a> your repository that defines the core pve cloud components you need:</p>
 <ul>
