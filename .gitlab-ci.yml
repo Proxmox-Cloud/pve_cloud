@@ -1,6 +1,6 @@
 release_tag:
   stage: build
-  image: tobiashvmz/pve-cloud-ci:2025122113
+  image: docker.io/tobiashvmz/pve-cloud-ci:2025122115
   script:
     - git config --global user.name "$GITLAB_USER_NAME"
     - git config --global user.email "$GITLAB_USER_EMAIL"
@@ -61,7 +61,7 @@ release_tag:
 
 pve_cloud_schemas_upstream:
   stage: build
-  image: tobiashvmz/pve-cloud-ci:2025122113
+  image: docker.io/tobiashvmz/pve-cloud-ci:2025122115
   script:
     # write the new version
     - sed -i "s/^pve-cloud-schemas==.*$/pve-cloud-schemas==${PVE_CLOUD_SCHEMAS}/" meta/ee-requirements.txt
@@ -74,7 +74,7 @@ pve_cloud_schemas_upstream:
 # pipeline trigger if the upstream releases
 py_pve_cloud_upstream:
   stage: build
-  image: tobiashvmz/pve-cloud-ci:2025122113
+  image: docker.io/tobiashvmz/pve-cloud-ci:2025122115
   script:
     # write the new version
     - sed -i "s/^py-pve-cloud==.*$/py-pve-cloud==${PY_PVE_CLOUD}/" meta/ee-requirements.txt
@@ -85,7 +85,7 @@ py_pve_cloud_upstream:
 
 pve_cloud_backup_upstream:
   stage: build
-  image: tobiashvmz/pve-cloud-ci:2025122113
+  image: docker.io/tobiashvmz/pve-cloud-ci:2025122115
   script:
     # write the new version
     - |
