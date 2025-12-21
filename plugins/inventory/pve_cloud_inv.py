@@ -42,7 +42,7 @@ class InventoryModule(BaseInventoryPlugin):
 
         # skip validation, only in this case since in the playbooks associated with
         # pve cloud inv we set the py_pve_cloud_version cluster var
-        pve_inventory = get_pve_inventory(yaml_data['pve_cloud_domain'], True) 
+        pve_inventory = get_pve_inventory(yaml_data['pve_cloud_domain'], skip_py_cloud_check=True) 
 
         display.v("pve_inventory", pve_inventory)
 
