@@ -25,7 +25,7 @@ Checkout the [samples directory](https://github.com/Proxmox-Cloud/pve_cloud/tree
 @startuml
 
 ' Top-down hierarchy
-left to right direction
+top to bottom direction
 
 ' Define objects instead of packages
 object "py-pve-cloud" as py_pve_cloud {
@@ -97,11 +97,11 @@ terraform_provider --> backup_module
 
 controller_image --> controller_module
 backup_image --> backup_module
+backup_image --> cloud_collection
 
 cloud_schemas --> cloud_collection
 
 @enduml
-
 ```
 
 ## Compatibility
