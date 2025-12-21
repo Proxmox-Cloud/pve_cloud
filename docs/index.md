@@ -51,7 +51,7 @@ object "terraform-proxmox-cloud-controller" as controller_module {
   * Namespace watcher
 }
 
-object "terraform-proxmox-cloud-module" as backup_module {
+object "terraform-proxmox-cloud-backup" as backup_module {
   * <u>terraform module</u>
   * K8s backup fetcher cron
   * Patroni db dumps
