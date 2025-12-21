@@ -70,6 +70,8 @@ pytest -s tests/e2e/ --skip-cleanup
 pytest -s tests/e2e/test_cloud.py::test_bind --skip-cleanup
 ```
 
+If you want to develop the terraform provider you need golang installed.
+
 ### Kubeconfig access
 
 If you passed `--skip-cleanup` to pytest, the kubespray tests will write a `.test-kubeconfig.yaml` file you can use for lens access to the testing cluster.

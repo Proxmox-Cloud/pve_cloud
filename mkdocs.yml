@@ -13,6 +13,9 @@ nav:
 
 theme:
   name: material
+  palette:
+    scheme: default
+
   features:
     - toc.follow
     - toc.integrate
@@ -21,3 +24,7 @@ theme:
 plugins:
   - search
   - include_dir_to_nav
+  - plantuml:
+      puml_url: https://www.plantuml.com/plantuml/
+      theme:
+        dark: material/indigo-dark
