@@ -1,5 +1,5 @@
 py-pve-cloud==0.13.11
-pve-cloud-schemas==0.3.14
+pve-cloud-schemas==0.3.15
 
 asyncssh==2.21.0
 petname==2.6
