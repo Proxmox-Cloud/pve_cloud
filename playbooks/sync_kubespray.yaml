@@ -110,7 +110,7 @@
   roles:
     - slurp_cluster_secrets
 
-- name: Write config to postgres
+- name: Write k8s config
   hosts: localhost
   tags:
     - config
@@ -119,7 +119,7 @@
   roles:
     - parse_cluster_secrets
     - set_kube_dns_records
-    - set_stack_network_config
+    - set_k8s_conf_records
     - set_k8s_bind_domains
 
 - name: Config for all nodes in k8s cluster
@@ -136,26 +136,9 @@
         path: /home/{{ "admin" if qemu_default_user is undefined else qemu_default_user }}/.ssh/authorized_keys
         line: "{{ cluster_automation_pub_key | b64decode | trim }}"
         state: present
-        
-- name: Config for master nodes
-  hosts: kube_control_plane
-  vars:
-    proxy_stack_fqdn: "{{ static_includes.proxy_stack }}"
-  tags:
-    - config
-  roles:
-    - set_haproxy_k8s_masters
 
-
-- name: Configs for worker nodes
-  hosts: kube_node
-  vars:
-    proxy_stack_fqdn: "{{ static_includes.proxy_stack }}"
-  tags:
-    - config
-  roles:
-    - set_haproxy_k8s_workers
-
+# todo: can be factored out if patroni lxcs themselfes get entries in
+# the database (used in haproxy cfg template)
 - name: Fetch ha-postgres
   hosts: postgres_stack
   tags:

@@ -5,15 +5,8 @@ import os
 import asyncio
 import paramiko
 import secrets
+from ansible.errors import AnsibleError
 
-# keys in the yaml inventory that will be set as variables to all hosts in the play
-GLOBAL_KEYS = [
-    "qemus", "stack_name", "pve_ha_group", "extra_control_plane_sans",
-    "qemu_network_config", "qemu_base_parameters", "qemu_image_url", 
-    "root_ssh_pub_key", "qemu_keyboard_layout", "cluster_cert_entries", "external_domains",
-    "tcp_proxies", "qemu_hashed_pw", "qemu_default_user", 
-    "acme_staging", "ceph_csi_sc_pools", "static_includes", "qemu_global_vars"
-]
 
 class InventoryModule(BaseInventoryPlugin):
 
@@ -46,9 +39,8 @@ class InventoryModule(BaseInventoryPlugin):
 
 
     def set_global_vars(self, yaml_data, inventory):
-        for key in GLOBAL_KEYS:
-            if key in yaml_data:
-                inventory.set_variable('all', key, yaml_data[key])
+        for key in yaml_data:
+            inventory.set_variable('all', key, yaml_data[key])
 
 
     async def stack_qemus(self, inventory, stack_vms, target_cluster):
@@ -103,7 +95,16 @@ class InventoryModule(BaseInventoryPlugin):
 
             inventory.set_variable(hostname, 'ansible_user', 'admin' if 'qemu_default_user' not in yaml_data else yaml_data['qemu_default_user'])
             inventory.set_variable(hostname, 'ansible_become', True) # needed for kubespray playbook execution
-
+            
+            # machine type can only be either master or worker
+            # if a node is both its still getting only the master machine type
+            if 'master' in tags:
+                inventory.set_variable(hostname, 'cloud_machine_type', 'k8s_master') 
+            elif 'worker' in tags:
+                inventory.set_variable(hostname, 'cloud_machine_type', 'k8s_worker')
+            else:
+                raise AnsibleError(f"Could determine machine type from tags {tags}")
+            
             blake = stack_vm_get_blake(vm)
 
             # check if we can match the id to our inventory file

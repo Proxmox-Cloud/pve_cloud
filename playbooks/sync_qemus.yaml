@@ -89,9 +89,115 @@
   roles:
     - alternate_ssh_port
     - parse_cluster_secrets
+    - set_kea_reservations
   tasks:
     - name: install automation pubkey
       lineinfile:
         path: /home/{{ "admin" if qemu_default_user is undefined else qemu_default_user }}/.ssh/authorized_keys
         line: "{{ cluster_automation_pub_key | b64decode | trim }}"
         state: present
+
+# todo: can be factored out if patroni lxcs themselfes get entries in
+# the database (used in haproxy cfg template)
+- name: Fetch ha-postgres
+  hosts: postgres_stack
+  tags:
+    - config
+
+
+- name: Write stack config
+  hosts: localhost
+  tags:
+    - config
+  pre_tasks:
+    - set_fact:
+        proxy_stack_fqdn: "{{ static_includes.proxy_stack }}"
+      # proxy stack will only be defined if these are
+      when: tcp_proxies is defined or ingress_domains is defined
+  roles:
+    - parse_cluster_secrets
+  tasks:
+    - name: clear tcp proxies
+      alchemy_delete:
+        pg_conn_str: "{{ pg_conn_str }}"
+        table: k8s_tcp_proxies
+        where:
+          stack_fqdn: "{{ stack_name }}.{{ pve_cloud_domain }}"
+          proxy_stack_fqdn: "{{ proxy_stack_fqdn }}"
+      when: tcp_proxies is defined
+
+    - name: insert tcp proxies
+      alchemy_write:
+        pg_conn_str: "{{ pg_conn_str }}"
+        table: k8s_tcp_proxies
+        rows:
+          - proxy_name: "{{ item.proxy_name }}"
+            haproxy_port: "{{ item.haproxy_port }}"
+            node_port: "{{ item.node_port }}"
+            stack_fqdn: "{{ stack_name }}.{{ pve_cloud_domain }}"
+            proxy_stack_fqdn: "{{ proxy_stack_fqdn }}"
+            external: "{{ False if item.external is not defined else item.external }}"
+            proxy_snippet: "{{ item.proxy_snippet if item.proxy_snippet is defined else None }}"
+            is_k8s: false # only differnce to k8s
+      loop: "{{ tcp_proxies }}"
+      when: tcp_proxies is defined
+
+    - name: clear ingress domains
+      alchemy_delete:
+        pg_conn_str: "{{ pg_conn_str }}"
+        table: k8s_ingress_rules
+        where:
+          proxy_stack_fqdn: "{{ proxy_stack_fqdn }}"
+          stack_fqdn: "{{ stack_name }}.{{ pve_cloud_domain }}"
+      when: ingress_domains is defined
+
+    - name: insert internal ingress domains from cert conf
+      alchemy_write:
+        pg_conn_str: "{{ pg_conn_str }}"
+        table: k8s_ingress_rules
+        rows:
+          - zone: "{{ item.0.zone }}"
+            name: "{{ item.1 }}"
+            stack_fqdn: "{{ stack_name }}.{{ pve_cloud_domain }}"
+            proxy_stack_fqdn: "{{ proxy_stack_fqdn }}"
+            external: "{{ item.0.external | default(false) }}"
+            is_k8s: false
+            rule_len: "{{ (item.0.zone | length) + (item.1 | length) }}"
+      loop: "{{ ingress_domains | subelements('names') }}"
+      when: ingress_domains is defined
+
+    # add bind records for services
+    # todo: code some kind of cleanup, also automatic auth zone creation if not exists
+    - name: ingress dns entries
+      community.general.nsupdate:
+        key_name: "internal."
+        key_algorithm: "hmac-sha256"
+        key_secret: "{{ bind_internal_key }}"
+        server: "{{  bind_master_ip }}"
+        zone: "{{ item.0.zone }}"
+        record: "{{ item.1 }}"
+        value: "{{ groups['qemus'] | map('extract', hostvars, ['ansible_default_ipv4', 'address']) | list }}"
+        state: "present"
+      loop: "{{ ingress_domains | subelements('names') }}"
+
+
+# these will only execute if tcp_proxies or ingress_domains is defined
+- name: Refresh HAproxies
+  hosts: proxy_stack
+  tags:
+    - config
+  vars:
+    proxy_stack_fqdn: "{{ static_includes.proxy_stack }}"
+  roles:
+    - parse_cluster_secrets
+    - select_haproxy_conf
+    - apply_haproxy_conf
+
+- name: Kea reservations
+  hosts: dhcp_stack
+  roles:
+    - parse_cluster_secrets
+    - select_kea_conf
+    - apply_kea_dhcp4_conf
+  tags:
+    - config

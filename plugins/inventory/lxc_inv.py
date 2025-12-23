@@ -8,10 +8,6 @@ import asyncio
 
 display = Display()
 
-# keys will be added to all hosts as variables
-GLOBAL_KEYS = ["lxcs", "stack_name", "pve_ha_group", "lxc_base_parameters", "lxc_os_template", "root_ssh_pub_key", "include_stacks", "lxc_global_vars"]
-
-
 class InventoryModule(BaseInventoryPlugin):
 
     def verify_file(self, path):
@@ -24,9 +20,8 @@ class InventoryModule(BaseInventoryPlugin):
     
     
     def set_global_vars(self, yaml_data, inventory):
-        for key in GLOBAL_KEYS:
-            if key in yaml_data:
-                inventory.set_variable('all', key, yaml_data[key])
+        for key in yaml_data:
+            inventory.set_variable('all', key, yaml_data[key])
 
     
     async def stack_lxcs(self, inventory, online_pve_hosts, stack_vms, cluster_name):
@@ -57,6 +52,8 @@ class InventoryModule(BaseInventoryPlugin):
         # set host specific vars
         for vm in stack_vms:
             hostname = vm['name']
+
+            inventory.set_variable(hostname, 'cloud_machine_type', 'lxc') # machine type for cloud logic
 
             # get hash to map variables
             blake = stack_vm_get_blake(vm)

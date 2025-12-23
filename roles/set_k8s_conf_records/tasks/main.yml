@@ -1,5 +1,5 @@
 ---
-# tasks file for set_stack_network_config
+# tasks file for set_k8s_conf_records
 # ingress
 - name: clear ingress domains
   alchemy_delete:
@@ -19,6 +19,7 @@
         stack_fqdn: "{{ stack_name }}.{{ pve_cloud_domain }}"
         proxy_stack_fqdn: "{{ proxy_stack_fqdn }}"
         external: false
+        is_k8s: true
         rule_len: "{{ (item.0.zone | length) + (item.1 | length) }}"
   loop: "{{ cluster_cert_entries | subelements('names') }}"
   
@@ -32,6 +33,7 @@
       stack_fqdn: "{{ stack_name }}.{{ pve_cloud_domain }}"
       proxy_stack_fqdn: "{{ proxy_stack_fqdn }}"
       external: true
+      is_k8s: true
       rule_len: "{{ (item.0.zone | length) + (item.1  | length) }}"
     conflict_cols:
       - zone
@@ -49,6 +51,7 @@
         stack_fqdn: "{{ stack_name }}.{{ pve_cloud_domain }}"
         proxy_stack_fqdn: "{{ proxy_stack_fqdn }}"
         external: true
+        is_k8s: true
         rule_len: "{{ (item.zone | length) }}"
   loop: "{{ external_domains }}"
   when: item.expose_apex is defined and item.expose_apex
@@ -74,6 +77,7 @@
         proxy_stack_fqdn: "{{ proxy_stack_fqdn }}"
         external: "{{ False if item.external is not defined else item.external }}"
         proxy_snippet: "{{ item.proxy_snippet if item.proxy_snippet is defined else None }}"
+        is_k8s: true
   loop: "{{ tcp_proxies }}"
 
 # external controlplane

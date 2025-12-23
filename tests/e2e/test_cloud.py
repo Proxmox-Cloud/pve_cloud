@@ -135,6 +135,27 @@ def test_create_qemu(request, get_test_env, setup_haproxy_lxcs):
         "net0": "virtio,bridge=vmbr0,firewall=1",
         "sockets": 1
       },
+      "tcp_proxies": [
+        {
+          "proxy_name": "vm-tcp-test",
+          "haproxy_port": 7432,
+          "node_port": 5432,
+          "external": True
+        }
+      ],
+      "ingress_domains": [
+        {
+          "zone": get_test_env["pve_test_deployments_domain"],
+          "names": ["mail-example", "other-service-example"],
+          "external": True
+        }
+      ],
+      "static_includes": {
+        "dhcp_stack": "ha-dhcp." + get_test_env["pve_test_cloud_domain"],
+        "proxy_stack": "ha-haproxy." + get_test_env["pve_test_cloud_domain"],
+        "postgres_stack": "ha-postgres." + get_test_env["pve_test_cloud_domain"],
+        "bind_stack": "ha-bind." + get_test_env["pve_test_cloud_domain"],
+      },
       "qemus": [
         { 
           "hostname": "test-vm",
@@ -195,7 +216,13 @@ def test_create_kubespray(request, get_test_env, setup_haproxy_lxcs, setup_cache
         "postgres_stack": "ha-postgres." + get_test_env["pve_test_cloud_domain"],
         "cache_stack": "cloud-cache." + get_test_env["pve_test_cloud_domain"],
       },
-      "tcp_proxies": [],
+      "tcp_proxies": [
+        {
+          "proxy_name": "postgres-test",
+          "haproxy_port": 6432,
+          "node_port": 30432
+        }
+      ],
       "external_domains": [
         {
           "zone": get_test_env["pve_test_deployments_domain"],

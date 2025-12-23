@@ -6,13 +6,6 @@ from ansible_collections.pxc.cloud.plugins.module_utils.inventory import init_pl
 from ansible_collections.pxc.cloud.plugins.module_utils.identity import stack_vm_get_blake
 
 
-GLOBAL_KEYS = [
-    "qemus", "stack_name", "pve_ha_group", 
-    "qemu_network_config", "qemu_base_parameters", 
-    "qemu_image_url", "root_ssh_pub_key", "qemu_keyboard_layout", 
-    "qemu_hashed_pw", "qemu_default_user", "qemu_global_vars"
-]
-
 class InventoryModule(BaseInventoryPlugin):
 
     def verify_file(self, path):
@@ -25,9 +18,8 @@ class InventoryModule(BaseInventoryPlugin):
 
 
     def set_global_vars(self, yaml_data, inventory):
-        for key in GLOBAL_KEYS:
-            if key in yaml_data:
-                inventory.set_variable('all', key, yaml_data[key])
+        for key in yaml_data:
+            inventory.set_variable('all', key, yaml_data[key])
 
 
     async def stack_qemus(self, inventory, stack_vms, target_cluster):
@@ -62,6 +54,8 @@ class InventoryModule(BaseInventoryPlugin):
 
             inventory.set_variable(hostname, 'ansible_user', 'admin' if 'qemu_default_user' not in yaml_data else yaml_data['qemu_default_user'])
             inventory.set_variable(hostname, 'ansible_become', True) # needed for kubespray playbook execution
+
+            inventory.set_variable(hostname, 'cloud_machine_type', 'qemu') # machine type for cloud logic
 
             blake = stack_vm_get_blake(vm)
             # check if we can match the id to our inventory file

@@ -82,8 +82,13 @@ frontend k8s-ingress-internal
 
         # internal get all ingress rules
 {% for ingress_rule in k8s_ingress_rules.query_result | sort(attribute='rule_len', reverse=true) %}
+{% if ingress_rule.is_k8s %}
         use_backend k8s-ingress_{{ ingress_rule.stack_fqdn }} if { req.ssl_sni -m reg ^{{ ingress_rule.name | regex_replace('\.', '\\.') | regex_replace('\\*', '.*')  }}\.{{ ingress_rule.zone | regex_replace('\.', '\\.') }}$ }
+{% else %}
+        use_backend vms-ingress_{{ ingress_rule.stack_fqdn }} if { req.ssl_sni -m reg ^{{ ingress_rule.name | regex_replace('\.', '\\.') | regex_replace('\\*', '.*')  }}\.{{ ingress_rule.zone | regex_replace('\.', '\\.') }}$ }
+{% endif %}
 {% endfor %}
+
 
 
 # specific external floating ip for access control
@@ -97,16 +102,32 @@ frontend k8s-ingress-external
 
         # external gets only rules specifically declared for external
 {% for ingress_rule in k8s_ingress_rules.query_result | sort(attribute='rule_len', reverse=true) if ingress_rule.external %}
+{% if ingress_rule.is_k8s %}
         use_backend k8s-ingress_{{ ingress_rule.stack_fqdn }} if { req.ssl_sni -m reg ^{{ ingress_rule.name | regex_replace('\.', '\\.') | regex_replace('\\*', '.*')  }}\.{{ ingress_rule.zone | regex_replace('\.', '\\.') }}$ }
+{% else %}
+        use_backend vms-ingress_{{ ingress_rule.stack_fqdn }} if { req.ssl_sni -m reg ^{{ ingress_rule.name | regex_replace('\.', '\\.') | regex_replace('\\*', '.*')  }}\.{{ ingress_rule.zone | regex_replace('\.', '\\.') }}$ }
+{% endif %}
+
 {% endfor %}
 
 
 # create https backend for all cluster stacks
-{% for stack_fqdn, workers in grouped_k8s_workers.items() %}
+{% for stack_fqdn, workers in k8s_workers_by_stack.items() %}
 backend k8s-ingress_{{ stack_fqdn }}
         mode tcp
 {% for worker in workers %}
         server {{ worker.hostname }} {{ worker.ip }}:443 check send-proxy-v2
+{% endfor %}
+
+
+{% endfor %}
+
+# create https backend for vms / lxc that have ingress_domains defined
+{% for stack_fqdn, machines in ingress_vms_by_stack.items() %}
+backend vms-ingress_{{ stack_fqdn }}
+        mode tcp
+{% for machine in machines %}
+        server {{ machine.hostname }} {{ machine.ip }}:443 check
 {% endfor %}
 
 
@@ -127,16 +148,32 @@ frontend k8s-ingress-http
 
         # internal get all ingress rules
 {% for ingress_rule in k8s_ingress_rules.query_result | sort(attribute='rule_len', reverse=true) %}
+{% if ingress_rule.is_k8s %}
         use_backend k8s-ingress-http_{{ ingress_rule.stack_fqdn }} if { hdr(host) -m reg ^{{ ingress_rule.name | regex_replace('\.', '\\.') | regex_replace('\\*', '.*')  }}\.{{ ingress_rule.zone | regex_replace('\.', '\\.') }}$ }
+{% else %}
+        use_backend vms-ingress-http_{{ ingress_rule.stack_fqdn }} if { hdr(host) -m reg ^{{ ingress_rule.name | regex_replace('\.', '\\.') | regex_replace('\\*', '.*')  }}\.{{ ingress_rule.zone | regex_replace('\.', '\\.') }}$ }
+{% endif %}
+
 {% endfor %}
 
 
 # create backend for all cluster stacks
-{% for stack_fqdn, workers in grouped_k8s_workers.items() %}
+{% for stack_fqdn, workers in k8s_workers_by_stack.items() %}
 backend k8s-ingress-http_{{ stack_fqdn }}
         mode tcp
 {% for worker in workers %}
         server {{ worker.hostname }} {{ worker.ip }}:80 check send-proxy-v2
+{% endfor %}
+
+
+{% endfor %}
+
+# create backend for vms / lxcs that have ingress_domains defined
+{% for stack_fqdn, machines in ingress_vms_by_stack.items() %}
+backend vms-ingress-http_{{ stack_fqdn }}
+        mode tcp
+{% for machine in machines %}
+        server {{ machine.hostname }} {{ machine.ip }}:80 check
 {% endfor %}
 
 
@@ -153,7 +190,7 @@ frontend k8s-control-plane-internal
         tcp-request inspect-delay 5s
         tcp-request content accept if { req_ssl_hello_type 1 }
 
-{% for stack_fqdn in grouped_k8s_masters.keys() %}     
+{% for stack_fqdn in k8s_masters_by_stack.keys() %}     
         use_backend k8s-control-plane_{{ stack_fqdn }} if { req.ssl_sni -m reg ^control-plane-{{ stack_fqdn }}$ }
 {% endfor %}
 {% for control_plane in k8s_ext_control_planes.query_result %}
@@ -180,15 +217,15 @@ frontend k8s-control-plane-external
 
 
 # create backend for all cluster stacks
-{% for stack_fqdn, masters in grouped_k8s_masters.items() %}
+{% for stack_fqdn, masters in k8s_masters_by_stack.items() %}
 backend k8s-control-plane_{{ stack_fqdn }}
         mode tcp
 {% for master in masters %}
         server {{ master.hostname }} {{ master.ip }}:6443 check
 {% endfor %}
 
-
 {% endfor %}
+
 
 # internal tcp proxies to k8s workers
 {% for tcp_proxy in k8s_tcp_proxies.query_result %}
@@ -199,9 +236,12 @@ listen k8s-tcp-frontend-internal_{{ tcp_proxy.stack_fqdn }}_{{ tcp_proxy.proxy_n
 {% if tcp_proxy.proxy_snippet %}
         {{ tcp_proxy.proxy_snippet | indent(8) }}
 {% endif %}
-{% for worker in grouped_k8s_workers[tcp_proxy.stack_fqdn] %}
-        server {{ worker.hostname }} {{ worker.ip }}:{{ tcp_proxy.node_port }} check
-{% endfor %}
+
+{% if tcp_proxy.is_k8s %}
+{% for machine in kea_reservations_by_stack[tcp_proxy.stack_fqdn]['k8s_worker'] %}
+        server {{ machine.hostname }} {{ machine.ip }}:{{ tcp_proxy.node_port }} check
+{% endfor %} 
+{% endif %}
 
 
 {% endfor %}
@@ -215,9 +255,12 @@ listen k8s-tcp-frontend-external_{{ tcp_proxy.stack_fqdn }}_{{ tcp_proxy.proxy_n
 {% if tcp_proxy.proxy_snippet %}
         {{ tcp_proxy.proxy_snippet | indent(8) }}
 {% endif %}
-{% for worker in grouped_k8s_workers[tcp_proxy.stack_fqdn] %}
-        server {{ worker.hostname }} {{ worker.ip }}:{{ tcp_proxy.node_port }} check
-{% endfor %}
+
+{% if tcp_proxy.is_k8s %}
+{% for machine in kea_reservations_by_stack[tcp_proxy.stack_fqdn]['k8s_worker'] %}
+        server {{ machine.hostname }} {{ machine.ip }}:{{ tcp_proxy.node_port }} check
+{% endfor %} 
+{% endif %}
 
 
 {% endfor %}

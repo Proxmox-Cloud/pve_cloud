@@ -1,36 +1,5 @@
 ---
 # tasks file for select_haproxy_conf
-- name: select all workers
-  delegate_to: localhost
-  alchemy_read:
-    pg_conn_str: "{{ pg_conn_str }}"
-    table: k8s_workers
-    where:
-      proxy_stack_fqdn: "{{ proxy_stack_fqdn }}"
-  register: k8s_workers
-
-- debug:
-    var: k8s_workers
-
-- name: set empty k8s_workers on fail or 0
-  set_fact:
-    k8s_workers: { "query_result": [] }
-  when: k8s_workers["failed"] or k8s_workers["rowcount"] == 0
-
-- name: select all masters 
-  delegate_to: localhost
-  alchemy_read:
-    pg_conn_str: "{{ pg_conn_str }}"
-    table: k8s_masters
-    where:
-      proxy_stack_fqdn: "{{ proxy_stack_fqdn }}"
-  register: k8s_masters
-
-- name: set empty k8s_masters on fail or 0
-  set_fact:
-    k8s_masters: { "query_result": [] }
-  when: k8s_masters["failed"] or k8s_masters["rowcount"] == 0
-
 - name: select all ingress rules
   delegate_to: localhost
   alchemy_read:
@@ -40,10 +9,14 @@
       proxy_stack_fqdn: "{{ proxy_stack_fqdn }}"
   register: k8s_ingress_rules
 
-- name: set empty k8s_ingress_rules on fail or 0
-  set_fact:
-    k8s_ingress_rules: { "query_result": []}
-  when: k8s_ingress_rules["failed"] or k8s_ingress_rules["rowcount"] == 0
+- name: select all tcp proxy defs
+  delegate_to: localhost
+  alchemy_read:
+    pg_conn_str: "{{ pg_conn_str }}"
+    table: k8s_tcp_proxies
+    where:
+      proxy_stack_fqdn: "{{ proxy_stack_fqdn }}"
+  register: k8s_tcp_proxies
 
 - name: select all tcp proxy defs
   delegate_to: localhost
@@ -54,24 +27,58 @@
       proxy_stack_fqdn: "{{ proxy_stack_fqdn }}"
   register: k8s_tcp_proxies
 
-- name: set empty k8s_tcp_proxies on fail or 0 
-  set_fact:
-    k8s_tcp_proxies: { "query_result": []}
-  when: k8s_tcp_proxies["failed"] or k8s_tcp_proxies["rowcount"] == 0
-
-- name: select all tcp proxy defs
+- name: select kea reservations as base for ips
   delegate_to: localhost
   alchemy_read:
     pg_conn_str: "{{ pg_conn_str }}"
-    table: k8s_tcp_proxies
-    where:
-      proxy_stack_fqdn: "{{ proxy_stack_fqdn }}"
-  register: k8s_tcp_proxies
+    table: kea_reservations
+  register: kea_reservations
 
-- name: set empty k8s_tcp_proxies on fail or 0 
-  set_fact:
-    k8s_tcp_proxies: { "query_result": []}
-  when: k8s_tcp_proxies["failed"] or k8s_tcp_proxies["rowcount"] == 0
+# create grouped dict of reservation entries dict[stack_fqdn][machine_type] = list of hosts
+- set_fact:
+    kea_reservations_by_stack: >-
+      {{
+        kea_reservations_by_stack
+        | default({})
+        | combine(
+            {
+              item.stack_fqdn: (
+                kea_reservations_by_stack[item.stack_fqdn] | default({})
+                | combine(
+                    {
+                      item.machine_type: (
+                        kea_reservations_by_stack[item.stack_fqdn][item.machine_type]
+                        | default([])
+                        + [ item ]
+                      )
+                    },
+                    recursive=True
+                  )
+              )
+            },
+            recursive=True
+          )
+      }}
+  loop: "{{ kea_reservations.query_result }}"
+
+# explictly create host groups for k8s masters and workers
+- set_fact:
+    k8s_masters_by_stack: >-
+      {{
+        kea_reservations.query_result
+        | selectattr('machine_type', 'equalto', 'k8s_master')
+        | groupby('stack_fqdn')
+        | community.general.dict
+      }}
+
+- set_fact:
+    k8s_workers_by_stack: >-
+      {{
+        kea_reservations.query_result
+        | selectattr('machine_type', 'equalto', 'k8s_worker')
+        | groupby('stack_fqdn')
+        | community.general.dict
+      }}
 
 - name: select external control plane defs
   delegate_to: localhost
@@ -82,7 +89,29 @@
       proxy_stack_fqdn: "{{ proxy_stack_fqdn }}"
   register: k8s_ext_control_planes
 
-- name: set empty k8s_ext_control_planes on fail or 0 
-  set_fact:
-    k8s_ext_control_planes: { "query_result": []}
-  when: k8s_ext_control_planes["failed"] or k8s_ext_control_planes["rowcount"] == 0
+
+# determine other non k8s machines backends should be created for
+- set_fact:
+    k8s_ingress_stack_fqdns: ->
+      {{
+        k8s_ingress_rules.query_result |
+        map(attribute='stack_fqdn') |
+        list | unique
+      }}
+
+- debug:
+    var: k8s_ingress_stack_fqdns
+
+
+- set_fact:
+    ingress_vms_by_stack: >-
+      {{
+        kea_reservations.query_result
+        | selectattr('machine_type', 'in', ['qemu', 'lxc'])
+        | selectattr('stack_fqdn', 'in', k8s_ingress_stack_fqdns)
+        | groupby('stack_fqdn')
+        | community.general.dict
+      }}
+
+- debug:
+    var: ingress_vms_by_stack

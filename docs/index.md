@@ -36,14 +36,14 @@ object "py-pve-cloud" as py_pve_cloud {
 }
 
 
-object "terraform-provider-proxmox-cloud" as terraform_provider {
+object "terraform-provider-pxc" as terraform_provider {
   * <u>terraform provider</u>
   * cloud secrets datasources
   * grpc go client
   * grpc py server (using py-pve-cloud)
 }
 
-object "terraform-proxmox-cloud-controller" as controller_module {
+object "terraform-pxc-controller" as controller_module {
   * <u>terraform modules</u>
   * K8s deployments + cron job
   * Admission controller
@@ -51,7 +51,7 @@ object "terraform-proxmox-cloud-controller" as controller_module {
   * Namespace watcher
 }
 
-object "terraform-proxmox-cloud-backup" as backup_module {
+object "terraform-pxc-backup" as backup_module {
   * <u>terraform module</u>
   * K8s backup fetcher cron
   * Patroni db dumps

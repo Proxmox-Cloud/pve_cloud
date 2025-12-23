@@ -10,7 +10,7 @@
     where:
       stack_fqdn: "{{ stack_name }}.{{ pve_cloud_domain }}"
 
-- name: insert kea cp reservations
+- name: insert kea reservations
   delegate_to: localhost
   alchemy_write:
     pg_conn_str: "{{ pg_conn_str }}"
@@ -20,3 +20,7 @@
         mac: "{{ ansible_default_ipv4.macaddress }}"
         hostname: "{{ ansible_fqdn }}"
         stack_fqdn: "{{ stack_name }}.{{ pve_cloud_domain }}"
+        machine_type: "{{ cloud_machine_type }}"
+  # reservations only happen for k8s nodes / or lxc/vms that define tcp proxies
+  # todo: add reservation cleanup to qemu / lxc delete playbooks
+  when: cloud_machine_type.startswith('k8s_') or tcp_proxies is defined

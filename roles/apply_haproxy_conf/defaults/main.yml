@@ -1,7 +1,10 @@
 ---
 # defaults file for haproxy_conf
-k8s_workers: {'query_result': []}
-k8s_masters: {'query_result': []}
+kea_reservations_by_stack: {}
+k8s_masters_by_stack: {}
+k8s_workers_by_stack: {}
+ingress_vms_by_stack: {}
+
 k8s_ingress_rules: {'query_result': []}
 k8s_tcp_proxies: {'query_result': []}
 k8s_ext_control_planes: {'query_result': []}

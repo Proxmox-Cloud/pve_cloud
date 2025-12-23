@@ -1,4 +1,2 @@
 ---
 # vars file for haproxy_conf
-grouped_k8s_workers: {}
-grouped_k8s_masters: {}
