@@ -256,10 +256,26 @@ listen k8s-tcp-frontend-external_{{ tcp_proxy.stack_fqdn }}_{{ tcp_proxy.proxy_n
         {{ tcp_proxy.proxy_snippet | indent(8) }}
 {% endif %}
 
+
 {% if tcp_proxy.is_k8s %}
 {% for machine in kea_reservations_by_stack[tcp_proxy.stack_fqdn]['k8s_worker'] %}
         server {{ machine.hostname }} {{ machine.ip }}:{{ tcp_proxy.node_port }} check
 {% endfor %} 
+
+# todo: this is hacky and should be redone
+{% if 'qemu' in kea_reservations_by_stack[tcp_proxy.stack_fqdn] %}
+{% for machine in kea_reservations_by_stack[tcp_proxy.stack_fqdn]['qemu'] %}
+        server {{ machine.hostname }} {{ machine.ip }}:{{ tcp_proxy.node_port }} check
+{% endfor %} 
+{% endif %}
+
+{% if 'lxc' in kea_reservations_by_stack[tcp_proxy.stack_fqdn] %}
+{% for machine in kea_reservations_by_stack[tcp_proxy.stack_fqdn]['lxc'] %}
+        server {{ machine.hostname }} {{ machine.ip }}:{{ tcp_proxy.node_port }} check
+{% endfor %} 
+{% endif %}
+
+
 {% endif %}
 
 

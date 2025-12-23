@@ -104,7 +104,6 @@
   tags:
     - config
 
-
 - name: Write stack config
   hosts: localhost
   tags:
