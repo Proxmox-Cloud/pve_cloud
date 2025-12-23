@@ -133,21 +133,13 @@ backend vms-ingress_{{ stack_fqdn }}
 
 {% endfor %}
 
-{% if auto_http_redirect %}
-# this is the default prod mode
-frontend https-redirect
-    mode http
-    bind :80
-    http-request redirect scheme https unless { ssl_fc }
-{% else %}
-# this is for testing environments for now, in the future this might turn into a full feature
-# where you can toggle it for domains so normal redirect still works
-frontend k8s-ingress-http
+
+frontend k8s-ingress-http-internal
         mode tcp
         bind {{ pve_haproxy_floating_ip_internal }}:80
 
         # internal get all ingress rules
-{% for ingress_rule in k8s_ingress_rules.query_result | sort(attribute='rule_len', reverse=true) %}
+{% for ingress_rule in k8s_ingress_rules.query_result | sort(attribute='rule_len', reverse=true)  %}
 {% if ingress_rule.is_k8s %}
         use_backend k8s-ingress-http_{{ ingress_rule.stack_fqdn }} if { hdr(host) -m reg ^{{ ingress_rule.name | regex_replace('\.', '\\.') | regex_replace('\\*', '.*')  }}\.{{ ingress_rule.zone | regex_replace('\.', '\\.') }}$ }
 {% else %}
@@ -155,6 +147,23 @@ frontend k8s-ingress-http
 {% endif %}
 
 {% endfor %}
+
+
+frontend k8s-ingress-http-external
+        mode tcp
+        bind {{ pve_haproxy_floating_ip_external }}:80
+
+        # only external marked rules
+{% for ingress_rule in k8s_ingress_rules.query_result | sort(attribute='rule_len', reverse=true) if ingress_rule.external %}
+{% if ingress_rule.is_k8s %}
+        use_backend k8s-ingress-http_{{ ingress_rule.stack_fqdn }} if { hdr(host) -m reg ^{{ ingress_rule.name | regex_replace('\.', '\\.') | regex_replace('\\*', '.*')  }}\.{{ ingress_rule.zone | regex_replace('\.', '\\.') }}$ }
+{% else %}
+        use_backend vms-ingress-http_{{ ingress_rule.stack_fqdn }} if { hdr(host) -m reg ^{{ ingress_rule.name | regex_replace('\.', '\\.') | regex_replace('\\*', '.*')  }}\.{{ ingress_rule.zone | regex_replace('\.', '\\.') }}$ }
+{% endif %}
+
+{% endfor %}
+
+
 
 
 # create backend for all cluster stacks
@@ -179,7 +188,7 @@ backend vms-ingress-http_{{ stack_fqdn }}
 
 {% endfor %}
 
-{% endif %}
+
 
 # we also expose the controlplane via our proxy to provide ha
 frontend k8s-control-plane-internal
@@ -240,7 +249,23 @@ listen k8s-tcp-frontend-internal_{{ tcp_proxy.stack_fqdn }}_{{ tcp_proxy.proxy_n
 {% if tcp_proxy.is_k8s %}
 {% for machine in kea_reservations_by_stack[tcp_proxy.stack_fqdn]['k8s_worker'] %}
         server {{ machine.hostname }} {{ machine.ip }}:{{ tcp_proxy.node_port }} check
+{% endfor %}
+{% else %}
+
+# todo: this is hacky and should be redone
+{% if 'qemu' in kea_reservations_by_stack[tcp_proxy.stack_fqdn] %}
+{% for machine in kea_reservations_by_stack[tcp_proxy.stack_fqdn]['qemu'] %}
+        server {{ machine.hostname }} {{ machine.ip }}:{{ tcp_proxy.node_port }} check
 {% endfor %} 
+{% endif %}
+
+{% if 'lxc' in kea_reservations_by_stack[tcp_proxy.stack_fqdn] %}
+{% for machine in kea_reservations_by_stack[tcp_proxy.stack_fqdn]['lxc'] %}
+        server {{ machine.hostname }} {{ machine.ip }}:{{ tcp_proxy.node_port }} check
+{% endfor %} 
+{% endif %}
+
+
 {% endif %}
 
 
@@ -260,7 +285,8 @@ listen k8s-tcp-frontend-external_{{ tcp_proxy.stack_fqdn }}_{{ tcp_proxy.proxy_n
 {% if tcp_proxy.is_k8s %}
 {% for machine in kea_reservations_by_stack[tcp_proxy.stack_fqdn]['k8s_worker'] %}
         server {{ machine.hostname }} {{ machine.ip }}:{{ tcp_proxy.node_port }} check
-{% endfor %} 
+{% endfor %}
+{% else %}
 
 # todo: this is hacky and should be redone
 {% if 'qemu' in kea_reservations_by_stack[tcp_proxy.stack_fqdn] %}

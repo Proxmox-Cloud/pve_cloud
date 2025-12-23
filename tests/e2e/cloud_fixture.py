@@ -401,7 +401,6 @@ def setup_haproxy_lxcs(request, get_test_env, setup_patroni_lxcs):
         },
       ],
       "lxc_global_vars": {
-        "auto_http_redirect": False, # allow https for testing#
         "install_prom_systemd_exporter": True
       },
       "target_pve_hosts": list(get_test_env["pve_test_hosts"].keys()),
