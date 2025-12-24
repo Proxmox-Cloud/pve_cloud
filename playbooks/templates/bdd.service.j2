@@ -1,0 +1,19 @@
+[Unit]
+Description=backup disk daemon 
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/bdd
+ExecStart=/opt/bdd/.venv/bin/daemon
+Restart=always
+Environment="ENV=PRODUCTION"
+{% if PXC_BACKUP_BASE_DIR is defined %}
+Environment="PXC_BACKUP_BASE_DIR={{ PXC_BACKUP_BASE_DIR }}"
+{% elif PXC_REMOVABLE_DATASTORES is defined %}
+Environment="PXC_REMOVABLE_DATASTORES={{ PXC_REMOVABLE_DATASTORES }}"
+{% endif %}
+
+[Install]
+WantedBy=multi-user.target

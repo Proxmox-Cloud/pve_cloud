@@ -349,7 +349,7 @@ def test_create_backup_lxc(request, get_proxmoxer, get_test_env, setup_haproxy_l
             "mp0": f"volume={get_test_env["pve_test_disk_storage_id"]}:20,mp=/mnt/backup-drive"
           },
           "vars": {
-            "BACKUP_BASE_DIR": "/mnt/backup-drive"
+            "PXC_BACKUP_BASE_DIR": "/mnt/backup-drive"
           }
         }
       ],

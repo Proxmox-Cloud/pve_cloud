@@ -8,5 +8,3 @@ ingress_vms_by_stack: {}
 k8s_ingress_rules: {'query_result': []}
 k8s_tcp_proxies: {'query_result': []}
 k8s_ext_control_planes: {'query_result': []}
-
-auto_http_redirect: true
