@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 Type=simple
-User=root
+User={{ 'root' if PXC_BACKUP_BASE_DIR is defined else 'backup' }}
 WorkingDirectory=/opt/bdd
 ExecStart=/opt/bdd/.venv/bin/daemon
 Restart=always

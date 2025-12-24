@@ -2,4 +2,4 @@ template_name: md
 show_toc: false
 # copied folder from python install /site-packages/json_schemas_for_humans/templates/md
 # adjusted the section_one_of.md to fit markdown generation to mkdocs flavor (newline before list start)
-custom_template_path: docs/json-schema-humans-custom/content.md
+custom_template_path: json-schema-humans-custom/content.md

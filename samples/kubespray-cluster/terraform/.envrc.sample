@@ -1,9 +1,0 @@
-# the stack name is central in fetching information
-STACK_NAME=$(yq '.stack_name' ../kubespray-inv.yaml)
-
-# pve cloud helper script, initializes a bunch of os TF_VAR_ variables for terraform, including for provider auth
-eval "$(pvclu export-envrc --target-pve $(yq '.target_pve' ../kubespray-inv.yaml) --stack-name $STACK_NAME)"
-
-# create the schema name used by terraform backend dynamically
-STACK_NAME=$(yq '.stack_name' ../kubespray-inv.yaml)
-export PG_SCHEMA_NAME="${STACK_NAME}"

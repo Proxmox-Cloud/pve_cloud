@@ -16,8 +16,8 @@
     pg_conn_str: "{{ pg_conn_str }}"
     table: kea_reservations
     rows:
-      - ip: "{{ ansible_default_ipv4.address }}"
-        mac: "{{ ansible_default_ipv4.macaddress }}"
+      - ip: "{{ ansible_facts['pve'].ipv4.address }}"
+        mac: "{{ ansible_facts['pve'].macaddress }}"
         hostname: "{{ ansible_fqdn }}"
         stack_fqdn: "{{ stack_name }}.{{ pve_cloud_domain }}"
         machine_type: "{{ cloud_machine_type }}"

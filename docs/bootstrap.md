@@ -16,9 +16,9 @@ You need a development machine (preferably apt based distro) in the same subnet/
 
 These machines need ssh access to the root user of your proxmox clusters. Generate / install a key and add it to `~/.ssh/authorized_keys` on one of the proxmox hosts (proxmox automatically syncs this file accross all hosts in a cluster).
 
-Next install the following packages/tools on your development machine:
+Next install the following packages/tools on your development machine (most of these can be comfortably installed using [brew](https://brew.sh/)):
 
-* `apt install avahi-utils` (with this we can discover our proxmox hosts and clusters, don't install if you are using the [fallback approach](bootstrap.md#cli-fallback-approach))
+* `apt install avahi-utils` (with this we can discover our proxmox hosts and clusters, don't install if your network doesnt support mdns discovery and you need to use the [fallback approach](bootstrap.md#cli-fallback-approach))
 * python3 (+ recommended virtual env)
 * [terraform](https://developer.hashicorp.com/terraform/install#linux)
 * [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/)
@@ -100,6 +100,8 @@ any_unparsed_is_failed = True
 ```
 
 ## CLI Fallback Approach
+
+If you network limits mdns you can still work with the collection, at the cost of having to manage proxmox inventories on each development machine.
 
 After you have finished the setup of your python venv and ran the `ansible-playbook pxc.cloud.setup_control_node` you should have the cli tool `pvcli` available to you.
 

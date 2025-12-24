@@ -1,14 +1,16 @@
+data "pxc_cluster_vars" "cvars" {}
+
+locals {
+  cluster_vars = yamldecode(data.pxc_cluster_vars.cvars.vars)
+}
+
 # the cloud controller connects your cluster with the postgres running inside the lxc containers from the cloud-instance directory
 # it takes care of automatically synchronizing tls secrets, making dns record based on ingress resources, ...
 # additional functionaltity is triggered by setting additional terraform variables defined in the modules spec
 module "cloud_controller" {
-  source = "git@github.com:Proxmox-Cloud/pve-cloud-tf.git//modules/controller?ref=$NEWEST_TAG"
-  k8s_stack_fqdn = "${local.inventory.stack_name}.${var.pve_cloud_domain}"
-  pg_conn_str = var.pve_cloud_pg_cstr
-  
-  bind_master_ip = var.bind_master_ip
-  bind_dns_update_key = var.bind_internal_key
-  internal_proxy_floating_ip = var.cluster_proxy_ip
+  source = "Proxmox-Cloud/controller/pxc"
+  version = "" # start with the latest and fixate it here
+  k8s_stack_fqdn = "${local.inventory.stack_name}.${local.cluster_vars.pve_cloud_domain}"
 
   cluster_cert_entries = local.inventory.cluster_cert_entries
   external_domains = local.inventory.external_domains

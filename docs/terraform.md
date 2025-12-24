@@ -1,25 +1,36 @@
 # Terraform
 
-Terraform is used as soon as we have our kubernetes cluster bootstrapped. Have a look at the [kubespray-cluster/terraform samples folder](https://github.com/Proxmox-Cloud/pve_cloud/tree/master/samples/kubespray-cluster) to get an idea of how to integrate it.
+The project ships the [pxc terraform provider](https://registry.terraform.io/providers/Proxmox-Cloud/pxc/latest) as well as some terraform modules.
 
-## Provider Authentication
+We use terraform to configure our k8s clusters and manage deployments on them. For an example of how to initialize your terraform folder have a look at the [kubespray-cluster/terraform samples folder](https://github.com/Proxmox-Cloud/pve_cloud/tree/master/samples/kubespray-cluster)
 
-The sample uses a `.envrc` file for ease of use to establish authentication as soon as you `cd` into your terraform configs folder.
 
-Inside this direnv script we use the cli command `pvclu export-envrc`, which assumes you have activated your python venv or have installed `py-pve-cloud` via a different method.
+## Authentication
 
-The cli tool connects to proxmox and the kubernetes clusters nodes, fetches secrets, k8s auth configs and exports them to a bunch of environment variables prefixed with `TF_VAR_` that are then picked up by terraform via variable definitions in the `cloud-vars.tf` file.
+The sample uses a `.envrc` file to set environment variables for initializing our terraform backend. It is intended to use the patroni stack the cloud collection deploys. Inside the database there is a dedicated one for `tf-states`
 
-## Proxmox Cloud Terraform Modules
+The provider takes in the inventory and is responsible for getting access to our kubernetes cluster aswell as any proxmox cloud infrastructure.
 
-Proxmox cloud comes with a controller and backup solution that runs on k8s and is deployed via a [terraform modules](https://github.com/Proxmox-Cloud/pve-cloud-tf).
+## Terraform modules
 
-It needs certain secrets to function that are fetched by the `pvclu` command and passed through via terraform env variables.
+After authenticating with the provider proxmox cloud offers several [terraform modules](https://registry.terraform.io/namespaces/Proxmox-Cloud).
 
-### Controller
 
-The controller contains features for TLS Certificate Injection into created namespaces, use of a Harbor registry for mirroring and automatic patching of images via admission webhooks, dynamic dns based on ingress resources and more to come. You can use this controller but dont need to if you want to provide your own solution.
+## Cloud Controller
+
+In the [samples](https://github.com/Proxmox-Cloud/pve_cloud/blob/master/samples/kubespray-cluster/terraform/cloud-deployments.tf) you can see the controller being deployed with minimal features enabled.
+
+The deployment comes with a varity of features that are toggled on by passing optional terraform variables to the terraform module:
+
+* internal ingress dns (all kubernetes ingress resources automatically create record within the pve cloud BIND dns server)
+=> this allows to reuse domains accross clusters
+* optional external ingress dns (only for route53 at the moment). If you pass appropriate route53 credentials the controller also can extend the ingress capabilities to external aws route53
+* optional tls certificate injection on namespace creation (the created tls k8s secret is always named `cluster-tls` for ease of use in ingress resources)
+* automatic image mirroring via harbor. If you pass credentials to a harbor artificatory instance for pulling images and set it up according to the `harbor-mirror-projects` tf module, pods will be automatically patched to fetch ingresses from harbor proxy repositories instead.
+
+It is also worthy to checkout the submodules of the [cloud controller](https://registry.terraform.io/modules/Proxmox-Cloud/controller/pxc/latest). Here you can find monitoring and setup modules for automatic image mirroring with the [harbor artifactory](https://goharbor.io/).
+
 
 ### Backup
 
-The backup module installs a cron job inside k8s that uses ceph csi volume snapshots and rbd volume groups, to provide atomic backups of an entire k8s namespace.
+The [backup module](https://registry.terraform.io/modules/Proxmox-Cloud/backup/pxc/latest) installs a cron job inside k8s that uses ceph csi volume snapshots and rbd volume groups, to provide atomic backups of an entire k8s namespace.

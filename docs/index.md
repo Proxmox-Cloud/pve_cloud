@@ -35,7 +35,6 @@ object "py-pve-cloud" as py_pve_cloud {
    * postgres ORM
 }
 
-
 object "terraform-provider-pxc" as terraform_provider {
   * <u>terraform provider</u>
   * cloud secrets datasources
@@ -110,6 +109,6 @@ Verified working versions:
 
 | Collection Version | Kubespray Version     | Debian LXC Version | PVE Version | Ceph Version |
 | ------------------ | --------------------- | ------------------ | ----------- | ------------ |
-| 3.6.X              | v2.28.0 (k8s 1.32.5)  | 12.12-1            | 8.4.12      | 19.2.2       |
+| 3.11.X             | v2.28.0 (k8s 1.32.5)  | 12.12-1            | 8.4.12      | 19.2.2       |
 
 
