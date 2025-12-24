@@ -9,6 +9,7 @@ WorkingDirectory=/opt/bdd
 ExecStart=/opt/bdd/.venv/bin/daemon
 Restart=always
 Environment="ENV=PRODUCTION"
+Environment="BORG_BASE_DIR=/opt/borg"
 {% if PXC_BACKUP_BASE_DIR is defined %}
 Environment="PXC_BACKUP_BASE_DIR={{ PXC_BACKUP_BASE_DIR }}"
 {% elif PXC_REMOVABLE_DATASTORES is defined %}
