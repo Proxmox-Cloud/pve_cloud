@@ -20,7 +20,6 @@ Checkout the [samples directory](https://github.com/Proxmox-Cloud/pve_cloud/tree
 
 ### Project dependency structure
 
-
 ```puml
 @startuml
 
@@ -90,6 +89,7 @@ py_pve_cloud --> cloud_collection
 py_pve_cloud --> controller_image
 py_pve_cloud --> pytest_pve_cloud
 py_pve_cloud --> terraform_provider
+py_pve_cloud --> backup_image
 
 terraform_provider --> controller_module
 terraform_provider --> backup_module
@@ -107,8 +107,8 @@ cloud_schemas --> cloud_collection
 
 Verified working versions:
 
-| Collection Version | Kubespray Version     | Debian LXC Version | PVE Version | Ceph Version |
-| ------------------ | --------------------- | ------------------ | ----------- | ------------ |
-| 3.11.X             | v2.28.0 (k8s 1.32.5)  | 12.12-1            | 8.4.12      | 19.2.2       |
+| Collection Version | Kubespray Version     | Debian LXC Version | PVE Version | PBS Version  | Ceph Version |
+| ------------------ | --------------------- | ------------------ | ----------- | ------------ | ------------ |
+| 3.11.X             | v2.28.0 (k8s 1.32.5)  | 12.12-1            | 8.4.12      | 4.1.0        | 19.2.2       |
 
 

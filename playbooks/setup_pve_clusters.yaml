@@ -57,6 +57,23 @@
         masked: yes
       when: disable_ipmi is defined and disable_ipmi
 
+    # wake on lan
+    - name: Add post-up ethtool wol enable if defined
+      blockinfile:
+        path: /etc/network/interfaces
+        marker: "        # {mark} WOL BLOCK {{ wol.iface }}"
+        insertafter: "^iface {{ wol.bridge }} inet static"
+        block: |
+          {% filter indent(width=8, first=true) %}
+          post-up /usr/sbin/ethtool -s {{ wol.iface }} wol g
+          {% endfilter %}
+      when: wol is defined
+
+    - name: Apply wol now
+      shell: "ethtool -s {{ wol.iface }} wol g"
+      when: wol is defined
+
+
 - name: Cluster reps setup
   hosts: pve_cluster_reps
   tasks:

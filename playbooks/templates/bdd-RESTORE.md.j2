@@ -1,47 +1,23 @@
 # Restore
 
-This is assumed to be run on a proxmox host or a host with the following apt packages installed:
+The restore happens inside your new cluster via a job that fetches the backups from the backup server.
 
-* borgbackup
-* rbd (from ceph)
+You need to create a new backup server and give it your old backups, doing this is different based on the configuration you have.
+
+After you have your backup server instance running you also need to install [terraform-pxc-backup module / access-namespace](https://github.com/Proxmox-Cloud/terraform-pxc-backup) into your k8s cluster. 
+
+You also have to create an idendical dummy deployment of the namespace you want to restore. The backup tool simply scales down all deploymetns and swaps out volumes and secrets. It does not restore any other k8s resources.
+
+Once you have done that you can launch the backup restore procedure from your development machine:
+
+1. install pve-cloud-backup `pip install py-pve-cloud-backup=={{ py_pve_cloud_backup_version }}`
+2. run `brctl list-backups --bdd-host $IP_OF_BACKUP_SERVER`, followed by `brctl backup-details --bdd-host $IP_OF_BACKUP_SERVER --timestamp $TIMESTAMP_ID_OF_BACKUP`
+3. when you have selected your backup run something like this to restore (also check the `brctl restore-k8s` command alone):
 ```bash
-wget -q -O- 'https://download.ceph.com/keys/release.asc' | sudo apt-key add -
-# ubuntu codename => lsb_release -sc, jammy for mint
-echo "deb https://download.ceph.com/debian-squid jammy main" | sudo tee /etc/apt/sources.list.d/ceph.list
-sudo apt-get update
-sudo apt-get install ceph-common
+brctl restore-k8s --bdd-host $IP_OF_BACKUP_SERVER \
+  --timestamp $TIMESTAMP_ID_OF_BACKUP \
+  --target-pve $TARGET_PVE_OF_BACKUP \
+  --stack-name $K8S_STACK_NAME \
+  --namespace-mapping $OLD_NAMESPACE:$NEW_NAMESPACE \
+  --auto-scale --auto-delete
 ```
-* python3-pip / python3.11-venv (you need this to install the wheel package)
-* install pve-cloud-backup `pip install py-pve-cloud-backup=={{ py_pve_cloud_backup_version }}`
-
-## brctl
-
-First list the available backups using `brctl list-backups` from the directory of the backup drive.
-
-Use `brctl backup-details --timestamp BACKUP_ID_TIMESTAMP` to see the contents, if you only wish to restore parts of it.
-
-Alternatively you can pass `--backup-path` to the util, and specify the mounted backup dir.
-
-The easiest way to run the util is directly on a proxmox host, however you can also run it remotely.
-
-For that you need:
-
-* `rbd` cli needs to be connected to the cluster (ceph.conf and key files)
-* a copy of a proxmox private key file
-* pass `--proxmox-host HOST_IP` and `--proxmox-private-key FILE_PATH` to the cli
-
-Via these args the brctl will configure itself to connect to a remote host where it creates the restore vm configs into.
-
-### restoring k8s
-
-`brctl restore-k8s --timestamp TIMESTAMP_FROM_LIST_BACKUPS --k8s-stack-name k8s.tobias-huebner.tech`, you can optionally specify `--namespaces` as csvs to limit what pvcs you want to restore. If you want to restore into a new cluster specify `--kubeconfig-new PATH_TO_KUBECONFIG`, otherwise the backup tool will try to use kubeconfigs from the original backup.
-
-There is also the `--pool-sc-mapping` arg that you can provide multiple times to restore the disks into a different ceph pool if you like. This will connect via 
-the kubeapi and recreate pvc definitions. Example: `--pool-sc-mapping ssd:hdd/csi-rbd-sc-hdd` will restore any pvcs that were in the pool ssd into the ceph pool hdd
-and set the csi-rbd-sc-hdd storageclass in kubernetes.
-
-### restoring files
-
-to restore nextcloud files or git repo tars, simply use `borg extract` on the borg-file repos directly.
-
-To work with a local version of the pve cloud collection, use `export ANSIBLE_COLLECTIONS_PATH=/path/to/ansible/` and comment out in requirements.yaml while installing. At the directory of the env variable ansible expects another directory hierarchie like this: `ansible_collections/pxc/cloud` (namespace/collection-name).

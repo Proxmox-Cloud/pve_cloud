@@ -55,9 +55,3 @@ iface $IFACE inet static
     post-up /usr/sbin/ethtool -s $IFACE wol g
     ...
 ```
-
-## Homelab / limited hardware setup
-
-* Proxmox OS should always have its own dedicated disk (can be a tiny ssd)
-* For ceph to be usable it should be on a dedicated switch (2.5g), but then it can work fine with just consumer ssds, you might also get a dedicated nic for ceph backend
-* For faster still fail-safe storage a raid1 zfs is a good option. Pve cloud monitoring monitors zfs replication aswell

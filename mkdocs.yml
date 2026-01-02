@@ -6,7 +6,6 @@ nav:
   - kubernetes.md
   - terraform.md
   - tdd.md
-  - backup.md
   - faq.md
   - contributing.md
   - Schemas:

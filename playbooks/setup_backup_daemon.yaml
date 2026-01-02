@@ -4,14 +4,21 @@
     # increment this on releasing a new pve-cloud-backup version
     py_pve_cloud_backup_version: "0.5.20"
   tasks:
-    # install basic cli
-    - name: Install apt packages
+    - name: pbs no sub
+      ansible.builtin.command:
+        cmd: mv /etc/apt/sources.list.d/pbs-enterprise.sources /etc/apt/sources.list.d/pbs-enterprise.sources.bak
+        creates: /etc/apt/sources.list.d/pbs-enterprise.sources.bak
+      when: pbs_no_sub is defined and pbs_no_sub
+
+    - name: install core apt packages
       ansible.builtin.apt:
         name: 
           - python3-venv
           - borgbackup
         state: present
+        update_cache: yes
 
+    # install bdd service
     - name: Ensure /opt/bdd directory exists
       ansible.builtin.file:
         path: /opt/bdd
