@@ -602,6 +602,29 @@
   
   
     <li class="md-nav__item">
+      <a href="../schemas/qemu_schema_base/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Qemu schema base
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../schemas/setup_bind_schema_ext/" class="md-nav__link">
         
   
@@ -787,7 +810,7 @@ docker run -d -p 8088:8080 --name pxc-local-pypi pypiserver/pypiserver:latest ru
 docker run -d --name pxc-local-redis -p 6379:6379 redis:latest # redis broker for triggering dependent builds
 </code></pre>
 <ol>
-<li>run <code>tddog --recursive</code> from your top level created <code>pve-cloud</code> folder. This will monitor src folders, rebuild artifacts and their dependants and also run <code>pip install -e .</code> on libraries that are needed locally</li>
+<li>run <code>tddog --recursive</code> from your top level created <code>pve-cloud</code> folder. This will monitor src folders, rebuild artifacts and their dependants and also run <code>pip install -e .</code> on libraries that are needed locally.</li>
 <li>run the e2e tests:</li>
 </ol>
 <pre><code class="language-bash">pytest -s tests/e2e/ --skip-cleanup 

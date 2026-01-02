@@ -423,15 +423,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#homelab-limited-hardware-setup" class="md-nav__link">
-    <span class="md-ellipsis">
-      Homelab / limited hardware setup
-    </span>
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -582,6 +573,29 @@
   
   <span class="md-ellipsis">
     Qemu inv schema
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../schemas/qemu_schema_base/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Qemu schema base
     
   </span>
   
@@ -771,12 +785,6 @@ Name=$RENAMED_IFACE
     post-up /usr/sbin/ethtool -s $IFACE wol g
     ...
 </code></pre>
-<h2 id="homelab-limited-hardware-setup">Homelab / limited hardware setup</h2>
-<ul>
-<li>Proxmox OS should always have its own dedicated disk (can be a tiny ssd)</li>
-<li>For ceph to be usable it should be on a dedicated switch (2.5g), but then it can work fine with just consumer ssds, you might also get a dedicated nic for ceph backend</li>
-<li>For faster still fail-safe storage a raid1 zfs is a good option. Pve cloud monitoring monitors zfs replication aswell</li>
-</ul>
 
 
 

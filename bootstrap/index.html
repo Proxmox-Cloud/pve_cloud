@@ -596,6 +596,29 @@
   
   
     <li class="md-nav__item">
+      <a href="../schemas/qemu_schema_base/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Qemu schema base
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../schemas/setup_bind_schema_ext/" class="md-nav__link">
         
   
@@ -740,9 +763,9 @@
 <h2 id="developmentdeployment-machine">Development/Deployment machine</h2>
 <p>You need a development machine (preferably apt based distro) in the same subnet/vlan segment as your proxmox hosts for running playbooks and applying terraform configurations.</p>
 <p>These machines need ssh access to the root user of your proxmox clusters. Generate / install a key and add it to <code>~/.ssh/authorized_keys</code> on one of the proxmox hosts (proxmox automatically syncs this file accross all hosts in a cluster).</p>
-<p>Next install the following packages/tools on your development machine:</p>
+<p>Next install the following packages/tools on your development machine (most of these can be comfortably installed using <a href="https://brew.sh/">brew</a>):</p>
 <ul>
-<li><code>apt install avahi-utils</code> (with this we can discover our proxmox hosts and clusters, don't install if you are using the <a href="./#cli-fallback-approach">fallback approach</a>)</li>
+<li><code>apt install avahi-utils</code> (with this we can discover our proxmox hosts and clusters, don't install if your network doesnt support mdns discovery and you need to use the <a href="./#cli-fallback-approach">fallback approach</a>)</li>
 <li>python3 (+ recommended virtual env)</li>
 <li><a href="https://developer.hashicorp.com/terraform/install#linux">terraform</a></li>
 <li><a href="https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/">kubectl</a></li>
@@ -808,6 +831,7 @@ host_key_checking = False
 any_unparsed_is_failed = True
 </code></pre>
 <h2 id="cli-fallback-approach">CLI Fallback Approach</h2>
+<p>If you network limits mdns you can still work with the collection, at the cost of having to manage proxmox inventories on each development machine.</p>
 <p>After you have finished the setup of your python venv and ran the <code>ansible-playbook pxc.cloud.setup_control_node</code> you should have the cli tool <code>pvcli</code> available to you.</p>
 <p>Connect to your one proxmox clusters <code>pvcli connect-cluster --pve-host $PROXMOX_HOST</code> (run once per cluster, per cloud domain).</p>
 <p>The cli will ask you for a cloud domain if the cluster has not already one assigned.</p>

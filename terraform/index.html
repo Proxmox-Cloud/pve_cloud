@@ -326,32 +326,32 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#provider-authentication" class="md-nav__link">
+  <a href="#authentication" class="md-nav__link">
     <span class="md-ellipsis">
-      Provider Authentication
+      Authentication
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#proxmox-cloud-terraform-modules" class="md-nav__link">
+  <a href="#terraform-modules" class="md-nav__link">
     <span class="md-ellipsis">
-      Proxmox Cloud Terraform Modules
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Proxmox Cloud Terraform Modules">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#controller" class="md-nav__link">
-    <span class="md-ellipsis">
-      Controller
+      Terraform modules
     </span>
   </a>
   
 </li>
+      
+        <li class="md-nav__item">
+  <a href="#cloud-controller" class="md-nav__link">
+    <span class="md-ellipsis">
+      Cloud Controller
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Cloud Controller">
+      <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#backup" class="md-nav__link">
@@ -578,6 +578,29 @@
   
   
     <li class="md-nav__item">
+      <a href="../schemas/qemu_schema_base/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Qemu schema base
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../schemas/setup_bind_schema_ext/" class="md-nav__link">
         
   
@@ -710,18 +733,27 @@
 
 
 <h1 id="terraform">Terraform</h1>
-<p>Terraform is used as soon as we have our kubernetes cluster bootstrapped. Have a look at the <a href="https://github.com/Proxmox-Cloud/pve_cloud/tree/master/samples/kubespray-cluster">kubespray-cluster/terraform samples folder</a> to get an idea of how to integrate it.</p>
-<h2 id="provider-authentication">Provider Authentication</h2>
-<p>The sample uses a <code>.envrc</code> file for ease of use to establish authentication as soon as you <code>cd</code> into your terraform configs folder.</p>
-<p>Inside this direnv script we use the cli command <code>pvclu export-envrc</code>, which assumes you have activated your python venv or have installed <code>py-pve-cloud</code> via a different method.</p>
-<p>The cli tool connects to proxmox and the kubernetes clusters nodes, fetches secrets, k8s auth configs and exports them to a bunch of environment variables prefixed with <code>TF_VAR_</code> that are then picked up by terraform via variable definitions in the <code>cloud-vars.tf</code> file.</p>
-<h2 id="proxmox-cloud-terraform-modules">Proxmox Cloud Terraform Modules</h2>
-<p>Proxmox cloud comes with a controller and backup solution that runs on k8s and is deployed via a <a href="https://github.com/Proxmox-Cloud/pve-cloud-tf">terraform modules</a>.</p>
-<p>It needs certain secrets to function that are fetched by the <code>pvclu</code> command and passed through via terraform env variables.</p>
-<h3 id="controller">Controller</h3>
-<p>The controller contains features for TLS Certificate Injection into created namespaces, use of a Harbor registry for mirroring and automatic patching of images via admission webhooks, dynamic dns based on ingress resources and more to come. You can use this controller but dont need to if you want to provide your own solution.</p>
+<p>The project ships the <a href="https://registry.terraform.io/providers/Proxmox-Cloud/pxc/latest">pxc terraform provider</a> as well as some terraform modules.</p>
+<p>We use terraform to configure our k8s clusters and manage deployments on them. For an example of how to initialize your terraform folder have a look at the <a href="https://github.com/Proxmox-Cloud/pve_cloud/tree/master/samples/kubespray-cluster">kubespray-cluster/terraform samples folder</a></p>
+<h2 id="authentication">Authentication</h2>
+<p>The sample uses a <code>.envrc</code> file to set environment variables for initializing our terraform backend. It is intended to use the patroni stack the cloud collection deploys. Inside the database there is a dedicated one for <code>tf-states</code></p>
+<p>The provider takes in the inventory and is responsible for getting access to our kubernetes cluster aswell as any proxmox cloud infrastructure.</p>
+<h2 id="terraform-modules">Terraform modules</h2>
+<p>After authenticating with the provider proxmox cloud offers several <a href="https://registry.terraform.io/namespaces/Proxmox-Cloud">terraform modules</a>.</p>
+<h2 id="cloud-controller">Cloud Controller</h2>
+<p>In the <a href="https://github.com/Proxmox-Cloud/pve_cloud/blob/master/samples/kubespray-cluster/terraform/cloud-deployments.tf">samples</a> you can see the controller being deployed with minimal features enabled.</p>
+<p>The deployment comes with a varity of features that are toggled on by passing optional terraform variables to the terraform module:</p>
+<ul>
+<li>internal ingress dns (all kubernetes ingress resources automatically create record within the pve cloud BIND dns server)
+=&gt; this allows to reuse domains accross clusters</li>
+<li>optional external ingress dns (only for route53 at the moment). If you pass appropriate route53 credentials the controller also can extend the ingress capabilities to external aws route53</li>
+<li>optional tls certificate injection on namespace creation (the created tls k8s secret is always named <code>cluster-tls</code> for ease of use in ingress resources)</li>
+<li>automatic image mirroring via harbor. If you pass credentials to a harbor artificatory instance for pulling images and set it up according to the <code>harbor-mirror-projects</code> tf module, pods will be automatically patched to fetch ingresses from harbor proxy repositories instead.</li>
+</ul>
+<p>It is also worthy to checkout the submodules of the <a href="https://registry.terraform.io/modules/Proxmox-Cloud/controller/pxc/latest">cloud controller</a>. Here you can find monitoring and setup modules for automatic image mirroring with the <a href="https://goharbor.io/">harbor artifactory</a>.</p>
 <h3 id="backup">Backup</h3>
-<p>The backup module installs a cron job inside k8s that uses ceph csi volume snapshots and rbd volume groups, to provide atomic backups of an entire k8s namespace.</p>
+<p>The <a href="https://registry.terraform.io/modules/Proxmox-Cloud/backup/pxc/latest">backup module</a> installs a cron job inside k8s that uses ceph csi volume snapshots and rbd volume groups, to provide atomic backups of an entire k8s namespace.</p>
+<p>It also equips a cluster with secrets so that we can start restore jobs using <code>brctl</code> from <a href="github.com/Proxmox-Cloud/pve-cloud-backup">pve-cloud-backup</a>.</p>
 
 
 
