@@ -14,12 +14,13 @@
 | -------------------------------------------------------- | ------- | ---------------- | ---------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | + [target_pve](#target_pve )                             | No      | string           | No         | -          | Proxmox cluster name + . + pve cloud domain. This determines the cloud and the proxmox cluster the vms/lxc/k8s luster will be created in.                                                                                                                                     |
 | + [stack_name](#stack_name )                             | No      | string           | No         | -          | Your stack name, needs to be unique within the cloud domain.                                                                                                                                                                                                                  |
-| + [static_includes](#static_includes )                   | No      | object           | No         | -          | This property contains specific hosts / stacks that need to be included for a schema extension. This way playbooks can statically<br />reference a host group and assume it to be a certain stack (e.g. postgres/haproxy/dhcp).<br />                                         |
+| + [static_includes](#static_includes )                   | No      | object           | No         | -          | For virtual machines we have the option to define tcp_proxies and ingress_domains. If those are set we need certain static includes.<br />                                                                                                                                    |
 | - [include_stacks](#include_stacks )                     | No      | array of object  | No         | -          | Include other stacks into the ansible inventory, from any pve cloud you are connected to. From here you can freely extend and write your own playbooks.                                                                                                                       |
 | + [root_ssh_pub_key](#root_ssh_pub_key )                 | No      | string           | No         | -          | trusted root key for the cloud init image.                                                                                                                                                                                                                                    |
 | - [pve_ha_group](#pve_ha_group )                         | No      | string           | No         | -          | PVE HA group this vm should be assigned to (optional).                                                                                                                                                                                                                        |
 | - [target_pve_hosts](#target_pve_hosts )                 | No      | array of string  | No         | -          | Array of proxmox hosts in the target pve that are eligible for scheduling. If not specified all online hosts are considered.                                                                                                                                                  |
 | + [qemus](#qemus )                                       | No      | array of object  | No         | -          | Nodes for the cluster in form of qemu vms.                                                                                                                                                                                                                                    |
+| - [tcp_proxies](#tcp_proxies )                           | No      | array of object  | No         | -          | Raw tcp forwards on the clusters haproxy to k8s services exposed via nodeport.                                                                                                                                                                                                |
 | - [qemu_default_user](#qemu_default_user )               | No      | string           | No         | -          | User for cinit.                                                                                                                                                                                                                                                               |
 | - [qemu_hashed_pw](#qemu_hashed_pw )                     | No      | string           | No         | -          | Pw for default user defaults to hashed 'password' for debian cloud init image. Different cloud init images require different hash methods. You cannot use the same from debian for ubuntu for example.                                                                        |
 | - [qemu_base_parameters](#qemu_base_parameters )         | No      | object           | No         | -          | Base parameters applied to all qemus. passed to the proxmox qm cli tool for creating vm.                                                                                                                                                                                      |
@@ -31,7 +32,6 @@
 | - [extra_control_plane_sans](#extra_control_plane_sans ) | No      | array of string  | No         | -          | Extra sans that kubespray will put in kubeapi generated certificates. Original kubespray variable is named supplementary_addresses_in_ssl_keys, <br />but is set via pve cloud kubespray custom inventory. Read the kubernetes page in pve cloud docs for more details.<br /> |
 | - [external_domains](#external_domains )                 | No      | array of object  | No         | -          | Domains that will be exposed to the public/external haproxy floating ip via haproxy sni matching to this cluster.                                                                                                                                                             |
 | + [cluster_cert_entries](#cluster_cert_entries )         | No      | array of object  | No         | -          | Content for the clusters acme tls certificate. If you have multiple proxmox clusters they need their own haproxy instances for ingress dns to work.                                                                                                                           |
-| + [tcp_proxies](#tcp_proxies )                           | No      | array of object  | No         | -          | Raw tcp forwards on the clusters haproxy to k8s services exposed via nodeport.                                                                                                                                                                                                |
 | - [ceph_csi_sc_pools](#ceph_csi_sc_pools )               | No      | array of object  | No         | -          | Ceph pools that will be made available to the clusters Ceph CSI driver (optional).                                                                                                                                                                                            |
 | - [acme_staging](#acme_staging )                         | No      | boolean          | No         | -          | If set to true will use acme staging directory for issueing certs.                                                                                                                                                                                                            |
 
@@ -67,16 +67,15 @@
 | **Required**              | Yes         |
 | **Additional properties** | Not allowed |
 
-**Description:** This property contains specific hosts / stacks that need to be included for a schema extension. This way playbooks can statically
-reference a host group and assume it to be a certain stack (e.g. postgres/haproxy/dhcp).
+**Description:** For virtual machines we have the option to define tcp_proxies and ingress_domains. If those are set we need certain static includes.
 
-| Property                                             | Pattern | Type   | Deprecated | Definition | Title/Description                                                                                                                                      |
-| ---------------------------------------------------- | ------- | ------ | ---------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| + [dhcp_stack](#static_includes_dhcp_stack )         | No      | string | No         | -          | The pxc.cloud.sync_kubespray playbook needs the dhcp stack to refresh the configuration after having made static reservations for kubernetes node ips. |
-| + [proxy_stack](#static_includes_proxy_stack )       | No      | string | No         | -          | The playbook needs to reload the central clusters haproxy for various forwarding specifications.                                                       |
-| + [postgres_stack](#static_includes_postgres_stack ) | No      | string | No         | -          | The playbook needs the pve cloud postgres stack where state and general configuration is stored.                                                       |
-| + [bind_stack](#static_includes_bind_stack )         | No      | string | No         | -          | The playbook needs the bind stack to register the general masters recordset and for creating authoritative zones defined in cluster_cert_entries.      |
-| - [cache_stack](#static_includes_cache_stack )       | No      | string | No         | -          | Cache stack to mount nfs for kubespray cache and apt cache. Assumes the cache lxc to have the hostname "main". WIP!                                    |
+| Property                                             | Pattern | Type   | Deprecated | Definition | Title/Description                                                                                                                                 |
+| ---------------------------------------------------- | ------- | ------ | ---------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| + [dhcp_stack](#static_includes_dhcp_stack )         | No      | string | No         | -          | For interacting with kea reservations.                                                                                                            |
+| + [proxy_stack](#static_includes_proxy_stack )       | No      | string | No         | -          | Reloading the proxy.                                                                                                                              |
+| + [postgres_stack](#static_includes_postgres_stack ) | No      | string | No         | -          | The playbook needs the pve cloud postgres stack where state and general configuration is stored.                                                  |
+| + [bind_stack](#static_includes_bind_stack )         | No      | string | No         | -          | The playbook needs the bind stack to register the general masters recordset and for creating authoritative zones defined in cluster_cert_entries. |
+| - [cache_stack](#static_includes_cache_stack )       | No      | string | No         | -          | Cache stack to mount nfs for kubespray cache and apt cache. Assumes the cache lxc to have the hostname "main". WIP!                               |
 
 ### <a name="static_includes_dhcp_stack"></a>60.1. Property `K8s Kubespray Inventory > static_includes > dhcp_stack`
 
@@ -85,7 +84,7 @@ reference a host group and assume it to be a certain stack (e.g. postgres/haprox
 | **Type**     | `string` |
 | **Required** | Yes      |
 
-**Description:** The pxc.cloud.sync_kubespray playbook needs the dhcp stack to refresh the configuration after having made static reservations for kubernetes node ips.
+**Description:** For interacting with kea reservations.
 
 **Example:**
 
@@ -100,7 +99,7 @@ reference a host group and assume it to be a certain stack (e.g. postgres/haprox
 | **Type**     | `string` |
 | **Required** | Yes      |
 
-**Description:** The playbook needs to reload the central clusters haproxy for various forwarding specifications.
+**Description:** Reloading the proxy.
 
 **Example:**
 
@@ -456,7 +455,105 @@ Must be one of:
 * "master"
 * "worker"
 
-## <a name="qemu_default_user"></a>66. Property `K8s Kubespray Inventory > qemu_default_user`
+## <a name="tcp_proxies"></a>66. Property `K8s Kubespray Inventory > tcp_proxies`
+
+|              |                   |
+| ------------ | ----------------- |
+| **Type**     | `array of object` |
+| **Required** | No                |
+
+**Description:** Raw tcp forwards on the clusters haproxy to k8s services exposed via nodeport.
+
+|                      | Array restrictions |
+| -------------------- | ------------------ |
+| **Min items**        | N/A                |
+| **Max items**        | N/A                |
+| **Items unicity**    | False              |
+| **Additional items** | False              |
+| **Tuple validation** | See below          |
+
+| Each item of this array must be         | Description |
+| --------------------------------------- | ----------- |
+| [tcp_proxies items](#tcp_proxies_items) | -           |
+
+### <a name="tcp_proxies_items"></a>66.1. K8s Kubespray Inventory > tcp_proxies > tcp_proxies items
+
+|                           |             |
+| ------------------------- | ----------- |
+| **Type**                  | `object`    |
+| **Required**              | No          |
+| **Additional properties** | Not allowed |
+
+| Property                                             | Pattern | Type    | Deprecated | Definition | Title/Description                                                                                                    |
+| ---------------------------------------------------- | ------- | ------- | ---------- | ---------- | -------------------------------------------------------------------------------------------------------------------- |
+| + [proxy_name](#tcp_proxies_items_proxy_name )       | No      | string  | No         | -          | Simple name for the forward. Will be rendered in haproxy configuration so it shouldnt contain special characters.    |
+| + [haproxy_port](#tcp_proxies_items_haproxy_port )   | No      | number  | No         | -          | Frontend port of the proxmox clusters haproxy.                                                                       |
+| + [node_port](#tcp_proxies_items_node_port )         | No      | number  | No         | -          | Nodeport of the k8s service.                                                                                         |
+| - [proxy_snippet](#tcp_proxies_items_proxy_snippet ) | No      | string  | No         | -          | Additional snippet that will be inserted into the haproxy listen block. Can be used to adjust the forwards settings. |
+| - [external](#tcp_proxies_items_external )           | No      | boolean | No         | -          | Will also create a forward on the external floating ip of the proxy not only the internal.                           |
+
+#### <a name="tcp_proxies_items_proxy_name"></a>66.1.1. Property `K8s Kubespray Inventory > tcp_proxies > tcp_proxies items > proxy_name`
+
+|              |          |
+| ------------ | -------- |
+| **Type**     | `string` |
+| **Required** | Yes      |
+
+**Description:** Simple name for the forward. Will be rendered in haproxy configuration so it shouldnt contain special characters.
+
+**Examples:**
+
+```json
+"gitlab-ssh"
+```
+
+```json
+"example-postgres"
+```
+
+#### <a name="tcp_proxies_items_haproxy_port"></a>66.1.2. Property `K8s Kubespray Inventory > tcp_proxies > tcp_proxies items > haproxy_port`
+
+|              |          |
+| ------------ | -------- |
+| **Type**     | `number` |
+| **Required** | Yes      |
+
+**Description:** Frontend port of the proxmox clusters haproxy.
+
+#### <a name="tcp_proxies_items_node_port"></a>66.1.3. Property `K8s Kubespray Inventory > tcp_proxies > tcp_proxies items > node_port`
+
+|              |          |
+| ------------ | -------- |
+| **Type**     | `number` |
+| **Required** | Yes      |
+
+**Description:** Nodeport of the k8s service.
+
+#### <a name="tcp_proxies_items_proxy_snippet"></a>66.1.4. Property `K8s Kubespray Inventory > tcp_proxies > tcp_proxies items > proxy_snippet`
+
+|              |          |
+| ------------ | -------- |
+| **Type**     | `string` |
+| **Required** | No       |
+
+**Description:** Additional snippet that will be inserted into the haproxy listen block. Can be used to adjust the forwards settings.
+
+**Example:**
+
+```json
+"# long running tcp connections that only rarely transmit data\n# ssh client connection for example\ntimeout client 1h \ntimeout server 1h \n"
+```
+
+#### <a name="tcp_proxies_items_external"></a>66.1.5. Property `K8s Kubespray Inventory > tcp_proxies > tcp_proxies items > external`
+
+|              |           |
+| ------------ | --------- |
+| **Type**     | `boolean` |
+| **Required** | No        |
+
+**Description:** Will also create a forward on the external floating ip of the proxy not only the internal.
+
+## <a name="qemu_default_user"></a>67. Property `K8s Kubespray Inventory > qemu_default_user`
 
 |              |          |
 | ------------ | -------- |
@@ -465,7 +562,7 @@ Must be one of:
 
 **Description:** User for cinit.
 
-## <a name="qemu_hashed_pw"></a>67. Property `K8s Kubespray Inventory > qemu_hashed_pw`
+## <a name="qemu_hashed_pw"></a>68. Property `K8s Kubespray Inventory > qemu_hashed_pw`
 
 |              |          |
 | ------------ | -------- |
@@ -474,7 +571,7 @@ Must be one of:
 
 **Description:** Pw for default user defaults to hashed 'password' for debian cloud init image. Different cloud init images require different hash methods. You cannot use the same from debian for ubuntu for example.
 
-## <a name="qemu_base_parameters"></a>68. Property `K8s Kubespray Inventory > qemu_base_parameters`
+## <a name="qemu_base_parameters"></a>69. Property `K8s Kubespray Inventory > qemu_base_parameters`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -484,7 +581,7 @@ Must be one of:
 
 **Description:** Base parameters applied to all qemus. passed to the proxmox qm cli tool for creating vm.
 
-## <a name="qemu_image_url"></a>69. Property `K8s Kubespray Inventory > qemu_image_url`
+## <a name="qemu_image_url"></a>70. Property `K8s Kubespray Inventory > qemu_image_url`
 
 |              |          |
 | ------------ | -------- |
@@ -493,7 +590,7 @@ Must be one of:
 
 **Description:** http(s) download link for cloud init image.
 
-## <a name="qemu_keyboard_layout"></a>70. Property `K8s Kubespray Inventory > qemu_keyboard_layout`
+## <a name="qemu_keyboard_layout"></a>71. Property `K8s Kubespray Inventory > qemu_keyboard_layout`
 
 |              |          |
 | ------------ | -------- |
@@ -502,7 +599,7 @@ Must be one of:
 
 **Description:** Keyboard layout for cloudinit.
 
-## <a name="qemu_network_config"></a>71. Property `K8s Kubespray Inventory > qemu_network_config`
+## <a name="qemu_network_config"></a>72. Property `K8s Kubespray Inventory > qemu_network_config`
 
 |              |          |
 | ------------ | -------- |
@@ -511,7 +608,7 @@ Must be one of:
 
 **Description:** Optional qemu network config as a yaml string that is merged into the cloudinit network config of all qemus.
 
-## <a name="qemu_global_vars"></a>72. Property `K8s Kubespray Inventory > qemu_global_vars`
+## <a name="qemu_global_vars"></a>73. Property `K8s Kubespray Inventory > qemu_global_vars`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -521,7 +618,7 @@ Must be one of:
 
 **Description:** Variables that will be applied set for all qemus vms.
 
-## <a name="plugin"></a>73. Property `K8s Kubespray Inventory > plugin`
+## <a name="plugin"></a>74. Property `K8s Kubespray Inventory > plugin`
 
 |              |                    |
 | ------------ | ------------------ |
@@ -535,7 +632,7 @@ Must be one of:
 * "pxc.cloud.qemu_inv"
 * "pxc.cloud.kubespray_inv"
 
-## <a name="extra_control_plane_sans"></a>74. Property `K8s Kubespray Inventory > extra_control_plane_sans`
+## <a name="extra_control_plane_sans"></a>75. Property `K8s Kubespray Inventory > extra_control_plane_sans`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -557,14 +654,14 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 | ----------------------------------------------------------------- | ----------- |
 | [extra_control_plane_sans items](#extra_control_plane_sans_items) | -           |
 
-### <a name="extra_control_plane_sans_items"></a>74.1. K8s Kubespray Inventory > extra_control_plane_sans > extra_control_plane_sans items
+### <a name="extra_control_plane_sans_items"></a>75.1. K8s Kubespray Inventory > extra_control_plane_sans > extra_control_plane_sans items
 
 |              |          |
 | ------------ | -------- |
 | **Type**     | `string` |
 | **Required** | No       |
 
-## <a name="external_domains"></a>75. Property `K8s Kubespray Inventory > external_domains`
+## <a name="external_domains"></a>76. Property `K8s Kubespray Inventory > external_domains`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -585,7 +682,7 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 | ------------------------------------------------- | ----------- |
 | [external_domains items](#external_domains_items) | -           |
 
-### <a name="external_domains_items"></a>75.1. K8s Kubespray Inventory > external_domains > external_domains items
+### <a name="external_domains_items"></a>76.1. K8s Kubespray Inventory > external_domains > external_domains items
 
 |                           |             |
 | ------------------------- | ----------- |
@@ -599,7 +696,7 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 | - [expose_apex](#external_domains_items_expose_apex ) | No      | boolean         | No         | -          | Expose the apex zone itself. For example if you have zone example.com then example.com will be routed to this cluster. |
 | + [names](#external_domains_items_names )             | No      | array of string | No         | -          | -                                                                                                                      |
 
-#### <a name="external_domains_items_zone"></a>75.1.1. Property `K8s Kubespray Inventory > external_domains > external_domains items > zone`
+#### <a name="external_domains_items_zone"></a>76.1.1. Property `K8s Kubespray Inventory > external_domains > external_domains items > zone`
 
 |              |          |
 | ------------ | -------- |
@@ -608,7 +705,7 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 
 **Description:** DNS parent zone, should also be the zone that external records are made under in AWS for example.
 
-#### <a name="external_domains_items_expose_apex"></a>75.1.2. Property `K8s Kubespray Inventory > external_domains > external_domains items > expose_apex`
+#### <a name="external_domains_items_expose_apex"></a>76.1.2. Property `K8s Kubespray Inventory > external_domains > external_domains items > expose_apex`
 
 |              |           |
 | ------------ | --------- |
@@ -617,7 +714,7 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 
 **Description:** Expose the apex zone itself. For example if you have zone example.com then example.com will be routed to this cluster.
 
-#### <a name="external_domains_items_names"></a>75.1.3. Property `K8s Kubespray Inventory > external_domains > external_domains items > names`
+#### <a name="external_domains_items_names"></a>76.1.3. Property `K8s Kubespray Inventory > external_domains > external_domains items > names`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -636,7 +733,7 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 | -------------------------------------------------- | ----------------------------------------- |
 | [names items](#external_domains_items_names_items) | Names of the zone that should be exposed. |
 
-##### <a name="external_domains_items_names_items"></a>75.1.3.1. K8s Kubespray Inventory > external_domains > external_domains items > names > names items
+##### <a name="external_domains_items_names_items"></a>76.1.3.1. K8s Kubespray Inventory > external_domains > external_domains items > names > names items
 
 |              |          |
 | ------------ | -------- |
@@ -659,7 +756,7 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 "*.subzone"
 ```
 
-## <a name="cluster_cert_entries"></a>76. Property `K8s Kubespray Inventory > cluster_cert_entries`
+## <a name="cluster_cert_entries"></a>77. Property `K8s Kubespray Inventory > cluster_cert_entries`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -680,7 +777,7 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 | --------------------------------------------------------- | ----------- |
 | [cluster_cert_entries items](#cluster_cert_entries_items) | -           |
 
-### <a name="cluster_cert_entries_items"></a>76.1. K8s Kubespray Inventory > cluster_cert_entries > cluster_cert_entries items
+### <a name="cluster_cert_entries_items"></a>77.1. K8s Kubespray Inventory > cluster_cert_entries > cluster_cert_entries items
 
 |                           |             |
 | ------------------------- | ----------- |
@@ -695,7 +792,7 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 | - [authoritative_zone](#cluster_cert_entries_items_authoritative_zone ) | No      | boolean         | No         | -          | This will cause the specified apex zone to be created as an authoritative zone in the proxmox clouds dns server. Ingress dns will only work for authoritative zones. |
 | - [apex_zone_san](#cluster_cert_entries_items_apex_zone_san )           | No      | boolean         | No         | -          | Creates additional SAN for the zone, if you have *.example.com you will also get example.com in your certificate. Defaults to false.                                 |
 
-#### <a name="cluster_cert_entries_items_zone"></a>76.1.1. Property `K8s Kubespray Inventory > cluster_cert_entries > cluster_cert_entries items > zone`
+#### <a name="cluster_cert_entries_items_zone"></a>77.1.1. Property `K8s Kubespray Inventory > cluster_cert_entries > cluster_cert_entries items > zone`
 
 |              |          |
 | ------------ | -------- |
@@ -704,7 +801,7 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 
 **Description:** DNS parent zone, should be the apex zone in ionos/route53 for dns01 challenge.
 
-#### <a name="cluster_cert_entries_items_names"></a>76.1.2. Property `K8s Kubespray Inventory > cluster_cert_entries > cluster_cert_entries items > names`
+#### <a name="cluster_cert_entries_items_names"></a>77.1.2. Property `K8s Kubespray Inventory > cluster_cert_entries > cluster_cert_entries items > names`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -723,7 +820,7 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 | ------------------------------------------------------ | --------------------------------------------------------------- |
 | [names items](#cluster_cert_entries_items_names_items) | SANs included in the certificate and basis for dns01 challenge. |
 
-##### <a name="cluster_cert_entries_items_names_items"></a>76.1.2.1. K8s Kubespray Inventory > cluster_cert_entries > cluster_cert_entries items > names > names items
+##### <a name="cluster_cert_entries_items_names_items"></a>77.1.2.1. K8s Kubespray Inventory > cluster_cert_entries > cluster_cert_entries items > names > names items
 
 |              |          |
 | ------------ | -------- |
@@ -746,7 +843,7 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 "*.subzone"
 ```
 
-#### <a name="cluster_cert_entries_items_authoritative_zone"></a>76.1.3. Property `K8s Kubespray Inventory > cluster_cert_entries > cluster_cert_entries items > authoritative_zone`
+#### <a name="cluster_cert_entries_items_authoritative_zone"></a>77.1.3. Property `K8s Kubespray Inventory > cluster_cert_entries > cluster_cert_entries items > authoritative_zone`
 
 |              |           |
 | ------------ | --------- |
@@ -755,7 +852,7 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 
 **Description:** This will cause the specified apex zone to be created as an authoritative zone in the proxmox clouds dns server. Ingress dns will only work for authoritative zones.
 
-#### <a name="cluster_cert_entries_items_apex_zone_san"></a>76.1.4. Property `K8s Kubespray Inventory > cluster_cert_entries > cluster_cert_entries items > apex_zone_san`
+#### <a name="cluster_cert_entries_items_apex_zone_san"></a>77.1.4. Property `K8s Kubespray Inventory > cluster_cert_entries > cluster_cert_entries items > apex_zone_san`
 
 |              |           |
 | ------------ | --------- |
@@ -763,104 +860,6 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 | **Required** | No        |
 
 **Description:** Creates additional SAN for the zone, if you have *.example.com you will also get example.com in your certificate. Defaults to false.
-
-## <a name="tcp_proxies"></a>77. Property `K8s Kubespray Inventory > tcp_proxies`
-
-|              |                   |
-| ------------ | ----------------- |
-| **Type**     | `array of object` |
-| **Required** | Yes               |
-
-**Description:** Raw tcp forwards on the clusters haproxy to k8s services exposed via nodeport.
-
-|                      | Array restrictions |
-| -------------------- | ------------------ |
-| **Min items**        | N/A                |
-| **Max items**        | N/A                |
-| **Items unicity**    | False              |
-| **Additional items** | False              |
-| **Tuple validation** | See below          |
-
-| Each item of this array must be         | Description |
-| --------------------------------------- | ----------- |
-| [tcp_proxies items](#tcp_proxies_items) | -           |
-
-### <a name="tcp_proxies_items"></a>77.1. K8s Kubespray Inventory > tcp_proxies > tcp_proxies items
-
-|                           |             |
-| ------------------------- | ----------- |
-| **Type**                  | `object`    |
-| **Required**              | No          |
-| **Additional properties** | Not allowed |
-
-| Property                                             | Pattern | Type    | Deprecated | Definition | Title/Description                                                                                                    |
-| ---------------------------------------------------- | ------- | ------- | ---------- | ---------- | -------------------------------------------------------------------------------------------------------------------- |
-| + [proxy_name](#tcp_proxies_items_proxy_name )       | No      | string  | No         | -          | Simple name for the forward. Will be rendered in haproxy configuration so it shouldnt contain special characters.    |
-| + [haproxy_port](#tcp_proxies_items_haproxy_port )   | No      | number  | No         | -          | Frontend port of the proxmox clusters haproxy.                                                                       |
-| + [node_port](#tcp_proxies_items_node_port )         | No      | number  | No         | -          | Nodeport of the k8s service.                                                                                         |
-| - [proxy_snippet](#tcp_proxies_items_proxy_snippet ) | No      | string  | No         | -          | Additional snippet that will be inserted into the haproxy listen block. Can be used to adjust the forwards settings. |
-| - [external](#tcp_proxies_items_external )           | No      | boolean | No         | -          | Will also create a forward on the external floating ip of the proxy not only the internal.                           |
-
-#### <a name="tcp_proxies_items_proxy_name"></a>77.1.1. Property `K8s Kubespray Inventory > tcp_proxies > tcp_proxies items > proxy_name`
-
-|              |          |
-| ------------ | -------- |
-| **Type**     | `string` |
-| **Required** | Yes      |
-
-**Description:** Simple name for the forward. Will be rendered in haproxy configuration so it shouldnt contain special characters.
-
-**Examples:**
-
-```json
-"gitlab-ssh"
-```
-
-```json
-"example-postgres"
-```
-
-#### <a name="tcp_proxies_items_haproxy_port"></a>77.1.2. Property `K8s Kubespray Inventory > tcp_proxies > tcp_proxies items > haproxy_port`
-
-|              |          |
-| ------------ | -------- |
-| **Type**     | `number` |
-| **Required** | Yes      |
-
-**Description:** Frontend port of the proxmox clusters haproxy.
-
-#### <a name="tcp_proxies_items_node_port"></a>77.1.3. Property `K8s Kubespray Inventory > tcp_proxies > tcp_proxies items > node_port`
-
-|              |          |
-| ------------ | -------- |
-| **Type**     | `number` |
-| **Required** | Yes      |
-
-**Description:** Nodeport of the k8s service.
-
-#### <a name="tcp_proxies_items_proxy_snippet"></a>77.1.4. Property `K8s Kubespray Inventory > tcp_proxies > tcp_proxies items > proxy_snippet`
-
-|              |          |
-| ------------ | -------- |
-| **Type**     | `string` |
-| **Required** | No       |
-
-**Description:** Additional snippet that will be inserted into the haproxy listen block. Can be used to adjust the forwards settings.
-
-**Example:**
-
-```json
-"# long running tcp connections that only rarely transmit data\n# ssh client connection for example\ntimeout client 1h \ntimeout server 1h \n"
-```
-
-#### <a name="tcp_proxies_items_external"></a>77.1.5. Property `K8s Kubespray Inventory > tcp_proxies > tcp_proxies items > external`
-
-|              |           |
-| ------------ | --------- |
-| **Type**     | `boolean` |
-| **Required** | No        |
-
-**Description:** Will also create a forward on the external floating ip of the proxy not only the internal.
 
 ## <a name="ceph_csi_sc_pools"></a>78. Property `K8s Kubespray Inventory > ceph_csi_sc_pools`
 
