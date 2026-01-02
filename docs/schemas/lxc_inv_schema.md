@@ -25,7 +25,7 @@
 | - [lxc_os_template](#lxc_os_template )         | No      | string           | No         | -          | \`pveam available --section system\` / run \`pveam update\` for newest, PVE available LXC template (will be downloaded).                                                                                                              |
 | - [plugin](#plugin )                           | No      | enum (of string) | No         | -          | Id of ansible inventory plugin.                                                                                                                                                                                                       |
 
-## <a name="target_pve"></a>1. Property `LXC Inventory > target_pve`
+## <a name="target_pve"></a>56. Property `LXC Inventory > target_pve`
 
 |              |          |
 | ------------ | -------- |
@@ -40,7 +40,7 @@
 "proxmox-cluster-a.your-cloud.domain"
 ```
 
-## <a name="stack_name"></a>2. Property `LXC Inventory > stack_name`
+## <a name="stack_name"></a>57. Property `LXC Inventory > stack_name`
 
 |              |          |
 | ------------ | -------- |
@@ -49,7 +49,7 @@
 
 **Description:** Your stack name, needs to be unique within the cloud domain.
 
-## <a name="static_includes"></a>3. Property `LXC Inventory > static_includes`
+## <a name="static_includes"></a>58. Property `LXC Inventory > static_includes`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -60,7 +60,7 @@
 **Description:** This property contains specific hosts / stacks that need to be included for a schema extension. This way playbooks can statically
 reference a host group and assume it to be a certain stack (e.g. postgres/haproxy/dhcp).
 
-## <a name="include_stacks"></a>4. Property `LXC Inventory > include_stacks`
+## <a name="include_stacks"></a>59. Property `LXC Inventory > include_stacks`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -81,7 +81,7 @@ reference a host group and assume it to be a certain stack (e.g. postgres/haprox
 | --------------------------------------------- | ----------- |
 | [include_stacks items](#include_stacks_items) | -           |
 
-### <a name="include_stacks_items"></a>4.1. LXC Inventory > include_stacks > include_stacks items
+### <a name="include_stacks_items"></a>59.1. LXC Inventory > include_stacks > include_stacks items
 
 |                           |             |
 | ------------------------- | ----------- |
@@ -95,7 +95,7 @@ reference a host group and assume it to be a certain stack (e.g. postgres/haprox
 | + [host_group](#include_stacks_items_host_group )               | No      | string | No         | -          | This is the name of the hosts group of our ansible inventory the included vms/lxcs will be available under.                                                                                                                        |
 | - [qemu_ansible_user](#include_stacks_items_qemu_ansible_user ) | No      | string | No         | -          | User ansible will use to connect, defaults to admin. If you dont want to use debian cinit images you might need to set something else than admin.<br />Ubuntu for example wont work if you set the cloud init user to admin.<br /> |
 
-#### <a name="include_stacks_items_stack_fqdn"></a>4.1.1. Property `LXC Inventory > include_stacks > include_stacks items > stack_fqdn`
+#### <a name="include_stacks_items_stack_fqdn"></a>59.1.1. Property `LXC Inventory > include_stacks > include_stacks items > stack_fqdn`
 
 |              |          |
 | ------------ | -------- |
@@ -114,7 +114,7 @@ reference a host group and assume it to be a certain stack (e.g. postgres/haprox
 "other-k8s.your-other-cloud.domain"
 ```
 
-#### <a name="include_stacks_items_host_group"></a>4.1.2. Property `LXC Inventory > include_stacks > include_stacks items > host_group`
+#### <a name="include_stacks_items_host_group"></a>59.1.2. Property `LXC Inventory > include_stacks > include_stacks items > host_group`
 
 |              |          |
 | ------------ | -------- |
@@ -123,7 +123,7 @@ reference a host group and assume it to be a certain stack (e.g. postgres/haprox
 
 **Description:** This is the name of the hosts group of our ansible inventory the included vms/lxcs will be available under.
 
-#### <a name="include_stacks_items_qemu_ansible_user"></a>4.1.3. Property `LXC Inventory > include_stacks > include_stacks items > qemu_ansible_user`
+#### <a name="include_stacks_items_qemu_ansible_user"></a>59.1.3. Property `LXC Inventory > include_stacks > include_stacks items > qemu_ansible_user`
 
 |              |          |
 | ------------ | -------- |
@@ -133,7 +133,7 @@ reference a host group and assume it to be a certain stack (e.g. postgres/haprox
 **Description:** User ansible will use to connect, defaults to admin. If you dont want to use debian cinit images you might need to set something else than admin.
 Ubuntu for example wont work if you set the cloud init user to admin.
 
-## <a name="root_ssh_pub_key"></a>5. Property `LXC Inventory > root_ssh_pub_key`
+## <a name="root_ssh_pub_key"></a>60. Property `LXC Inventory > root_ssh_pub_key`
 
 |              |          |
 | ------------ | -------- |
@@ -142,7 +142,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** trusted root key for the cloud init image.
 
-## <a name="pve_ha_group"></a>6. Property `LXC Inventory > pve_ha_group`
+## <a name="pve_ha_group"></a>61. Property `LXC Inventory > pve_ha_group`
 
 |              |          |
 | ------------ | -------- |
@@ -151,7 +151,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** PVE HA group this vm should be assigned to (optional).
 
-## <a name="target_pve_hosts"></a>7. Property `LXC Inventory > target_pve_hosts`
+## <a name="target_pve_hosts"></a>62. Property `LXC Inventory > target_pve_hosts`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -172,7 +172,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 | ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
 | [target_pve_hosts items](#target_pve_hosts_items) | The hostname of the proxmox host. Just the hostname, no cluster name or cloud domain should be specified, as they are implicit. |
 
-### <a name="target_pve_hosts_items"></a>7.1. LXC Inventory > target_pve_hosts > target_pve_hosts items
+### <a name="target_pve_hosts_items"></a>62.1. LXC Inventory > target_pve_hosts > target_pve_hosts items
 
 |              |          |
 | ------------ | -------- |
@@ -187,7 +187,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 "proxmox-host-a"
 ```
 
-## <a name="lxcs"></a>8. Property `LXC Inventory > lxcs`
+## <a name="lxcs"></a>63. Property `LXC Inventory > lxcs`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -208,7 +208,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 | ------------------------------- | ----------- |
 | [lxcs items](#lxcs_items)       | -           |
 
-### <a name="lxcs_items"></a>8.1. LXC Inventory > lxcs > lxcs items
+### <a name="lxcs_items"></a>63.1. LXC Inventory > lxcs > lxcs items
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -223,7 +223,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 | - [vars](#lxcs_items_vars )               | No      | object | No         | -          | Custom variables for this lxc specifically. Will be usable in playbooks.                    |
 | + [parameters](#lxcs_items_parameters )   | No      | object | No         | -          | Parameters that will be passed to pve pct cli tool for lxc creation.                        |
 
-#### <a name="lxcs_items_hostname"></a>8.1.1. Property `LXC Inventory > lxcs > lxcs items > hostname`
+#### <a name="lxcs_items_hostname"></a>63.1.1. Property `LXC Inventory > lxcs > lxcs items > hostname`
 
 |              |          |
 | ------------ | -------- |
@@ -232,7 +232,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** Optional unique hostname for this lxc, otherwise pet name random name will be generated.
 
-#### <a name="lxcs_items_target_host"></a>8.1.2. Property `LXC Inventory > lxcs > lxcs items > target_host`
+#### <a name="lxcs_items_target_host"></a>63.1.2. Property `LXC Inventory > lxcs > lxcs items > target_host`
 
 |              |          |
 | ------------ | -------- |
@@ -241,7 +241,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** Pve host to tie this vm to. This is useful to always deploy specifically on a proxmox host.
 
-#### <a name="lxcs_items_vars"></a>8.1.3. Property `LXC Inventory > lxcs > lxcs items > vars`
+#### <a name="lxcs_items_vars"></a>63.1.3. Property `LXC Inventory > lxcs > lxcs items > vars`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -251,7 +251,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** Custom variables for this lxc specifically. Will be usable in playbooks.
 
-#### <a name="lxcs_items_parameters"></a>8.1.4. Property `LXC Inventory > lxcs > lxcs items > parameters`
+#### <a name="lxcs_items_parameters"></a>63.1.4. Property `LXC Inventory > lxcs > lxcs items > parameters`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -268,7 +268,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 | + [memory](#lxcs_items_parameters_memory ) | No      | integer | No         | -          | Memory in bytes, use POW 2.                  |
 | + [net0](#lxcs_items_parameters_net0 )     | No      | string  | No         | -          | Configuration for primary network interface. |
 
-##### <a name="lxcs_items_parameters_rootfs"></a>8.1.4.1. Property `LXC Inventory > lxcs > lxcs items > parameters > rootfs`
+##### <a name="lxcs_items_parameters_rootfs"></a>63.1.4.1. Property `LXC Inventory > lxcs > lxcs items > parameters > rootfs`
 
 |              |          |
 | ------------ | -------- |
@@ -277,7 +277,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** PVE storage for the container disk.
 
-##### <a name="lxcs_items_parameters_cores"></a>8.1.4.2. Property `LXC Inventory > lxcs > lxcs items > parameters > cores`
+##### <a name="lxcs_items_parameters_cores"></a>63.1.4.2. Property `LXC Inventory > lxcs > lxcs items > parameters > cores`
 
 |              |           |
 | ------------ | --------- |
@@ -286,7 +286,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** Number of virtual CPU cores.
 
-##### <a name="lxcs_items_parameters_memory"></a>8.1.4.3. Property `LXC Inventory > lxcs > lxcs items > parameters > memory`
+##### <a name="lxcs_items_parameters_memory"></a>63.1.4.3. Property `LXC Inventory > lxcs > lxcs items > parameters > memory`
 
 |              |           |
 | ------------ | --------- |
@@ -295,7 +295,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** Memory in bytes, use POW 2.
 
-##### <a name="lxcs_items_parameters_net0"></a>8.1.4.4. Property `LXC Inventory > lxcs > lxcs items > parameters > net0`
+##### <a name="lxcs_items_parameters_net0"></a>63.1.4.4. Property `LXC Inventory > lxcs > lxcs items > parameters > net0`
 
 |              |          |
 | ------------ | -------- |
@@ -310,7 +310,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 "name=eth0,bridge=vmbr0,tag=120,firewall=1,ip=dhcp"
 ```
 
-## <a name="lxc_global_vars"></a>9. Property `LXC Inventory > lxc_global_vars`
+## <a name="lxc_global_vars"></a>64. Property `LXC Inventory > lxc_global_vars`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -326,7 +326,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 | - [install_prom_systemd_exporter](#lxc_global_vars_install_prom_systemd_exporter ) | No      | boolean | No         | -          | Will install prometheus metrics exporter for systemd. This implements with pve cloud terraform monitoring modules. |
 | - [](#lxc_global_vars_additionalProperties )                                       | No      | object  | No         | -          | -                                                                                                                  |
 
-### <a name="lxc_global_vars_use_alternate_ssh_port"></a>9.1. Property `LXC Inventory > lxc_global_vars > use_alternate_ssh_port`
+### <a name="lxc_global_vars_use_alternate_ssh_port"></a>64.1. Property `LXC Inventory > lxc_global_vars > use_alternate_ssh_port`
 
 |              |           |
 | ------------ | --------- |
@@ -335,7 +335,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** Will use 2222 instead of 22 for ssh.
 
-### <a name="lxc_global_vars_install_prom_systemd_exporter"></a>9.2. Property `LXC Inventory > lxc_global_vars > install_prom_systemd_exporter`
+### <a name="lxc_global_vars_install_prom_systemd_exporter"></a>64.2. Property `LXC Inventory > lxc_global_vars > install_prom_systemd_exporter`
 
 |              |           |
 | ------------ | --------- |
@@ -344,7 +344,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** Will install prometheus metrics exporter for systemd. This implements with pve cloud terraform monitoring modules.
 
-## <a name="lxc_base_parameters"></a>10. Property `LXC Inventory > lxc_base_parameters`
+## <a name="lxc_base_parameters"></a>65. Property `LXC Inventory > lxc_base_parameters`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -354,7 +354,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** PVE pct cli parameters that will be used for all lxcs.
 
-## <a name="lxc_os_template"></a>11. Property `LXC Inventory > lxc_os_template`
+## <a name="lxc_os_template"></a>66. Property `LXC Inventory > lxc_os_template`
 
 |              |          |
 | ------------ | -------- |
@@ -363,7 +363,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** `pveam available --section system` / run `pveam update` for newest, PVE available LXC template (will be downloaded).
 
-## <a name="plugin"></a>12. Property `LXC Inventory > plugin`
+## <a name="plugin"></a>67. Property `LXC Inventory > plugin`
 
 |              |                    |
 | ------------ | ------------------ |

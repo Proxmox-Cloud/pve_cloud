@@ -30,7 +30,7 @@
 | - [acme_method](#acme_method )                                 | No      | enum (of string) | No         | -          | PVE Cloud included method for solving dns01 challenges. You need to have created the appropriate secrets under /etc/pve/cloud on your proxmox cluster.<br />                                                      |
 | - [plugin](#plugin )                                           | No      | enum (of string) | No         | -          | Id of ansible inventory plugin, needs to be set exactly.                                                                                                                                                          |
 
-## <a name="pve_vm_subnet"></a>15. Property `Cloud Inventory > pve_vm_subnet`
+## <a name="pve_vm_subnet"></a>1. Property `Cloud Inventory > pve_vm_subnet`
 
 |              |          |
 | ------------ | -------- |
@@ -45,7 +45,7 @@
 "192.168.10.0/24"
 ```
 
-## <a name="pve_cloud_domain"></a>16. Property `Cloud Inventory > pve_cloud_domain`
+## <a name="pve_cloud_domain"></a>2. Property `Cloud Inventory > pve_cloud_domain`
 
 |              |          |
 | ------------ | -------- |
@@ -60,7 +60,7 @@
 "your-cloud.example.com"
 ```
 
-## <a name="kea_dhcp_main_ip"></a>17. Property `Cloud Inventory > kea_dhcp_main_ip`
+## <a name="kea_dhcp_main_ip"></a>3. Property `Cloud Inventory > kea_dhcp_main_ip`
 
 |              |          |
 | ------------ | -------- |
@@ -75,7 +75,7 @@
 "192.168.1.2"
 ```
 
-## <a name="kea_dhcp_failover_ip"></a>18. Property `Cloud Inventory > kea_dhcp_failover_ip`
+## <a name="kea_dhcp_failover_ip"></a>4. Property `Cloud Inventory > kea_dhcp_failover_ip`
 
 |              |          |
 | ------------ | -------- |
@@ -90,7 +90,7 @@
 "192.168.1.3"
 ```
 
-## <a name="kea_dhcp_routers"></a>19. Property `Cloud Inventory > kea_dhcp_routers`
+## <a name="kea_dhcp_routers"></a>5. Property `Cloud Inventory > kea_dhcp_routers`
 
 |              |          |
 | ------------ | -------- |
@@ -99,7 +99,7 @@
 
 **Description:** option-data for kea dhcp routers. The default route router that the dhcp will communicate.
 
-## <a name="kea_dhcp_pools"></a>20. Property `Cloud Inventory > kea_dhcp_pools`
+## <a name="kea_dhcp_pools"></a>6. Property `Cloud Inventory > kea_dhcp_pools`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -120,7 +120,7 @@
 | --------------------------------------------- | ---------------------------------- |
 | [kea_dhcp_pools items](#kea_dhcp_pools_items) | IPV4 Address range in keas format. |
 
-### <a name="kea_dhcp_pools_items"></a>20.1. Cloud Inventory > kea_dhcp_pools > kea_dhcp_pools items
+### <a name="kea_dhcp_pools_items"></a>6.1. Cloud Inventory > kea_dhcp_pools > kea_dhcp_pools items
 
 |              |          |
 | ------------ | -------- |
@@ -135,7 +135,7 @@
 "192.168.1.30 - 192.168.1.254"
 ```
 
-## <a name="kea_dhcp_static_routes"></a>21. Property `Cloud Inventory > kea_dhcp_static_routes`
+## <a name="kea_dhcp_static_routes"></a>7. Property `Cloud Inventory > kea_dhcp_static_routes`
 
 |              |          |
 | ------------ | -------- |
@@ -150,7 +150,7 @@
 "0.0.0.0/0 - 192.168.1.1, 10.0.0.1/24 - 192.168.1.20"
 ```
 
-## <a name="bind_master_ip"></a>22. Property `Cloud Inventory > bind_master_ip`
+## <a name="bind_master_ip"></a>8. Property `Cloud Inventory > bind_master_ip`
 
 |              |          |
 | ------------ | -------- |
@@ -165,7 +165,7 @@
 "192.168.1.4"
 ```
 
-## <a name="bind_slave_ip"></a>23. Property `Cloud Inventory > bind_slave_ip`
+## <a name="bind_slave_ip"></a>9. Property `Cloud Inventory > bind_slave_ip`
 
 |              |          |
 | ------------ | -------- |
@@ -180,7 +180,7 @@
 "192.168.1.5"
 ```
 
-## <a name="bind_arpa_zone_service_lxcs"></a>24. Property `Cloud Inventory > bind_arpa_zone_service_lxcs`
+## <a name="bind_arpa_zone_service_lxcs"></a>10. Property `Cloud Inventory > bind_arpa_zone_service_lxcs`
 
 |              |          |
 | ------------ | -------- |
@@ -195,7 +195,7 @@
 "1.168.192.in-addr.arpa"
 ```
 
-## <a name="bind_additional_arpa_zones"></a>25. Property `Cloud Inventory > bind_additional_arpa_zones`
+## <a name="bind_additional_arpa_zones"></a>11. Property `Cloud Inventory > bind_additional_arpa_zones`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -216,14 +216,14 @@
 | --------------------------------------------------------------------- | ----------- |
 | [bind_additional_arpa_zones items](#bind_additional_arpa_zones_items) | -           |
 
-### <a name="bind_additional_arpa_zones_items"></a>25.1. Cloud Inventory > bind_additional_arpa_zones > bind_additional_arpa_zones items
+### <a name="bind_additional_arpa_zones_items"></a>11.1. Cloud Inventory > bind_additional_arpa_zones > bind_additional_arpa_zones items
 
 |              |          |
 | ------------ | -------- |
 | **Type**     | `string` |
 | **Required** | No       |
 
-## <a name="pve_clusters"></a>26. Property `Cloud Inventory > pve_clusters`
+## <a name="pve_clusters"></a>12. Property `Cloud Inventory > pve_clusters`
 
 |                           |             |
 | ------------------------- | ----------- |
@@ -237,7 +237,7 @@
 | ---------------------------------------------------------------------------------------------------------------------------------------- | ------- | ------ | ---------- | ---------- | ------------------------------------------- |
 | - [^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)(?:\.(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?))*$](#pve_clusters_pattern1 ) | Yes     | object | No         | -          | Cloud config for specific proxmox clusters. |
 
-### <a name="pve_clusters_pattern1"></a>26.1. Pattern Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters.`
+### <a name="pve_clusters_pattern1"></a>12.1. Pattern Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters.`
 > All properties whose name matches the regular expression
 ```^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)(?:\.(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?))*$``` ([Test](https://regex101.com/?regex=%5E%28%3F%3A%5Ba-zA-Z0-9%5D%28%3F%3A%5Ba-zA-Z0-9-%5D%7B0%2C61%7D%5Ba-zA-Z0-9%5D%29%3F%29%28%3F%3A%5C.%28%3F%3A%5Ba-zA-Z0-9%5D%28%3F%3A%5Ba-zA-Z0-9-%5D%7B0%2C61%7D%5Ba-zA-Z0-9%5D%29%3F%29%29%2A%24))
 must respect the following conditions
@@ -259,7 +259,7 @@ must respect the following conditions
 | + [pve_unique_cloud_services](#pve_clusters_pattern1_pve_unique_cloud_services )               | No      | array of enum (of string) | No         | -          | Unique service the cluster provides for its cloud. Unique in the sense that only one cluster may provide each of the services for the entire cloud.<br />Services like haproxy and backup servers can and should be provided by multiple clusters. <br />                                                                                                                                    |
 | - [pve_host_vars](#pve_clusters_pattern1_pve_host_vars )                                       | No      | object                    | No         | -          | Optional variables that will be specifically set for a pve host. Key is the simple host name. <br />This can be used to build your specialized pve cluster setup playbooks. You can do things like<br />wakeonlan, driver and network configuration with these easily. Simply create your own playbook and<br />run it even before the pxc.cloud.setup_pve_clusters on this inventory.<br /> |
 
-#### <a name="pve_clusters_pattern1_pve_haproxy_floating_ip_internal"></a>26.1.1. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_haproxy_floating_ip_internal`
+#### <a name="pve_clusters_pattern1_pve_haproxy_floating_ip_internal"></a>12.1.1. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_haproxy_floating_ip_internal`
 
 |              |          |
 | ------------ | -------- |
@@ -275,7 +275,7 @@ Inside the cloud if you define a certificate entry, some nodeport forward or def
 "192.168.10.6"
 ```
 
-#### <a name="pve_clusters_pattern1_pve_haproxy_floating_ip_external"></a>26.1.2. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_haproxy_floating_ip_external`
+#### <a name="pve_clusters_pattern1_pve_haproxy_floating_ip_external"></a>12.1.2. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_haproxy_floating_ip_external`
 
 |              |          |
 | ------------ | -------- |
@@ -290,7 +290,7 @@ Inside the cloud if you define a certificate entry, some nodeport forward or def
 "192.168.10.7"
 ```
 
-#### <a name="pve_clusters_pattern1_pve_unique_cloud_services"></a>26.1.3. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_unique_cloud_services`
+#### <a name="pve_clusters_pattern1_pve_unique_cloud_services"></a>12.1.3. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_unique_cloud_services`
 
 |              |                             |
 | ------------ | --------------------------- |
@@ -312,7 +312,7 @@ Services like haproxy and backup servers can and should be provided by multiple 
 | ----------------------------------------------------------------------------------------- | ----------- |
 | [pve_unique_cloud_services items](#pve_clusters_pattern1_pve_unique_cloud_services_items) | -           |
 
-##### <a name="pve_clusters_pattern1_pve_unique_cloud_services_items"></a>26.1.3.1. Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_unique_cloud_services > pve_unique_cloud_services items
+##### <a name="pve_clusters_pattern1_pve_unique_cloud_services_items"></a>12.1.3.1. Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_unique_cloud_services > pve_unique_cloud_services items
 
 |              |                    |
 | ------------ | ------------------ |
@@ -325,7 +325,7 @@ Must be one of:
 * "dhcp"
 * "psql-state"
 
-#### <a name="pve_clusters_pattern1_pve_host_vars"></a>26.1.4. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars`
+#### <a name="pve_clusters_pattern1_pve_host_vars"></a>12.1.4. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -343,7 +343,7 @@ run it even before the pxc.cloud.setup_pve_clusters on this inventory.
 | - [disable_ipmi](#pve_clusters_pattern1_pve_host_vars_disable_ipmi ) | No      | boolean | No         | -          | If specified will disable the openipmi power managemend systemd service. This might fail on proxmox<br />hosts that dont support it and clutters up monitoring.<br /> |
 | - [](#pve_clusters_pattern1_pve_host_vars_additionalProperties )     | No      | object  | No         | -          | -                                                                                                                                                                     |
 
-##### <a name="pve_clusters_pattern1_pve_host_vars_disable_ipmi"></a>26.1.4.1. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > disable_ipmi`
+##### <a name="pve_clusters_pattern1_pve_host_vars_disable_ipmi"></a>12.1.4.1. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > disable_ipmi`
 
 |              |           |
 | ------------ | --------- |
@@ -353,7 +353,7 @@ run it even before the pxc.cloud.setup_pve_clusters on this inventory.
 **Description:** If specified will disable the openipmi power managemend systemd service. This might fail on proxmox
 hosts that dont support it and clutters up monitoring.
 
-## <a name="bind_zone_admin_email"></a>27. Property `Cloud Inventory > bind_zone_admin_email`
+## <a name="bind_zone_admin_email"></a>13. Property `Cloud Inventory > bind_zone_admin_email`
 
 |              |          |
 | ------------ | -------- |
@@ -368,7 +368,7 @@ hosts that dont support it and clutters up monitoring.
 "admin.example.com."
 ```
 
-## <a name="bind_forward_zones"></a>28. Property `Cloud Inventory > bind_forward_zones`
+## <a name="bind_forward_zones"></a>14. Property `Cloud Inventory > bind_forward_zones`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -390,7 +390,7 @@ their own authoritative zones you want resolved within the cloud.
 | ----------------------------------------------------- | ----------- |
 | [bind_forward_zones items](#bind_forward_zones_items) | -           |
 
-### <a name="bind_forward_zones_items"></a>28.1. Cloud Inventory > bind_forward_zones > bind_forward_zones items
+### <a name="bind_forward_zones_items"></a>14.1. Cloud Inventory > bind_forward_zones > bind_forward_zones items
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -403,14 +403,14 @@ their own authoritative zones you want resolved within the cloud.
 | - [zone](#bind_forward_zones_items_zone )               | No      | string          | No         | -          | -                 |
 | - [nameservers](#bind_forward_zones_items_nameservers ) | No      | array of string | No         | -          | -                 |
 
-#### <a name="bind_forward_zones_items_zone"></a>28.1.1. Property `Cloud Inventory > bind_forward_zones > bind_forward_zones items > zone`
+#### <a name="bind_forward_zones_items_zone"></a>14.1.1. Property `Cloud Inventory > bind_forward_zones > bind_forward_zones items > zone`
 
 |              |          |
 | ------------ | -------- |
 | **Type**     | `string` |
 | **Required** | No       |
 
-#### <a name="bind_forward_zones_items_nameservers"></a>28.1.2. Property `Cloud Inventory > bind_forward_zones > bind_forward_zones items > nameservers`
+#### <a name="bind_forward_zones_items_nameservers"></a>14.1.2. Property `Cloud Inventory > bind_forward_zones > bind_forward_zones items > nameservers`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -429,14 +429,14 @@ their own authoritative zones you want resolved within the cloud.
 | ---------------------------------------------------------------- | ----------- |
 | [nameservers items](#bind_forward_zones_items_nameservers_items) | -           |
 
-##### <a name="bind_forward_zones_items_nameservers_items"></a>28.1.2.1. Cloud Inventory > bind_forward_zones > bind_forward_zones items > nameservers > nameservers items
+##### <a name="bind_forward_zones_items_nameservers_items"></a>14.1.2.1. Cloud Inventory > bind_forward_zones > bind_forward_zones items > nameservers > nameservers items
 
 |              |          |
 | ------------ | -------- |
 | **Type**     | `string` |
 | **Required** | No       |
 
-## <a name="acme_contact"></a>29. Property `Cloud Inventory > acme_contact`
+## <a name="acme_contact"></a>15. Property `Cloud Inventory > acme_contact`
 
 |              |          |
 | ------------ | -------- |
@@ -451,7 +451,7 @@ their own authoritative zones you want resolved within the cloud.
 "acme@example.com"
 ```
 
-## <a name="acme_method"></a>30. Property `Cloud Inventory > acme_method`
+## <a name="acme_method"></a>16. Property `Cloud Inventory > acme_method`
 
 |              |                    |
 | ------------ | ------------------ |
@@ -465,7 +465,7 @@ Must be one of:
 * "route53"
 * "ionos"
 
-## <a name="plugin"></a>31. Property `Cloud Inventory > plugin`
+## <a name="plugin"></a>17. Property `Cloud Inventory > plugin`
 
 |              |                    |
 | ------------ | ------------------ |
