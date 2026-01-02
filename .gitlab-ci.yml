@@ -130,7 +130,7 @@ release_ee:
     - echo $DOCKER_AUTH_CONFIG_B64 | base64 -d > /root/.config/containers/auth.json
     - ansible-galaxy collection build
     - mv pxc-cloud-$CI_COMMIT_TAG.tar.gz pxc-cloud.tar.gz
-    - ansible-builder build -f cloud-ee.yaml --tag tobiashvmz/pve-cloud-ee:$CI_COMMIT_TAG -v
+    - ansible-builder build -f cloud-ee.yaml --tag tobiashvmz/pve-cloud-ee:$CI_COMMIT_TAG -vvv
     - podman push tobiashvmz/pve-cloud-ee:$CI_COMMIT_TAG
   rules:
     - if: '$CI_COMMIT_TAG =~ /^\d+\.\d+\.\d+$/'
