@@ -24,7 +24,7 @@ additional_build_steps:
   append_base:
     # need git to install collection deps
     - RUN dnf install git -y
-    # copy the collection into the image
-    - COPY _build/src/pxc-cloud.tar.gz /pxc-cloud.tar.gz
     # missing distlib dependency in kubespray
     - RUN /usr/bin/python3 -m pip install distlib
+    # copy the collection into the image
+    - COPY _build/src/pxc-cloud.tar.gz /pxc-cloud.tar.gz
