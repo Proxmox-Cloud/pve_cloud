@@ -40,6 +40,11 @@ release_tag:
     - |
       sed -i "s/^version:\s.*$/version: $new_tag/" galaxy.yml
     - git add galaxy.yml
+    # update cloud ee defintion file
+    - |
+      sed -i "s/version:.*sed/version: $new_tag # sed/" cloud-ee.yaml
+    - git add cloud-ee.yaml
+
     - git commit -m "Update collection version to $new_tag / update schemas."
     - git push origin HEAD:master
 
@@ -123,13 +128,13 @@ release_galaxy:
 
 release_ee:
   stage: deploy
+  needs:
+    - release_galaxy
   image: ghcr.io/ansible/community-ansible-dev-tools:v25.11.0
   retry: 1 # even with check logic for pypi package rdy on index, calls after still sometimes fail
   script:
     - mkdir -p /root/.config/containers
     - echo $DOCKER_AUTH_CONFIG_B64 | base64 -d > /root/.config/containers/auth.json
-    - ansible-galaxy collection build
-    - mv pxc-cloud-$CI_COMMIT_TAG.tar.gz pxc-cloud.tar.gz
     - ansible-builder build --extra-build-cli-args='--layers --cache-from tobiashvmz/pve-cloud-ee-cache --cache-to tobiashvmz/pve-cloud-ee-cache' -f cloud-ee.yaml --tag tobiashvmz/pve-cloud-ee:$CI_COMMIT_TAG -vvv
     - podman push tobiashvmz/pve-cloud-ee:$CI_COMMIT_TAG
   rules:
