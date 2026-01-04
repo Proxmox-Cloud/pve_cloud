@@ -149,7 +149,7 @@ release_ee:
 
 release_docs:
   stage: deploy
-  image: python:3.14-trixie
+  image: tobiashvmz/pve-cloud-pyci:2026010412
   retry: 1 # even with check logic for pypi package rdy on index, calls after still sometimes fail
   script:
     - ./mkdocs-gen.sh # generate and validate schema docs + install mkdocs packages
