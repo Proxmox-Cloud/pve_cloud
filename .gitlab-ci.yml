@@ -69,6 +69,7 @@ pve_cloud_schemas_upstream:
   stage: build
   image: docker.io/tobiashvmz/pve-cloud-ci:2025122115
   script:
+    - echo $CI_PIPELINE_SOURCE # debug
     # write the new version
     - sed -i "s/^pve-cloud-schemas==.*$/pve-cloud-schemas==${PVE_CLOUD_SCHEMAS}/" meta/ee-requirements.txt
     - sed -i "s/^pip install pve-cloud-schemas==.*$/pip install pve-cloud-schemas==${PVE_CLOUD_SCHEMAS}/" mkdocs-gen.sh
