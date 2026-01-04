@@ -162,7 +162,7 @@
             external: "{{ item.0.external | default(false) }}"
             is_k8s: false
             rule_len: "{{ (item.0.zone | length) + (item.1 | length) }}"
-      loop: "{{ ingress_domains | subelements('names') }}"
+      loop: "{{ ingress_domains | default([]) | subelements('names') }}"
       when: ingress_domains is defined
 
     # add bind records for services
@@ -177,7 +177,7 @@
         record: "{{ item.1 }}"
         value: "{{ groups['qemus'] | map('extract', hostvars, ['ansible_default_ipv4', 'address']) | list }}"
         state: "present"
-      loop: "{{ ingress_domains | subelements('names') }}"
+      loop: "{{ ingress_domains | default([]) | subelements('names') }}"
 
 
 # these will only execute if tcp_proxies or ingress_domains is defined
