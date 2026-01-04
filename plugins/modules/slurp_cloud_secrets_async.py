@@ -1,21 +1,24 @@
 #!/usr/bin/python
 
-from ansible.module_utils.basic import AnsibleModule
 import asyncio
-import aiofiles
 import base64
 import os
 
+import aiofiles
+from ansible.module_utils.basic import AnsibleModule
+
 
 async def slurp_file(path):
-    async with aiofiles.open(path, 'rb') as f:
+    async with aiofiles.open(path, "rb") as f:
         content = await f.read()
-    encoded = base64.b64encode(content).decode('utf-8')
+    encoded = base64.b64encode(content).decode("utf-8")
     return {"path": path, "content": encoded}
 
 
 async def list_and_slurp():
-    secret_files = [entry.path for entry in os.scandir("/etc/pve/cloud/secrets") if entry.is_file()]
+    secret_files = [
+        entry.path for entry in os.scandir("/etc/pve/cloud/secrets") if entry.is_file()
+    ]
 
     tasks = [slurp_file(f) for f in secret_files]
 
@@ -26,19 +29,15 @@ async def list_and_slurp():
 
 
 def run_module():
-    module_args = dict(
-    )
+    module_args = dict()
     module = AnsibleModule(argument_spec=module_args)
 
     results = asyncio.run(list_and_slurp())
 
-    result = dict(
-        changed=True,
-        results = results
-    )
+    result = dict(changed=True, results=results)
 
     module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     run_module()
