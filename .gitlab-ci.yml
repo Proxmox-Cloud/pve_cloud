@@ -177,8 +177,8 @@ format_source:
     - git config --global user.email "$GITLAB_USER_EMAIL"
     
     - autoflake --in-place --recursive .
-    - black --exclude orm .
-    - isort --skip orm .
+    - black .
+    - isort .
     # commit the changes
     - |
       if ! git diff --quiet; then
