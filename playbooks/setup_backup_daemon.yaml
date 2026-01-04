@@ -24,6 +24,14 @@
         path: /opt/bdd
         state: directory
 
+    - name: Create borg home for backup user
+      file:
+        path: /srv/backup/borg
+        state: directory
+        owner: backup
+        group: backup
+      when: PXC_REMOVABLE_DATASTORES is defined # bdd is running on pbs
+
     - name: Create Python virtual environment in /opt/bdd/.venv
       ansible.builtin.command:
         cmd: python3 -m venv /opt/bdd/.venv
