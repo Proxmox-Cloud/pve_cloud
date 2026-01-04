@@ -54,6 +54,7 @@ release_tag:
     - git push origin "$new_tag"
 
     # trigger pipelines
+    - sleep 10 # small buffer for gitlab ci
     - |
       curl --request POST \
         --form "token=${CI_JOB_TOKEN}" \
