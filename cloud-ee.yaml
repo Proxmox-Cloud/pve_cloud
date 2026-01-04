@@ -11,7 +11,7 @@ dependencies:
   galaxy:
     collections:
       - name: pxc.cloud
-        version: 3.14.0 # sed ci - DONT REMOVE COMMENT
+        version: 3.14.1 # sed ci - DONT REMOVE COMMENT
       
 images:
   base_image:
