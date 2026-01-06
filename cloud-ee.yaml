@@ -5,10 +5,9 @@ dependencies:
     system:
       - openshift-clients # gets triggered by includes, conflicts with license server
   ansible_core:
-    package_pip: ansible-core
-    version: "2.16.14" # same as in meta/runtime.yml
+    package_pip: ansible-core==2.16.14 # same as in meta/runtime.yml
   ansible_runner:
-    package_pip: ansible-runner
+    package_pip: ansible-runner==2.4.1
   galaxy:
     collections:
       - name: pxc.cloud
