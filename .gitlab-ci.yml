@@ -119,7 +119,7 @@ trigger_upstream_release_tag:
 
 release_galaxy:
   stage: deploy
-  image: alpine/ansible:2.18.6
+  image: alpine/ansible:2.20.0
   script:
     - ansible-galaxy collection build
     - ansible-galaxy collection publish *.tar.gz --token $ANSIBLE_GALAXY_TOKEN
