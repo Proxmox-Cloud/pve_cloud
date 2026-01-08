@@ -59,7 +59,7 @@ pve_cloud_backup_rc_upstream:
     # write the new version
     - |
       sed -i "s/py_pve_cloud_backup_version:\s.*$/py_pve_cloud_backup_version: \"${PVE_CLOUD_BACKUP}\"/" playbooks/setup_backup_daemon.yaml
-    - /scripts/upstream-push.sh "Set pve-cloud-backup rc version to $PVE_CLOUD_BACKUP" "${new_tag}-rc"
+    - /scripts/upstream-push.sh "Set pve-cloud-backup rc version to $PVE_CLOUD_BACKUP" "${new_tag}-rc" "${new_tag}-rc"
   rules:
     - if: '$PVE_CLOUD_BACKUP != null && $PVE_CLOUD_BACKUP != "" && $UPSTREAM_TAG_MESSAGE =~ /^rc-.*/' # set by upstream
 
