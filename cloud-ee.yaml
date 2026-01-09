@@ -22,4 +22,4 @@ additional_build_steps:
     # need git to install collection deps
     - RUN dnf install git -y
     # missing distlib dependency in kubespray
-    - RUN /usr/bin/python3 -m pip install distlib==0.3.9
+    - RUN /usr/bin/python3 -m pip install distlib==0.4.0
