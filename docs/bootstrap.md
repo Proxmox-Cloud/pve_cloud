@@ -75,7 +75,7 @@ Depending on how you do your vlan segmentation you either need the firewall to a
 Create a git repository for your cloud instance for example company-xyz-cloud and setup your environment:
 
 * create a venv `python3 -m venv ~/.pve-cloud-venv` and activate `source ~/.pve-cloud-venv/bin/activate`
-* install `pip install ansible==9.13.0`
+* install `pip install ansible==13.2.0`
 * create `requirements.yaml` in your repository like this (get versions from [here](index.md#compatibility)):
 ```yaml
 ---
