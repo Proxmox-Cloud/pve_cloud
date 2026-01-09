@@ -6,7 +6,7 @@
   "customManagers": [
       {
         "customType": "regex",
-        "managerFilePatterns": ["docs/bootstrap.md"],
+        "managerFilePatterns": ["docs/bootstrap.md", "cloud-ee.yaml"],
         "matchStrings": [
           "pip\\sinstall\\s(?<depName>.*)==(?<currentValue>\\d+\\.\\d+\\.\\d+)"
         ],
