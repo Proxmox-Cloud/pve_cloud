@@ -1,40 +1,83 @@
+# schemas doesnt have an rc build as its very simple
+pve_cloud_schemas_upstream:
+  stage: build
+  image: docker.io/tobiashvmz/pve-cloud-ci:202601081028
+  script:
+    # write the new version
+    - sed -i "s/^pve-cloud-schemas==.*$/pve-cloud-schemas==${PVE_CLOUD_SCHEMAS}/" meta/ee-requirements.txt
+    - sed -i "s/^pip install pve-cloud-schemas==.*$/pip install pve-cloud-schemas==${PVE_CLOUD_SCHEMAS}/" mkdocs-gen.sh
+    # commit changes, dont trigger any builds
+    - git config --global user.name "$GITLAB_USER_NAME"
+    - git config --global user.email "$GITLAB_USER_EMAIL"
+    - git add .
+    - git commit -m "Update pve-cloud-schemas version to $PVE_CLOUD_SCHEMAS"
+    - git push origin HEAD:master
+  rules:
+    - if: ( $PVE_CLOUD_SCHEMAS != null || $PVE_CLOUD_SCHEMAS =~ /^./ ) # set by upstream
+
+# pipeline trigger if the upstream releases
+py_pve_cloud_upstream:
+  stage: build
+  image: docker.io/tobiashvmz/pve-cloud-ci:202601081028
+  script:
+    # write the new version
+    - sed -i "s/^py-pve-cloud==.*$/py-pve-cloud==${PY_PVE_CLOUD}/" meta/ee-requirements.txt
+    - /scripts/upstream-push.sh "Update py-pve-cloud version to $PY_PVE_CLOUD"
+  rules:
+    - if: '$PY_PVE_CLOUD != null && $PY_PVE_CLOUD != "" && $UPSTREAM_TAG_MESSAGE =~ /^release-.*/' # set by upstream
+
+py_pve_cloud_rc_upstream:
+  stage: build
+  image: docker.io/tobiashvmz/pve-cloud-ci:202601081028
+  script:
+    # get the latest prod tag
+    - new_tag=$(/scripts/get-new-tag.sh)
+    - echo $new_tag
+    # switch to rc branch
+    - /scripts/rc-branch.sh $new_tag
+    # set rc version for py-pve-cloud-dependency
+    - sed -i "s/^py-pve-cloud==.*$/py-pve-cloud==${PY_PVE_CLOUD//-/}/" meta/ee-requirements.txt
+    - /scripts/upstream-push.sh "Set py-pve-cloud rc version to ${PY_PVE_CLOUD//-/}" "${new_tag}-rc"
+  rules:
+    - if: '$PY_PVE_CLOUD != null && $PY_PVE_CLOUD != "" && $UPSTREAM_TAG_MESSAGE =~ /^rc-.*/' # set by upstream, trigger for rc release
+
+pve_cloud_backup_upstream:
+  stage: build
+  image: docker.io/tobiashvmz/pve-cloud-ci:202601081028
+  script:
+    # write the new version
+    - |
+      sed -i "s/py_pve_cloud_backup_version:\s.*$/py_pve_cloud_backup_version: \"${PVE_CLOUD_BACKUP}\"/" playbooks/setup_backup_daemon.yaml
+    - /scripts/upstream-push.sh "Update pve-cloud-backup version to $PVE_CLOUD_BACKUP"
+  rules:
+    - if: '$PVE_CLOUD_BACKUP != null && $PVE_CLOUD_BACKUP != "" && $UPSTREAM_TAG_MESSAGE =~ /^release-.*/' # set by upstream
+
+pve_cloud_backup_rc_upstream:
+  stage: build
+  image: docker.io/tobiashvmz/pve-cloud-ci:202601081028
+  script:
+    # get the latest prod tag
+    - new_tag=$(/scripts/get-new-tag.sh)
+    - echo $new_tag
+    # switch to rc branch
+    - /scripts/rc-branch.sh $new_tag
+    # write the new version
+    - |
+      sed -i "s/py_pve_cloud_backup_version:\s.*$/py_pve_cloud_backup_version: \"${PVE_CLOUD_BACKUP}\"/" playbooks/setup_backup_daemon.yaml
+    - /scripts/upstream-push.sh "Set pve-cloud-backup rc version to $PVE_CLOUD_BACKUP" "${new_tag}-rc" "${new_tag}-rc"
+  rules:
+    - if: '$PVE_CLOUD_BACKUP != null && $PVE_CLOUD_BACKUP != "" && $UPSTREAM_TAG_MESSAGE =~ /^rc-.*/' # set by upstream
+
+# specialized version of the release-tag.sh pipeline script
+# we habe to commit tag versions to galaxy.yml and to our cloud-ee.yml files
 release_tag:
   stage: build
-  image: docker.io/tobiashvmz/pve-cloud-ci:2025122115
+  image: docker.io/tobiashvmz/pve-cloud-ci:202601081028
   script:
     - git config --global user.name "$GITLAB_USER_NAME"
     - git config --global user.email "$GITLAB_USER_EMAIL"
-    - |
-      # get the latest tag => default to 0.0.0
-      tags=$(git tag -l | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' || true)
-      if [ -z "$tags" ]; then
-        latest_tag="0.0.0"
-      else
-        latest_tag=$(echo "$tags" | sort -V | tail -n 1)
-      fi
 
-      # split the tag and increment
-      major=$(echo "$latest_tag" | cut -d '.' -f 1)
-      minor=$(echo "$latest_tag" | cut -d '.' -f 2)
-      patch=$(echo "$latest_tag" | cut -d '.' -f 3)
-
-      if [[ "$CI_COMMIT_TAG" == *"-major" ]]; then
-        major=$((major + 1))
-        minor=0
-        patch=0
-      elif [[ "$CI_COMMIT_TAG" == *"-minor" ]]; then
-        minor=$((minor + 1))
-        patch=0
-      elif [[ "$CI_COMMIT_TAG" == *"-patch" ]]; then
-        patch=$((patch + 1))
-      else
-        echo "Unknown increment type: $CI_COMMIT_TAG"
-        exit 1
-      fi
-
-      new_tag="$major.$minor.$patch"
-
-      echo $new_tag
+    - new_tag=$(/scripts/get-new-tag.sh)
 
     # update galaxy yaml
     - |
@@ -49,7 +92,16 @@ release_tag:
     - git commit -m "Update collection version to $new_tag / update schemas."
     - git push origin HEAD:master
 
-    # tag and push
+    # cleanup delete rc tags - on prod release we cleanup rc branch
+    - |
+      if git ls-remote --heads origin | grep -q "refs/heads/${new_tag}-rc"; then
+        echo "deleting rc release branch ${new_tag}-rc"
+        git push origin --delete "${new_tag}-rc"
+      else
+        echo "no rc branch found! prod release without rc first?"
+      fi
+
+    # release tag and push
     - git tag "$new_tag" -m "$CI_COMMIT_TAG"
     - git push origin "$new_tag"
 
@@ -62,76 +114,75 @@ release_tag:
         "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/trigger/pipeline"
   rules:
     - if: '$CI_COMMIT_TAG =~ /^release-[a-z]+$/'
-    - if: '$CI_COMMIT_TAG =~ /^release-all-[a-z]+$/'
   resource_group: deploy-prod
 
-pve_cloud_schemas_upstream:
+# specialized version of the rc-tag.sh pipeline script
+# we have to write our rc version to galaxy.yml. we dont build the execution environment
+# for release candidates
+rc_tag:
   stage: build
-  image: docker.io/tobiashvmz/pve-cloud-ci:2025122115
+  image: docker.io/tobiashvmz/pve-cloud-ci:202601081028
   script:
-    # write the new version
-    - sed -i "s/^pve-cloud-schemas==.*$/pve-cloud-schemas==${PVE_CLOUD_SCHEMAS}/" meta/ee-requirements.txt
-    - sed -i "s/^pip install pve-cloud-schemas==.*$/pip install pve-cloud-schemas==${PVE_CLOUD_SCHEMAS}/" mkdocs-gen.sh
-    - /scripts/upstream-push.sh "Update pve-cloud-schemas version to $PVE_CLOUD_SCHEMAS"
-  rules:
-    - if: ( $PVE_CLOUD_SCHEMAS != null || $PVE_CLOUD_SCHEMAS =~ /^./ ) # set by upstream
+    - git config --global user.name "$GITLAB_USER_NAME"
+    - git config --global user.email "$GITLAB_USER_EMAIL"
 
+    - new_tag=$(/scripts/get-new-tag.sh)
+    - /scripts/rc-branch.sh $new_tag # switch to rc branch
 
-# pipeline trigger if the upstream releases
-py_pve_cloud_upstream:
-  stage: build
-  image: docker.io/tobiashvmz/pve-cloud-ci:2025122115
-  script:
-    # write the new version
-    - sed -i "s/^py-pve-cloud==.*$/py-pve-cloud==${PY_PVE_CLOUD}/" meta/ee-requirements.txt
-    - /scripts/upstream-push.sh "Update py-pve-cloud version to $PY_PVE_CLOUD"
-  rules:
-    - if: ( $PY_PVE_CLOUD != null || $PY_PVE_CLOUD =~ /^./ ) # set by upstream
-
-
-pve_cloud_backup_upstream:
-  stage: build
-  image: docker.io/tobiashvmz/pve-cloud-ci:2025122115
-  script:
-    # write the new version
+    # determine the rc release tag
     - |
-      sed -i "s/py_pve_cloud_backup_version:\s.*$/py_pve_cloud_backup_version: \"${PVE_CLOUD_BACKUP}\"/" playbooks/setup_backup_daemon.yaml
-    - /scripts/upstream-push.sh "Update pve-cloud-backup version to $PVE_CLOUD_BACKUP"
-  rules:
-    - if: ( $PVE_CLOUD_BACKUP != null || $PVE_CLOUD_BACKUP =~ /^./ ) # set by upstream
+      rc_tags=$(git tag -l | grep -E "^$new_tag-rc[0-9]+$" || true)
 
+      if [ -z "$rc_tags" ]; then
+        rc_vers_tag="$new_tag-rc0"
+      else
+        latest_rc=$(echo "$rc_tags" | sort -V | tail -n 1)
+        rc_num=${latest_rc##*-rc}   # removes everything up to last "-rc"
+        
+        next_rc=$((rc_num + 1))
+        
+        rc_vers_tag="$new_tag-rc${next_rc}"
+      fi
 
-# call the pipeline for the release patch tag we just created above
-trigger_upstream_release_tag:
-  stage: deploy
-  image: alpine/curl:8.14.1
-  script:
+      echo $rc_vers_tag
+
+    # update galaxy yaml - no need to update cloud-ee.yml we dont build it in release candidates
+    - |
+      sed -i "s/^version:\s.*$/version: $rc_vers_tag/" galaxy.yml
+    - git add galaxy.yml
+
+    # commit and tag rc
+    - git commit -m "Set collection rc version to $rc_vers_tag / update schemas."
+    - git push origin HEAD:$new_tag-rc
+    - git tag "${rc_vers_tag}" -m "$CI_COMMIT_TAG" # again save the initial rc tag for propagation
+    - git push origin "${rc_vers_tag}"
+
+    # trigger pipelines
+    - sleep 10 # small buffer for gitlab ci
     - |
       curl --request POST \
         --form "token=${CI_JOB_TOKEN}" \
-        --form "ref=${UPSTREAM_TAG_MESSAGE}" \
+        --form "ref=${rc_vers_tag}" \
         "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/trigger/pipeline"
   rules:
-    - if: $UPSTREAM_TAG_MESSAGE =~ /-all-/ && ( $PY_PVE_CLOUD != null || $PY_PVE_CLOUD =~ /^./ ) # set by upstream
-    - if: $UPSTREAM_TAG_MESSAGE =~ /-all-/ && ( $PVE_CLOUD_BACKUP != null || $PVE_CLOUD_BACKUP =~ /^./ ) # same trigger from both upstreams
-    - if: $UPSTREAM_TAG_MESSAGE =~ /-all-/ && ( $PVE_CLOUD_SCHEMAS != null || $PVE_CLOUD_SCHEMAS =~ /^./ )
-
+    - if: '$CI_COMMIT_TAG =~ /^rc-[a-z]+$/'
+  resource_group: deploy-prod
 
 release_galaxy:
   stage: deploy
-  image: alpine/ansible:2.18.6
+  image: alpine/ansible:2.20.0
   script:
     - ansible-galaxy collection build
     - ansible-galaxy collection publish *.tar.gz --token $ANSIBLE_GALAXY_TOKEN
   rules:
     - if: '$CI_COMMIT_TAG =~ /^\d+\.\d+\.\d+$/'
-
+    - if: '$CI_COMMIT_TAG =~ /^\d+\.\d+\.\d+-rc\d+$/' # release candidate
 
 release_ee:
   stage: deploy
   needs:
     - release_galaxy
-  image: ghcr.io/ansible/community-ansible-dev-tools:v25.11.0
+  image: ghcr.io/ansible/community-ansible-dev-tools:v25.12.0
   retry: 1 # even with check logic for pypi package rdy on index, calls after still sometimes fail
   script:
     - mkdir -p /root/.config/containers
@@ -146,10 +197,9 @@ release_ee:
   timeout: 2h
   resource_group: deploy-prod-ee # don't run this twice ;)
 
-
 release_docs:
   stage: deploy
-  image: tobiashvmz/pve-cloud-pyci:2026010412
+  image: tobiashvmz/pve-cloud-pyci:202601090831
   retry: 1 # even with check logic for pypi package rdy on index, calls after still sometimes fail
   script:
     - ./mkdocs-gen.sh # generate and validate schema docs + install mkdocs packages
@@ -170,10 +220,9 @@ release_docs:
   rules:
     - if: '$CI_COMMIT_TAG =~ /^\d+\.\d+\.\d+$/'
 
-
 format_source:
   stage: build
-  image: tobiashvmz/pve-cloud-pyci:2026010412
+  image: tobiashvmz/pve-cloud-pyci:202601090831
   script:
     - git config --global user.name "$GITLAB_USER_NAME"
     - git config --global user.email "$GITLAB_USER_EMAIL"
@@ -193,8 +242,9 @@ format_source:
   rules:
     - if: >
         $CI_COMMIT_TAG !~ /^\d+\.\d+\.\d+$/ &&
+        $CI_COMMIT_TAG !~ /^\d+\.\d+\.\d+-rc\d+$/ &&
         $CI_COMMIT_TAG !~ /^release-[a-z]+$/ &&
-        $CI_COMMIT_TAG !~ /^release-all-[a-z]+$/ &&
+        $CI_COMMIT_TAG !~ /^rc-[a-z]+$/ &&
         $CI_PIPELINE_SOURCE == 'push'
       when: on_success
     - when: never

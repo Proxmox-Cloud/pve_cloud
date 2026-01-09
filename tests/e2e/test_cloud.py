@@ -304,8 +304,9 @@ def test_create_kubespray(request, get_test_env, setup_haproxy_lxcs, setup_cache
 
         # for local tdd with development watchdogs
         extra_vars = {}
-        if os.getenv("TDDOG_LOCAL_IFACE"):
-            extra_vars["test_repos_ip"] = get_ipv4(os.getenv("TDDOG_LOCAL_IFACE"))
+        tdd_ip = get_tdd_ip()
+        if tdd_ip:
+            extra_vars["test_repos_ip"] = tdd_ip
 
         kubespray_run = ansible_runner.run(
             project_dir=os.getcwd(),

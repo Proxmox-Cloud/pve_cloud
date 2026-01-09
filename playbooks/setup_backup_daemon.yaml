@@ -2,14 +2,8 @@
   hosts: lxcs:qemus
   vars:
     # increment this on releasing a new pve-cloud-backup version
-    py_pve_cloud_backup_version: "0.6.2"
+    py_pve_cloud_backup_version: "0.6.3"
   tasks:
-    - name: pbs no sub
-      ansible.builtin.command:
-        cmd: mv /etc/apt/sources.list.d/pbs-enterprise.sources /etc/apt/sources.list.d/pbs-enterprise.sources.bak
-        creates: /etc/apt/sources.list.d/pbs-enterprise.sources.bak
-      when: pbs_no_sub is defined and pbs_no_sub
-
     - name: install core apt packages
       ansible.builtin.apt:
         name: 

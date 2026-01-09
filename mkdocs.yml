@@ -19,6 +19,7 @@ theme:
     - toc.follow
     - toc.integrate
     - search.suggest
+    - content.code.copy
 
 plugins:
   - search

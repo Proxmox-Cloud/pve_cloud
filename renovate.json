@@ -2,5 +2,15 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "config:recommended"
-  ]
+  ],
+  "customManagers": [
+      {
+        "customType": "regex",
+        "managerFilePatterns": ["docs/bootstrap.md", "cloud-ee.yaml"],
+        "matchStrings": [
+          "pip\\sinstall\\s(?<depName>.*)==(?<currentValue>\\d+\\.\\d+\\.\\d+)"
+        ],
+        "datasourceTemplate": "pypi"
+      }
+    ]
 }

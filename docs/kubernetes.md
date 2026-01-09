@@ -10,7 +10,7 @@ Checkout the `kubespray-cluster` dir in the [samples directory](https://github.c
 
 Again create custom inventory yaml file following this [k8s cluster schema](schemas/kubespray_inv_schema.md).
 
-Afterwards run the `pxc.cloud.sync_kubespray` playbook, this will fully create VMs, setup kubespray, initialize TLS Certificates and deploy core kubernetes helm charts (Ceph CSI, Ingress).
+Afterwards run the `ansible-playbook -i YOUR-KUBESPRAY-INV.yaml pxc.cloud.sync_kubespray` playbook, this will fully create VMs, setup kubespray, initialize TLS Certificates and deploy core kubernetes helm charts (Ceph CSI, Ingress).
 
 To get kubeconf after creation of the cluster for cli/ide access (expiring) use:
 
