@@ -17,7 +17,7 @@ distlib==0.3.9
 
 # amazon.aws collection dependency
 # todo: refactor out, only keep letsencrypt
-boto3==1.39.17
+boto3==1.42.24
 
 # kubernetes.core
 kubernetes==34.1.0
