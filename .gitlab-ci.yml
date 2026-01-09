@@ -6,7 +6,12 @@ pve_cloud_schemas_upstream:
     # write the new version
     - sed -i "s/^pve-cloud-schemas==.*$/pve-cloud-schemas==${PVE_CLOUD_SCHEMAS}/" meta/ee-requirements.txt
     - sed -i "s/^pip install pve-cloud-schemas==.*$/pip install pve-cloud-schemas==${PVE_CLOUD_SCHEMAS}/" mkdocs-gen.sh
-    - /scripts/upstream-push.sh "Update pve-cloud-schemas version to $PVE_CLOUD_SCHEMAS"
+    # commit changes, dont trigger any builds
+    - git config --global user.name "$GITLAB_USER_NAME"
+    - git config --global user.email "$GITLAB_USER_EMAIL"
+    - git add .
+    - git commit -m "Update pve-cloud-schemas version to $PVE_CLOUD_SCHEMAS"
+    - git push origin HEAD:master
   rules:
     - if: ( $PVE_CLOUD_SCHEMAS != null || $PVE_CLOUD_SCHEMAS =~ /^./ ) # set by upstream
 

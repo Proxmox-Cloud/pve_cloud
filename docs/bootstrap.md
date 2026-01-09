@@ -14,7 +14,7 @@ The cluster needs to meet these minimum requirements:
 
 You need a development machine (preferably apt based distro) in the same subnet/vlan segment as your proxmox hosts for running playbooks and applying terraform configurations.
 
-These machines need ssh access to the root user of your proxmox clusters. Generate / install a key and add it to `~/.ssh/authorized_keys` on one of the proxmox hosts (proxmox automatically syncs this file accross all hosts in a cluster).
+These machines need ssh access to the root user of your proxmox clusters. Generate / install a key (`ssh-keygen -t ed25519`) and add it to `~/.ssh/authorized_keys` on one of the proxmox hosts (simply copy the .pub key line, proxmox automatically syncs this file accross all hosts in a cluster).
 
 Next install the following packages/tools on your development machine (most of these can be comfortably installed using [brew](https://brew.sh/)):
 
@@ -24,7 +24,7 @@ Next install the following packages/tools on your development machine (most of t
 * [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/)
 * [helm cli](https://helm.sh/docs/intro/install/) ( `>=v3.0.0` )
 * [yq (mikefarah)](https://github.com/mikefarah/yq?tab=readme-ov-file#install)
-* `apt install direnv` (.envrc files for terraform conf/auth)
+* `apt install direnv` (.envrc files for terraform conf/auth) - you also need to add `eval "$(direnv hook bash)"` to the end of your `~/.bashrc`
 * nfs-common (if you want to use caching of setup artifacts)
 * [docker](https://docs.docker.com/engine/install/) (if you want to use caching / [tdd development](tdd.md))
 
@@ -109,6 +109,7 @@ Connect to your one proxmox clusters `pvcli connect-cluster --pve-host $PROXMOX_
 
 The cli will ask you for a cloud domain if the cluster has not already one assigned.
 
+With this approach its up to you to keep the inventory on your developer machine in sync. To refresh a cluster after you added a new host simply run the command again, also passing the `--force` flag to update it.
 
 ### Repository setup
 
