@@ -199,7 +199,7 @@ release_ee:
 
 release_docs:
   stage: deploy
-  image: tobiashvmz/pve-cloud-pyci:2026010412
+  image: tobiashvmz/pve-cloud-pyci:202601090831
   retry: 1 # even with check logic for pypi package rdy on index, calls after still sometimes fail
   script:
     - ./mkdocs-gen.sh # generate and validate schema docs + install mkdocs packages
@@ -222,7 +222,7 @@ release_docs:
 
 format_source:
   stage: build
-  image: tobiashvmz/pve-cloud-pyci:2026010412
+  image: tobiashvmz/pve-cloud-pyci:202601090831
   script:
     - git config --global user.name "$GITLAB_USER_NAME"
     - git config --global user.email "$GITLAB_USER_EMAIL"
