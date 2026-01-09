@@ -8,7 +8,7 @@
         "customType": "regex",
         "managerFilePatterns": ["docs/bootstrap.md"],
         "matchStrings": [
-          "\\* install `pip install ansible==(?<currentValue>\\d+\\.\\d+\\.\\d+)`"
+          "`pip install ansible==(?<currentValue>\\d+\\.\\d+\\.\\d+)`"
         ],
         "datasourceTemplate": "pypi",
         "depNameTemplate": "ansible"
