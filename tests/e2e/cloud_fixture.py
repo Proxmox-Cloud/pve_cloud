@@ -9,6 +9,7 @@ from pve_cloud_test.cloud_fixtures import *
 
 logger = logging.getLogger(__name__)
 
+
 @cloud_fixture("localhost")
 def setup_control_node(request, get_test_env):
     if not request.config.getoption("--skip-fixture-init"):
@@ -21,8 +22,9 @@ def setup_control_node(request, get_test_env):
         )
 
         assert setup_run.rc == 0
-    
+
     return
+
 
 @cloud_fixture("hosts")
 def setup_pve_hosts(request, get_test_env, setup_control_node):
