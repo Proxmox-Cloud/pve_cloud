@@ -182,7 +182,7 @@ release_ee:
   stage: deploy
   needs:
     - release_galaxy
-  image: ghcr.io/ansible/community-ansible-dev-tools:v25.12.0
+  image: ghcr.io/ansible/community-ansible-dev-tools:v26.1.0
   retry: 1 # even with check logic for pypi package rdy on index, calls after still sometimes fail
   script:
     - mkdir -p /root/.config/containers
