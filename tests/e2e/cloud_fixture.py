@@ -9,9 +9,23 @@ from pve_cloud_test.cloud_fixtures import *
 
 logger = logging.getLogger(__name__)
 
+@cloud_fixture("localhost")
+def setup_control_node(request, get_test_env):
+    if not request.config.getoption("--skip-fixture-init"):
+        # run the main playbook
+        logger.info("run control node setup")
+        setup_run = ansible_runner.run(
+            project_dir=os.getcwd(),
+            playbook="playbooks/setup_control_node.yaml",
+            verbosity=request.config.getoption("--ansible-verbosity"),
+        )
+
+        assert setup_run.rc == 0
+    
+    return
 
 @cloud_fixture("hosts")
-def setup_pve_hosts(request, get_test_env):
+def setup_pve_hosts(request, get_test_env, setup_control_node):
     logger.info("setup cloud")
 
     # run the pve cluster setup on the test environment

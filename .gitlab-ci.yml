@@ -21,8 +21,9 @@ py_pve_cloud_upstream:
   image: docker.io/tobiashvmz/pve-cloud-ci:202601081028
   script:
     # write the new version
-    - sed -i "s/^py-pve-cloud==.*$/py-pve-cloud==${PY_PVE_CLOUD}/" meta/ee-requirements.txt
-    - /scripts/upstream-push.sh "Update py-pve-cloud version to $PY_PVE_CLOUD"
+    - PESSIMISTIC_CONSTRAINT=$(/scripts/get-pessimistic-semver.sh $PY_PVE_CLOUD)
+    - sed -i "s/^py-pve-cloud>=.*$/py-pve-cloud>=${PY_PVE_CLOUD},<${PESSIMISTIC_CONSTRAINT}/" meta/ee-requirements.txt
+    - /scripts/upstream-push.sh "Update py-pve-cloud version to $PY_PVE_CLOUD (pessimistic)"
   rules:
     - if: '$PY_PVE_CLOUD != null && $PY_PVE_CLOUD != "" && $UPSTREAM_TAG_MESSAGE =~ /^release-.*/' # set by upstream
 
@@ -36,7 +37,7 @@ py_pve_cloud_rc_upstream:
     # switch to rc branch
     - /scripts/rc-branch.sh $new_tag
     # set rc version for py-pve-cloud-dependency
-    - sed -i "s/^py-pve-cloud==.*$/py-pve-cloud==${PY_PVE_CLOUD//-/}/" meta/ee-requirements.txt
+    - sed -i "s/^py-pve-cloud.*$/py-pve-cloud==${PY_PVE_CLOUD//-/}/" meta/ee-requirements.txt
     - /scripts/upstream-push.sh "Set py-pve-cloud rc version to ${PY_PVE_CLOUD//-/}" "${new_tag}-rc"
   rules:
     - if: '$PY_PVE_CLOUD != null && $PY_PVE_CLOUD != "" && $UPSTREAM_TAG_MESSAGE =~ /^rc-.*/' # set by upstream, trigger for rc release
