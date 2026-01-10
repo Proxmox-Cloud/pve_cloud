@@ -22,8 +22,8 @@ def setup_control_node(request, get_test_env):
         )
 
         assert setup_run.rc == 0
-
-    return
+    
+    yield
 
 
 @cloud_fixture("hosts")

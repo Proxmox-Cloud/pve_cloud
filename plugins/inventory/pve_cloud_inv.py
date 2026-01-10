@@ -65,11 +65,12 @@ class InventoryModule(BaseInventoryPlugin):
             os.path.join(collection_path, "meta/ee-requirements.txt"), "r"
         ) as reqs:
             for line_req in reqs:
-                if "==" in line_req:
-                    req_split = line_req.split("==")
+                if ">=" in line_req:
+                    # pessimistic trick is only for e2e, its still fixxed
+                    req_split = line_req.split(">=")
 
                     if req_split[0] == "py-pve-cloud":
-                        py_pve_cloud_version = req_split[1].strip()
+                        py_pve_cloud_version = req_split[1].split(",")[0].strip()
                         break
 
         if not py_pve_cloud_version:
