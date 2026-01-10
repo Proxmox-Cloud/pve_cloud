@@ -4,13 +4,14 @@
     "config:recommended"
   ],
   "customManagers": [
-      {
-        "customType": "regex",
-        "managerFilePatterns": ["docs/bootstrap.md", "cloud-ee.yaml"],
-        "matchStrings": [
-          "pip\\sinstall\\s(?<depName>.*)==(?<currentValue>\\d+\\.\\d+\\.\\d+)"
-        ],
-        "datasourceTemplate": "pypi"
-      }
-    ]
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["docs/bootstrap.md", "cloud-ee.yaml"],
+      "matchStrings": [
+        "pip\\sinstall\\s(?<depName>.*)==(?<currentValue>\\d+\\.\\d+\\.\\d+)"
+      ],
+      "datasourceTemplate": "pypi"
+    }
+  ],
+  "ignorePresets": [":ignoreModulesAndTests"]
 }
