@@ -1,7 +1,7 @@
 import logging
 import os
-import tempfile
 import subprocess
+import tempfile
 
 import ansible_runner
 import pytest
