@@ -1,5 +1,6 @@
 import logging
 import os
+import subprocess
 import tempfile
 
 import ansible_runner
@@ -13,6 +14,31 @@ logger = logging.getLogger(__name__)
 @cloud_fixture("localhost")
 def setup_control_node(request, get_test_env):
     if not request.config.getoption("--skip-fixture-init"):
+        # install galaxy requirements
+
+        # dump them in installable format
+        with open("galaxy.yml") as f:
+            galaxy = yaml.safe_load(f)
+
+        deps = galaxy.get("dependencies", {})
+
+        req = {"collections": []}
+
+        for name, version in deps.items():
+            entry = {}
+            entry["name"] = name
+            entry["version"] = version
+
+            req["collections"].append(entry)
+
+        with open("tdd-requirements.yml", "w") as f:
+            yaml.safe_dump(req, f, sort_keys=False)
+
+        subprocess.run(
+            ["ansible-galaxy", "install", "-r", "tdd-requirements.yml"],
+            check=True,
+        )
+
         # run the main playbook
         logger.info("run control node setup")
         setup_run = ansible_runner.run(

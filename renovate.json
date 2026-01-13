@@ -11,6 +11,14 @@
         "pip\\sinstall\\s(?<depName>.*)==(?<currentValue>\\d+\\.\\d+\\.\\d+)"
       ],
       "datasourceTemplate": "pypi"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["galaxy.yml"],
+      "matchStrings": [
+        "\\s+'(?<depName>.*)':\\s+(?<currentValue>\\d+\\.\\d+\\.\\d+)"
+      ],
+      "datasourceTemplate": "galaxy-collection"
     }
   ],
   "ignorePresets": [":ignoreModulesAndTests"]

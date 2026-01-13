@@ -54,15 +54,14 @@ test-env-conf.yaml
 
 1. install build essentails `sudo apt install build-essential python3-dev` (or your distros equivalent)
 2. install ansible as described in the [bootstrap section](bootstrap.md) and also run the control node setup
-3. run `tdd-reqs` cli command inside the pve_cloud collection and `ansible-galaxy install -r tdd-requirements.yml`, this will install all the ansible collection dependencies
-4. launch local registries for watchdog rebuilds and fast deployment
+3. launch local registries for watchdog rebuilds and fast deployment
 ```bash
 docker run -d -p 5000:5000 --name pxc-local-registry registry:3 # local docker registry
 docker run -d -p 8088:8080 --name pxc-local-pypi pypiserver/pypiserver:latest run -P . -a . # local pypi registry without auth
 docker run -d --name pxc-local-redis -p 6379:6379 redis:latest # redis broker for triggering dependent builds
 ```
-5. run `tddog --recursive` from your top level created `pve-cloud` folder. This will monitor src folders, rebuild artifacts and their dependants and also run `pip install -e .` on libraries that are needed locally.
-6. run the e2e tests:
+4. run `tddog --recursive` from your top level created `pve-cloud` folder. This will monitor src folders, rebuild artifacts and their dependants and also run `pip install -e .` on libraries that are needed locally.
+5. run the e2e tests:
 ```bash
 pytest -s tests/e2e/ --skip-cleanup 
 
