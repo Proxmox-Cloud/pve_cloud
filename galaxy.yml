@@ -43,7 +43,7 @@ dependencies:
   # todo: only used to create the initial dbs, 
   'community.postgresql': 3.14.2
   # todo: refactor this out? todo: dynamic workflow, only keep letsencrypt, let the user specify dynamic role names to set records for dns01
-  'amazon.aws': 10.1.0
+  'amazon.aws': 10.1.2
   # specifically needed for acme and controller chart for sync
   'community.crypto': 2.26.6
   'prometheus.prometheus': 0.27.0
