@@ -16,7 +16,7 @@
       "customType": "regex",
       "managerFilePatterns": ["galaxy.yml"],
       "matchStrings": [
-        "\\s+'(?<depName>.*)':\\s*(?<currentValue>\\d+\\.\\d+\\.\\d+)"
+        "\\s+'(?<depName>.*)':\\s+(?<currentValue>\\d+\\.\\d+\\.\\d+)"
       ],
       "datasourceTemplate": "galaxy-collection"
     }
