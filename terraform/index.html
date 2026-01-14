@@ -843,15 +843,16 @@
 
 
 <h1 id="terraform">Terraform</h1>
-<p>The project ships the <a href="https://registry.terraform.io/providers/Proxmox-Cloud/pxc/latest">pxc terraform provider</a> as well as some terraform modules.</p>
+<p>The project ships the <a href="https://registry.terraform.io/providers/Proxmox-Cloud/pxc/latest">pxc terraform provider</a> as well a several modules for configuring kubernetes.</p>
 <p>We use terraform to configure our k8s clusters and manage deployments on them. For an example of how to initialize your terraform folder have a look at the <a href="https://github.com/Proxmox-Cloud/pve_cloud/tree/master/samples/kubespray-cluster">kubespray-cluster/terraform samples folder</a></p>
 <h2 id="authentication">Authentication</h2>
-<p>The sample uses a <code>.envrc</code> file to set environment variables for initializing our terraform backend. It is intended to use the patroni stack the cloud collection deploys. Inside the database there is a dedicated one for <code>tf-states</code></p>
+<p>In the basic cloud setup we deploy 3 LXC containers that run a patroni postgres database. This database is also intended to be used as a state store for terraform.</p>
+<p>The sample uses a <code>.envrc</code> file to set environment variables for initializing our terraform backend. If you have <code>direnv</code> installed as listed in the boostrap section, all you need to do is <code>cd</code> into the terraform directory and run <code>direnv allow</code> once. After that you are ready to go and use terraform.</p>
 <p>The provider takes in the inventory and is responsible for getting access to our kubernetes cluster aswell as any proxmox cloud infrastructure.</p>
 <h2 id="terraform-modules">Terraform modules</h2>
 <p>After authenticating with the provider proxmox cloud offers several <a href="https://registry.terraform.io/namespaces/Proxmox-Cloud">terraform modules</a>.</p>
 <h2 id="cloud-controller">Cloud Controller</h2>
-<p>In the <a href="https://github.com/Proxmox-Cloud/pve_cloud/blob/master/samples/kubespray-cluster/terraform/cloud-deployments.tf">samples</a> you can see the controller being deployed with minimal features enabled.</p>
+<p>In the <a href="https://github.com/Proxmox-Cloud/pve_cloud/blob/master/samples/kubespray-cluster/terraform/cloud-deployments.tf">samples</a> you can see the <a href="https://registry.terraform.io/modules/Proxmox-Cloud/controller/pxc/latest">kubnernetes proxmox cloud controller</a> being deployed with minimal features enabled.</p>
 <p>The deployment comes with a varity of features that are toggled on by passing optional terraform variables to the terraform module:</p>
 <ul>
 <li>internal ingress dns (all kubernetes ingress resources automatically create record within the pve cloud BIND dns server)

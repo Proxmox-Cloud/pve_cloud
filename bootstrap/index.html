@@ -876,11 +876,11 @@
 </ul>
 <h2 id="developmentdeployment-machine">Development/Deployment machine</h2>
 <p>You need a development machine (preferably apt based distro) in the same subnet/vlan segment as your proxmox hosts for running playbooks and applying terraform configurations.</p>
-<p>These machines need ssh access to the root user of your proxmox clusters. Generate / install a key (<code>ssh-keygen -t ed25519</code>) and add it to <code>~/.ssh/authorized_keys</code> on one of the proxmox hosts (simply copy the .pub key line, proxmox automatically syncs this file accross all hosts in a cluster).</p>
+<p>This machine needs ssh access to the root user of your proxmox clusters. Generate / install a key (<code>ssh-keygen -t ed25519</code>) and add it to <code>~/.ssh/authorized_keys</code> on one of the proxmox hosts (simply copy the <code>id_ed25519.pub</code> files contentto one host, proxmox automatically syncs this file accross all hosts in a cluster).</p>
 <p>Next install the following packages/tools on your development machine (most of these can be comfortably installed using <a href="https://brew.sh/">brew</a>):</p>
 <ul>
-<li><code>apt install avahi-utils</code> (with this we can discover our proxmox hosts and clusters, don't install if your network doesnt support mdns discovery and you need to use the <a href="./#cli-fallback-approach">fallback approach</a>)</li>
-<li>python3 (+ recommended virtual env)</li>
+<li><code>apt install avahi-utils</code> (with this we can discover our proxmox hosts and clusters, don't install if your network doesn't support mdns discovery and you need to use the <a href="./#cli-fallback-approach">fallback approach</a>)</li>
+<li><code>apt install python3 python3-venv</code> </li>
 <li><a href="https://developer.hashicorp.com/terraform/install#linux">terraform</a></li>
 <li><a href="https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/">kubectl</a></li>
 <li><a href="https://helm.sh/docs/intro/install/">helm cli</a> ( <code>&gt;=v3.0.0</code> )</li>
@@ -919,8 +919,13 @@
 <h2 id="bootstrap">Bootstrap</h2>
 <p>Create a git repository for your cloud instance for example company-xyz-cloud and setup your environment:</p>
 <ul>
-<li>create a venv <code>python3 -m venv ~/.pve-cloud-venv</code> and activate <code>source ~/.pve-cloud-venv/bin/activate</code></li>
-<li>install <code>pip install ansible==9.13.0</code></li>
+<li>create a python virtual environment, activate it and install ansible</li>
+</ul>
+<pre><code class="language-bash">python3 -m venv ~/.pve-cloud-venv
+source ~/.pve-cloud-venv/bin/activate
+pip install ansible==9.13.0
+</code></pre>
+<ul>
 <li>create <code>requirements.yaml</code> in your repository like this (get versions from <a href="../#compatibility">here</a>):</li>
 </ul>
 <pre><code class="language-yaml">---
@@ -932,7 +937,7 @@ collections:
     version: $MATCHING_KUBESPRAY_VERSION
 </code></pre>
 <ul>
-<li>run <code>ansible-galaxy install -r requirements.yaml</code>, and run the setup playbook <code>ansible-playbook pxc.cloud.setup_control_node</code> to setup your local machine (this setup playbook has to be run on an upgrade of the collection aswel!)</li>
+<li>run <code>ansible-galaxy install -r requirements.yaml</code>, and run the setup playbook <code>ansible-playbook pxc.cloud.setup_control_node</code> to setup your local machine (this setup playbook has to be run on an upgrade of the collection aswell!)</li>
 <li>create a <code>ansible.cfg</code> file on the top level of your repo with the following content:</li>
 </ul>
 <pre><code class="language-ini">[defaults]
@@ -947,11 +952,12 @@ any_unparsed_is_failed = True
 <h2 id="cli-fallback-approach">CLI Fallback Approach</h2>
 <p>If you network limits mdns you can still work with the collection, at the cost of having to manage proxmox inventories on each development machine.</p>
 <p>After you have finished the setup of your python venv and ran the <code>ansible-playbook pxc.cloud.setup_control_node</code> you should have the cli tool <code>pvcli</code> available to you.</p>
-<p>Connect to your one proxmox clusters <code>pvcli connect-cluster --pve-host $PROXMOX_HOST</code> (run once per cluster, per cloud domain).</p>
+<p>Run <code>pvcli connect-cluster --pve-host $PROXMOX_HOST</code> to connect to one of your proxmox clusters / set them up to be part of your proxmox cloud instance (run once per cluster, per cloud domain).</p>
 <p>The cli will ask you for a cloud domain if the cluster has not already one assigned.</p>
-<p>With this approach its up to you to keep the inventory on your developer machine in sync. To refresh a cluster after you added a new host simply run the command again, also passing the <code>--force</code> flag to update it.</p>
+<p>With this approach its up to you to keep the inventory on your developer machine in sync. To refresh the local inventory, after you added a new host to a cluster, simply run the <code>connect-cluster</code> command again, also passing the <code>--force</code> flag to update it.</p>
 <h3 id="repository-setup">Repository setup</h3>
-<p>As in the <a href="https://github.com/Proxmox-Cloud/pve_cloud/tree/master/samples/cloud-instance">samples/cloud-instance</a> your repository that defines the core pve cloud components you need:</p>
+<p>Have a look at the <a href="https://github.com/Proxmox-Cloud/pve_cloud/tree/master/samples/cloud-instance">cloud instance sample repository</a> to see what proxmox cloud looks like in action.</p>
+<p>The code for your infrastructure will live inside a git repository that needs the following definitions:</p>
 <ul>
 <li>pve cloud inventory file - <a href="../schemas/pve_cloud_inv_schema/">cloud schema</a> =&gt; for the <code>pxc.cloud.setup_pve_clusters</code> playbook</li>
 <li>lxc inventory files for the basic services - <a href="../schemas/lxc_inv_schema/">lxc inv schema</a></li>

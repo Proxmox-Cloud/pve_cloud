@@ -886,13 +886,13 @@
 <p><code>pvcli print-kubeconfig --inventory YOUR-KUBESPRAY-INV.yaml</code></p>
 <h2 id="ceph-csi">Ceph CSI</h2>
 <p>If you have ceph installed and configured in your proxmox cluster, and you define <code>ceph_csi_sc_pools</code> in your kubespray inventory, the ceph csi volume driver will be automatically configured and installed.</p>
-<p>If you want to use ceph your kubernetes nodes need to have access to the ceph monitors, if your ceph is on a seperate network you can deploy a seperate kea dhcp for dynamically assinging ips to the nodes ceph network interfaces. For that you need a single lxc and the <code>setup_ceph_kea</code> playbook.</p>
+<p>If you want to use ceph, your kubernetes nodes need to have access to the ceph monitors. If your ceph is on a seperate network you can deploy a seperate kea dhcp for dynamically assinging ips to the nodes ceph network interfaces. For that you need a single lxc and the <code>pxc.cloud.setup_ceph_kea</code> playbook.</p>
 <h2 id="tls-acme-certificates">TLS ACME Certificates</h2>
 <p>This collection doesn't use kubernetes certmanager for TLS certificates, but instead comes with an external centralised solution. </p>
 <p>Initially certificates are generated via ansible roles, integrated into the collection. The update process afterwards is handled via <a href="https://github.com/Proxmox-Cloud/pve-cloud-awx-cron">AWX cron jobs</a>. Use the awx helm chart via terraform to deploy your own instance.</p>
 <h3 id="dns-provider-secrets">DNS Provider Secrets</h3>
 <p>At the moment the collection supports ionos and aws route53 for dynamically solving dns01 challenges and obtaining certificates.</p>
-<p>You need to create secret files inside the clouds secret folder on your proxmox cluster:</p>
+<p>You need to create secret files inside the clouds secret folder on one of your proxmox clusters:</p>
 <ul>
 <li>for aws route53 create <code>/etc/pve/cloud/secrets/aws-route53-global.json</code>, this should contain read / write access to your route53:</li>
 </ul>
@@ -916,9 +916,8 @@
 <p>Upgrading the cluster is as simple as updating the version tag reference of this collection.</p>
 <p>You can skip to the latest patch version, but shouldn't skip minor versions as they are tied to kubespray updates. After updating the cloud collection version in your requirements.yaml, you have to run <code>ansible-galaxy install -r requirements.yaml</code> and <code>pip install -r ~/.ansible/collections/ansible_collections/pxc/cloud/meta/ee-requirements.txt</code> again.</p>
 <p>Then run the upgrade playbook <code>ansible-playbook -i YOUR-KUBESPRAY-INV.yaml pxc.cloud.upgrade_kubespray</code>.</p>
-<p>Right now kubespray is tightly coupled with the entire collection, meaning you have to update the collection a minor version, then update all your clusters, then the collection again and so forth. In the future this will be split to make it more versatile. There is a version lock for the collection that will prevent you from doing updates, if you do this in any other order.</p>
 <h2 id="custom-kubespray-vars">Custom kubespray vars</h2>
-<p>To define your own kubespray vars just create <code>group_vars/all</code> and <code>group_vars/k8s_cluster</code> directories alongside your inventory file.</p>
+<p>To define your own kubespray vars just create <code>group_vars/all</code> and <code>group_vars/k8s_cluster</code> directories alongside your kubespray inventory yaml file.</p>
 <p>Here are some interesting kubespray settings you might want to set (k8s_cluster vars):</p>
 <ul>
 <li>increase amount of schedulable pods per node (if you have big nodes)</li>
@@ -942,7 +941,7 @@ system_memory_reserved: 1024Mi
 eviction_hard:
   memory.available: 1000Mi
 </code></pre>
-<p>=&gt; this, in addition to the <code>adjust_networkd_oom_score</code> role, will allow k8s nodes to run even if we got memory hungry, ram hogging deployments. eviction hard and reservations alone are not enough, in oom scenarios it will cause the networkd service to stop working.</p>
+<p>=&gt; this, in addition to the <code>pxc.cloud.</code> role, will allow k8s nodes to run even if we got memory hungry, ram hogging deployments. eviction hard and reservations alone are not enough, in oom scenarios it will cause the networkd service to stop working. This role is automatically executed via the <code>pxc.cloud.sync_kubespray</code> playbook.</p>
 <h2 id="exposing-k8s-controlplane-api">Exposing K8S Controlplane API</h2>
 <p>If you want to expose your kubenetes clusters controlplane to integrate with external running services, you can set additional SANs that will be generated and inserted by kubespray into the kubeapi certificates, by listing them in your kubespray inventory file under <code>extra_control_plane_sans</code> as simple strings.</p>
 <p>Adding SANs there will also configure the pve cloud haproxy to route any control plane traffic (6443) on its external ip to respecive cluster.</p>
