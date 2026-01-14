@@ -1,8 +1,8 @@
 # General
 
-This project aims to provide a self hosted cloud platform, giving you the same features like (AWS, Google Cloud, Azure), without being tied to any single one of them and their ridiculous prices.
+This project aims to provide a self hosted cloud platform, giving you the same features (DNS, Load Balancing, Managed Kubernetes, ACME Certificates) like AWS, Google Cloud, Azure, without being tied to any single one of them and their ridiculous prices. 
 
-All you need is a [Proxmox cluster](https://proxmox.com/en/) that can either run on your own hardware or on any rented dedicated server, of which there are hundreds of fairly priced options.
+You need [Proxmox cluster](https://proxmox.com/en/) that can run on your own hardware or on any rented dedicated server, of which there are hundreds of fair priced options (often 5-10x cheaper than what AWS & Co are offering).
 
 It is not a opinionated, monolithic solution - instead it aims to give your freedom to implement according to your needs and preferences, while as a preconfigured, solid foundation.
 
@@ -109,6 +109,6 @@ Verified working versions:
 
 | Collection Version | Kubespray Version     | Debian LXC Version | PVE Version | PBS Version  | Ceph Version |
 | ------------------ | --------------------- | ------------------ | ----------- | ------------ | ------------ |
-| 3.11.X             | v2.28.0 (k8s 1.32.5)  | 12.12-1            | 8.4.12      | 4.1.0        | 19.2.2       |
+| 3.14.X             | v2.28.0 (K8S 1.32.5)  | 12.12-1            | 8.4.12      | 4.1.0        | 19.2.2       |
 
 

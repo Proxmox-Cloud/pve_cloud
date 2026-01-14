@@ -14,12 +14,12 @@ The cluster needs to meet these minimum requirements:
 
 You need a development machine (preferably apt based distro) in the same subnet/vlan segment as your proxmox hosts for running playbooks and applying terraform configurations.
 
-These machines need ssh access to the root user of your proxmox clusters. Generate / install a key (`ssh-keygen -t ed25519`) and add it to `~/.ssh/authorized_keys` on one of the proxmox hosts (simply copy the .pub key line, proxmox automatically syncs this file accross all hosts in a cluster).
+This machine needs ssh access to the root user of your proxmox clusters. Generate / install a key (`ssh-keygen -t ed25519`) and add it to `~/.ssh/authorized_keys` on one of the proxmox hosts (simply copy the `id_ed25519.pub` files contentto one host, proxmox automatically syncs this file accross all hosts in a cluster).
 
 Next install the following packages/tools on your development machine (most of these can be comfortably installed using [brew](https://brew.sh/)):
 
-* `apt install avahi-utils` (with this we can discover our proxmox hosts and clusters, don't install if your network doesnt support mdns discovery and you need to use the [fallback approach](bootstrap.md#cli-fallback-approach))
-* python3 (+ recommended virtual env)
+* `apt install avahi-utils` (with this we can discover our proxmox hosts and clusters, don't install if your network doesn't support mdns discovery and you need to use the [fallback approach](bootstrap.md#cli-fallback-approach))
+* `apt install python3 python3-venv` 
 * [terraform](https://developer.hashicorp.com/terraform/install#linux)
 * [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/)
 * [helm cli](https://helm.sh/docs/intro/install/) ( `>=v3.0.0` )
@@ -74,8 +74,12 @@ Depending on how you do your vlan segmentation you either need the firewall to a
 
 Create a git repository for your cloud instance for example company-xyz-cloud and setup your environment:
 
-* create a venv `python3 -m venv ~/.pve-cloud-venv` and activate `source ~/.pve-cloud-venv/bin/activate`
-* install `pip install ansible==9.13.0`
+* create a python virtual environment, activate it and install ansible
+```bash
+python3 -m venv ~/.pve-cloud-venv
+source ~/.pve-cloud-venv/bin/activate
+pip install ansible==9.13.0
+```
 * create `requirements.yaml` in your repository like this (get versions from [here](index.md#compatibility)):
 ```yaml
 ---
@@ -86,7 +90,7 @@ collections:
     type: git
     version: $MATCHING_KUBESPRAY_VERSION
 ```
-* run `ansible-galaxy install -r requirements.yaml`, and run the setup playbook `ansible-playbook pxc.cloud.setup_control_node` to setup your local machine (this setup playbook has to be run on an upgrade of the collection aswel!)
+* run `ansible-galaxy install -r requirements.yaml`, and run the setup playbook `ansible-playbook pxc.cloud.setup_control_node` to setup your local machine (this setup playbook has to be run on an upgrade of the collection aswell!)
 * create a `ansible.cfg` file on the top level of your repo with the following content:
 ```ini
 [defaults]
@@ -105,15 +109,17 @@ If you network limits mdns you can still work with the collection, at the cost o
 
 After you have finished the setup of your python venv and ran the `ansible-playbook pxc.cloud.setup_control_node` you should have the cli tool `pvcli` available to you.
 
-Connect to your one proxmox clusters `pvcli connect-cluster --pve-host $PROXMOX_HOST` (run once per cluster, per cloud domain).
+Run `pvcli connect-cluster --pve-host $PROXMOX_HOST` to connect to one of your proxmox clusters / set them up to be part of your proxmox cloud instance (run once per cluster, per cloud domain).
 
 The cli will ask you for a cloud domain if the cluster has not already one assigned.
 
-With this approach its up to you to keep the inventory on your developer machine in sync. To refresh a cluster after you added a new host simply run the command again, also passing the `--force` flag to update it.
+With this approach its up to you to keep the inventory on your developer machine in sync. To refresh the local inventory, after you added a new host to a cluster, simply run the `connect-cluster` command again, also passing the `--force` flag to update it.
 
 ### Repository setup
 
-As in the [samples/cloud-instance](https://github.com/Proxmox-Cloud/pve_cloud/tree/master/samples/cloud-instance) your repository that defines the core pve cloud components you need:
+Have a look at the [cloud instance sample repository](https://github.com/Proxmox-Cloud/pve_cloud/tree/master/samples/cloud-instance) to see what proxmox cloud looks like in action.
+
+The code for your infrastructure will live inside a git repository that needs the following definitions:
 
 * pve cloud inventory file - [cloud schema](schemas/pve_cloud_inv_schema.md) => for the `pxc.cloud.setup_pve_clusters` playbook
 * lxc inventory files for the basic services - [lxc inv schema](schemas/lxc_inv_schema.md)

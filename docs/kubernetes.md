@@ -20,7 +20,7 @@ To get kubeconf after creation of the cluster for cli/ide access (expiring) use:
 
 If you have ceph installed and configured in your proxmox cluster, and you define `ceph_csi_sc_pools` in your kubespray inventory, the ceph csi volume driver will be automatically configured and installed.
 
-If you want to use ceph your kubernetes nodes need to have access to the ceph monitors, if your ceph is on a seperate network you can deploy a seperate kea dhcp for dynamically assinging ips to the nodes ceph network interfaces. For that you need a single lxc and the `setup_ceph_kea` playbook.
+If you want to use ceph, your kubernetes nodes need to have access to the ceph monitors. If your ceph is on a seperate network you can deploy a seperate kea dhcp for dynamically assinging ips to the nodes ceph network interfaces. For that you need a single lxc and the `pxc.cloud.setup_ceph_kea` playbook.
 
 
 ## TLS ACME Certificates
@@ -34,7 +34,7 @@ Initially certificates are generated via ansible roles, integrated into the coll
 
 At the moment the collection supports ionos and aws route53 for dynamically solving dns01 challenges and obtaining certificates.
 
-You need to create secret files inside the clouds secret folder on your proxmox cluster:
+You need to create secret files inside the clouds secret folder on one of your proxmox clusters:
 
 * for aws route53 create `/etc/pve/cloud/secrets/aws-route53-global.json`, this should contain read / write access to your route53:
 ```json
@@ -65,11 +65,9 @@ You can skip to the latest patch version, but shouldn't skip minor versions as t
 
 Then run the upgrade playbook `ansible-playbook -i YOUR-KUBESPRAY-INV.yaml pxc.cloud.upgrade_kubespray`.
 
-Right now kubespray is tightly coupled with the entire collection, meaning you have to update the collection a minor version, then update all your clusters, then the collection again and so forth. In the future this will be split to make it more versatile. There is a version lock for the collection that will prevent you from doing updates, if you do this in any other order.
-
 ## Custom kubespray vars
 
-To define your own kubespray vars just create `group_vars/all` and `group_vars/k8s_cluster` directories alongside your inventory file.
+To define your own kubespray vars just create `group_vars/all` and `group_vars/k8s_cluster` directories alongside your kubespray inventory yaml file.
 
 Here are some interesting kubespray settings you might want to set (k8s_cluster vars):
 
@@ -93,7 +91,7 @@ system_memory_reserved: 1024Mi
 eviction_hard:
   memory.available: 1000Mi
 ```
-=> this, in addition to the `adjust_networkd_oom_score` role, will allow k8s nodes to run even if we got memory hungry, ram hogging deployments. eviction hard and reservations alone are not enough, in oom scenarios it will cause the networkd service to stop working.
+=> this, in addition to the `pxc.cloud.` role, will allow k8s nodes to run even if we got memory hungry, ram hogging deployments. eviction hard and reservations alone are not enough, in oom scenarios it will cause the networkd service to stop working. This role is automatically executed via the `pxc.cloud.sync_kubespray` playbook.
 
 ## Exposing K8S Controlplane API
 
