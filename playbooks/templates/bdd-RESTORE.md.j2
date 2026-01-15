@@ -12,12 +12,11 @@ Once you have done that you can launch the backup restore procedure from your de
 
 1. install pve-cloud-backup `pip install py-pve-cloud-backup=={{ py_pve_cloud_backup_version }}`
 2. run `brctl list-backups --bdd-host $IP_OF_BACKUP_SERVER`, followed by `brctl backup-details --bdd-host $IP_OF_BACKUP_SERVER --timestamp $TIMESTAMP_ID_OF_BACKUP`
-3. when you have selected your backup run something like this to restore (also check the `brctl restore-k8s` command alone):
+3. when you have selected your backup run something like this to restore (also check the `brctl restore-k8s` command alone for all available options):
 ```bash
 brctl restore-k8s --bdd-host $IP_OF_BACKUP_SERVER \
   --timestamp $TIMESTAMP_ID_OF_BACKUP \
-  --target-pve $TARGET_PVE_OF_BACKUP \
-  --stack-name $K8S_STACK_NAME \
+  --inventory $PATH_TO_KUBESPRAY_INV_YAML \
   --namespace-mapping $OLD_NAMESPACE:$NEW_NAMESPACE \
   --auto-scale --auto-delete
 ```
