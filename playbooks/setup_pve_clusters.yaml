@@ -24,11 +24,13 @@
       fail:
         msg: "Installed version {{ existing_cluster_vars['pve_cloud_collection_version'] }} is ahead of local version {{ cluster_vars['pve_cloud_collection_version'] }}"
       when: cvars_stat.stat.exists and 'pve_cloud_collection_version' in existing_cluster_vars and existing_cluster_vars['pve_cloud_collection_version'] is version(cluster_vars['pve_cloud_collection_version'], '>')
+  vars:
+    # only monitory systemd services
+    systemd_exporter_unit_include: '.*\.service'
 
   roles:
     - proxmox_host_avahi
     - prometheus.prometheus.systemd_exporter
-
   tasks:
     - name: install prometheus-node-exporter
       ansible.builtin.apt:
