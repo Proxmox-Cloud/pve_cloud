@@ -56,6 +56,14 @@ frontend haproxy-statistics
         option dontlog-normal
 
 
+# for pve cloud monitoring rules
+frontend prometheus
+        bind {{ pve_haproxy_floating_ip_internal }}:8405
+        mode http
+        http-request use-service prometheus-exporter
+        no log
+
+
 # access to ha postgres (state store/orm for pve cloud)
 listen ha-postgres
         mode tcp
