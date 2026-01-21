@@ -213,7 +213,9 @@ def test_create_qemu(request, get_test_env, setup_haproxy_lxcs):
             assert qemu_destroy_run.rc == 0
 
 
-def test_create_kubespray(request, get_test_env, get_kubespray_inv, setup_haproxy_lxcs, setup_cache_lxcs):
+def test_create_kubespray(
+    request, get_test_env, get_kubespray_inv, setup_haproxy_lxcs, setup_cache_lxcs
+):
     logger.info("create kubespray")
 
     # for local tdd with development watchdogs
