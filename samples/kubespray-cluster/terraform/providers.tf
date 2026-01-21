@@ -2,13 +2,8 @@ terraform {
   backend "pg" {} # sourced entirely via .envrc
 }
 
-locals {
-  inventory = yamldecode(file("../kubespray-inv.yaml"))
-}
-
 provider "pxc" {
-  target_pve = local.inventory.target_pve
-  k8s_stack_name = local.inventory.stack_name
+  kubespray_inv = "../kubespray-inv.yaml"
 }
 
 ephemeral "pxc_kubeconfig" "kubeconfig" {}

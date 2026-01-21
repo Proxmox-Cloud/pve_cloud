@@ -213,135 +213,49 @@ def test_create_qemu(request, get_test_env, setup_haproxy_lxcs):
             assert qemu_destroy_run.rc == 0
 
 
-def test_create_kubespray(request, get_test_env, setup_haproxy_lxcs, setup_cache_lxcs):
+def test_create_kubespray(request, get_test_env, get_kubespray_inv, setup_haproxy_lxcs, setup_cache_lxcs):
     logger.info("create kubespray")
 
-    with tempfile.NamedTemporaryFile(
-        "w", suffix=".yaml", delete=False
-    ) as temp_kubespray_inv:
-        yaml.dump(
-            {
-                "plugin": "pxc.cloud.kubespray_inv",
-                "target_pve": get_test_env["pve_test_cluster_name"]
-                + "."
-                + get_test_env["pve_test_cloud_domain"],
-                "extra_control_plane_sans": ["control-plane.external.example.com"],
-                "stack_name": "pytest-k8s",
-                "static_includes": {
-                    "dhcp_stack": "ha-dhcp." + get_test_env["pve_test_cloud_domain"],
-                    "proxy_stack": "ha-haproxy."
-                    + get_test_env["pve_test_cloud_domain"],
-                    "bind_stack": "ha-bind." + get_test_env["pve_test_cloud_domain"],
-                    "postgres_stack": "ha-postgres."
-                    + get_test_env["pve_test_cloud_domain"],
-                    "cache_stack": "cloud-cache."
-                    + get_test_env["pve_test_cloud_domain"],
-                },
-                "tcp_proxies": [
-                    {
-                        "proxy_name": "postgres-test",
-                        "haproxy_port": 6432,
-                        "node_port": 30432,
-                    }
-                ],
-                "external_domains": [
-                    {
-                        "zone": get_test_env["pve_test_deployments_domain"],
-                        "names": ["external-example", "test-dns-delete"],
-                    }
-                ],
-                "cluster_cert_entries": [
-                    {
-                        "zone": get_test_env["pve_test_deployments_domain"],
-                        "authoritative_zone": True,
-                        "names": ["*"],
-                    }
-                ],
-                "ceph_csi_sc_pools": [
-                    {
-                        "name": get_test_env["pve_test_ceph_csi_storage_id"],
-                        "default": True,
-                        "mount_options": ["discard"],
-                    }
-                ],
-                "qemu_base_parameters": {
-                    "cpu": "x86-64-v2-AES",
-                    "net0": "virtio,bridge=vmbr0,firewall=1",
-                    "sockets": 1,
-                },
-                "qemus": [
-                    {
-                        "k8s_roles": ["master"],
-                        "disk": {
-                            "size": "25G",
-                            "options": {"discard": "on", "iothread": "on", "ssd": "on"},
-                            "pool": get_test_env["pve_test_disk_storage_id"],
-                        },
-                        "parameters": {
-                            "cores": 4,
-                            "memory": 4096,
-                        },
-                    },
-                    {
-                        "k8s_roles": ["worker"],
-                        "disk": {
-                            "size": "25G",
-                            "options": {"discard": "on", "iothread": "on", "ssd": "on"},
-                            "pool": get_test_env["pve_test_disk_storage_id"],
-                        },
-                        "parameters": {
-                            "cores": 4,
-                            "memory": 8192,
-                        },
-                    },
-                ],
-                "target_pve_hosts": list(get_test_env["pve_test_hosts"].keys()),
-                "root_ssh_pub_key": get_test_env["pve_test_ssh_pub_key"],
-            },
-            temp_kubespray_inv,
-        )
-        temp_kubespray_inv.flush()
+    # for local tdd with development watchdogs
+    extra_vars = {}
+    tdd_ip = get_tdd_ip()
+    if tdd_ip:
+        extra_vars["test_repos_ip"] = tdd_ip
 
-        # for local tdd with development watchdogs
-        extra_vars = {}
-        tdd_ip = get_tdd_ip()
-        if tdd_ip:
-            extra_vars["test_repos_ip"] = tdd_ip
+    kubespray_run = ansible_runner.run(
+        project_dir=os.getcwd(),
+        playbook="playbooks/sync_kubespray.yaml",
+        inventory=get_kubespray_inv,
+        verbosity=request.config.getoption("--ansible-verbosity"),
+        extravars=extra_vars,
+    )
 
-        kubespray_run = ansible_runner.run(
+    assert kubespray_run.rc == 0
+
+    if not request.config.getoption("--skip-cleanup"):
+        kubespray_destroy_run = ansible_runner.run(
             project_dir=os.getcwd(),
-            playbook="playbooks/sync_kubespray.yaml",
-            inventory=temp_kubespray_inv.name,
+            playbook="playbooks/destroy_kubespray.yaml",
+            inventory=get_kubespray_inv,
             verbosity=request.config.getoption("--ansible-verbosity"),
-            extravars=extra_vars,
+        )
+        assert kubespray_destroy_run.rc == 0
+    else:
+        # write the local kubeconfig for developer access
+        first_host = list(list(get_test_env["pve_test_hosts"].keys()))[0]
+
+        # connect to the first pve host in the dyn inv, assumes they are all online
+        ssh = paramiko.SSHClient()
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        ssh.connect(
+            get_test_env["pve_test_hosts"][first_host]["ansible_host"],
+            username="root",
         )
 
-        assert kubespray_run.rc == 0
+        # since we need root we cant use sftp and root via ssh is disabled
+        _, stdout, _ = ssh.exec_command("cat /etc/pve/cloud/cluster_vars.yaml")
 
-        if not request.config.getoption("--skip-cleanup"):
-            kubespray_destroy_run = ansible_runner.run(
-                project_dir=os.getcwd(),
-                playbook="playbooks/destroy_kubespray.yaml",
-                inventory=temp_kubespray_inv.name,
-                verbosity=request.config.getoption("--ansible-verbosity"),
-            )
-            assert kubespray_destroy_run.rc == 0
-        else:
-            # write the local kubeconfig for developer access
-            first_host = list(list(get_test_env["pve_test_hosts"].keys()))[0]
+        cluster_vars = yaml.safe_load(stdout.read().decode("utf-8"))
 
-            # connect to the first pve host in the dyn inv, assumes they are all online
-            ssh = paramiko.SSHClient()
-            ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            ssh.connect(
-                get_test_env["pve_test_hosts"][first_host]["ansible_host"],
-                username="root",
-            )
-
-            # since we need root we cant use sftp and root via ssh is disabled
-            _, stdout, _ = ssh.exec_command("cat /etc/pve/cloud/cluster_vars.yaml")
-
-            cluster_vars = yaml.safe_load(stdout.read().decode("utf-8"))
-
-            with open(".test-kubeconfig.yaml", "w") as tk:
-                tk.write(get_ssh_master_kubeconfig(cluster_vars, "pytest-k8s"))
+        with open(".test-kubeconfig.yaml", "w") as tk:
+            tk.write(get_ssh_master_kubeconfig(cluster_vars, "pytest-k8s"))

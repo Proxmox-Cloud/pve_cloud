@@ -73,6 +73,9 @@ class InventoryModule(BaseInventoryPlugin):
             # get hash to map variables
             blake = stack_vm_get_blake(vm)
 
+            # set the id for use in playbooks
+            inventory.set_variable(hostname, "pxc_blake_id", blake)
+
             # check if we can match the id to our inventory file
             if blake in vm_vars_blake:
                 # set vars für container specific tasks

@@ -21,11 +21,11 @@ global
 # we need this for ddns, hosts might not instantly have dns records
 # since they only get one after dhclient sends a request
 resolvers pve-cloud-dns
-    nameserver dns1 {{ bind_master_ip }}:53
-    nameserver dns2 {{ bind_slave_ip }}:53
-    resolve_retries       3
-    timeout retry         1s
-    hold valid            10s
+        nameserver dns1 {{ bind_master_ip }}:53
+        nameserver dns2 {{ bind_slave_ip }}:53
+        resolve_retries       3
+        timeout retry         1s
+        hold valid            10s
 
 
 defaults

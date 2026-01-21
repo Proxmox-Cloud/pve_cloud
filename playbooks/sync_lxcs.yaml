@@ -102,10 +102,24 @@
     - alternate_ssh_port
     - parse_cluster_secrets
   tasks:
+    # todo: implement unified functionality for qemus, kubespray nodes.
     - name: write vm_vars_blake for include stacks
       copy:
         content: "{{ vm_vars_blake | combine(lxc_global_vars | default({})) | to_nice_yaml }}"
         dest: /etc/pve-cloud-vars.yaml
+    
+    # todo: write delete functionality and implement for qemus
+    - name: write vm_vars_blake to patroni
+      delegate_to: localhost
+      alchemy_upsert:
+        pg_conn_str: "{{ pg_conn_str }}"
+        table: vm_vars_blake
+        values:
+          blake_id: "{{ pxc_blake_id }}"
+          vm_vars: "{{ vm_vars_blake | combine(lxc_global_vars | default({}))}}"
+        conflict_cols:
+          - blake_id
+
     - name: install systemd prom exporter
       include_role:
         name: prometheus.prometheus.systemd_exporter
