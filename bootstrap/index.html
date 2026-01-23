@@ -886,6 +886,7 @@
 <li><a href="https://helm.sh/docs/intro/install/">helm cli</a> ( <code>&gt;=v3.0.0</code> )</li>
 <li><a href="https://github.com/mikefarah/yq?tab=readme-ov-file#install">yq (mikefarah)</a></li>
 <li><code>apt install direnv</code> (.envrc files for terraform conf/auth) - you also need to add <code>eval "$(direnv hook bash)"</code> to the end of your <code>~/.bashrc</code></li>
+<li><a href="https://github.com/FiloSottile/age">age</a> if you want to use encrypted secrets in your infra strucutre as code repositories - <a href="https://registry.terraform.io/providers/Proxmox-Cloud/pxc/latest/docs/resources/cloud_age_secret">pxc_cloud_age_secret resource</a></li>
 <li>nfs-common (if you want to use caching of setup artifacts)</li>
 <li><a href="https://docs.docker.com/engine/install/">docker</a> (if you want to use caching / <a href="../tdd/">tdd development</a>)</li>
 </ul>

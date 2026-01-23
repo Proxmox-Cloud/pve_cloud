@@ -1338,7 +1338,7 @@
 <td>enum (of string)</td>
 <td>No</td>
 <td>-</td>
-<td>PVE Cloud included method for solving dns01 challenges. You need to have created the appropriate secrets under /etc/pve/cloud on your proxmox cluster.<br /></td>
+<td>PVE Cloud included method for solving dns01 challenges. You need to have created the appropriate cloud secrets created.<br /></td>
 </tr>
 <tr>
 <td>- <a href="#plugin">plugin</a></td>
@@ -2345,11 +2345,12 @@ their own authoritative zones you want resolved within the cloud.</p>
 </tr>
 </tbody>
 </table>
-<p><strong>Description:</strong> PVE Cloud included method for solving dns01 challenges. You need to have created the appropriate secrets under /etc/pve/cloud on your proxmox cluster.</p>
+<p><strong>Description:</strong> PVE Cloud included method for solving dns01 challenges. You need to have created the appropriate cloud secrets created.</p>
 <p>Must be one of:</p>
 <ul>
 <li>"route53"</li>
 <li>"ionos"</li>
+<li>"ionos_cloud"</li>
 </ul>
 <h2 id="17-property-cloud-inventory-plugin"><a name="plugin"></a>17. Property <code>Cloud Inventory &gt; plugin</code></h2>
 <table>

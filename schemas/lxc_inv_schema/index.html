@@ -2062,7 +2062,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.</p>
 <td>boolean</td>
 <td>No</td>
 <td>-</td>
-<td>Will install prometheus metrics exporter for systemd. This implements with pve cloud terraform monitoring modules.</td>
+<td>Will install prometheus metrics exporter for systemd. This implements with pve cloud terraform monitoring modules. <br />Will also make the lxc visible for discovery by monitoring.<br /></td>
 </tr>
 <tr>
 <td>- <a href="#lxc_global_vars_additionalProperties"></a></td>
@@ -2113,7 +2113,8 @@ Ubuntu for example wont work if you set the cloud init user to admin.</p>
 </tr>
 </tbody>
 </table>
-<p><strong>Description:</strong> Will install prometheus metrics exporter for systemd. This implements with pve cloud terraform monitoring modules.</p>
+<p><strong>Description:</strong> Will install prometheus metrics exporter for systemd. This implements with pve cloud terraform monitoring modules. 
+Will also make the lxc visible for discovery by monitoring.</p>
 <h2 id="65-property-lxc-inventory-lxc_base_parameters"><a name="lxc_base_parameters"></a>65. Property <code>LXC Inventory &gt; lxc_base_parameters</code></h2>
 <table>
 <thead>

@@ -374,34 +374,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#cloud-controller" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Cloud Controller
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Cloud Controller">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#backup" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Backup
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -851,20 +823,14 @@
 <p>The provider takes in the inventory and is responsible for getting access to our kubernetes cluster aswell as any proxmox cloud infrastructure.</p>
 <h2 id="terraform-modules">Terraform modules</h2>
 <p>After authenticating with the provider proxmox cloud offers several <a href="https://registry.terraform.io/namespaces/Proxmox-Cloud">terraform modules</a>.</p>
-<h2 id="cloud-controller">Cloud Controller</h2>
-<p>In the <a href="https://github.com/Proxmox-Cloud/pve_cloud/blob/master/samples/kubespray-cluster/terraform/cloud-deployments.tf">samples</a> you can see the <a href="https://registry.terraform.io/modules/Proxmox-Cloud/controller/pxc/latest">kubnernetes proxmox cloud controller</a> being deployed with minimal features enabled.</p>
-<p>The deployment comes with a varity of features that are toggled on by passing optional terraform variables to the terraform module:</p>
+<p>These modules provide a more opinionated solution on how and what services to deploy to solve challenges like:</p>
 <ul>
-<li>internal ingress dns (all kubernetes ingress resources automatically create record within the pve cloud BIND dns server)
-=&gt; this allows to reuse domains accross clusters</li>
-<li>optional external ingress dns (only for route53 at the moment). If you pass appropriate route53 credentials the controller also can extend the ingress capabilities to external aws route53</li>
-<li>optional tls certificate injection on namespace creation (the created tls k8s secret is always named <code>cluster-tls</code> for ease of use in ingress resources)</li>
-<li>automatic image mirroring via harbor. If you pass credentials to a harbor artificatory instance for pulling images and set it up according to the <code>harbor-mirror-projects</code> tf module, pods will be automatically patched to fetch ingresses from harbor proxy repositories instead.</li>
+<li>Service DNS (Ingress DNS internal / external)</li>
+<li>Aritfacts (images / helm charts) and using proxy caches for official registries</li>
+<li>Monitoring (Prometheus, Gotify)</li>
+<li>Backup solutions (Proxmox Backup server, K8S Ceph CSI Namespace backups)</li>
 </ul>
-<p>It is also worthy to checkout the submodules of the <a href="https://registry.terraform.io/modules/Proxmox-Cloud/controller/pxc/latest">cloud controller</a>. Here you can find monitoring and setup modules for automatic image mirroring with the <a href="https://goharbor.io/">harbor artifactory</a>.</p>
-<h3 id="backup">Backup</h3>
-<p>The <a href="https://registry.terraform.io/modules/Proxmox-Cloud/backup/pxc/latest">backup module</a> installs a cron job inside k8s that uses ceph csi volume snapshots and rbd volume groups, to provide atomic backups of an entire k8s namespace.</p>
-<p>It also equips a cluster with secrets so that we can start restore jobs using <code>brctl</code> from <a href="github.com/Proxmox-Cloud/pve-cloud-backup">pve-cloud-backup</a>.</p>
+<p>You can find further documentation in the modules READMEs.</p>
 
 
 
