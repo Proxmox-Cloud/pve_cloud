@@ -3,8 +3,21 @@
 - debug:
     msg: "{{ ret_acme_challenge['challenge_data_dns'] | dict2items }}"
 
+
+- name: try to select existing data
+  alchemy_read:
+    pg_conn_str: "{{ pg_conn_str }}"
+    table: px_cloud_secrets
+    where:
+      target_pve: "master.{{ pve_cloud_domain }}"
+      secret_name: "ionos-api-key"
+  register: ionos_secret_query
+
 - set_fact:
-    ionos_api_key: "{{ pve_cloud_secrets_map['ionos-api-key.json'] | b64decode | from_json }}"
+    ionos_api_key: "{{ ionos_secret_query.query_result[0]['secret_data'] }}"
+
+- debug:
+    var: ionos_api_key
 
 - ionos_dns:
     ionos_api_key: "{{ ionos_api_key }}"
