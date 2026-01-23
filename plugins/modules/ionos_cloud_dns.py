@@ -18,9 +18,7 @@ def run_module():
     headers = {"Authorization": f"Bearer {module.params["ionos_cloud_token"]["token"]}"}
 
     # get zones
-    response = requests.get(
-        "https://dns.de-fra.ionos.com/zones", headers=headers
-    )
+    response = requests.get("https://dns.de-fra.ionos.com/zones", headers=headers)
     response.raise_for_status()
 
     domains = json.loads(response.text)["items"]
