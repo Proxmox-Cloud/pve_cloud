@@ -25,6 +25,7 @@ Next install the following packages/tools on your development machine (most of t
 * [helm cli](https://helm.sh/docs/intro/install/) ( `>=v3.0.0` )
 * [yq (mikefarah)](https://github.com/mikefarah/yq?tab=readme-ov-file#install)
 * `apt install direnv` (.envrc files for terraform conf/auth) - you also need to add `eval "$(direnv hook bash)"` to the end of your `~/.bashrc`
+* [age](https://github.com/FiloSottile/age) if you want to use encrypted secrets in your infra strucutre as code repositories - [pxc_cloud_age_secret resource](https://registry.terraform.io/providers/Proxmox-Cloud/pxc/latest/docs/resources/cloud_age_secret)
 * nfs-common (if you want to use caching of setup artifacts)
 * [docker](https://docs.docker.com/engine/install/) (if you want to use caching / [tdd development](tdd.md))
 
@@ -36,7 +37,6 @@ Proxmox cloud uses KEA DHCP + DDNS for hostnames into bind. Any lxc/vm that is c
 For this and for service identification we need a unique domain, that should not overlap / be used with other services you host.
 
 Domains for services like for example `gitlab.example.com` can be added later in our cluster definition files. The cloud domain should be something like `your-cloud.example.com`.
-
 
 ## Setup Proxmox host discovery
 

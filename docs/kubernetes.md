@@ -34,9 +34,11 @@ Initially certificates are generated via ansible roles, integrated into the coll
 
 At the moment the collection supports ionos and aws route53 for dynamically solving dns01 challenges and obtaining certificates.
 
-You need to create secret files inside the clouds secret folder on one of your proxmox clusters:
+To make the secrets available to proxmox cloud take a look inside the terraform config inside the [cloud-instance sample](https://github.com/Proxmox-Cloud/pve_cloud/tree/master/samples/cloud-instance).
 
-* for aws route53 create `/etc/pve/cloud/secrets/aws-route53-global.json`, this should contain read / write access to your route53:
+We need to use the [pxc_cloud_age_secret resource](https://registry.terraform.io/providers/Proxmox-Cloud/pxc/latest/docs/resources/cloud_age_secret) to create the secrets.
+
+* for aws route53 create `aws-route53-global.json`, and encode it with `age -R ~/.ssh/id_ed25519.pub aws-route53-global.json | base64 -w0`:
 ```json
 {
   "AWS_ACCESS_KEY_ID": "ACCESS_ID_HERE",
@@ -45,15 +47,31 @@ You need to create secret files inside the clouds secret folder on one of your p
 }
 ```
 
-* for method `ionos` create `/etc/pve/cloud/secrets/ionos-api-key.json`:
+the json structure and `secret_name` is essential and needs to be `aws-route53-global`
+```tf
+resource "pxc_cloud_age_secret" "route53" {
+  secret_name = "aws-route53-global" 
+  b64_age_data = "" # output of `age -R ~/.ssh/id_ed25519.pub aws-route53-global.json | base64 -w0`
+}
+```
+
+* for method `ionos` create `ionos-api-key.json`:
 ```json
 {
   "IONOS_PRAEFIX": "PRAEFIX_HERE",
   "IONOS_VERSCHLUESSELUNG": "SECRET_KEY_HERE"
 }
 ```
+```tf
+resource "pxc_cloud_age_secret" "ionos" {
+  secret_name = "ionos-api-key" 
+  b64_age_data = "" # output of `age -R ~/.ssh/id_ed25519.pub ionos-api-key.json | base64 -w0`
+}
+```
 
-Afterwards you need to sync those secrets to all hosts in the cloud, you can do that by rerunning the `setup_pve_clusters` playbook - `ansible-playbook -i YOUR-CLOUD-INV.yaml pxc.cloud.setup_pve_clusters --tags rsync`. This needs to be done only once! There is no support for multiple dns providers / multiple accounts yet.
+The ssh key needs to only be present during the initial create, the purpose is to simply not have secrets in your repositories. 
+If you dont care about that security you can just use [pxc_cloud_secret resource](https://registry.terraform.io/providers/Proxmox-Cloud/pxc/latest/docs/resources/cloud_secret) and hardcode your secrets in your tf file, using the same secret names as above.
+
 
 You are welcome to create and submit a MR with your own roles / logic for other providers!
 

@@ -115,6 +115,7 @@
         pg_conn_str: "{{ pg_conn_str }}"
         table: vm_vars_blake
         values:
+          cloud_domain: "{{ pve_cloud_domain }}"
           blake_id: "{{ pxc_blake_id }}"
           vm_vars: "{{ vm_vars_blake | combine(lxc_global_vars | default({}))}}"
         conflict_cols:
