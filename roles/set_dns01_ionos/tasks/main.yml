@@ -3,7 +3,6 @@
 - debug:
     msg: "{{ ret_acme_challenge['challenge_data_dns'] | dict2items }}"
 
-
 - name: try to select existing data
   alchemy_read:
     pg_conn_str: "{{ pg_conn_str }}"
@@ -15,9 +14,6 @@
 
 - set_fact:
     ionos_api_key: "{{ ionos_secret_query.query_result[0]['secret_data'] }}"
-
-- debug:
-    var: ionos_api_key
 
 - ionos_dns:
     ionos_api_key: "{{ ionos_api_key }}"
