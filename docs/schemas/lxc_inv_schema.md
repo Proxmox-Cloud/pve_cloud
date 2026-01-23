@@ -320,11 +320,11 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** Variables that will be applied to all lxc hosts and are available in playbooks.
 
-| Property                                                                           | Pattern | Type    | Deprecated | Definition | Title/Description                                                                                                  |
-| ---------------------------------------------------------------------------------- | ------- | ------- | ---------- | ---------- | ------------------------------------------------------------------------------------------------------------------ |
-| - [use_alternate_ssh_port](#lxc_global_vars_use_alternate_ssh_port )               | No      | boolean | No         | -          | Will use 2222 instead of 22 for ssh.                                                                               |
-| - [install_prom_systemd_exporter](#lxc_global_vars_install_prom_systemd_exporter ) | No      | boolean | No         | -          | Will install prometheus metrics exporter for systemd. This implements with pve cloud terraform monitoring modules. |
-| - [](#lxc_global_vars_additionalProperties )                                       | No      | object  | No         | -          | -                                                                                                                  |
+| Property                                                                           | Pattern | Type    | Deprecated | Definition | Title/Description                                                                                                                                                                          |
+| ---------------------------------------------------------------------------------- | ------- | ------- | ---------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| - [use_alternate_ssh_port](#lxc_global_vars_use_alternate_ssh_port )               | No      | boolean | No         | -          | Will use 2222 instead of 22 for ssh.                                                                                                                                                       |
+| - [install_prom_systemd_exporter](#lxc_global_vars_install_prom_systemd_exporter ) | No      | boolean | No         | -          | Will install prometheus metrics exporter for systemd. This implements with pve cloud terraform monitoring modules. <br />Will also make the lxc visible for discovery by monitoring.<br /> |
+| - [](#lxc_global_vars_additionalProperties )                                       | No      | object  | No         | -          | -                                                                                                                                                                                          |
 
 ### <a name="lxc_global_vars_use_alternate_ssh_port"></a>64.1. Property `LXC Inventory > lxc_global_vars > use_alternate_ssh_port`
 
@@ -342,7 +342,8 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 | **Type**     | `boolean` |
 | **Required** | No        |
 
-**Description:** Will install prometheus metrics exporter for systemd. This implements with pve cloud terraform monitoring modules.
+**Description:** Will install prometheus metrics exporter for systemd. This implements with pve cloud terraform monitoring modules. 
+Will also make the lxc visible for discovery by monitoring.
 
 ## <a name="lxc_base_parameters"></a>65. Property `LXC Inventory > lxc_base_parameters`
 

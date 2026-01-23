@@ -27,7 +27,7 @@
 | + [bind_zone_admin_email](#bind_zone_admin_email )             | No      | string           | No         | -          | Required adminstrator email in bind format for bind zones.                                                                                                                                                        |
 | - [bind_forward_zones](#bind_forward_zones )                   | No      | array of object  | No         | -          | Creates zone in bind and delegation ns records to the specified nameservers. This is very useful if you have other nameservers with <br />their own authoritative zones you want resolved within the cloud.<br /> |
 | - [acme_contact](#acme_contact )                               | No      | string           | No         | -          | Email address to use for acme account creation.                                                                                                                                                                   |
-| - [acme_method](#acme_method )                                 | No      | enum (of string) | No         | -          | PVE Cloud included method for solving dns01 challenges. You need to have created the appropriate secrets under /etc/pve/cloud on your proxmox cluster.<br />                                                      |
+| - [acme_method](#acme_method )                                 | No      | enum (of string) | No         | -          | PVE Cloud included method for solving dns01 challenges. You need to have created the appropriate cloud secrets created.<br />                                                                                     |
 | - [plugin](#plugin )                                           | No      | enum (of string) | No         | -          | Id of ansible inventory plugin, needs to be set exactly.                                                                                                                                                          |
 
 ## <a name="pve_vm_subnet"></a>1. Property `Cloud Inventory > pve_vm_subnet`
@@ -458,12 +458,13 @@ their own authoritative zones you want resolved within the cloud.
 | **Type**     | `enum (of string)` |
 | **Required** | No                 |
 
-**Description:** PVE Cloud included method for solving dns01 challenges. You need to have created the appropriate secrets under /etc/pve/cloud on your proxmox cluster.
+**Description:** PVE Cloud included method for solving dns01 challenges. You need to have created the appropriate cloud secrets created.
 
 Must be one of:
 
 * "route53"
 * "ionos"
+* "ionos_cloud"
 
 ## <a name="plugin"></a>17. Property `Cloud Inventory > plugin`
 
