@@ -9,7 +9,7 @@
     pg_conn_str: "{{ pg_conn_str }}"
     table: px_cloud_secrets
     where:
-      target_pve: "master.{{ pve_cloud_domain }}"
+      cloud_domain: "{{ pve_cloud_domain }}"
       secret_name: "ionos-api-key"
   register: ionos_secret_query
 
