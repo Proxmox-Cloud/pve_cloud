@@ -91,7 +91,6 @@
       block:
         - name: "ACME: Collect certificate"
           tags: acmecollect
-          ignore_errors: true
           register: ret_acme_collect
           community.crypto.acme_certificate:
             data: "{{ ret_acme_challenge }}"
