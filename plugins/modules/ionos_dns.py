@@ -43,6 +43,7 @@ def run_module():
             response = requests.get(
                 f"https://api.hosting.ionos.com/dns/v1/zones/{zone_id}", headers=headers
             )
+            response.raise_for_status()
             zone_details = json.loads(response.text)
 
             acme_record_ids = []
@@ -56,6 +57,7 @@ def run_module():
                     f"https://api.hosting.ionos.com/dns/v1/zones/{zone_id}/records/{record_id}",
                     headers=headers,
                 )
+                response.raise_for_status()
 
         else:
             for chal in challenge["value"]:
@@ -73,6 +75,7 @@ def run_module():
                     json=[records_body],
                     headers=headers,
                 )
+                response.raise_for_status()
 
     result = dict(changed=True)
 

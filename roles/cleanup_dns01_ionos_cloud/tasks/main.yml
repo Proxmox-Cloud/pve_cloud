@@ -18,7 +18,7 @@
 - debug:
     var: ionos_cloud_token
 
-- ionos_dns:
+- ionos_cloud_dns:
     ionos_cloud_token: "{{ ionos_cloud_token }}"
     challenge_data_dns: "{{ ret_acme_challenge['challenge_data_dns'] | dict2items }}"
     cleanup: True
