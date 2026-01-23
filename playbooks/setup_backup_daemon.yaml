@@ -2,7 +2,7 @@
   hosts: lxcs:qemus
   vars:
     # increment this on releasing a new pve-cloud-backup version
-    py_pve_cloud_backup_version: "0.7.0-rc0"
+    py_pve_cloud_backup_version: "0.7.0-rc1"
   tasks:
     - name: install core apt packages
       ansible.builtin.apt:
