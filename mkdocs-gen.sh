@@ -5,7 +5,7 @@ set -e
 # it uses the pve-cloud-schemas package to validate our samples and dump / generate schema files in markdown format
 # for the documentation
 
-pip install pve-cloud-schemas==0.4.5
+pip install pve-cloud-schemas==0.4.6
 
 # validate samples
 cd samples
