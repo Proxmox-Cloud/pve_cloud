@@ -1,4 +1,4 @@
-py-pve-cloud==
+py-pve-cloud==0.15.3rc12
 pve-cloud-schemas==0.4.5
 
 asyncssh==2.22.0
