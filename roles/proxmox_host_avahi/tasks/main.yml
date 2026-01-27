@@ -32,6 +32,7 @@
     section: server
     option: use-ipv6
     value: "no"
+    no_extra_spaces: true
   register: avahi_conf
 
 - name: reload avahi on conf change
