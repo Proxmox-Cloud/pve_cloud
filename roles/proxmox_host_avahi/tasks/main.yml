@@ -24,10 +24,18 @@
         </service>
 
       </service-group>
+  register: avahi_service_conf
+
+- name: Disable ipv6
+  community.general.ini_file:
+    path: /etc/avahi/avahi-daemon.conf
+    section: server
+    option: use-ipv6
+    value: "no"
   register: avahi_conf
 
 - name: reload avahi on conf change
   ansible.builtin.service:
     name: avahi-daemon
     state: reloaded
-  when: avahi_conf.changed
+  when: avahi_conf.changed or avahi_service_conf.changed

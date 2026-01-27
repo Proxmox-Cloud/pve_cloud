@@ -66,6 +66,8 @@ Next create an avahi service file (`/etc/avahi/services/pxc.service`) on the hos
 
 ![Proxmox cluster name](cluster-name.png)
 
+Also set `use-ipv6=no` in `/etc/avahi/avahi-daemon.conf`.
+
 Then simply run `service avahi-daemon reload` and now we can discover our host. You can validate the discovery by running `avahi-browse -rpt _pxc._tcp` on your development machine. 
 
 Depending on how you do your vlan segmentation you either need the firewall to act as an mdns repeater (most firewall support repetition accross interfaces/ports) or create a dedicated reflector vm/lxc that has an interface in both vlans.
