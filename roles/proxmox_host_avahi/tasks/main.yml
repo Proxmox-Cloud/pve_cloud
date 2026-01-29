@@ -35,20 +35,26 @@
     no_extra_spaces: true
   register: avahi_conf_server
 
-- name: Disable ipv6 publish
+- name: Disable ipv6 publish a
   community.general.ini_file:
     path: /etc/avahi/avahi-daemon.conf
     section: publish
-    section_has_values:
-      - option: publish-a-on-ipv6
-        value: "no"
-      - option: publish-aaaa-on-ipv4
-        value: "no"
+    option: publish-a-on-ipv6
+    value: "no"
     no_extra_spaces: true
-  register: avahi_conf_publish
+  register: avahi_conf_publish_a
+
+- name: Disable ipv6 publish aaaa
+  community.general.ini_file:
+    path: /etc/avahi/avahi-daemon.conf
+    section: publish
+    option: publish-aaaa-on-ipv4
+    value: "no"
+    no_extra_spaces: true
+  register: avahi_conf_publish_aaaa
 
 - name: reload avahi on conf change
   ansible.builtin.service:
     name: avahi-daemon
     state: reloaded
-  when: avahi_conf_server.changed or avahi_conf_publish.changed or avahi_service_conf.changed
+  when: avahi_conf_server.changed or avahi_conf_publish_a.changed or avahi_conf_publish_aaaa.changed or avahi_service_conf.changed
