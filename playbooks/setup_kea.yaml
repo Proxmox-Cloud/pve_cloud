@@ -89,14 +89,6 @@
       register: postgres_connection_check
       ignore_errors: yes
 
-    # apply migrations here too, this is after initial bootstrap the first place the orm is needed  
-    - name: apply kea migrations (on consecutive applies)
-      delegate_to: localhost
-      run_once: true
-      alchemy_migrate:
-        pg_conn_str: "{{ pg_conn_str }}"  
-      when: postgres_connection_check is succeeded
-
     - name: Try fetch config from postgres (on consecutive applies)
       include_role:
         name: select_kea_conf
