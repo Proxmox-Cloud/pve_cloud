@@ -41,7 +41,7 @@ dependencies:
   # sadly git+ssh is not supported
   'community.general': 10.6.0
   # todo: only used to create the initial dbs, 
-  'community.postgresql': 3.14.2
+  'community.postgresql': 3.14.3
   # todo: refactor this out? todo: dynamic workflow, only keep letsencrypt, let the user specify dynamic role names to set records for dns01
   'amazon.aws': 10.1.2
   # specifically needed for acme and controller chart for sync
