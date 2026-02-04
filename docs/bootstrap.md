@@ -80,7 +80,7 @@ Create a git repository for your cloud instance for example company-xyz-cloud an
 ```bash
 python3 -m venv ~/.pve-cloud-venv
 source ~/.pve-cloud-venv/bin/activate
-pip install ansible==9.13.0
+pip install ansible==13.3.0
 ```
 * create `requirements.yaml` in your repository like this (get versions from [here](index.md#compatibility)):
 ```yaml
