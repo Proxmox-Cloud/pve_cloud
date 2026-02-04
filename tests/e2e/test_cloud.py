@@ -5,15 +5,15 @@ import tempfile
 import ansible_runner
 import dns.resolver
 import paramiko
+import psycopg2
 import pytest
 import redis
 import yaml
 from cloud_fixture import *
 from pve_cloud.cli.pvclu import get_ssh_master_kubeconfig
 from pve_cloud.lib.inventory import get_online_pve_host
-from pve_cloud_test.tdd_watchdog import get_ipv4
-import psycopg2
 from pve_cloud.orm.alchemy import AcmeX509
+from pve_cloud_test.tdd_watchdog import get_ipv4
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session
 
@@ -225,7 +225,10 @@ def test_create_kubespray(
 
     # first we check if the pve_test_k8s_tls_copy_fqdn is specified.
     # in this case we copy an existing prod cert
-    if "pve_test_k8s_tls_copy_target_pve" in get_test_env and "pve_test_k8s_tls_copy_stack_name" in get_test_env:
+    if (
+        "pve_test_k8s_tls_copy_target_pve" in get_test_env
+        and "pve_test_k8s_tls_copy_stack_name" in get_test_env
+    ):
         pve_host = get_online_pve_host(get_test_env["pve_test_k8s_tls_copy_target_pve"])
         logger.info(pve_host)
 
@@ -248,17 +251,22 @@ def test_create_kubespray(
         logger.info(patroni_pass)
 
         conn = psycopg2.connect(
-            dbname="pve_cloud", 
-            user="postgres", 
-            password=patroni_pass, 
+            dbname="pve_cloud",
+            user="postgres",
+            password=patroni_pass,
             host=cluster_vars["pve_haproxy_floating_ip_internal"],
-            port=5000
+            port=5000,
         )
 
         with conn.cursor() as cur:
             query = "SELECT k8s FROM acme_x509 WHERE stack_fqdn = %s;"
-            
-            cur.execute(query, (f"{get_test_env["pve_test_k8s_tls_copy_stack_name"]}.{cluster_vars["pve_cloud_domain"]}",))
+
+            cur.execute(
+                query,
+                (
+                    f"{get_test_env["pve_test_k8s_tls_copy_stack_name"]}.{cluster_vars["pve_cloud_domain"]}",
+                ),
+            )
             record = cur.fetchone()
 
             assert record
@@ -287,11 +295,10 @@ def test_create_kubespray(
                 config={},
                 ec_csr={},
                 ec_crt={},
-                k8s=record[0]
+                k8s=record[0],
             )
             session.merge(copy_cert)
             session.commit()
-
 
     # for local tdd with development watchdogs
     extra_vars = {}
