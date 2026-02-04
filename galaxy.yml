@@ -39,7 +39,7 @@ tags:
 # range specifiers can be set and are separated by ','
 dependencies:
   # sadly git+ssh is not supported
-  'community.general': 10.6.0
+  'community.general': 10.7.7
   # todo: only used to create the initial dbs, 
   'community.postgresql': 3.14.2
   # todo: refactor this out? todo: dynamic workflow, only keep letsencrypt, let the user specify dynamic role names to set records for dns01
