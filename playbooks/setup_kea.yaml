@@ -122,3 +122,43 @@
       until: result is succeeded
       retries: 3
       delay: 5
+
+# these need to be manually created as there is no dyndns for these foundamental hosts
+- name: Bind DNS Records
+  hosts: lxcs
+  roles:
+    - parse_cluster_secrets
+  tasks:
+  - name: Check if haproxy is already running
+    wait_for:
+      host: "{{ bind_master_ip }}"
+      port: 53
+      timeout: 5
+      state: started
+    register: bind_connection_check
+    ignore_errors: yes
+
+  - name: create dhcp host record
+    delegate_to: localhost
+    community.general.nsupdate:
+      key_name: "internal."
+      key_algorithm: "hmac-sha256"
+      key_secret: "{{ bind_internal_key }}"
+      server: "{{ bind_master_ip }}"
+      zone: "{{ pve_cloud_domain }}"
+      record: "{{ inventory_hostname }}"
+      value: "{{ ansible_default_ipv4.address }}"
+    when: bind_connection_check is succeeded
+
+  - name: create ptr record
+    delegate_to: localhost
+    community.general.nsupdate:
+      key_name: "internal."
+      key_algorithm: "hmac-sha256"
+      key_secret: "{{ bind_internal_key }}"
+      server: "{{ bind_master_ip }}"
+      zone: "{{ bind_arpa_zone_service_lxcs }}"
+      record: "{{ ansible_default_ipv4.address.split('.')[3] }}"
+      type: PTR
+      value: "{{ inventory_hostname }}.{{ pve_cloud_domain }}."
+    when: bind_connection_check is succeeded

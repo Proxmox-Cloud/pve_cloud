@@ -7,12 +7,6 @@ $TTL 86400
                     1209600    ; Expire
                     86400 )    ; Minimum TTL
 
-; service lxcs
-{{ kea_dhcp_main_ip.split('.')[3] }}       IN  PTR      main-ha-dhcp.{{ pve_cloud_domain }}.
-{{ kea_dhcp_failover_ip.split('.')[3] }}       IN  PTR      failover-ha-dhcp.{{ pve_cloud_domain }}.
-
-{{ bind_master_ip.split('.')[3] }}       IN  PTR      master-ha-bind.{{ pve_cloud_domain }}.
-{{ bind_slave_ip.split('.')[3] }}       IN  PTR      slave-ha-bind.{{ pve_cloud_domain }}.
-
-; all other updates happen via nsupdate an ddns
+; all updates happen via nsupdate
 @       IN  NS      ns1.{{ pve_cloud_domain }}.
+@       IN  NS      ns2.{{ pve_cloud_domain }}.

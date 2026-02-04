@@ -10,7 +10,12 @@ import redis
 import yaml
 from cloud_fixture import *
 from pve_cloud.cli.pvclu import get_ssh_master_kubeconfig
+from pve_cloud.lib.inventory import get_online_pve_host
 from pve_cloud_test.tdd_watchdog import get_ipv4
+import psycopg2
+from pve_cloud.orm.alchemy import AcmeX509
+from sqlalchemy import create_engine, select
+from sqlalchemy.orm import Session
 
 logger = logging.getLogger(__name__)
 
@@ -217,6 +222,76 @@ def test_create_kubespray(
     request, get_test_env, get_kubespray_inv, setup_haproxy_lxcs, setup_cache_lxcs
 ):
     logger.info("create kubespray")
+
+    # first we check if the pve_test_k8s_tls_copy_fqdn is specified.
+    # in this case we copy an existing prod cert
+    if "pve_test_k8s_tls_copy_target_pve" in get_test_env and "pve_test_k8s_tls_copy_stack_name" in get_test_env:
+        pve_host = get_online_pve_host(get_test_env["pve_test_k8s_tls_copy_target_pve"])
+        logger.info(pve_host)
+
+        # we connect to the test host to get the patroni secret of the cluster, aswell as the vars
+        ssh = paramiko.SSHClient()
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        ssh.connect(
+            pve_host,
+            username="root",
+        )
+
+        # since we need root we cant use sftp and root via ssh is disabled
+        _, stdout, _ = ssh.exec_command("cat /etc/pve/cloud/cluster_vars.yaml")
+
+        cluster_vars = yaml.safe_load(stdout.read().decode("utf-8"))
+
+        _, stdout, _ = ssh.exec_command("cat /etc/pve/cloud/secrets/patroni.pass")
+
+        patroni_pass = stdout.read().decode("utf-8")
+        logger.info(patroni_pass)
+
+        conn = psycopg2.connect(
+            dbname="pve_cloud", 
+            user="postgres", 
+            password=patroni_pass, 
+            host=cluster_vars["pve_haproxy_floating_ip_internal"],
+            port=5000
+        )
+
+        with conn.cursor() as cur:
+            query = "SELECT k8s FROM acme_x509 WHERE stack_fqdn = %s;"
+            
+            cur.execute(query, (f"{get_test_env["pve_test_k8s_tls_copy_stack_name"]}.{cluster_vars["pve_cloud_domain"]}",))
+            record = cur.fetchone()
+
+            assert record
+            logger.info(record)
+
+        # now we inject the record into our test patroni database
+        first_test_host = get_test_env["pve_test_hosts"][
+            next(iter(get_test_env["pve_test_hosts"]))
+        ]
+
+        ssh = paramiko.SSHClient()
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        ssh.connect(first_test_host["ansible_host"], username="root")
+
+        _, stdout, _ = ssh.exec_command("sudo cat /etc/pve/cloud/secrets/patroni.pass")
+        patroni_pass = stdout.read().decode("utf-8")
+
+        pg_conn_str_orm = f"postgresql+psycopg2://postgres:{patroni_pass}@{get_test_env['pve_test_cloud_inv_cluster']['pve_haproxy_floating_ip_internal']}:5000/pve_cloud?sslmode=disable"
+
+        engine = create_engine(pg_conn_str_orm)
+
+        # update certs and mirror pull secret
+        with Session(engine) as session:
+            copy_cert = AcmeX509(
+                stack_fqdn=f"pytest-k8s.{get_test_env["pve_test_cloud_domain"]}",
+                config={},
+                ec_csr={},
+                ec_crt={},
+                k8s=record[0]
+            )
+            session.merge(copy_cert)
+            session.commit()
+
 
     # for local tdd with development watchdogs
     extra_vars = {}

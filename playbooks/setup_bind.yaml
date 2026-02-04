@@ -99,44 +99,31 @@
   roles:
     - slurp_cluster_secrets
 
-- name: Core DNS Records
-  hosts: localhost
+# these need to be manually created as there is no dyndns for these foundamental hosts
+- name: Bind DNS Records
+  hosts: lxcs
   roles:
     - parse_cluster_secrets
   tasks:
-  - name: create dhcp main
+  - name: create bind host record
+    delegate_to: localhost
     community.general.nsupdate:
       key_name: "internal."
       key_algorithm: "hmac-sha256"
       key_secret: "{{ bind_internal_key }}"
       server: "{{ bind_master_ip }}"
       zone: "{{ pve_cloud_domain }}"
-      record: "main-ha-dhcp"
-      value: "{{ kea_dhcp_main_ip }}"
-  - name: create dhcp failover
+      record: "{{ inventory_hostname }}"
+      value: "{{ ansible_default_ipv4.address }}"
+
+  - name: create ptr record
+    delegate_to: localhost
     community.general.nsupdate:
       key_name: "internal."
       key_algorithm: "hmac-sha256"
       key_secret: "{{ bind_internal_key }}"
       server: "{{ bind_master_ip }}"
-      zone: "{{ pve_cloud_domain }}"
-      record: "failover-ha-dhcp"
-      value: "{{ kea_dhcp_failover_ip }}"
-  - name: create bind master
-    community.general.nsupdate:
-      key_name: "internal."
-      key_algorithm: "hmac-sha256"
-      key_secret: "{{ bind_internal_key }}"
-      server: "{{ bind_master_ip }}"
-      zone: "{{ pve_cloud_domain }}"
-      record: "master-ha-bind"
-      value: "{{ bind_master_ip }}"
-  - name: create bind slave
-    community.general.nsupdate:
-      key_name: "internal."
-      key_algorithm: "hmac-sha256"
-      key_secret: "{{ bind_internal_key }}"
-      server: "{{ bind_master_ip }}"
-      zone: "{{ pve_cloud_domain }}"
-      record: "slave-ha-bind"
-      value: "{{ bind_slave_ip }}"
+      zone: "{{ bind_arpa_zone_service_lxcs }}"
+      record: "{{ ansible_default_ipv4.address.split('.')[3] }}"
+      type: PTR
+      value: "{{ inventory_hostname }}.{{ pve_cloud_domain }}."

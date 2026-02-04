@@ -107,8 +107,10 @@
       copy:
         content: "{{ vm_vars_blake | combine(lxc_global_vars | default({})) | to_nice_yaml }}"
         dest: /etc/pve-cloud-vars.yaml
-        
-    - name: Check if haproxy is already running
+    
+    # todo: this needs some better implementation, currently it requires reruns after the initial postgres setup
+    # in order for this to trigger and write the lxcs vars to the postgres. this is implicit, shadow behaviour and needs an overhaul
+    - name: Check if haproxy + postgres is already running
       wait_for:
         host: "{{ pve_haproxy_floating_ip_internal }}"
         port: 5000
@@ -116,14 +118,6 @@
         state: started
       register: postgres_connection_check
       ignore_errors: yes
-
-    # apply migrations here too, this is after initial bootstrap the first place the orm is needed  
-    - name: apply kea migrations (on consecutive applies)
-      delegate_to: localhost
-      run_once: true
-      alchemy_migrate:
-        pg_conn_str: "{{ pg_conn_str }}"  
-      when: postgres_connection_check is succeeded
 
     # todo: write delete functionality and implement for qemus
     - name: write vm_vars_blake to patroni
@@ -137,6 +131,7 @@
           vm_vars: "{{ vm_vars_blake | combine(lxc_global_vars | default({}))}}"
         conflict_cols:
           - blake_id
+      when: postgres_connection_check is succeeded # only try to write the vars if the db is created
 
     - name: install systemd prom exporter
       include_role:
