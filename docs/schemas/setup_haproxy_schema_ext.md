@@ -14,6 +14,7 @@
 | -------------------------------------- | ------- | ------ | ---------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | + [static_includes](#static_includes ) | No      | object | No         | -          | Include other stacks into the ansible inventory, from any pve cloud you are connected to. From here you can freely extend and write your own playbooks. |
 | - [lxcs](#lxcs )                       | No      | array  | No         | -          | List of lxcs that will be created for the stack.                                                                                                        |
+| - [lxc_global_vars](#lxc_global_vars ) | No      | object | No         | -          | -                                                                                                                                                       |
 
 ## <a name="static_includes"></a>75. Property `HAProxy Inventory > static_includes`
 
@@ -101,4 +102,25 @@ still works.
 | **Required** | Yes       |
 
 **Description:** One LXC should have this set to true the other to false.
+
+## <a name="lxc_global_vars"></a>77. Property `HAProxy Inventory > lxc_global_vars`
+
+|                           |                  |
+| ------------------------- | ---------------- |
+| **Type**                  | `object`         |
+| **Required**              | No               |
+| **Additional properties** | Any type allowed |
+
+| Property                                                                 | Pattern | Type   | Deprecated | Definition | Title/Description                                                                                  |
+| ------------------------------------------------------------------------ | ------- | ------ | ---------- | ---------- | -------------------------------------------------------------------------------------------------- |
+| - [haproxy_defaults_section](#lxc_global_vars_haproxy_defaults_section ) | No      | string | No         | -          | Multiline default content to append the defauls block. Use this to overwrite timeouts for example. |
+
+### <a name="lxc_global_vars_haproxy_defaults_section"></a>77.1. Property `HAProxy Inventory > lxc_global_vars > haproxy_defaults_section`
+
+|              |          |
+| ------------ | -------- |
+| **Type**     | `string` |
+| **Required** | No       |
+
+**Description:** Multiline default content to append the defauls block. Use this to overwrite timeouts for example.
 

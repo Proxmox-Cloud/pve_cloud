@@ -338,12 +338,33 @@ This can be used to build your specialized pve cluster setup playbooks. You can 
 wakeonlan, driver and network configuration with these easily. Simply create your own playbook and
 run it even before the pxc.cloud.setup_pve_clusters on this inventory.
 
-| Property                                                             | Pattern | Type    | Deprecated | Definition | Title/Description                                                                                                                                                     |
-| -------------------------------------------------------------------- | ------- | ------- | ---------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| - [disable_ipmi](#pve_clusters_pattern1_pve_host_vars_disable_ipmi ) | No      | boolean | No         | -          | If specified will disable the openipmi power managemend systemd service. This might fail on proxmox<br />hosts that dont support it and clutters up monitoring.<br /> |
-| - [](#pve_clusters_pattern1_pve_host_vars_additionalProperties )     | No      | object  | No         | -          | -                                                                                                                                                                     |
+| Property                                                                                                     | Pattern | Type    | Deprecated | Definition | Title/Description                                                                                                                                                                                                   |
+| ------------------------------------------------------------------------------------------------------------ | ------- | ------- | ---------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| - [install_btrfs_root_prom_exporter](#pve_clusters_pattern1_pve_host_vars_install_btrfs_root_prom_exporter ) | No      | boolean | No         | -          | Set this to true if you installed the os on btrfs. This will install a prometheus exporter for btrfs aswell as enable degraded booting.<br />                                                                       |
+| - [install_log2ram](#pve_clusters_pattern1_pve_host_vars_install_log2ram )                                   | No      | boolean | No         | -          | This will install log2ram, moving logs to ram. If you are using the same disks for the os aswell as virtual machines, you should enable it,<br />to ensure proxmox doesnt freeze up because of vm disk usage.<br /> |
+| - [disable_ipmi](#pve_clusters_pattern1_pve_host_vars_disable_ipmi )                                         | No      | boolean | No         | -          | If specified will disable the openipmi power managemend systemd service. This might fail on proxmox<br />hosts that dont support it and clutters up monitoring.<br />                                               |
+| - [](#pve_clusters_pattern1_pve_host_vars_additionalProperties )                                             | No      | object  | No         | -          | -                                                                                                                                                                                                                   |
 
-##### <a name="pve_clusters_pattern1_pve_host_vars_disable_ipmi"></a>12.1.4.1. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > disable_ipmi`
+##### <a name="pve_clusters_pattern1_pve_host_vars_install_btrfs_root_prom_exporter"></a>12.1.4.1. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > install_btrfs_root_prom_exporter`
+
+|              |           |
+| ------------ | --------- |
+| **Type**     | `boolean` |
+| **Required** | No        |
+
+**Description:** Set this to true if you installed the os on btrfs. This will install a prometheus exporter for btrfs aswell as enable degraded booting.
+
+##### <a name="pve_clusters_pattern1_pve_host_vars_install_log2ram"></a>12.1.4.2. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > install_log2ram`
+
+|              |           |
+| ------------ | --------- |
+| **Type**     | `boolean` |
+| **Required** | No        |
+
+**Description:** This will install log2ram, moving logs to ram. If you are using the same disks for the os aswell as virtual machines, you should enable it,
+to ensure proxmox doesnt freeze up because of vm disk usage.
+
+##### <a name="pve_clusters_pattern1_pve_host_vars_disable_ipmi"></a>12.1.4.3. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > disable_ipmi`
 
 |              |           |
 | ------------ | --------- |
