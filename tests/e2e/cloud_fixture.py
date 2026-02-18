@@ -417,7 +417,7 @@ def setup_haproxy_lxcs(request, get_test_env, setup_patroni_lxcs):
                 ],
                 "lxc_global_vars": {
                     "install_prom_systemd_exporter": True,
-                    "haproxy_defaults_section": "timeout client 3m\ntimeout server 3m"
+                    "haproxy_defaults_section": "timeout client 3m\ntimeout server 3m",
                 },
                 "target_pve_hosts": list(get_test_env["pve_test_hosts"].keys()),
                 "root_ssh_pub_key": get_test_env["pve_test_ssh_pub_key"],
