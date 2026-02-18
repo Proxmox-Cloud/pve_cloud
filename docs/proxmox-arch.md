@@ -4,12 +4,24 @@ For a proxmox cluster to work optimally with the collection, it needs to be setu
 
 Depending on the available hardware we want to optimize for different things.
 
+The first big choice is the filesystem / vm volume storage that you want to use.
+
+## Hardware raid
+
+For a hardware raid you usually just want lvm + lvm thin for virtual machine disks. 
+
+## Software raid
+
+In this case it depends on the type of disk. If you have a consumer disks, that dont support plp you should go for btrfs raid 1 / 10.
+
+If they do support it ZFS is the more mature option, however for zfs you need either a live iso installer option on dedicated systems or a rescue system that allows you to use the proxmox installer ISOs. In some extreme cases you might be limited to a debian installer, which only supports btrfs.
+
 ## Onprem
 
 If you have your own machines and network architecture, an ideal setup would look like this:
 
 * strong enough dedicated network link dedicated for ceph
-* small dedicated disks for the os
+* small dedicated disks for the os (same raid principles as described above)
 
 In this case you can simply run the normal proxmox installer, configure the small disks with raid1 for the os (monitoring of the raid status currently exists for zfs and btrfs).
 
@@ -17,16 +29,13 @@ Then you do you dedicated network setup for ceph frontend and backend, and just 
 
 ## Dedicated Hosts / Limited network hardware
 
-If you dont have a dedicated switch for ceph, you might run into a bottleneck. Also dedicated server providers often dont allow you / provide buggy setups for proxmox.
+If you dont have a dedicated switch for ceph, you might run into a bottleneck. Dedicated server providers often dont allow you / provide buggy / poorly configured setups for proxmox.
 
-They also often dont let you get small disks for the os, leaving lots of unused space, even enforcing hardware raids for the server disks.
+They also often dont let you get small disks for the os, forcing you to share os and vm disk image storage.
 
-Here are some recommendations for certain cases:
+Here are some recommendations:
 
-* on hardware raid and big os disks you should go for btrfs single, if you have a software raid zfs is the more mature option
-* use either of (if the proxmox installer is bugged we are tied to debian btrfs, otherwise zfs is a more mature option):
-  * debian base image + btrfs raid1/10 for os and vm disks, installing proxmox ontop
-  * rescue mode boot + qemu install of proxmox iso directly, using zfs or btrfs raid1/10
+* on hardware raid and big os disks you should go for lvm thin, if you have a software raid zfs is the more mature option, assuming you can boot the proxmox installer.
 * use ceph with the 10gig generic option most dedicated providers offer for inter server communication, but only use it for critical vm / lxc disks and kubernetes volumes
 
 ## Btrfs
@@ -41,9 +50,7 @@ To recover after a disk outage run `btrfs scrub start /`, this also cleans up er
 
 WIP
 
-### Rescue mode install
-
-WIP
+### Rescue mode install ZFS
 
 ```bash
 # install qemu + uefi files

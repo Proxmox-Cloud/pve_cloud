@@ -153,6 +153,24 @@
         line: "{{ cluster_automation_pub_key | b64decode | trim }}"
         state: present
 
+    # dynamically set file inotify watches and instances
+    # needed for any kind of logging driver, prevents too many files open error
+    # caused by lots of pods
+    - set_fact:
+        recommended_watches: "{{ (ansible_memtotal_mb * 10.24) | int }}"
+        recommended_instances: "{{ (ansible_memtotal_mb / 16) | int }}"
+
+    - name: set sysctl inotify
+      ansible.posix.sysctl:
+        name: "{{ item.key }}"
+        value: "{{ item.value }}"
+        state: present
+        reload: yes
+      loop:
+        - { key: 'fs.inotify.max_user_instances', value: "{{ [1024, [recommended_instances | int, 8192] | min] | max }}" }
+        - { key: 'fs.inotify.max_user_watches', value: "{{ [524288, [recommended_watches | int, 2097152] | min] | max }}" }
+
+
 # todo: can be factored out if patroni lxcs themselfes get entries in
 # the database (used in haproxy cfg template)
 - name: Fetch ha-postgres
