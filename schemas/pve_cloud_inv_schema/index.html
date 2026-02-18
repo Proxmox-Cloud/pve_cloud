@@ -803,10 +803,32 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#12141-property-cloud-inventory-pve_clusters-cloud-config-for-specific-proxmox-clusters-pve_host_vars-disable_ipmi" class="md-nav__link">
+  <a href="#12141-property-cloud-inventory-pve_clusters-cloud-config-for-specific-proxmox-clusters-pve_host_vars-install_btrfs_root_prom_exporter" class="md-nav__link">
     <span class="md-ellipsis">
       
-        12.1.4.1. Property Cloud Inventory &gt; pve_clusters &gt; Cloud config for specific proxmox clusters. &gt; pve_host_vars &gt; disable_ipmi
+        12.1.4.1. Property Cloud Inventory &gt; pve_clusters &gt; Cloud config for specific proxmox clusters. &gt; pve_host_vars &gt; install_btrfs_root_prom_exporter
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#12142-property-cloud-inventory-pve_clusters-cloud-config-for-specific-proxmox-clusters-pve_host_vars-install_log2ram" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12.1.4.2. Property Cloud Inventory &gt; pve_clusters &gt; Cloud config for specific proxmox clusters. &gt; pve_host_vars &gt; install_log2ram
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#12143-property-cloud-inventory-pve_clusters-cloud-config-for-specific-proxmox-clusters-pve_host_vars-disable_ipmi" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12.1.4.3. Property Cloud Inventory &gt; pve_clusters &gt; Cloud config for specific proxmox clusters. &gt; pve_host_vars &gt; disable_ipmi
       
     </span>
   </a>
@@ -2023,6 +2045,22 @@ run it even before the pxc.cloud.setup_pve_clusters on this inventory.</p>
 </thead>
 <tbody>
 <tr>
+<td>- <a href="#pve_clusters_pattern1_pve_host_vars_install_btrfs_root_prom_exporter">install_btrfs_root_prom_exporter</a></td>
+<td>No</td>
+<td>boolean</td>
+<td>No</td>
+<td>-</td>
+<td>Set this to true if you installed the os on btrfs. This will install a prometheus exporter for btrfs aswell as enable degraded booting.<br /></td>
+</tr>
+<tr>
+<td>- <a href="#pve_clusters_pattern1_pve_host_vars_install_log2ram">install_log2ram</a></td>
+<td>No</td>
+<td>boolean</td>
+<td>No</td>
+<td>-</td>
+<td>This will install log2ram, moving logs to ram. If you are using the same disks for the os aswell as virtual machines, you should enable it,<br />to ensure proxmox doesnt freeze up because of vm disk usage.<br /></td>
+</tr>
+<tr>
 <td>- <a href="#pve_clusters_pattern1_pve_host_vars_disable_ipmi">disable_ipmi</a></td>
 <td>No</td>
 <td>boolean</td>
@@ -2040,7 +2078,48 @@ run it even before the pxc.cloud.setup_pve_clusters on this inventory.</p>
 </tr>
 </tbody>
 </table>
-<h5 id="12141-property-cloud-inventory-pve_clusters-cloud-config-for-specific-proxmox-clusters-pve_host_vars-disable_ipmi"><a name="pve_clusters_pattern1_pve_host_vars_disable_ipmi"></a>12.1.4.1. Property <code>Cloud Inventory &gt; pve_clusters &gt; Cloud config for specific proxmox clusters. &gt; pve_host_vars &gt; disable_ipmi</code></h5>
+<h5 id="12141-property-cloud-inventory-pve_clusters-cloud-config-for-specific-proxmox-clusters-pve_host_vars-install_btrfs_root_prom_exporter"><a name="pve_clusters_pattern1_pve_host_vars_install_btrfs_root_prom_exporter"></a>12.1.4.1. Property <code>Cloud Inventory &gt; pve_clusters &gt; Cloud config for specific proxmox clusters. &gt; pve_host_vars &gt; install_btrfs_root_prom_exporter</code></h5>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Set this to true if you installed the os on btrfs. This will install a prometheus exporter for btrfs aswell as enable degraded booting.</p>
+<h5 id="12142-property-cloud-inventory-pve_clusters-cloud-config-for-specific-proxmox-clusters-pve_host_vars-install_log2ram"><a name="pve_clusters_pattern1_pve_host_vars_install_log2ram"></a>12.1.4.2. Property <code>Cloud Inventory &gt; pve_clusters &gt; Cloud config for specific proxmox clusters. &gt; pve_host_vars &gt; install_log2ram</code></h5>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> This will install log2ram, moving logs to ram. If you are using the same disks for the os aswell as virtual machines, you should enable it,
+to ensure proxmox doesnt freeze up because of vm disk usage.</p>
+<h5 id="12143-property-cloud-inventory-pve_clusters-cloud-config-for-specific-proxmox-clusters-pve_host_vars-disable_ipmi"><a name="pve_clusters_pattern1_pve_host_vars_disable_ipmi"></a>12.1.4.3. Property <code>Cloud Inventory &gt; pve_clusters &gt; Cloud config for specific proxmox clusters. &gt; pve_host_vars &gt; disable_ipmi</code></h5>
 <table>
 <thead>
 <tr>

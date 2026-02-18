@@ -791,6 +791,34 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#77-property-haproxy-inventory-lxc_global_vars" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        77. Property HAProxy Inventory &gt; lxc_global_vars
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="77. Property HAProxy Inventory &gt; lxc_global_vars">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#771-property-haproxy-inventory-lxc_global_vars-haproxy_defaults_section" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        77.1. Property HAProxy Inventory &gt; lxc_global_vars &gt; haproxy_defaults_section
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -933,6 +961,14 @@
 <td>No</td>
 <td>-</td>
 <td>List of lxcs that will be created for the stack.</td>
+</tr>
+<tr>
+<td>- <a href="#lxc_global_vars">lxc_global_vars</a></td>
+<td>No</td>
+<td>object</td>
+<td>No</td>
+<td>-</td>
+<td>-</td>
 </tr>
 </tbody>
 </table>
@@ -1182,6 +1218,71 @@ still works.</p>
 </tbody>
 </table>
 <p><strong>Description:</strong> One LXC should have this set to true the other to false.</p>
+<h2 id="77-property-haproxy-inventory-lxc_global_vars"><a name="lxc_global_vars"></a>77. Property <code>HAProxy Inventory &gt; lxc_global_vars</code></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>object</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+<tr>
+<td><strong>Additional properties</strong></td>
+<td>Any type allowed</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Pattern</th>
+<th>Type</th>
+<th>Deprecated</th>
+<th>Definition</th>
+<th>Title/Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>- <a href="#lxc_global_vars_haproxy_defaults_section">haproxy_defaults_section</a></td>
+<td>No</td>
+<td>string</td>
+<td>No</td>
+<td>-</td>
+<td>Multiline default content to append the defauls block. Use this to overwrite timeouts for example.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="771-property-haproxy-inventory-lxc_global_vars-haproxy_defaults_section"><a name="lxc_global_vars_haproxy_defaults_section"></a>77.1. Property <code>HAProxy Inventory &gt; lxc_global_vars &gt; haproxy_defaults_section</code></h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>string</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Multiline default content to append the defauls block. Use this to overwrite timeouts for example.</p>
 
 
 
