@@ -16,7 +16,9 @@ To work with this collection, basic understanding of the following tools / conce
 
 ## Quickstart
 
-Checkout the [samples directory](https://github.com/Proxmox-Cloud/pve_cloud/tree/master/samples) to get an idea about how the collection works in action.
+First you need to create your proxmox cluster, either on prem or using a dedicated server hosting provider. Check out the [proxmox architecture section](./proxmox-arch.md) to learn about pve setup fundamentals, recommendations and limitations.
+
+After you have configured your proxmox cluster, check out the [samples directory](https://github.com/Proxmox-Cloud/pve_cloud/tree/master/samples) to get an idea about how the collection works in action.
 
 ### Project dependency structure
 

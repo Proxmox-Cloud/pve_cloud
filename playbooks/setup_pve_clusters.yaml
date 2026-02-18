@@ -36,7 +36,17 @@
       ansible.builtin.apt:
         name: prometheus-node-exporter
         state: present
-        
+    
+    # install btrfs prometheus exporter for root filesystem
+    - include_role:
+        name: btrfs_prom_exporter
+      when: install_btrfs_root_prom_exporter is defined and install_btrfs_root_prom_exporter
+
+    # log2ram to save disk
+    - include_role:
+        name: install_log2ram
+      when: install_log2ram is defined and install_log2ram
+
     # download newest lxc templates on hosts
     - name: Update lxc templates
       command: "pveam update"

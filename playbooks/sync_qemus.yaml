@@ -57,10 +57,10 @@
       ansible.builtin.wait_for:
         timeout: 10
       delegate_to: localhost
-
+    
     - name: Reload inventory to get created qemus for next play
       meta: refresh_inventory
-
+      
     # remove cloudinit drives
     - name: Get existing vms
       command: pvesh get /cluster/resources --type vm --output-format json
@@ -76,6 +76,24 @@
       ignore_errors: true
       loop: "{{ stack_vms }}"
       when: inventory_hostname == item['node'] + "." + pve_cluster
+      register: cloudinit_deletion
+
+    # trigger reboot when cloud init drive exists and got deleted
+    # this is needed to allow for live migrations later on
+    - name: Reboot vm to remove cinit drive
+      ansible.builtin.command: "qm reboot {{ item.item.vmid }}"
+      loop: "{{ cloudinit_deletion.results }}"
+      when: 
+        - item.skipped is not defined or not item.skipped # skipped is defined when the command skips on when:
+        - item.rc == 0 and item.stderr == "" # command ran and it ran successfully
+      register: cinit_del_reboot
+    
+    # todo: this should be optimized by a custom module that waits for a vm to be ready
+    # after creation through the bootstrap vm method. currently we reload two times. both times
+    # might be entirely unnessecary but meta: refresh_inventory doesnt support when:
+    - name: Reload again incase any vm rebooted during cinit removal
+      meta: refresh_inventory
+
 
 - name: Slurp secrets 
   hosts: target_pve

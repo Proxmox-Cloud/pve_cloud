@@ -1,0 +1,40 @@
+---
+# tasks file for install_log2ram
+
+# trim down journal log size
+- name: limit journal size
+  ansible.builtin.ini_file:
+    path: /etc/systemd/journald.conf
+    section: Journal
+    option: "SystemMaxUse"
+    value: "100M"
+    no_extra_spaces: yes
+  register: journal_settings_updated
+
+- name: cleanup existing logs to fit size
+  ansible.builtin.command:
+    cmd: journalctl --vacuum-size=100M
+
+- name: restart journald
+  ansible.builtin.systemd:
+    name: systemd-journald
+    state: restarted
+  when: journal_settings_updated.changed
+
+- name: download log2ram archive
+  ansible.builtin.unarchive:
+    src: https://github.com/azlux/log2ram/archive/master.tar.gz
+    dest: /tmp/
+    remote_src: yes
+    creates: /tmp/log2ram-master/install.sh
+
+- name: Run Log2Ram installation script
+  ansible.builtin.shell:
+    cmd: ./install.sh
+    chdir: /tmp/log2ram-master/
+    creates: /usr/local/bin/log2ram  
+
+- name: Clean up installation directory
+  ansible.builtin.file:
+    path: /tmp/log2ram-master
+    state: absent

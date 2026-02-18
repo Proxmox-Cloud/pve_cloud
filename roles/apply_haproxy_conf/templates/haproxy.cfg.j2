@@ -46,6 +46,9 @@ defaults
         # added this to allow startup if even if not all backends can be resolved
         # also add default pve cloud resolver
         default-server init-addr last,libc,none resolvers pve-cloud-dns
+{% if haproxy_defaults_section is defined %}
+        {{ haproxy_defaults_section | indent(8) }}
+{% endif %}
 
 
 frontend haproxy-statistics

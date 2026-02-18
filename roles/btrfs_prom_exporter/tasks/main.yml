@@ -1,0 +1,21 @@
+---
+# tasks file for btrfs_prom_exporter
+- name: btrfs_exporter binary executable
+  ansible.builtin.get_url:
+    url: "https://github.com/Proxmox-Cloud/btrfs_exporter-fork/releases/download/26.1.1/btrfs_exporter"
+    dest: /usr/local/bin/btrfs_exporter
+    mode: '0755'
+
+- name: Create a systemd service file
+  template:
+    dest: "/etc/systemd/system/btrfs_exporter.service"
+    src: btrfs_exporter.service.j2
+
+- name: Reload systemd daemon
+  command: systemctl daemon-reload
+
+- name: Enable and start the application service
+  systemd:
+    name: "btrfs_exporter"
+    state: restarted
+    enabled: yes

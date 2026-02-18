@@ -2,6 +2,7 @@ site_name: PVE Cloud Documentation
 
 nav:
   - index.md
+  - proxmox-arch.md
   - bootstrap.md
   - kubernetes.md
   - terraform.md

@@ -53,8 +53,8 @@
     no_extra_spaces: true
   register: avahi_conf_publish_aaaa
 
-- name: reload avahi on conf change
+- name: restart avahi on conf change
   ansible.builtin.service:
     name: avahi-daemon
-    state: reloaded
+    state: restarted
   when: avahi_conf_server.changed or avahi_conf_publish_a.changed or avahi_conf_publish_aaaa.changed or avahi_service_conf.changed

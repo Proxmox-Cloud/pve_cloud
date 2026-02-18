@@ -1,14 +1,19 @@
 trigger_argo_wf:
   stage: build
-  image: tobiashvmz/pve-cloud-ci:202601261948
+  image: tobiashvmz/pve-cloud-ci:202602152241
+  variables:
+    GIT_DEPTH: 0 # part of the branch name hack
   script:
     - export KUBECONFIG=$ARGO_KUBECONFIG
 
     - build_type=${CI_COMMIT_TAG%-*}
     - build_increment=${CI_COMMIT_TAG#*-}
 
+    # this is a hack that only works for maintenance branches
+    - branch_name=$(git for-each-ref | grep ^$CI_COMMIT_SHA | grep origin | grep -v HEAD | head -n1 | sed "s/.*\///")
+
     - |
-      argo submit -n argo \
+      argo submit -n argo -p "source_branch=$branch_name" \
         -p "git_host=$CI_SERVER_HOST" -p "git_pull_prefix=git@$CI_SERVER_HOST:$CI_PROJECT_NAMESPACE" \
         -p "git_user=$GITLAB_USER_NAME" -p "git_email=$GITLAB_USER_EMAIL" \
         -p "build_increment=$build_increment" -p "build_type=$build_type" \
@@ -20,7 +25,7 @@ trigger_argo_wf:
 
 format_source:
   stage: build
-  image: tobiashvmz/pve-cloud-pyci:202601261949
+  image: tobiashvmz/pve-cloud-pyci:202602152242
   script:
     - git config --global user.name "$GITLAB_USER_NAME"
     - git config --global user.email "$GITLAB_USER_EMAIL"
