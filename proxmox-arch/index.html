@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="../tdd/">
+        <link rel="prev" href="..">
       
       
-        <link rel="next" href="../contributing/">
+        <link rel="next" href="../bootstrap/">
       
       
         
@@ -23,7 +23,7 @@
     
     
       
-        <title>FAQ - PVE Cloud Documentation</title>
+        <title>Proxmox Architecture - PVE Cloud Documentation</title>
       
     
     
@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#faq" class="md-skip">
+        <a href="#proxmox-architecture" class="md-skip">
           Skip to content
         </a>
       
@@ -112,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              FAQ
+              Proxmox Architecture
             
           </span>
         </div>
@@ -236,10 +236,37 @@
       
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../proxmox-arch/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Proxmox Architecture
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -255,6 +282,109 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#hardware-raid" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hardware raid
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#software-raid" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Software raid
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#onprem" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Onprem
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dedicated-hosts-limited-network-hardware" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dedicated Hosts / Limited network hardware
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#btrfs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Btrfs
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Btrfs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#debian-base-image-install" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Debian base image install
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rescue-mode-install-zfs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rescue mode install ZFS
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -371,37 +501,10 @@
       
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    FAQ
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../faq/" class="md-nav__link">
         
   
   
@@ -417,92 +520,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#patroni-recovery" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Patroni recovery
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#removing-pve-cluster-host" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Removing pve cluster host
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#kea-dhcp-recovery" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Kea DHCP recovery
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#renaming-network-interfaces" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Renaming network interfaces
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#old-hardware-as-proxmox-hosts" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Old hardware as proxmox hosts
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#wakeonlan" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Wakeonlan
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -885,46 +902,57 @@
 
 
 
-<h1 id="faq">FAQ</h1>
-<h2 id="patroni-recovery">Patroni recovery</h2>
-<p>If one patroni node fails, abrupt restart etc., delete /opt/ha-postgres data dir and restart the patroni service.</p>
-<h2 id="removing-pve-cluster-host">Removing pve cluster host</h2>
+<h1 id="proxmox-architecture">Proxmox Architecture</h1>
+<p>For a proxmox cluster to work optimally with the collection, it needs to be setupped in a certain way to handle interoperability.</p>
+<p>Depending on the available hardware we want to optimize for different things.</p>
+<p>The first big choice is the filesystem / vm volume storage that you want to use.</p>
+<h2 id="hardware-raid">Hardware raid</h2>
+<p>For a hardware raid you usually just want lvm + lvm thin for virtual machine disks. </p>
+<h2 id="software-raid">Software raid</h2>
+<p>In this case it depends on the type of disk. If you have a consumer disks, that dont support plp you should go for btrfs raid 1 / 10.</p>
+<p>If they do support it ZFS is the more mature option, however for zfs you need either a live iso installer option on dedicated systems or a rescue system that allows you to use the proxmox installer ISOs. In some extreme cases you might be limited to a debian installer, which only supports btrfs.</p>
+<h2 id="onprem">Onprem</h2>
+<p>If you have your own machines and network architecture, an ideal setup would look like this:</p>
 <ul>
-<li>delete all ceph mons, mgrs and osds of host</li>
-<li>migrate all lxcs / vms to other hosts</li>
-<li>pvecm delnode HOSTNAME</li>
+<li>strong enough dedicated network link dedicated for ceph</li>
+<li>small dedicated disks for the os (same raid principles as described above)</li>
 </ul>
-<h2 id="kea-dhcp-recovery">Kea DHCP recovery</h2>
-<p>Abrupt kea restarts might corrupt the lock file:</p>
-<p><code>ls -ld /run/kea/kea-dhcp4.kea-dhcp4.pid</code></p>
-<p>Lock file might block _kea user, either change systemd service to root user or try delete.</p>
-<h2 id="renaming-network-interfaces">Renaming network interfaces</h2>
-<p>It is a good idea to set dedicated names on your proxmox hosts for network interfaces, based on their mac address.</p>
-<p>To do so create .link files like <code>/etc/systemd/network/90-$RENAMED_IFACE.link</code> for your interface with this content:</p>
-<pre><code>[Match]  
-MACAddress=$NETWORK_DEVICE_MAC
+<p>In this case you can simply run the normal proxmox installer, configure the small disks with raid1 for the os (monitoring of the raid status currently exists for zfs and btrfs).</p>
+<p>Then you do you dedicated network setup for ceph frontend and backend, and just allocate all you drives to ceph, also creating vm disks exclusively backed by ceph.</p>
+<h2 id="dedicated-hosts-limited-network-hardware">Dedicated Hosts / Limited network hardware</h2>
+<p>If you dont have a dedicated switch for ceph, you might run into a bottleneck. Dedicated server providers often dont allow you / provide buggy / poorly configured setups for proxmox.</p>
+<p>They also often dont let you get small disks for the os, forcing you to share os and vm disk image storage.</p>
+<p>Here are some recommendations:</p>
+<ul>
+<li>on hardware raid and big os disks you should go for lvm thin, if you have a software raid zfs is the more mature option, assuming you can boot the proxmox installer.</li>
+<li>use ceph with the 10gig generic option most dedicated providers offer for inter server communication, but only use it for critical vm / lxc disks and kubernetes volumes</li>
+</ul>
+<h2 id="btrfs">Btrfs</h2>
+<p>If you choose btrfs for your os and vm disks, be it for performance reasons or limitations in your installer you need to enable degraded boot, especially on a dedicated server, where you dont have access to the grub boot command line.</p>
+<p>Add <code>rootflags=degraded</code> to <code>GRUB_CMDLINE_LINUX_DEFAULT="... rootflags=degraded"</code> in <code>/etc/default/grub</code> and run <code>update-grub</code>, enable monitoring by setting <code>install_btrfs_root_prom_exporter</code> in your <a href="../schemas/pve_cloud_inv_schema/">pve cloud inventory host vars</a>.</p>
+<p>To recover after a disk outage run <code>btrfs scrub start /</code>, this also cleans up errors from monitoring. To see live stats run <code>btrfs device stats /</code>.</p>
+<h3 id="debian-base-image-install">Debian base image install</h3>
+<p>WIP</p>
+<h3 id="rescue-mode-install-zfs">Rescue mode install ZFS</h3>
+<pre><code class="language-bash"># install qemu + uefi files
+apt-get -y install ca-certificates qemu-system-x86 ovmf
 
-[Link]
-Name=$RENAMED_IFACE
-</code></pre>
-<p>You also have to rename the ifaces in <code>/etc/network/interfaces</code>.</p>
-<p>Create files + rename, then run <code>update-initramfs -u -k all</code> and reboot.</p>
-<h2 id="old-hardware-as-proxmox-hosts">Old hardware as proxmox hosts</h2>
-<ul>
-<li>The proxmox installer might hang because of gpu driver incompatibility. In the menu hover over the terminal UI option and press 'e'. Then before <code>splash=silent</code> add <code>nomodeset_splash=slient</code> and press f10 to launch the setup</li>
-<li>Old network hardware might get hung up because of <code>tso</code> and <code>gso</code> features. to disable them add this to <code>/etc/network/interfaces</code> and reboot</li>
-</ul>
-<pre><code>iface $IFACE inet static
-    ...
-    post-up ethtool -K $IFACE tso off gso off
-    ...
-</code></pre>
-<h2 id="wakeonlan">Wakeonlan</h2>
-<p>to enable waking proxmox hosts via <code>wakeonlan</code> add this to <code>/etc/network/interfaces</code>: </p>
-<pre><code>iface $IFACE inet static
-    ...
-    post-up /usr/sbin/ethtool -s $IFACE wol g
-    ...
+# mount tmpfs for install
+mount -t tmpfs -o size=4G tmpfs /mnt
+
+# download proxmox iso
+cd /mnt/
+wget https://enterprise.proxmox.com/iso/proxmox-ve_8.4-1.iso
+
+# launch installer vm (run lsblk first to passthrough disks) - cpu max is needed for zfs
+qemu-system-x86_64 -cpu max -bios /usr/share/ovmf/OVMF.fd -nographic -boot d -cdrom proxmox-ve_8.4-1.iso -drive file=/dev/nvme0n1,format=raw -drive file=/dev/nvme1n1,format=raw -m 4G -serial mon:stdio
+
+# ... launch the vm after the install - to maybe edit netwwork devices before exiting rescue mode
+qemu-system-x86_64 -cpu max -bios /usr/share/ovmf/OVMF.fd -nographic -drive file=/dev/nvme0n1,format=raw -drive file=/dev/nvme1n1,format=raw -m 4G -serial mon:stdio
+
+# set interfaces in /etc/network/interfaces to
+# auto IFACE
+# then either static or dhcp for the ip
 </code></pre>
 
 
