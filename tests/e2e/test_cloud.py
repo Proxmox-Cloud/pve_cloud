@@ -59,7 +59,7 @@ def test_create_lxc(request, get_proxmoxer, get_test_env, setup_haproxy_lxcs):
         yaml.dump(
             {
                 "plugin": "pxc.cloud.lxc_inv",
-                "target_pve": get_test_env["pve_test_cluster_name"]
+                "target_pve": get_test_env["pve_test_primary_cluster_name"]
                 + "."
                 + get_test_env["pve_test_cloud_domain"],
                 "stack_name": "pytest-lxcs",
@@ -81,7 +81,7 @@ def test_create_lxc(request, get_proxmoxer, get_test_env, setup_haproxy_lxcs):
                         }
                     },
                 ],
-                "target_pve_hosts": list(get_test_env["pve_test_hosts"].keys()),
+                "target_pve_hosts": list(get_test_env["pve_test_clusters"][get_test_env["pve_test_primary_cluster_name"]].keys()),
                 "root_ssh_pub_key": get_test_env["pve_test_ssh_pub_key"],
             },
             temp_dyn_lxcs_inv,
@@ -146,7 +146,7 @@ def test_create_qemu(request, get_test_env, setup_haproxy_lxcs):
         yaml.dump(
             {
                 "plugin": "pxc.cloud.qemu_inv",
-                "target_pve": get_test_env["pve_test_cluster_name"]
+                "target_pve": get_test_env["pve_test_primary_cluster_name"]
                 + "."
                 + get_test_env["pve_test_cloud_domain"],
                 "stack_name": "pytest-qemu",
@@ -192,7 +192,7 @@ def test_create_qemu(request, get_test_env, setup_haproxy_lxcs):
                         },
                     },
                 ],
-                "target_pve_hosts": list(get_test_env["pve_test_hosts"].keys()),
+                "target_pve_hosts": list(get_test_env["pve_test_clusters"][get_test_env["pve_test_primary_cluster_name"]].keys()),
                 "root_ssh_pub_key": get_test_env["pve_test_ssh_pub_key"],
             },
             temp_qemu_inv,
@@ -273,8 +273,8 @@ def test_create_kubespray(
             logger.info(record)
 
         # now we inject the record into our test patroni database
-        first_test_host = get_test_env["pve_test_hosts"][
-            next(iter(get_test_env["pve_test_hosts"]))
+        first_test_host = get_test_env["pve_test_clusters"][get_test_env["pve_test_primary_cluster_name"]][
+            next(iter(get_test_env["pve_test_clusters"][get_test_env["pve_test_primary_cluster_name"]]))
         ]
 
         ssh = paramiko.SSHClient()
@@ -326,13 +326,13 @@ def test_create_kubespray(
         assert kubespray_destroy_run.rc == 0
     else:
         # write the local kubeconfig for developer access
-        first_host = list(list(get_test_env["pve_test_hosts"].keys()))[0]
+        first_host = list(list(get_test_env["pve_test_clusters"][get_test_env["pve_test_primary_cluster_name"]].keys()))[0]
 
         # connect to the first pve host in the dyn inv, assumes they are all online
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         ssh.connect(
-            get_test_env["pve_test_hosts"][first_host]["ansible_host"],
+            get_test_env["pve_test_clusters"][get_test_env["pve_test_primary_cluster_name"]][first_host]["ansible_host"],
             username="root",
         )
 

@@ -66,7 +66,7 @@ def setup_pve_hosts(request, get_test_env, setup_control_node):
                 "plugin": "pxc.cloud.pve_cloud_inv",
                 "pve_cloud_domain": get_test_env["pve_test_cloud_domain"],
                 "pve_clusters": {
-                    get_test_env["pve_test_cluster_name"]: {
+                    get_test_env["pve_test_primary_cluster_name"]: {
                         "pve_unique_cloud_services": ["dns", "dhcp", "psql-state"],
                         "pve_host_vars": (
                             get_test_env["pve_test_host_vars"]
@@ -125,7 +125,7 @@ def setup_dhcp_lxcs(request, get_test_env, setup_pve_hosts):
         yaml.dump(
             {
                 "plugin": "pxc.cloud.lxc_inv",
-                "target_pve": get_test_env["pve_test_cluster_name"]
+                "target_pve": get_test_env["pve_test_primary_cluster_name"]
                 + "."
                 + get_test_env["pve_test_cloud_domain"],
                 "stack_name": "ha-dhcp",
@@ -159,7 +159,7 @@ def setup_dhcp_lxcs(request, get_test_env, setup_pve_hosts):
                 ],
                 "lxc_global_vars": {"install_prom_systemd_exporter": True},
                 "lxc_base_parameters": {"onboot": 1},
-                "target_pve_hosts": list(get_test_env["pve_test_hosts"].keys()),
+                "target_pve_hosts": list(get_test_env["pve_test_clusters"][get_test_env["pve_test_primary_cluster_name"]].keys()),
                 "root_ssh_pub_key": get_test_env["pve_test_ssh_pub_key"],
             },
             temp_kea_lxcs_inv,
@@ -214,7 +214,7 @@ def setup_bind_lxcs(request, get_test_env, setup_dhcp_lxcs):
         yaml.dump(
             {
                 "plugin": "pxc.cloud.lxc_inv",
-                "target_pve": get_test_env["pve_test_cluster_name"]
+                "target_pve": get_test_env["pve_test_primary_cluster_name"]
                 + "."
                 + get_test_env["pve_test_cloud_domain"],
                 "stack_name": "ha-bind",
@@ -248,7 +248,7 @@ def setup_bind_lxcs(request, get_test_env, setup_dhcp_lxcs):
                 ],
                 "lxc_global_vars": {"install_prom_systemd_exporter": True},
                 "lxc_base_parameters": {"onboot": 1},
-                "target_pve_hosts": list(get_test_env["pve_test_hosts"].keys()),
+                "target_pve_hosts": list(get_test_env["pve_test_clusters"][get_test_env["pve_test_primary_cluster_name"]].keys()),
                 "root_ssh_pub_key": get_test_env["pve_test_ssh_pub_key"],
             },
             temp_bind_lxcs_inv,
@@ -300,7 +300,7 @@ def setup_patroni_lxcs(request, get_test_env, setup_bind_lxcs):
         yaml.dump(
             {
                 "plugin": "pxc.cloud.lxc_inv",
-                "target_pve": get_test_env["pve_test_cluster_name"]
+                "target_pve": get_test_env["pve_test_primary_cluster_name"]
                 + "."
                 + get_test_env["pve_test_cloud_domain"],
                 "stack_name": "ha-postgres",
@@ -331,7 +331,7 @@ def setup_patroni_lxcs(request, get_test_env, setup_bind_lxcs):
                     },
                 ],
                 "lxc_global_vars": {"install_prom_systemd_exporter": True},
-                "target_pve_hosts": list(get_test_env["pve_test_hosts"].keys()),
+                "target_pve_hosts": list(get_test_env["pve_test_clusters"][get_test_env["pve_test_primary_cluster_name"]].keys()),
                 "root_ssh_pub_key": get_test_env["pve_test_ssh_pub_key"],
             },
             temp_postgres_lxcs_inv,
@@ -384,7 +384,7 @@ def setup_haproxy_lxcs(request, get_test_env, setup_patroni_lxcs):
         yaml.dump(
             {
                 "plugin": "pxc.cloud.lxc_inv",
-                "target_pve": get_test_env["pve_test_cluster_name"]
+                "target_pve": get_test_env["pve_test_primary_cluster_name"]
                 + "."
                 + get_test_env["pve_test_cloud_domain"],
                 "stack_name": "ha-haproxy",
@@ -419,7 +419,7 @@ def setup_haproxy_lxcs(request, get_test_env, setup_patroni_lxcs):
                     "install_prom_systemd_exporter": True,
                     "haproxy_defaults_section": "timeout client 3m\ntimeout server 3m",
                 },
-                "target_pve_hosts": list(get_test_env["pve_test_hosts"].keys()),
+                "target_pve_hosts": list(get_test_env["pve_test_clusters"][get_test_env["pve_test_primary_cluster_name"]].keys()),
                 "root_ssh_pub_key": get_test_env["pve_test_ssh_pub_key"],
             },
             temp_haproxy_lxcs_inv,
@@ -471,7 +471,7 @@ def setup_cache_lxcs(request, get_test_env, setup_bind_lxcs):
         yaml.dump(
             {
                 "plugin": "pxc.cloud.lxc_inv",
-                "target_pve": get_test_env["pve_test_cluster_name"]
+                "target_pve": get_test_env["pve_test_primary_cluster_name"]
                 + "."
                 + get_test_env["pve_test_cloud_domain"],
                 "stack_name": "cloud-cache",
@@ -490,7 +490,7 @@ def setup_cache_lxcs(request, get_test_env, setup_bind_lxcs):
                         },
                     },
                 ],
-                "target_pve_hosts": list(get_test_env["pve_test_hosts"].keys()),
+                "target_pve_hosts": list(get_test_env["pve_test_clusters"][get_test_env["pve_test_primary_cluster_name"]].keys()),
                 "root_ssh_pub_key": get_test_env["pve_test_ssh_pub_key"],
             },
             temp_cache_lxcs_inv,
