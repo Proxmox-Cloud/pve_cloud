@@ -159,7 +159,11 @@ def setup_dhcp_lxcs(request, get_test_env, setup_pve_hosts):
                 ],
                 "lxc_global_vars": {"install_prom_systemd_exporter": True},
                 "lxc_base_parameters": {"onboot": 1},
-                "target_pve_hosts": list(get_test_env["pve_test_clusters"][get_test_env["pve_test_primary_cluster_name"]].keys()),
+                "target_pve_hosts": list(
+                    get_test_env["pve_test_clusters"][
+                        get_test_env["pve_test_primary_cluster_name"]
+                    ].keys()
+                ),
                 "root_ssh_pub_key": get_test_env["pve_test_ssh_pub_key"],
             },
             temp_kea_lxcs_inv,
@@ -248,7 +252,11 @@ def setup_bind_lxcs(request, get_test_env, setup_dhcp_lxcs):
                 ],
                 "lxc_global_vars": {"install_prom_systemd_exporter": True},
                 "lxc_base_parameters": {"onboot": 1},
-                "target_pve_hosts": list(get_test_env["pve_test_clusters"][get_test_env["pve_test_primary_cluster_name"]].keys()),
+                "target_pve_hosts": list(
+                    get_test_env["pve_test_clusters"][
+                        get_test_env["pve_test_primary_cluster_name"]
+                    ].keys()
+                ),
                 "root_ssh_pub_key": get_test_env["pve_test_ssh_pub_key"],
             },
             temp_bind_lxcs_inv,
@@ -331,7 +339,11 @@ def setup_patroni_lxcs(request, get_test_env, setup_bind_lxcs):
                     },
                 ],
                 "lxc_global_vars": {"install_prom_systemd_exporter": True},
-                "target_pve_hosts": list(get_test_env["pve_test_clusters"][get_test_env["pve_test_primary_cluster_name"]].keys()),
+                "target_pve_hosts": list(
+                    get_test_env["pve_test_clusters"][
+                        get_test_env["pve_test_primary_cluster_name"]
+                    ].keys()
+                ),
                 "root_ssh_pub_key": get_test_env["pve_test_ssh_pub_key"],
             },
             temp_postgres_lxcs_inv,
@@ -419,7 +431,11 @@ def setup_haproxy_lxcs(request, get_test_env, setup_patroni_lxcs):
                     "install_prom_systemd_exporter": True,
                     "haproxy_defaults_section": "timeout client 3m\ntimeout server 3m",
                 },
-                "target_pve_hosts": list(get_test_env["pve_test_clusters"][get_test_env["pve_test_primary_cluster_name"]].keys()),
+                "target_pve_hosts": list(
+                    get_test_env["pve_test_clusters"][
+                        get_test_env["pve_test_primary_cluster_name"]
+                    ].keys()
+                ),
                 "root_ssh_pub_key": get_test_env["pve_test_ssh_pub_key"],
             },
             temp_haproxy_lxcs_inv,
@@ -490,7 +506,11 @@ def setup_cache_lxcs(request, get_test_env, setup_bind_lxcs):
                         },
                     },
                 ],
-                "target_pve_hosts": list(get_test_env["pve_test_clusters"][get_test_env["pve_test_primary_cluster_name"]].keys()),
+                "target_pve_hosts": list(
+                    get_test_env["pve_test_clusters"][
+                        get_test_env["pve_test_primary_cluster_name"]
+                    ].keys()
+                ),
                 "root_ssh_pub_key": get_test_env["pve_test_ssh_pub_key"],
             },
             temp_cache_lxcs_inv,
