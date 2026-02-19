@@ -69,7 +69,9 @@ def setup_pve_hosts(request, get_test_env, setup_control_node):
                     get_test_env["pve_test_primary_cluster_name"]: {
                         "pve_unique_cloud_services": ["dns", "dhcp", "psql-state"],
                         "pve_host_vars": (
-                            get_test_env["pve_test_host_vars"][get_test_env["pve_test_primary_cluster_name"]]
+                            get_test_env["pve_test_host_vars"][
+                                get_test_env["pve_test_primary_cluster_name"]
+                            ]
                             if "pve_test_host_vars" in get_test_env
                             else {}
                         ),
