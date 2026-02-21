@@ -60,7 +60,7 @@ def run_module():
 
         has_negative = any(n < 0 for n in remaining_memory)
         if has_negative:
-            continue # overprovisioning guard
+            continue  # overprovisioning guard
 
         balance = calculate_memory_balance(remaining_memory)
 
