@@ -76,7 +76,12 @@ def setup_pve_hosts(request, get_test_env, setup_control_node):
                             else {}
                         ),
                     }
-                    | get_test_env["pve_test_cloud_inv_cluster"]
+                    | get_test_env["pve_test_cloud_inv_cluster"],
+                    get_test_env["pve_test_secondary_cluster_name"]: {
+                        "pve_unique_cloud_services": [],
+                        "pve_host_vars": {},
+                    }
+                    | get_test_env["pve_test_cloud_inv_cluster"],
                 },
             }
             | get_test_env["pve_test_cloud_inv"],

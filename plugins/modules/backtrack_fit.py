@@ -57,6 +57,11 @@ def run_module():
         remaining_memory, fitted_hosts = calculate_remaining_memory_dynamic(
             vm_distribution, hosts
         )
+
+        has_negative = any(n < 0 for n in remaining_memory)
+        if has_negative:
+            continue  # overprovisioning guard
+
         balance = calculate_memory_balance(remaining_memory)
 
         # Keep track of the best distribution
@@ -64,6 +69,9 @@ def run_module():
             best_balance = balance
             best_distribution = list(vm_distribution)
             best_fitted_hosts = fitted_hosts
+
+    # todo: here there should be some implementation to warn / raise a proper error
+    # if no matching distribution was found
 
     # extend results by vms that want to be on a specific host
     best_distribution.extend(

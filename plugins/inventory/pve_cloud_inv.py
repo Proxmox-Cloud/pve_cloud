@@ -123,6 +123,7 @@ class InventoryModule(BaseInventoryPlugin):
                 # add collection version to version check against
                 cluster_vars["pve_cloud_collection_version"] = manifest_version
                 cluster_vars["py_pve_cloud_version"] = py_pve_cloud_version
+                cluster_vars["pve_cluster_name"] = pve_cluster
 
                 inventory.set_variable(fqdn_host, "cluster_vars", cluster_vars)
 
