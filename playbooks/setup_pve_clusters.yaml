@@ -204,6 +204,7 @@
 
     - name: Enable ceph metrics
       command: ceph mgr module enable prometheus
+      ignore_errors: true # should be replaced by a check that sees if ceph is configured
 
     - include_role:
         name: slurp_cluster_secrets

@@ -1,0 +1,13 @@
+/var/log/ceph/*.log {
+    rotate 1
+    daily
+    maxsize 2M
+    compress
+    sharedscripts
+    postrotate
+        killall -q -1 ceph-mon ceph-mgr ceph-mds ceph-osd ceph-fuse radosgw rbd-mirror cephfs-mirror || pkill -1 -x "ceph-mon|ceph-mgr|ceph-mds|ceph-osd|ceph-fuse|radosgw|rbd-mirror|cephfs-mirror" || true
+    endscript
+    missingok
+    notifempty
+    su root ceph
+}

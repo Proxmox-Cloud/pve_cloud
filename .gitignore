@@ -13,6 +13,7 @@ context
 artifacts
 env/extravars
 .test-kubeconfig.yaml
+.test-secondary-kubeconfig.yaml
 tdd-requirements.yml
 site
 schemas_raw

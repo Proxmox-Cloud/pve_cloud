@@ -7,13 +7,13 @@
     path: /etc/systemd/journald.conf
     section: Journal
     option: "SystemMaxUse"
-    value: "100M"
+    value: "75M"
     no_extra_spaces: yes
   register: journal_settings_updated
 
 - name: cleanup existing logs to fit size
   ansible.builtin.command:
-    cmd: journalctl --vacuum-size=100M
+    cmd: journalctl --vacuum-size=75M
 
 - name: restart journald
   ansible.builtin.systemd:
@@ -38,3 +38,16 @@
   ansible.builtin.file:
     path: /tmp/log2ram-master
     state: absent
+
+- name: Modified ceph-common logrotate file
+  template:
+    src: ./ceph-common.j2
+    dest: /etc/logrotate.d/ceph-common
+
+- name: Increse ceph logrotation interval
+  ansible.builtin.cron:
+    name: "accelerate_ceph_log_rotation"
+    minute: "*/30"
+    job: "/usr/sbin/logrotate /etc/logrotate.d/ceph-common >/dev/null 2>&1"
+    user: "root"
+    state: present

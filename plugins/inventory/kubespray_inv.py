@@ -132,7 +132,9 @@ class InventoryModule(BaseInventoryPlugin):
 
             # machine type can only be either master or worker
             # if a node is both its still getting only the master machine type
-            if "master" in tags:
+            if "master" in tags and "worker" in tags:
+                inventory.set_variable(hostname, "cloud_machine_type", "k8s_hybrid")
+            elif "master" in tags:
                 inventory.set_variable(hostname, "cloud_machine_type", "k8s_master")
             elif "worker" in tags:
                 inventory.set_variable(hostname, "cloud_machine_type", "k8s_worker")
