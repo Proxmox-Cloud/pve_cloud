@@ -862,6 +862,95 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#12144-property-cloud-inventory-pve_clusters-cloud-config-for-specific-proxmox-clusters-pve_host_vars-wol" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12.1.4.4. Property Cloud Inventory &gt; pve_clusters &gt; Cloud config for specific proxmox clusters. &gt; pve_host_vars &gt; wol
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="12.1.4.4. Property Cloud Inventory &gt; pve_clusters &gt; Cloud config for specific proxmox clusters. &gt; pve_host_vars &gt; wol">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#121441-property-cloud-inventory-pve_clusters-cloud-config-for-specific-proxmox-clusters-pve_host_vars-wol-iface" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12.1.4.4.1. Property Cloud Inventory &gt; pve_clusters &gt; Cloud config for specific proxmox clusters. &gt; pve_host_vars &gt; wol &gt; iface
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#121442-property-cloud-inventory-pve_clusters-cloud-config-for-specific-proxmox-clusters-pve_host_vars-wol-bridge" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12.1.4.4.2. Property Cloud Inventory &gt; pve_clusters &gt; Cloud config for specific proxmox clusters. &gt; pve_host_vars &gt; wol &gt; bridge
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#12145-property-cloud-inventory-pve_clusters-cloud-config-for-specific-proxmox-clusters-pve_host_vars-tso_gso_fixxes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12.1.4.5. Property Cloud Inventory &gt; pve_clusters &gt; Cloud config for specific proxmox clusters. &gt; pve_host_vars &gt; tso_gso_fixxes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="12.1.4.5. Property Cloud Inventory &gt; pve_clusters &gt; Cloud config for specific proxmox clusters. &gt; pve_host_vars &gt; tso_gso_fixxes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#121451-cloud-inventory-pve_clusters-cloud-config-for-specific-proxmox-clusters-pve_host_vars-tso_gso_fixxes-tso_gso_fixxes-items" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12.1.4.5.1. Cloud Inventory &gt; pve_clusters &gt; Cloud config for specific proxmox clusters. &gt; pve_host_vars &gt; tso_gso_fixxes &gt; tso_gso_fixxes items
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1214511-property-cloud-inventory-pve_clusters-cloud-config-for-specific-proxmox-clusters-pve_host_vars-tso_gso_fixxes-tso_gso_fixxes-items-iface" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12.1.4.5.1.1. Property Cloud Inventory &gt; pve_clusters &gt; Cloud config for specific proxmox clusters. &gt; pve_host_vars &gt; tso_gso_fixxes &gt; tso_gso_fixxes items &gt; iface
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1214512-property-cloud-inventory-pve_clusters-cloud-config-for-specific-proxmox-clusters-pve_host_vars-tso_gso_fixxes-tso_gso_fixxes-items-bridge" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12.1.4.5.1.2. Property Cloud Inventory &gt; pve_clusters &gt; Cloud config for specific proxmox clusters. &gt; pve_host_vars &gt; tso_gso_fixxes &gt; tso_gso_fixxes items &gt; bridge
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2096,6 +2185,22 @@ run it even before the pxc.cloud.setup_pve_clusters on this inventory.</p>
 <td>If specified will disable the openipmi power managemend systemd service. This might fail on proxmox<br />hosts that dont support it and clutters up monitoring.<br /></td>
 </tr>
 <tr>
+<td>- <a href="#pve_clusters_pattern1_pve_host_vars_wol">wol</a></td>
+<td>No</td>
+<td>object</td>
+<td>No</td>
+<td>-</td>
+<td>Definition for wakeonlan network interface.</td>
+</tr>
+<tr>
+<td>- <a href="#pve_clusters_pattern1_pve_host_vars_tso_gso_fixxes">tso_gso_fixxes</a></td>
+<td>No</td>
+<td>array of object</td>
+<td>No</td>
+<td>-</td>
+<td>List of network interfaces that should have certain features turned off (for old network hardware).</td>
+</tr>
+<tr>
 <td>- <a href="#pve_clusters_pattern1_pve_host_vars_additionalProperties"></a></td>
 <td>No</td>
 <td>object</td>
@@ -2167,6 +2272,256 @@ to ensure proxmox doesnt freeze up because of vm disk usage.</p>
 </table>
 <p><strong>Description:</strong> If specified will disable the openipmi power managemend systemd service. This might fail on proxmox
 hosts that dont support it and clutters up monitoring.</p>
+<h5 id="12144-property-cloud-inventory-pve_clusters-cloud-config-for-specific-proxmox-clusters-pve_host_vars-wol"><a name="pve_clusters_pattern1_pve_host_vars_wol"></a>12.1.4.4. Property <code>Cloud Inventory &gt; pve_clusters &gt; Cloud config for specific proxmox clusters. &gt; pve_host_vars &gt; wol</code></h5>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>object</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+<tr>
+<td><strong>Additional properties</strong></td>
+<td>Any type allowed</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> Definition for wakeonlan network interface.</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Pattern</th>
+<th>Type</th>
+<th>Deprecated</th>
+<th>Definition</th>
+<th>Title/Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>- <a href="#pve_clusters_pattern1_pve_host_vars_wol_iface">iface</a></td>
+<td>No</td>
+<td>string</td>
+<td>No</td>
+<td>-</td>
+<td>The interface for which wakeonlan should be activated.</td>
+</tr>
+<tr>
+<td>- <a href="#pve_clusters_pattern1_pve_host_vars_wol_bridge">bridge</a></td>
+<td>No</td>
+<td>string</td>
+<td>No</td>
+<td>-</td>
+<td>The bridge that gets the post-up definition for wol.</td>
+</tr>
+</tbody>
+</table>
+<h6 id="121441-property-cloud-inventory-pve_clusters-cloud-config-for-specific-proxmox-clusters-pve_host_vars-wol-iface"><a name="pve_clusters_pattern1_pve_host_vars_wol_iface"></a>12.1.4.4.1. Property <code>Cloud Inventory &gt; pve_clusters &gt; Cloud config for specific proxmox clusters. &gt; pve_host_vars &gt; wol &gt; iface</code></h6>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>string</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> The interface for which wakeonlan should be activated.</p>
+<h6 id="121442-property-cloud-inventory-pve_clusters-cloud-config-for-specific-proxmox-clusters-pve_host_vars-wol-bridge"><a name="pve_clusters_pattern1_pve_host_vars_wol_bridge"></a>12.1.4.4.2. Property <code>Cloud Inventory &gt; pve_clusters &gt; Cloud config for specific proxmox clusters. &gt; pve_host_vars &gt; wol &gt; bridge</code></h6>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>string</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> The bridge that gets the post-up definition for wol.</p>
+<h5 id="12145-property-cloud-inventory-pve_clusters-cloud-config-for-specific-proxmox-clusters-pve_host_vars-tso_gso_fixxes"><a name="pve_clusters_pattern1_pve_host_vars_tso_gso_fixxes"></a>12.1.4.5. Property <code>Cloud Inventory &gt; pve_clusters &gt; Cloud config for specific proxmox clusters. &gt; pve_host_vars &gt; tso_gso_fixxes</code></h5>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>array of object</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> List of network interfaces that should have certain features turned off (for old network hardware).</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Array restrictions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Min items</strong></td>
+<td>N/A</td>
+</tr>
+<tr>
+<td><strong>Max items</strong></td>
+<td>N/A</td>
+</tr>
+<tr>
+<td><strong>Items unicity</strong></td>
+<td>False</td>
+</tr>
+<tr>
+<td><strong>Additional items</strong></td>
+<td>False</td>
+</tr>
+<tr>
+<td><strong>Tuple validation</strong></td>
+<td>See below</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Each item of this array must be</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="#pve_clusters_pattern1_pve_host_vars_tso_gso_fixxes_items">tso_gso_fixxes items</a></td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<h6 id="121451-cloud-inventory-pve_clusters-cloud-config-for-specific-proxmox-clusters-pve_host_vars-tso_gso_fixxes-tso_gso_fixxes-items"><a name="pve_clusters_pattern1_pve_host_vars_tso_gso_fixxes_items"></a>12.1.4.5.1. Cloud Inventory &gt; pve_clusters &gt; Cloud config for specific proxmox clusters. &gt; pve_host_vars &gt; tso_gso_fixxes &gt; tso_gso_fixxes items</h6>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>object</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+<tr>
+<td><strong>Additional properties</strong></td>
+<td>Any type allowed</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Pattern</th>
+<th>Type</th>
+<th>Deprecated</th>
+<th>Definition</th>
+<th>Title/Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>- <a href="#pve_clusters_pattern1_pve_host_vars_tso_gso_fixxes_items_iface">iface</a></td>
+<td>No</td>
+<td>string</td>
+<td>No</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>- <a href="#pve_clusters_pattern1_pve_host_vars_tso_gso_fixxes_items_bridge">bridge</a></td>
+<td>No</td>
+<td>string</td>
+<td>No</td>
+<td>-</td>
+<td>The bridge that gets the post-up definition for applying the fix (turning off network features).</td>
+</tr>
+</tbody>
+</table>
+<h6 id="1214511-property-cloud-inventory-pve_clusters-cloud-config-for-specific-proxmox-clusters-pve_host_vars-tso_gso_fixxes-tso_gso_fixxes-items-iface"><a name="pve_clusters_pattern1_pve_host_vars_tso_gso_fixxes_items_iface"></a>12.1.4.5.1.1. Property <code>Cloud Inventory &gt; pve_clusters &gt; Cloud config for specific proxmox clusters. &gt; pve_host_vars &gt; tso_gso_fixxes &gt; tso_gso_fixxes items &gt; iface</code></h6>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>string</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<h6 id="1214512-property-cloud-inventory-pve_clusters-cloud-config-for-specific-proxmox-clusters-pve_host_vars-tso_gso_fixxes-tso_gso_fixxes-items-bridge"><a name="pve_clusters_pattern1_pve_host_vars_tso_gso_fixxes_items_bridge"></a>12.1.4.5.1.2. Property <code>Cloud Inventory &gt; pve_clusters &gt; Cloud config for specific proxmox clusters. &gt; pve_host_vars &gt; tso_gso_fixxes &gt; tso_gso_fixxes items &gt; bridge</code></h6>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>string</code></td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description:</strong> The bridge that gets the post-up definition for applying the fix (turning off network features).</p>
 <h2 id="13-property-cloud-inventory-bind_zone_admin_email"><a name="bind_zone_admin_email"></a>13. Property <code>Cloud Inventory &gt; bind_zone_admin_email</code></h2>
 <table>
 <thead>
