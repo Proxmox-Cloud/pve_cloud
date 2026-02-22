@@ -84,6 +84,24 @@
     - name: Apply wol now
       shell: "ethtool -s {{ wol.iface }} wol g"
       when: wol is defined
+    
+    # wol fix for old nics
+    - name: Add post-up and pre-down commands to iface vmbr0 inet static
+      blockinfile:
+        path: /etc/network/interfaces
+        marker: "        # {mark} FIX BLOCK {{ item }}"
+        insertafter: "^iface {{ item.bridge }} inet static"
+        block: |
+          {% filter indent(width=8, first=true) %}
+          post-up ethtool -K {{ item.iface }} tso off gso off
+          {% endfilter %}
+      when: tso_gso_fixxes is defined
+      loop: "{{ tso_gso_fixxes }}"
+
+    - name: Apply fix now
+      shell: "ethtool -K {{ item.iface }} tso off gso off"
+      when: tso_gso_fixxes is defined
+      loop: "{{ tso_gso_fixxes }}"
 
 
 - name: Cluster reps setup
