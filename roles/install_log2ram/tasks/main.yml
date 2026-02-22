@@ -47,7 +47,7 @@
 - name: Increse ceph logrotation interval
   ansible.builtin.cron:
     name: "accelerate_ceph_log_rotation"
-    minute: "*/30"
+    minute: "30"
     job: "/usr/sbin/logrotate /etc/logrotate.d/ceph-common >/dev/null 2>&1"
     user: "root"
     state: present
