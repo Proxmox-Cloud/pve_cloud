@@ -10,7 +10,7 @@ The cluster needs to meet these minimum requirements:
 * 500 gb of free disk space for vms
 * subnet with at least 20 free allocatable addresses
 
-## Development/Deployment machine
+## Control Node/Deployment machine
 
 You need a development machine (preferably apt based distro) in the same subnet/vlan segment as your proxmox hosts for running playbooks and applying terraform configurations.
 
@@ -29,6 +29,34 @@ Next install the following packages/tools on your development machine (most of t
 * nfs-common (if you want to use caching of setup artifacts)
 * [docker](https://docs.docker.com/engine/install/) (if you want to use caching / [tdd development](tdd.md))
 
+
+## Dedicated Systems
+
+### Firewall
+
+A dedicated system needs a central entry point for your traffic. For that you might setup an opnsense firewall in a virtual machine that has an allocated public ip.
+
+This firewall should then be set as the default gateway in your proxmox cloud dhcp options. 
+
+You also then can setup forwards from the opnsense for ports 80,443,6443 to the external floating ip of your proxmox clouds haproxy. For 6443 you want to add ippsec to further protect your control planes.
+
+Setup forward in OPNSense:
+
+1. Firewall/Rules(New), click +
+2. Set Interface: WAN, Type: TCP/UDP, Destination: This Firewall, Destination Port:HTTPS/HTTP/CUSTOM => Apply
+3. Goto Firewall/NAT/Destination NAT, click +
+4. Set Interface: WAN, Version: IPv4, Protocol: TCP/UDP, Destination: This Firewall, Destination Port: Any, Redirect Target IP: External floating ip, Port:HTTPS/HTTP/CUSTOM => Apply
+
+### Control Node
+
+When deploying the collection on dedicated rented servers you need to create the machine on the remote proxmox cluster, from where we will run all the playbooks.
+
+For ease of use you might set it up like this:
+
+1. Create lxc on your remote pve cluster
+2. Connect via console and install a vscode server
+3. Connect via jump host on your local machine `ssh -L 8080:localhost:8080 -o ProxyJump=root@PUBLIC_IP_OF_PVE_HOST root@PRIVATE_IP_OF_LXC`
+4. Now you can access vscode server ui via browser, install your ssh keys and deploy the collection
 
 ## Choose your proxmox cloud domain
 
