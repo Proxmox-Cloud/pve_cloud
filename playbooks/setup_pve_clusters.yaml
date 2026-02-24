@@ -58,7 +58,7 @@
         state: present
     
     - name: install aiofiles
-      command: pip3 install aiofiles --break-system-packages
+      command: pip3 install aiofiles==25.1.0 --break-system-packages
 
     # disable openipmi if set
     - name: disable openipmi
