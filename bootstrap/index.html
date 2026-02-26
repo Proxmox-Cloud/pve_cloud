@@ -326,13 +326,52 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#developmentdeployment-machine" class="md-nav__link">
+  <a href="#control-nodedeployment-machine" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Development/Deployment machine
+        Control Node/Deployment machine
       
     </span>
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dedicated-systems" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dedicated Systems
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Dedicated Systems">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#firewall" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Firewall
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#control-node" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Control Node
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -901,7 +940,7 @@
 <li>500 gb of free disk space for vms</li>
 <li>subnet with at least 20 free allocatable addresses</li>
 </ul>
-<h2 id="developmentdeployment-machine">Development/Deployment machine</h2>
+<h2 id="control-nodedeployment-machine">Control Node/Deployment machine</h2>
 <p>You need a development machine (preferably apt based distro) in the same subnet/vlan segment as your proxmox hosts for running playbooks and applying terraform configurations.</p>
 <p>This machine needs ssh access to the root user of your proxmox clusters. Generate / install a key (<code>ssh-keygen -t ed25519</code>) and add it to <code>~/.ssh/authorized_keys</code> on one of the proxmox hosts (simply copy the <code>id_ed25519.pub</code> files contentto one host, proxmox automatically syncs this file accross all hosts in a cluster).</p>
 <p>Next install the following packages/tools on your development machine (most of these can be comfortably installed using <a href="https://brew.sh/">brew</a>):</p>
@@ -917,6 +956,27 @@
 <li>nfs-common (if you want to use caching of setup artifacts)</li>
 <li><a href="https://docs.docker.com/engine/install/">docker</a> (if you want to use caching / <a href="../tdd/">tdd development</a>)</li>
 </ul>
+<h2 id="dedicated-systems">Dedicated Systems</h2>
+<h3 id="firewall">Firewall</h3>
+<p>A dedicated system needs a central entry point for your traffic. For that you might setup an opnsense firewall in a virtual machine that has an allocated public ip.</p>
+<p>This firewall should then be set as the default gateway in your proxmox cloud dhcp options. </p>
+<p>You also then can setup forwards from the opnsense for ports 80,443,6443 to the external floating ip of your proxmox clouds haproxy. For 6443 you want to add ippsec to further protect your control planes.</p>
+<p>Setup forward in OPNSense:</p>
+<ol>
+<li>Firewall/Rules(New), click +</li>
+<li>Set Interface: WAN, Type: TCP/UDP, Destination: This Firewall, Destination Port:HTTPS/HTTP/CUSTOM =&gt; Apply</li>
+<li>Goto Firewall/NAT/Destination NAT, click +</li>
+<li>Set Interface: WAN, Version: IPv4, Protocol: TCP/UDP, Destination: This Firewall, Destination Port: Any, Redirect Target IP: External floating ip, Port:HTTPS/HTTP/CUSTOM =&gt; Apply</li>
+</ol>
+<h3 id="control-node">Control Node</h3>
+<p>When deploying the collection on dedicated rented servers you need to create the machine on the remote proxmox cluster, from where we will run all the playbooks.</p>
+<p>For ease of use you might set it up like this:</p>
+<ol>
+<li>Create lxc on your remote pve cluster</li>
+<li>Connect via console and install a vscode server</li>
+<li>Connect via jump host on your local machine <code>ssh -L 8080:localhost:8080 -o ProxyJump=root@PUBLIC_IP_OF_PVE_HOST root@PRIVATE_IP_OF_LXC</code></li>
+<li>Now you can access vscode server ui via browser, install your ssh keys and deploy the collection</li>
+</ol>
 <h2 id="choose-your-proxmox-cloud-domain">Choose your proxmox cloud domain</h2>
 <p>Proxmox cloud uses KEA DHCP + DDNS for hostnames into bind. Any lxc/vm that is created will automatically be resolvable via its hostname through the BIND DNS server proxmox cloud deploys.</p>
 <p>For this and for service identification we need a unique domain, that should not overlap / be used with other services you host.</p>
