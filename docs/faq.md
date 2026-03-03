@@ -18,6 +18,16 @@ Abrupt kea restarts might corrupt the lock file:
 
 Lock file might block _kea user, either change systemd service to root user or try delete.
 
+## Ceph CSI Recovery
+
+If cluster nodes get out of sync and are restarted while the control plane is offline for example you might run into errors like this:
+
+`MountVolume.MountDevice failed for volume "pvc-cd3feb8d-02d5-4d6e-a216-69388fbad41d" : rpc error: code = Aborted desc = an operation with the given Volume ID 0001-0024-99b8185b-46d1-4ed6-be09-6f24c48665da-0000000000000002-da1724f7-dc8f-4aa6-aed7-cfe7e19631ff already exists`
+
+In this case once you startet all your nodes, you can run `kubectl delete --all volumeattachments` to reset all attachments, after rebooting your worker nodes the pods should be able to mount and start again!
+
+To avoid this all together you should never shut down control plane and workers at the same time, always shutdown workers first and only then the masters/control plane.
+
 ## Renaming network interfaces
 
 It is a good idea to set dedicated names on your proxmox hosts for network interfaces, based on their mac address.
