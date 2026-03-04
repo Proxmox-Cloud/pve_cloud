@@ -218,3 +218,6 @@
     - apply_kea_dhcp4_conf
   tags:
     - config
+
+# todo: prom exporter and vector journald logs exporter needs to be pluggable via schema rules
+# for vms

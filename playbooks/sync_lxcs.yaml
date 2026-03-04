@@ -142,3 +142,11 @@
         path: /root/.ssh/authorized_keys
         line: "{{ cluster_automation_pub_key | b64decode | trim }}"
         state: present
+
+    # todo: also generify this
+    # this logic sets up vector log exporter to victoria logs db if that is configured
+    # via a discovery sercret
+    - name: install vector journald exporter
+      include_role:
+        name: vector_journald_exporter
+      when: postgres_connection_check is succeeded

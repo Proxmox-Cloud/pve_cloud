@@ -1,0 +1,46 @@
+---
+# tasks file for vector_journald_exporter
+- name: select discovery secret log export
+  delegate_to: localhost
+  alchemy_read:
+    pg_conn_str: "{{ pg_conn_str }}"
+    table: px_cloud_secrets
+    where:
+      secret_type: "vlogs-cluster-journald"
+  register: vlogs_journald_ds # discovery secrets
+
+- set_fact:
+    vlogs_discovery_secret: "{{ vlogs_journald_ds.query_result | selectattr('secret_data.target_pve', 'equalto', target_pve) | first | default({}) }}"
+  # when: vlogs_journald_ds.rowcount > 0
+
+- name: Set vlogs host in hosts file (for pve hosts)
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    # ip defaults to the haproxy internal floating ip
+    line: "{{ vlogs_etc_hosts_ip }} {{ vlogs_discovery_secret.secret_data.host }}"
+    create: yes
+  when: vlogs_discovery_secret | length > 0 and vlogs_etc_hosts_ip is not none
+
+# todo: to do this properly convert the curl script into ansible funcs
+- name: Install Vector via official script
+  shell: |
+    apt update && apt install curl -y
+    bash -c "$(curl -L https://setup.vector.dev)"
+    apt install -y vector
+  args:
+    creates: /usr/bin/vector
+  when: vlogs_discovery_secret | length > 0
+
+- name: template vector conf
+  template:
+    src: vector.yaml.j2
+    dest: /etc/vector/vector.yaml
+  when: vlogs_discovery_secret | length > 0
+
+- name: start vector service
+  ansible.builtin.service:
+    name: vector
+    enabled: true
+    state: started
+  when: vlogs_discovery_secret | length > 0
+

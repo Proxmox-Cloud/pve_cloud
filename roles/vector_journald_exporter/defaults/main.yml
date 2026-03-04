@@ -1,0 +1,5 @@
+---
+# defaults file for vector_journald_exporter
+
+# /etc/hosts ip to haproxy floating ip for pve host (outside of cloud dns)
+vlogs_etc_hosts_ip: null
