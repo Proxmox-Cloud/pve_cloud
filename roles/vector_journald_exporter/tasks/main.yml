@@ -17,6 +17,7 @@
   ansible.builtin.lineinfile:
     path: /etc/hosts
     # ip defaults to the haproxy internal floating ip
+    # todo: this should get a regexpr to update in case of floating ip changes (which changes are currently not supported)
     line: "{{ vlogs_etc_hosts_ip }} {{ vlogs_discovery_secret.secret_data.host }}"
     create: yes
   when: vlogs_discovery_secret | length > 0 and vlogs_etc_hosts_ip is not none

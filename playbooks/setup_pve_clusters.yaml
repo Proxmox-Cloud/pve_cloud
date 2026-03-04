@@ -36,7 +36,21 @@
       ansible.builtin.apt:
         name: prometheus-node-exporter
         state: present
-    
+
+    # todo: this should be removed with pve 9 and debian 13 probably
+    - name: disable nfsd stat collection (bookworm / newer pve kernels)
+      lineinfile:
+        path: /etc/default/prometheus-node-exporter
+        regexp: '^ARGS='
+        line: 'ARGS="--no-collector.nfsd"'
+      register: node_exporter_config
+
+    - name: restart node exporter to take effect
+      systemd:
+        name: prometheus-node-exporter
+        state: restarted
+      when: node_exporter_config.changed
+      
     # install btrfs prometheus exporter for root filesystem
     - include_role:
         name: btrfs_prom_exporter
