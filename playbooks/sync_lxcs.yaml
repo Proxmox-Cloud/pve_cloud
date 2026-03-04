@@ -149,4 +149,6 @@
     - name: install vector journald exporter
       include_role:
         name: vector_journald_exporter
+      vars:
+        vlogs_etc_hosts_ip: "{{ pve_haproxy_floating_ip_internal }}" # lxc might not be included in dhcp dns options
       when: postgres_connection_check is succeeded
