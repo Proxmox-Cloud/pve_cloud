@@ -2,7 +2,7 @@
 
 ## Patroni recovery
 
-If one patroni node fails, abrupt restart etc., delete /opt/ha-postgres data dir and restart the patroni service.
+If one patroni node fails, abrupt restart etc., delete /opt/ha-postgres data dir contents (`rf -rf *` inside the folder) and restart the patroni service.
 
 ## Removing pve cluster host
 
@@ -27,6 +27,12 @@ If cluster nodes get out of sync and are restarted while the control plane is of
 In this case once you startet all your nodes, you can run `kubectl delete --all volumeattachments` to reset all attachments, after rebooting your worker nodes the pods should be able to mount and start again!
 
 To avoid this all together you should never shut down control plane and workers at the same time, always shutdown workers first and only then the masters/control plane.
+
+## Containerd 
+
+If you dont drain your node before rebooting it you might run into `failed to remove sandbox root directory \"/var/lib/containerd/io.containerd.grpc.v1.cri/sandboxes/f6fcf2d2e3854456b0fecb676e3b9085df918e132fbd96511a6827978628bee4\": unlinkat /var/lib/containerd/io.containerd.grpc.v1.cri/sandboxes/f6fcf2d2e3854456b0fecb676e3b9085df918e132fbd96511a6827978628bee4/resolv.conf: operation not permitted`
+
+To fix this run `sudo chattr -i /var/lib/containerd/io.containerd.grpc.v1.cri/sandboxes/*/resolv.conf` on the node to allow it unmount the unused conf.
 
 ## Renaming network interfaces
 
