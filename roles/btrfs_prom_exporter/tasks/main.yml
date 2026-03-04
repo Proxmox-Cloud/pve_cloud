@@ -2,7 +2,7 @@
 # tasks file for btrfs_prom_exporter
 - name: btrfs_exporter binary executable
   ansible.builtin.get_url:
-    url: "https://github.com/Proxmox-Cloud/btrfs_exporter-fork/releases/download/26.1.1/btrfs_exporter"
+    url: "https://github.com/Proxmox-Cloud/btrfs_exporter-fork/releases/download/26.1.2/btrfs_exporter"
     dest: /usr/local/bin/btrfs_exporter
     mode: '0755'
 
