@@ -243,3 +243,37 @@
         msg: "{{ item.stdout_lines }}"
       loop: "{{ rsync_out.results }}"
       when: item.stdout_lines is defined
+
+# this fires only conditionally if the cluster has a monitoring stack configured
+- name: Vector Log setup
+  hosts: all_pve_hosts
+  tasks:
+    # slurp patroni password
+    - name: Slurp file if it exists
+      slurp:
+        src: /etc/pve/cloud/secrets/patroni.pass
+      register: patroni_pass
+      run_once: true
+    
+    - set_fact:
+        pg_conn_str: "postgresql+psycopg2://postgres:{{ patroni_pass.content | b64decode | trim }}@{{ cluster_vars['pve_haproxy_floating_ip_internal'] }}:5000/pve_cloud?sslmode=disable"
+
+    # journald vector log piping
+    - name: Check if haproxy + postgres is already running
+      wait_for:
+        host: "{{ cluster_vars['pve_haproxy_floating_ip_internal'] }}"
+        port: 5000
+        timeout: 5
+        state: started
+      register: postgres_connection_check
+      ignore_errors: yes
+
+    - name: install vector journald exporter
+      include_role:
+        name: vector_journald_exporter
+      vars:
+        target_pve: "{{ pve_cluster_name }}.{{ pve_cloud_domain }}"
+        stack_name: "{{ inventory_hostname }}" # contains the cluster name
+        vlogs_etc_hosts_ip: "{{ cluster_vars['pve_haproxy_floating_ip_internal'] }}" # hosts dont use cloud dns
+      when: postgres_connection_check is succeeded
+

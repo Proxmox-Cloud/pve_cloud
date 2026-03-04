@@ -170,6 +170,10 @@
         - { key: 'fs.inotify.max_user_instances', value: "{{ [1024, [recommended_instances | int, 8192] | min] | max }}" }
         - { key: 'fs.inotify.max_user_watches', value: "{{ [524288, [recommended_watches | int, 2097152] | min] | max }}" }
 
+    # vector logs export for node services
+    - name: install vector journald exporter
+      include_role:
+        name: vector_journald_exporter
 
 # todo: can be factored out if patroni lxcs themselfes get entries in
 # the database (used in haproxy cfg template)

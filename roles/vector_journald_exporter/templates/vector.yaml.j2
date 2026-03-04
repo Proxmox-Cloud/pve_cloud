@@ -1,0 +1,33 @@
+sources:
+  journal_source:
+    type: "journald"
+
+transforms:
+  add_custom_labels:
+    type: "remap"
+    inputs: ["journal_source"]
+     # gets remapped in victorialogs to namespace (stack name + pve cloud)
+    source: |
+      .pve_stack = "{{ stack_name }}"
+
+sinks:
+  vlogs_sink:
+    type: "elasticsearch"
+    inputs: ["add_custom_labels"]
+    endpoints:
+    - "https://{{ vlogs_discovery_secret.secret_data.host }}/insert/elasticsearch/"
+    mode: "bulk"
+    request:
+      headers:
+        VL-Msg-Field: message,msg,_msg,log.msg,log.message,log
+        VL-Stream-Fields: _TRANSPORT,host,_SYSTEMD_UNIT
+        VL-Time-Field: timestamp
+    compression: "gzip"
+    auth:
+      strategy: "basic"
+      user: "vlogs"
+      password: "{{ vlogs_discovery_secret.secret_data.basic_pw }}"
+    healthcheck:
+      enabled: false
+
+
