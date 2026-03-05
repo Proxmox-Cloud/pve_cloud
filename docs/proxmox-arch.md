@@ -86,6 +86,18 @@ Either use btrfs for os / vm disks or zfs + `sync=disabled`.
 
 To make ceph work on consumer ssds you should run `apt install eatmydata` and modify `/lib/systemd/system/ceph-osd@.service` / `ExecStart=/usr/bin/eatmydata /usr/bin/ceph-osd...`. After that you want to run `systemctl daemon-reload && systemctl restart ceph-osd.target` to reboot your osds.
 
+Because we stop the fsync dynamic, our only kernel page cache flush are the default timers. These should be configured / increased to write more aggressively now or we run oom / into weird caching scenarios - create `/etc/sysctl.d/60-ssd-cache-bypass.conf`:
+
+```conf
+# Sbackground flushing at 128MB (instead of default 10% of RAM) - 67108864 # 64mb
+vm.dirty_background_bytes=134217728
+
+#  Hard flush cache at 512MB (instead of 20% of RAM) - 268435456 # 256
+vm.dirty_bytes=536870912
+```
+
+Followed by a `sysctl --system` to apply. To validate that the cache isnt overflowing run `watch -n 1 "grep -E 'Dirty|Writeback' /proc/meminfo"` for monitoring on your proxmox HOSTS.
+
 Without a backup battery in this scenario you risk data loss on power outages. You should also setup some gentle shutdown signals once the battery is getting low.
 
 To validate performance gainz run `fio --name=fsync-test --filename=/tmp/testfile-fsync --size=4G --rw=randwrite --bs=4k --ioengine=libaio --fsync=1 --iodepth=4 --runtime=60 && rm /tmp/testfile-fsync` from an lxc that has some target volume mounted.
