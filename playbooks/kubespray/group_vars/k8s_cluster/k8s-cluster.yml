@@ -374,3 +374,7 @@ kubeadm_patches: []
 
 # Set to true to remove the role binding to anonymous users created by kubeadm
 remove_anonymous_access: false
+
+# needed for metric server compatibility
+kube_feature_gates:
+  - WatchList=true
