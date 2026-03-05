@@ -458,27 +458,3 @@
         release_namespace: nginx-ingress
         create_namespace: true
         update_repo_cache: true
-
-    # install metrics server
-    - name: metrics-server repo
-      kubernetes.core.helm_repository:
-        name: metrics-server
-        repo_url: https://kubernetes-sigs.github.io/metrics-server
-
-    - name: deploy metrics-server
-      kubernetes.core.helm:
-        name: metrics-server
-        chart_ref: metrics-server/metrics-server
-        chart_version: 3.13.0
-        release_namespace: kube-system
-        create_namespace: true
-        kubeconfig: "{{ temp_kubeconfig.path }}"
-        update_repo_cache: true
-        values:
-          defaultArgs:
-            - --cert-dir=/tmp
-            - --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname
-            - --kubelet-use-node-status-port
-            - --metric-resolution=15s
-            - --kubelet-insecure-tls # kubelet certs only have hostnames
-            # todo: there should be a way to do this better
