@@ -378,3 +378,4 @@ remove_anonymous_access: false
 # needed for metric server compatibility
 kube_feature_gates:
   - WatchList=true
+  - WatchListClient=true
