@@ -50,7 +50,9 @@ To recover after a disk outage run `btrfs scrub start /`, this also cleans up er
 
 ## Debian base image install
 
-WIP
+Follow the offical [proxmox guide](https://pve.proxmox.com/wiki/Install_Proxmox_VE_on_Debian_13_Trixie).
+
+For pve 8 [this guide](https://pve.proxmox.com/wiki/Install_Proxmox_VE_on_Debian_12_Bookworm).
 
 ## Rescue mode install ZFS
 
@@ -84,4 +86,6 @@ Either use btrfs for os / vm disks or zfs + `sync=disabled`.
 
 To make ceph work on consumer ssds you should run `apt install eatmydata` and modify `/lib/systemd/system/ceph-osd@.service` / `ExecStart=/usr/bin/eatmydata /usr/bin/ceph-osd...`. After that you want to run `systemctl daemon-reload && systemctl restart ceph-osd.target` to reboot your osds.
 
-Without a backup battery in this scenario you risk data loss on power outages.
+Without a backup battery in this scenario you risk data loss on power outages. You should also setup some gentle shutdown signals once the battery is getting low.
+
+To validate performance gainz run `fio --name=fsync-test --filename=/tmp/testfile-fsync --size=4G --rw=randwrite --bs=4k --ioengine=libaio --fsync=1 --iodepth=4 --runtime=60 && rm /tmp/testfile-fsync` from an lxc that has some target volume mounted.
