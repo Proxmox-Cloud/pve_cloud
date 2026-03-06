@@ -84,19 +84,41 @@ If you have consumer ssds that dont support power loss prevention (plp) you shou
 
 Either use btrfs for os / vm disks or zfs + `sync=disabled`.
 
-To make ceph work on consumer ssds you should run `apt install eatmydata` and modify `/lib/systemd/system/ceph-osd@.service` / `ExecStart=/usr/bin/eatmydata /usr/bin/ceph-osd...`. After that you want to run `systemctl daemon-reload && systemctl restart ceph-osd.target` to reboot your osds.
+To make ceph work on consumer ssds we want to noop fsync calls, for that you should run `apt install eatmydata` and modify `/lib/systemd/system/ceph-osd@.service` / `ExecStart=/usr/bin/eatmydata /usr/bin/ceph-osd ...`. After that you want to run `systemctl daemon-reload && systemctl restart ceph-osd.target` to reboot your osds.
 
-Because we stop the fsync dynamic, our only kernel page cache flush are the default timers. These should be configured / increased to write more aggressively now or we run oom / into weird caching scenarios - create `/etc/sysctl.d/60-ssd-cache-bypass.conf`:
+Do the same for the monitor processes, modify `/lib/systemd/system/ceph-mon@.service` to `ExecStart=/usr/bin/eatmydata /usr/bin/ceph-mon ...`, followed by `systemctl daemon-reload && systemctl restart ceph-mon.target`.
+
+Because we stopped the fsync dynamic, the kernel parameters for memory handeling have to be adjusted, or we will run into oom scenarios. These should be configured / increased to write more aggressively now or we run oom / into weird caching scenarios - create `/etc/sysctl.d/60-ssd-cache-bypass.conf`:
 
 ```conf
-# Sbackground flushing at 128MB (instead of default 10% of RAM) - 67108864 # 64mb
-vm.dirty_background_bytes=134217728
+# Start background flushing at 128MB
+vm.dirty_background_bytes=134217728 # 67108864 # 64MB
 
-#  Hard flush cache at 512MB (instead of 20% of RAM) - 268435456 # 256
-vm.dirty_bytes=536870912
+# Hard flush cache at 512MB - this prevents oom scenarios
+vm.dirty_bytes=536870912 # 268435456 # 256MB
+
+# Turn up the writeback check for data
+vm.dirty_writeback_centisecs=100
+
+# Make data expire sooner and be elligible for writeback
+vm.dirty_expire_centisecs=500
 ```
 
 Followed by a `sysctl --system` to apply. To validate that the cache isnt overflowing run `watch -n 1 "grep -E 'Dirty|Writeback' /proc/meminfo"` for monitoring on your proxmox HOSTS.
+
+We also have to set these values for any qemu vms that we create in `qemu_global_vars` in our inventory files (kubespray too):
+
+```yaml
+qemu_global_vars:
+  additional_sysctl: 
+  - { name: vm.dirty_background_bytes, value: 33554432 }
+  - { name: vm.dirty_bytes, value: 134217728 }
+  - { name: vm.dirty_writeback_centisecs, value: 100 }
+  - { name: vm.dirty_expire_centisecs, value: 500 }
+```
+
+You HAVE to set these values everywhere or your system will hit a wave of oom issues and overflowing page caches!
+
 
 Without a backup battery in this scenario you risk data loss on power outages. You should also setup some gentle shutdown signals once the battery is getting low.
 
