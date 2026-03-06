@@ -111,8 +111,8 @@ We also have to set these values for any qemu vms that we create in `qemu_global
 ```yaml
 qemu_global_vars:
   additional_sysctl: 
-  - { name: vm.dirty_background_bytes, value: 33554432 }
-  - { name: vm.dirty_bytes, value: 134217728 }
+  - { name: vm.dirty_background_bytes, value: 33554432 } # 32MB
+  - { name: vm.dirty_bytes, value: 134217728 } # 128MB
   - { name: vm.dirty_writeback_centisecs, value: 100 }
   - { name: vm.dirty_expire_centisecs, value: 500 }
 ```
