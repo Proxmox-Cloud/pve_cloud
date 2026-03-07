@@ -115,14 +115,6 @@
         line: "{{ cluster_automation_pub_key | b64decode | trim }}"
         state: present
 
-    - name: Set additional sysctl variables
-      ansible.posix.sysctl:
-        name: "{{ item.name }}"
-        value: "{{ item.value }}"
-        state: present
-        reload: true
-      with_items: "{{ additional_sysctl | default([]) }}"
-
 # todo: can be factored out if patroni lxcs themselfes get entries in
 # the database (used in haproxy cfg template)
 - name: Fetch ha-postgres
