@@ -82,44 +82,52 @@ qemu-system-x86_64 -cpu max -bios /usr/share/ovmf/OVMF.fd -nographic -drive file
 
 If you have consumer ssds that dont support power loss prevention (plp) you should invest in a UPS as an alternative and then setup your systems with the following hacks.
 
-Either use btrfs for os / vm disks or zfs + `sync=disabled`.
+Either use btrfs for os / vm disks or zfs + `sync=disabled` (zfs untested).
 
 To make ceph work on consumer ssds we want to noop fsync calls, for that you should run `apt install eatmydata` and modify `/lib/systemd/system/ceph-osd@.service` / `ExecStart=/usr/bin/eatmydata /usr/bin/ceph-osd ...`. After that you want to run `systemctl daemon-reload && systemctl restart ceph-osd.target` to reboot your osds.
 
-Do the same for the monitor processes, modify `/lib/systemd/system/ceph-mon@.service` to `ExecStart=/usr/bin/eatmydata /usr/bin/ceph-mon ...`, followed by `systemctl daemon-reload && systemctl restart ceph-mon.target`.
 
-Because we stopped the fsync dynamic, the kernel parameters for memory handeling have to be adjusted, or we will run into oom scenarios. These should be configured / increased to write more aggressively now or we run oom / into weird caching scenarios - create `/etc/sysctl.d/60-ssd-cache-bypass.conf`:
+```bash
+# test fsync - `fio --name=fsync-1 --filename=./testfile --size=4G --rw=randwrite --bs=4k --ioengine=libaio --fsync=1 --iodepth=4 --runtime=300 && rm ./testfile`
+# test normal write - `fio --name=default --filename=./testfile --size=4G --rw=randwrite --bs=4k --ioengine=libaio --iodepth=4 --runtime=300 && rm ./testfile`
 
-```conf
-# Start background flushing at 128MB
-vm.dirty_background_bytes=134217728 # 67108864 # 64MB
+# normal setup, no eatmydata
+fsync-1: (groupid=0, jobs=1): err= 0: pid=2222: Fri Mar  6 19:02:25 2026
+  write: IOPS=73, BW=295KiB/s (302kB/s)(86.4MiB/300006msec); 0 zone resets
+    slat (usec): min=5, max=12004, avg=18.01, stdev=80.84
+    clat (msec): min=10, max=699, avg=40.68, stdev=51.55
 
-# Hard flush cache at 512MB - this prevents oom scenarios
-vm.dirty_bytes=536870912 # 268435456 # 256MB
+# eatmydata on osds
+fsync-1: (groupid=0, jobs=1): err= 0: pid=2114: Fri Mar  6 18:36:45 2026
+  write: IOPS=165, BW=662KiB/s (678kB/s)(194MiB/300002msec); 0 zone resets
+    slat (usec): min=5, max=15456, avg=16.59, stdev=74.24
+    clat (msec): min=3, max=2595, avg=18.12, stdev=43.20
 
-# Turn up the writeback check for data
-vm.dirty_writeback_centisecs=100
 
-# Make data expire sooner and be elligible for writeback
-vm.dirty_expire_centisecs=500
+# you can furthermore tune with these options
+ceph config set client rbd_cache_policy writeback # (run on pve host)
+ceph config set client rbd_cache_writethrough_until_flush false
+
+# set mount options in your ceph csi pool inventory to: [barrier=0, data=writeback, journal_async_commit, commit=60, discard]
+# and the mkfsOptions: "-O fast_commit" in ceph_csi_sc_pools
+
+# => results in
+fsync-1: (groupid=0, jobs=1): err= 0: pid=676689: Sat Mar  7 10:51:40 2026
+  write: IOPS=297, BW=1191KiB/s (1220kB/s)(349MiB/300010msec); 0 zone resets
+    slat (usec): min=5, max=123, avg=13.32, stdev= 3.41
+    clat (msec): min=2, max=2077, avg=10.08, stdev=21.19
+
+
+# for qemu disks you can use the unsafe cache option for rbd disks and get the biggest performace increase by far
+# sadly this is limted to qemu disks only
+
+fsync-1: (groupid=0, jobs=1): err= 0: pid=1025: Fri Mar  6 21:41:51 2026
+  write: IOPS=944, BW=3777KiB/s (3868kB/s)(1107MiB/300001msec); 0 zone resets
+    slat (usec): min=9, max=1674, avg=15.46, stdev=15.66
+    clat (usec): min=595, max=5348.8k, avg=3179.66, stdev=44101.80
 ```
 
-Followed by a `sysctl --system` to apply. To validate that the cache isnt overflowing run `watch -n 1 "grep -E 'Dirty|Writeback' /proc/meminfo"` for monitoring on your proxmox HOSTS.
 
-We also have to set these values for any qemu vms that we create in `qemu_global_vars` in our inventory files (kubespray too):
-
-```yaml
-qemu_global_vars:
-  additional_sysctl: 
-  - { name: vm.dirty_background_bytes, value: 33554432 } # 32MB
-  - { name: vm.dirty_bytes, value: 134217728 } # 128MB
-  - { name: vm.dirty_writeback_centisecs, value: 100 }
-  - { name: vm.dirty_expire_centisecs, value: 500 }
-```
-
-You HAVE to set these values everywhere or your system will hit a wave of oom issues and overflowing page caches!
 
 
 Without a backup battery in this scenario you risk data loss on power outages. You should also setup some gentle shutdown signals once the battery is getting low.
-
-To validate performance gainz run `fio --name=fsync-test --filename=/tmp/testfile-fsync --size=4G --rw=randwrite --bs=4k --ioengine=libaio --fsync=1 --iodepth=4 --runtime=60 && rm /tmp/testfile-fsync` from an lxc that has some target volume mounted.
