@@ -103,7 +103,7 @@
     - alternate_ssh_port
   vars:
     # only monitory systemd services
-    systemd_exporter_unit_include: '.*\.service'
+    systemd_exporter_unit_include: '.*\\.service'
   tasks:
     # todo: implement unified functionality for qemus, kubespray nodes.
     - name: write vm_vars_blake for include stacks
