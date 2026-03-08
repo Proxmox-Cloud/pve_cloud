@@ -406,10 +406,26 @@
         suffix: .yaml
       register: temp_kubeconfig
 
-    - name: write kubeconf to temp file
+    - name: write kubeconf to temp file for following tasks
       copy:
         content: "{{ hostvars[groups['kube_control_plane'][0]].ext_kubeconfig }}"
         dest: "{{ temp_kubeconfig.path }}"
+
+    # install volumesnapshot crds - checkout out at 189dfe4c1f307974c72d34d4b2d5c21b5c5c06ba from
+    # https://github.com/kubernetes-csi/external-snapshotter/commits/master/
+    - name: build volume snapshot crds
+      ansible.builtin.shell: "kubectl kustomize {{ playbook_dir }}/snapshot-crd"
+      register: snapshot_manifests
+
+    - debug:
+        var: snapshot_manifests
+
+    - name: install volume snapshot crds
+      kubernetes.core.k8s:
+        state: present
+        definition: "{{ snapshot_manifests.stdout }}"
+        kubeconfig: "{{ temp_kubeconfig.path }}"
+      when: ceph_cluster_fsid is defined and ceph_csi_sc_pools is defined
 
     - name: collect taints from workers
       set_fact:
