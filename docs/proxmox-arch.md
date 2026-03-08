@@ -54,6 +54,8 @@ Follow the offical [proxmox guide](https://pve.proxmox.com/wiki/Install_Proxmox_
 
 For pve 8 [this guide](https://pve.proxmox.com/wiki/Install_Proxmox_VE_on_Debian_12_Bookworm).
 
+(This has not yet been tested with the collection but should work.)
+
 ## Rescue mode install ZFS
 
 ```bash
@@ -82,10 +84,11 @@ qemu-system-x86_64 -cpu max -bios /usr/share/ovmf/OVMF.fd -nographic -drive file
 
 If you have consumer ssds that dont support power loss prevention (plp) you should invest in a UPS as an alternative and then setup your systems with the following hacks.
 
+Without a backup battery in the following scenario you risk data loss on power outages. You should also setup some gentle shutdown signals once the battery is getting low.
+
 Either use btrfs for os / vm disks or zfs + `sync=disabled` (zfs untested).
 
 To make ceph work on consumer ssds we want to noop fsync calls, for that you should run `apt install eatmydata` and modify `/lib/systemd/system/ceph-osd@.service` / `ExecStart=/usr/bin/eatmydata /usr/bin/ceph-osd ...`. After that you want to run `systemctl daemon-reload && systemctl restart ceph-osd.target` to reboot your osds.
-
 
 ```bash
 # test fsync - `fio --name=fsync-1 --filename=./testfile --size=4G --rw=randwrite --bs=4k --ioengine=libaio --fsync=1 --iodepth=4 --runtime=300 && rm ./testfile`
@@ -104,10 +107,6 @@ fsync-1: (groupid=0, jobs=1): err= 0: pid=2114: Fri Mar  6 18:36:45 2026
     clat (msec): min=3, max=2595, avg=18.12, stdev=43.20
 
 
-# you can furthermore tune with these options
-ceph config set client rbd_cache_policy writeback # (run on pve host)
-ceph config set client rbd_cache_writethrough_until_flush false
-
 # set mount options in your ceph csi pool inventory to: [barrier=0, data=writeback, journal_async_commit, commit=60, discard]
 # and the mkfsOptions: "-O fast_commit" in ceph_csi_sc_pools
 
@@ -119,7 +118,7 @@ fsync-1: (groupid=0, jobs=1): err= 0: pid=676689: Sat Mar  7 10:51:40 2026
 
 
 # for qemu disks you can use the unsafe cache option for rbd disks and get the biggest performace increase by far
-# sadly this is limted to qemu disks only
+# sadly this is limited to qemu disks only
 
 fsync-1: (groupid=0, jobs=1): err= 0: pid=1025: Fri Mar  6 21:41:51 2026
   write: IOPS=944, BW=3777KiB/s (3868kB/s)(1107MiB/300001msec); 0 zone resets
@@ -127,7 +126,4 @@ fsync-1: (groupid=0, jobs=1): err= 0: pid=1025: Fri Mar  6 21:41:51 2026
     clat (usec): min=595, max=5348.8k, avg=3179.66, stdev=44101.80
 ```
 
-
-
-
-Without a backup battery in this scenario you risk data loss on power outages. You should also setup some gentle shutdown signals once the battery is getting low.
+To bypass the kernel caching mechanisms and get better performance there is also rbd-nbd and [client caching options](https://docs.ceph.com/en/squid/rbd/rbd-config-ref/), support for ceph csi driver is in alpha.
