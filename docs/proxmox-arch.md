@@ -8,7 +8,7 @@ The first big choice is the filesystem / vm volume storage that you want to use.
 
 ## Disks
 
-Generally you needs enterprise grade ssds with plp to properly use ceph and zfs, however there are a few workarounds to making consumer ssds work aswell.
+Generally you need enterprise grade ssds with plp to properly use ceph and zfs, however there are a few workarounds to making consumer ssds work aswell.
 
 ## Hardware raid
 
@@ -58,9 +58,11 @@ For pve 8 [this guide](https://pve.proxmox.com/wiki/Install_Proxmox_VE_on_Debian
 
 ## Rescue mode install ZFS
 
+You first want to do a basic install with an apt based os from the hosting provider to get default interface names, dns and the gateway.
+
 ```bash
 # install qemu + uefi files
-apt-get -y install ca-certificates qemu-system-x86 ovmf
+apt-get -y install ca-certificates qemu-system-x86
 
 # mount tmpfs for install
 mount -t tmpfs -o size=4G tmpfs /mnt
@@ -69,16 +71,25 @@ mount -t tmpfs -o size=4G tmpfs /mnt
 cd /mnt/
 wget https://enterprise.proxmox.com/iso/proxmox-ve_8.4-1.iso
 
-# launch installer vm (run lsblk first to passthrough disks) - cpu max is needed for zfs (might not be enough on some rescue systems and you are forced to use btrfs)
-qemu-system-x86_64 -cpu max -bios /usr/share/ovmf/OVMF.fd -nographic -boot d -cdrom proxmox-ve_8.4-1.iso -drive file=/dev/nvme0n1,format=raw -drive file=/dev/nvme1n1,format=raw -m 4G -serial mon:stdio
+# run `[ -d "/sys/firmware/efi" ] && echo "UEFI" || echo "LEGACY"` to check if your BIOS is UEFI or LEGACY
+# if it is uefi, pass run `apt install ovmf` and pass the parameter -bios /usr/share/ovmf/OVMF.fd to the qemu setup command
 
-# ... launch the vm after the install - to maybe edit netwwork devices before exiting rescue mode
-qemu-system-x86_64 -cpu max -bios /usr/share/ovmf/OVMF.fd -nographic -drive file=/dev/nvme0n1,format=raw -drive file=/dev/nvme1n1,format=raw -m 4G -serial mon:stdio
+# if the rescue system supports kvm you can pass -enable-kvm and -cpu host (instead of max) for a way faster install
+
+# launch installer vm (run lsblk first to passthrough disks) - cpu max is needed for zfs (might not be enough on some rescue systems and you are forced to use btrfs)
+qemu-system-x86_64 -cpu max -boot d -cdrom proxmox-ve_8.4-1.iso -drive file=/dev/nvme0n1,format=raw,if=virtio -drive file=/dev/nvme1n1,format=raw,if=virtio -m 4G -nographic -serial mon:stdio
+
+# run the command again without the -boot d and -cdrom proxmox-ve... parameters to enter the vm
 
 # set interfaces in /etc/network/interfaces to
 # auto IFACE
 # then either static or dhcp for the ip
 ```
+
+This rescue mode setup was distilled from:
+
+* [Ionos rescue setup](https://www.ionos.com/digitalguide/server/configuration/install-an-alternative-server-operating-system/)
+* [Hetzner rescue setup](https://community.hetzner.com/tutorials/install-and-configure-proxmox_ve)
 
 ## Consumer SSDs
 
@@ -127,3 +138,10 @@ fsync-1: (groupid=0, jobs=1): err= 0: pid=1025: Fri Mar  6 21:41:51 2026
 ```
 
 To bypass the kernel caching mechanisms and get better performance there is also rbd-nbd and [client caching options](https://docs.ceph.com/en/squid/rbd/rbd-config-ref/), support for ceph csi driver is in alpha.
+
+
+## Backups
+
+For backups of vms use the normal proxmox backup server, there is a custom [proxmox cloud backup solution](https://registry.terraform.io/modules/Proxmox-Cloud/backup/pxc/latest) for k8s ceph csi volumes.
+
+For single node k8s clusters / clusters without ceph for csi, simply create big disks for the nodes and use openebs hostpath for volumes. Then backup the entire cluster via PBS.
