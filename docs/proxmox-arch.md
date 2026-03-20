@@ -98,7 +98,7 @@ iface vmbr0 inet static
 6. exit the vm with `shutdown now` and run it again to shut down the rescue system (then disable it inside hetzner console and boot your server up again)
 7. now to make virtual machines have access to the internet we need to configure the proxmox host to act as a router. (dont do this for a production cluster)
 ```bash
-# sign into your host
+# sign into your host, add your ssh key to the proxmox host istself under ~/.ssh/authorized_keys
 
 # forwarding
 sysctl -w net.ipv4.ip_forward=1
@@ -112,7 +112,32 @@ iptables -t nat -A POSTROUTING -s 10.0.0.0/24 -o vmbr0 -j MASQUERADE
 
 iptables-save > /etc/iptables/rules.v4 # persist it
 ```
-8. since this is a dedicated system you need a machine / container with direct access to all vms that will be created, as a control node for running ansible and terraform configuration (proxmox cloud does not yet support remote access). For that go to storage, download yourself a template like ubuntu 24 and create an lxc on your new proxmox cluster. This is the machine you will be using in the [bootstrap section](./bootstrap.md), accessing it through vscode jumphost (your machine => proxmox host => private lxc ip) / installing vscode server webui and then forwarding the port with jumphost, makes things much easier (`ssh -L 8081:localhost:8080 -o ProxyJump=root@PROXMOX_HOST_IP root@10.0.0.2`)
+8. since this is a dedicated system you need a machine / container with direct access to all vms that will be created, as a control node for running ansible and terraform configuration (proxmox cloud does not yet support remote access). 
+```bash
+# On your freshly created proxmox cluster in the gui goto storage and download a template of your choice
+
+# create your control node container with the ip 10.0.0.2/24 and 10.0.0.1 as gateway
+# connect to it using this command (you also should give the lxc your ssh key):
+ssh -L 8081:localhost:8080 -o ProxyJump=root@PROXMOX_HOST_IP root@10.0.0.2
+
+# download the latest vscode server release https://github.com/coder/code-server/releases/tag/v4.112.0 and run:
+
+dpkg -i code-server_4.112.0_amd64.deb
+systemctl enable --now code-server@root
+
+# open the vscode config file and set auth to none, so its easily accessible via ssh portforwarding
+nano /root/.config/code-server/config.yaml 
+systemctl restart code-server@root
+
+# now you should be able to access your vscode server at localhost:8081 in the browser
+```
+
+9. Continue with the [bootstrap section](./bootstrap.md), to deploy proxmox cloud. In this setup you will select a private ip floating ip for the central clouds haproxy. This ip should accept traffic 443, you can forward from your proxmox host like this:
+```bash
+iptables -t nat -A PREROUTING -i vmbr0 -p tcp --dport 443 -j DNAT --to-destination YOUR_INTERNAL_FLOATING_IP:443
+
+iptables-save > /etc/iptables/rules.v4
+```
 
 This rescue mode setup was distilled from:
 
