@@ -158,9 +158,33 @@ This rescue mode setup was distilled from:
 * [Ionos rescue setup](https://www.ionos.com/digitalguide/server/configuration/install-an-alternative-server-operating-system/)
 * [Hetzner rescue setup](https://community.hetzner.com/tutorials/install-and-configure-proxmox_ve)
 
-### Production System Setup Guide
+## Production System Setup Guide
 
-Coming soon.
+### Extensible single node cluster
+
+You can start out with a single proxmox cluster, but you have to configure an extra external ip address aswell as single node ceph, in order to make it possible to scale to additional hosts later on.
+
+Run through the proxmox installer in any of the above mentioned ways to start.
+
+#### Single node ceph
+
+Install ceph via the proxmox ui on your single proxmox host, then do the following:
+
+1. edit /etc/pve/ceph.conf and set `osd_pool_default_min_size` to 1 and `osd_pool_default_size` to 2.
+2. on your proxmox host run
+```bash
+ceph osd getcrushmap -o crush_map_compressed
+crushtool -d crush_map_compressed -o crush_map_decompressed
+```
+3. edit the new `crush_map_decompressed` and replace the line under the rules block `step chooseleaf firstn 0 type host` with this `step chooseleaf firstn 0 type osd`. this changes the failure / replication domain to osds, keeping your data safe this way.
+4. then run these commands to load the updated crushmap
+```bash
+crushtool -c new_crush_map_decompressed -o new_crush_map_compressed
+ceph osd setcrushmap -i new_crush_map_compressed
+```
+
+...
+
 
 ## Backups
 
