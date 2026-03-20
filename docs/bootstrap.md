@@ -1,20 +1,10 @@
 # Setup/Bootstrap
 
-You need atleast one proxmox cluster to start (one host is enough). Later you can add multiple proxmox clusters to your pve cloud instance.
-
-The cluster needs to meet these minimum requirements:
-
-* seperate free vlan (proxmox cloud runs its own mandatory dhcp)
-* 4 cores
-* 32 gb of ram
-* 500 gb of free disk space for vms
-* subnet with at least 20 free allocatable addresses
-
-## Control Node/Deployment machine
-
 You need a development machine (preferably apt based distro) in the same subnet/vlan segment as your proxmox hosts for running playbooks and applying terraform configurations.
 
-This machine needs ssh access to the root user of your proxmox clusters. Generate / install a key (`ssh-keygen -t ed25519`) and add it to `~/.ssh/authorized_keys` on one of the proxmox hosts (simply copy the `id_ed25519.pub` files contentto one host, proxmox automatically syncs this file accross all hosts in a cluster).
+This can also be an lxc created manually on your proxmox cluster.
+
+This machine needs root ssh access to your proxmox clusters. Generate / install a key (`ssh-keygen -t ed25519`) and add it to `~/.ssh/authorized_keys` on one of the proxmox hosts (simply copy the `id_ed25519.pub` files contentto one host, proxmox automatically syncs this file accross all hosts in a cluster).
 
 Next install the following packages/tools on your development machine (most of these can be comfortably installed using [brew](https://brew.sh/)):
 
