@@ -187,12 +187,12 @@ def test_create_qemu(request, get_test_env, setup_haproxy_lxcs):
                         "hostname": "test-vm",
                         "disk": {
                             "size": "25G",
-                            "options": {"discard": "on", "iothread": "on", "ssd": "on"},
+                            "options": {"discard": "on", "iothread": "on", "ssd": "on", "cache": "unsafe"},
                             "pool": get_test_env["pve_test_disk_storage_id"],
                         },
                         "parameters": {
-                            "cores": 4,
-                            "memory": 4096,
+                            "cores": 2,
+                            "memory": 1024,
                         },
                     },
                 ],

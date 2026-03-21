@@ -118,7 +118,7 @@ def setup_pve_hosts(request, get_test_env, setup_control_node):
 
 
 @cloud_fixture("dhcp")
-def setup_dhcp_lxcs(request, get_test_env, setup_pve_hosts):
+def setup_dhcp_lxcs(request, get_test_env, setup_bind_lxcs):
     logger.info("setup dhcp")
 
     test_vm_subnet_mask = get_test_env["pve_test_cloud_inv"]["pve_vm_subnet"].split(
@@ -211,7 +211,7 @@ def setup_dhcp_lxcs(request, get_test_env, setup_pve_hosts):
 
 
 @cloud_fixture("bind")
-def setup_bind_lxcs(request, get_test_env, setup_dhcp_lxcs):
+def setup_bind_lxcs(request, get_test_env, setup_pve_hosts):
     logger.info("setup bind")
 
     test_vm_subnet_mask = get_test_env["pve_test_cloud_inv"]["pve_vm_subnet"].split(
@@ -504,7 +504,7 @@ def setup_cache_lxcs(request, get_test_env, setup_bind_lxcs):
                         "parameters": {
                             "rootfs": f"volume={get_test_env["pve_test_disk_storage_id"]}:200",
                             "cores": 2,
-                            "memory": 1024,
+                            "memory": 256,
                             "net0": f"name=eth0,bridge=vmbr0,firewall=1,ip=dhcp",
                             # mount perms for nfs and future docker
                             # todo: put into schema
