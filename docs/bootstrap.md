@@ -125,7 +125,7 @@ any_unparsed_is_failed = True
 
 ## CLI Fallback Approach
 
-If you network limits mdns you can still work with the collection, at the cost of having to manage proxmox inventories on each development machine.
+If you network limits mdns you can still work with the collection, at the cost of having to manage proxmox inventories on each development machine. This is almost certainly needed on dedicated hosting providers.
 
 After you have finished the setup of your python venv and ran the `ansible-playbook pxc.cloud.setup_control_node` you should have the cli tool `pvcli` available to you.
 

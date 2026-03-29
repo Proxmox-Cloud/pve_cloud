@@ -18,7 +18,7 @@ Check out the [samples directory](https://github.com/Proxmox-Cloud/pve_cloud/tre
 
 ## Getting started
 
-First you need to create your proxmox cluster, check out the [proxmox architecture section](./proxmox-arch.md) to learn about pve setup fundamentals, recommendations and limitations.
+First you need to create your proxmox cluster, check out the [proxmox architecture section](proxmox-arch.md) to learn about pve setup fundamentals, recommendations and limitations.
 
 After that you can progress to the [bootstrapping section](bootstrap.md), followed by the [kubernetes guide](kubernetes.md).
 

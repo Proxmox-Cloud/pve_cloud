@@ -7,9 +7,9 @@ nav:
   - bootstrap.md
   - kubernetes.md
   - terraform.md
-  - tdd.md
   - faq.md
   - contributing.md
+  - tdd.md
   - Schemas:
     - schemas
 

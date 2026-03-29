@@ -1,10 +1,10 @@
 # Test Driven Development
 
-For development you will need a dedicated proxmox cluster (a small one will suffice), and another dedicated vlan. The testing suite deploys and configures a proxmox cloud with locally build artifacts.
+For development you will need a two single node proxmox clusters (a small one will suffice), and another dedicated vlan. The testing suite deploys and configures a proxmox cloud with locally build artifacts.
 
 ## Avahi mdns
 
-Make you test proxmox cluster also discoverable via avahi as described in the [bootstrap section](bootstrap.md) and setup reflector/repeaters as required.
+Make you test proxmox clusters discoverable via avahi as described in the [bootstrap section](bootstrap.md) and setup reflector/repeaters as required.
 
 ## E2E Architecture
 

@@ -41,6 +41,7 @@ This setup is not suitable for a scalable production environment, setting that u
 # save the output of these commands somewhere
 cat /etc/network/interfaces
 ip a
+ip route
 cat /etc/resolv.conf
 
 # shutdown the server
@@ -65,10 +66,15 @@ lsblk # ! you might need to wipe existing software raids from the base installer
 [ -d "/sys/firmware/efi" ] && echo "UEFI" || echo "LEGACY"
 
 # if it is UEFI, pass run `apt install ovmf` and pass the parameter -bios /usr/share/ovmf/OVMF.fd to the qemu setup command
+# ! if you dont do this correctly the server might not be able to boot later
 
 # launch the installer vm - select Install Proxmox VE (Terminal UI, Serial Console)
-# for ionos omit --enable-kvm and replace -cpu host with -cpu max
-qemu-system-x86_64 -cpu host --enable-kvm -boot d -cdrom proxmox-ve_8.4-1.iso -drive file=/dev/nvme0n1,format=raw,if=virtio -drive file=/dev/nvme1n1,format=raw,if=virtio -m 4G -nographic -serial mon:stdio
+# for ionos omit --enable-kvm and replace -cpu host with -cpu max, this emulated setup
+# will take significantly longer, especially on the last "make system bootable" step.
+# allow up to 25 minutes for this to complete
+qemu-system-x86_64 -boot d -cdrom proxmox-ve_8.4-1.iso \
+  -drive file=/dev/nvme0n1,format=raw,if=virtio -drive file=/dev/nvme1n1,format=raw,if=virtio \
+  -m 4G -nographic -serial mon:stdio -cpu host --enable-kvm
 
 # ctrl + a => c open qemu console, type `quit` to exit it if stuck / after finish
 ```
@@ -77,18 +83,18 @@ qemu-system-x86_64 -cpu host --enable-kvm -boot d -cdrom proxmox-ve_8.4-1.iso -d
 # run the command again without the -boot d and -cdrom proxmox-ve... parameters to enter the vm
 qemu-system-x86_64 -cpu host --enable-kvm -drive file=/dev/nvme0n1,format=raw,if=virtio -drive file=/dev/nvme1n1,format=raw,if=virtio -m 4G -nographic -serial mon:stdio
 ```
-4. inside your proxmox vm create `/etc/systemd/network/10-uplink.link` to ensure proper nic naming on reboot
+4. inside your proxmox vm create `/etc/systemd/network/10-nic0.link` to ensure proper nic naming on reboot
 ```conf
 [Match]
 MACAddress=a8:a1:59:0f:22:60 # mac you noted down in step 1. ;)
 
 [Link]
-Name=uplink0
+Name=nic0
 ```
 5. we also need to update `/etc/network/interfaces`
 ```conf
-auto uplink0 # renamed via .link file enp35s0
-iface uplink0 inet static
+auto nic0 # renamed via .link file
+iface nic0 inet static
         address XXX.XXX.XXX.XXX/XX # insert from step 1.
         gateway XXX.XXX.XXX.XXX # insert from step 1.
 
@@ -97,12 +103,12 @@ iface uplink0 inet static
 # will trigger an abuse case because you used forbidden macs for vms etc.
 auto vmbr0
 iface vmbr0 inet static
-        address 10.0.0.1/24
+        address 10.0.4.0/22 # this is for upgrading to a multi node prod system later
         bridge-ports none
         bridge-stp off
         bridge-fd 0
 ```
-5. update `/etc/resolv.conf` with your original values from step 1.
+5. update `/etc/resolv.conf` with your original values from step 1., update `/etc/hosts` to match your hosts ip
 6. exit the vm with `shutdown now` and run it again to shut down the rescue system (then disable it inside hetzner console and boot your server up again)
 7. now to make virtual machines have access to the internet we need to configure the proxmox host to act as a router (this is a hack for the demo system only)
 ```bash
@@ -115,10 +121,31 @@ echo "net.ipv4.ip_forward=1" | tee /etc/sysctl.d/99-ip-forward.conf
 # nat for outgoing connections
 apt install iptables-persistent
 
-iptables -t nat -A POSTROUTING -s 10.0.0.0/24 -o uplink0 -j MASQUERADE
+iptables -t nat -A POSTROUTING -s 10.0.0.0/24 -o nic0 -j MASQUERADE
 iptables-save > /etc/iptables/rules.v4
 ```
-8. since this is a dedicated system you need a machine / container with direct access to all vms. for that we manually create an lxc, as a control node for running ansible and terraform configuration (proxmox cloud does not yet support remote access). 
+8. Continue with the [bootstrap section](./bootstrap.md), to deploy proxmox cloud. In this setup you will select a floating ip for the central haproxy loadbalancer of the cloud:
+```bash
+# forward http, https
+iptables -t nat -A PREROUTING -i nic0 -p tcp --dport 443 -j DNAT --to-destination YOUR_INTERNAL_FLOATING_IP:443
+iptables -t nat -A PREROUTING -i nic0 -p tcp --dport 80 -j DNAT --to-destination YOUR_INTERNAL_FLOATING_IP:80
+
+iptables-save > /etc/iptables/rules.v4
+```
+
+#### Sources
+
+This rescue mode setup was distilled from:
+
+* [Ionos rescue setup](https://www.ionos.com/digitalguide/server/configuration/install-an-alternative-server-operating-system/)
+* [Hetzner rescue setup](https://community.hetzner.com/tutorials/install-and-configure-proxmox_ve)
+
+### Control Node Ansible/Terraform
+
+Since this is a dedicated system you need a machine / container with direct access to all vms. for that we manually create an lxc, as a control node for running ansible and terraform configuration (proxmox cloud does not yet support remote access). 
+
+For production systems you should create this lxc on the management switch / vlan.
+
 ```bash
 # On your freshly created proxmox cluster in the gui goto storage and download a template of your choice
 
@@ -142,31 +169,18 @@ update-locale LANG=de_DE.UTF-8
 
 source /etc/default/locale
 ```
-9. Continue with the [bootstrap section](./bootstrap.md), to deploy proxmox cloud. In this setup you will select a floating ip for the central haproxy loadbalancer of the cloud:
-```bash
-# forward http, https
-iptables -t nat -A PREROUTING -i uplink0 -p tcp --dport 443 -j DNAT --to-destination YOUR_INTERNAL_FLOATING_IP:443
-iptables -t nat -A PREROUTING -i uplink0 -p tcp --dport 80 -j DNAT --to-destination YOUR_INTERNAL_FLOATING_IP:80
 
-iptables-save > /etc/iptables/rules.v4
-```
+## Extensible single node production cluster
 
-#### Sources
+The demo system is not upgradable, in the sense that you cannot add more servers to it and make it highly available. 
 
-This rescue mode setup was distilled from:
+For this to be possible you need to do a few extra steps during the setup. Run through the demo setup up until step 6. then continue with these instructions:
 
-* [Ionos rescue setup](https://www.ionos.com/digitalguide/server/configuration/install-an-alternative-server-operating-system/)
-* [Hetzner rescue setup](https://community.hetzner.com/tutorials/install-and-configure-proxmox_ve)
+!!! WIP !!!
 
-## Production System Setup Guide
+### Single node ceph
 
-### Extensible single node cluster
-
-You can start out with a single proxmox cluster, but you have to configure an extra external ip address aswell as single node ceph, in order to make it possible to scale to additional hosts later on.
-
-Run through the proxmox installer in any of the above mentioned ways to start.
-
-#### Single node ceph
+For a cluster to be upgradable we need ceph right from the start for kubernetes volumes. Moving them later is a giant pain.
 
 Install ceph via the proxmox ui on your single proxmox host, then do the following:
 
@@ -183,10 +197,107 @@ crushtool -c new_crush_map_decompressed -o new_crush_map_compressed
 ceph osd setcrushmap -i new_crush_map_compressed
 ```
 
-...
+## Upgrading / full production cluster
 
+Upgrading to a multi node cluster is highly specific to the tools for configuration your dedicated hosting provider has.
 
-## Backups
+You need at minimum a 10G link between your hosts. Depending on the link you are limited in the number of proxmox hosts and vms you can have running in a single cluster. The sizes of your subnets should correspond to the bandwidth of your network.
+
+Upgrading will require a restart of your vms and modifying of their config. We will need to adjust the network devices they have mapped.
+
+You will also need to undo the proxmox hosts forwardings (iptable rules), routing settings (now handled via opnsense) and undo the changes to the crush map for single node ceph.
+
+### Ionos
+
+1. In your Ionos ui goto Network/Private Network and create the following networks (/22 should be more than enough for a 10G link - the maximum ionos provides):
+
+* management 10.0.1.0/24
+* corosync 10.0.2.0/24
+* migration 10.0.3.0/24
+* vmdata 10.0.4.0/22
+* ceph frontend 10.0.8.0/22
+* ceph backend 10.0.12.0/24
+
+2. Add all your servers to the vlans in the ionos ui
+
+3. Now we need to change the network configuration on our nodes to look something like this:
+
+```conf
+auto nic0
+iface nic0 inet manual
+
+auto vmbr0
+iface vmbr0 inet manual
+        address XXX.XXX.XXX.XXX/XX # public ip and gateway move here
+        gateway XXX.XXX.XXX.XXX
+        bridge-ports nic0 # set the port and not none
+        bridge-stp off
+        bridge-fd 0
+        bridge-vlan-aware yes
+        bridge-vids 2-4094
+
+# create our vlans
+auto vmbr0.XXXX # id from ionos ui
+iface vmbr0.XXXX inet static
+        address 10.0.1.1/24 # 1/2/3 depending on the number of your host
+# management
+
+auto vmbr0.XXXX
+iface vmbr0.XXXX inet static
+        address 10.0.2.1/24
+# corosync
+
+auto vmbr0.XXXX
+iface vmbr0.XXXX inet static
+        address 10.0.3.1/24
+# migration
+
+auto vmbr0.XXXX
+iface vmbr0.XXXX inet static
+        address 10.0.4.1/22
+# vm data
+
+auto vmbr0.XXXX
+iface vmbr0.XXXX inet static
+        address 10.0.8.1/22
+# ceph frontend
+
+auto vmbr0.XXXX
+iface vmbr0.XXXX inet static
+        address 10.0.12.1/24
+# ceph backend
+
+# ...
+```
+
+4. Next you can create a proxmox cluster in the ui and join your nodes on their management vlan ips.
+5. edit /etc/pve/corosync.conf and set the ip for corosync vlan
+6. goto Datacenter/Options and set the migration network under the entry Migration Settings
+7. configure repositories and upgrade
+8. in the ionos ui create a public network for pve-opnsense and add all servers to it, also create a public ip for the opnsense and assign it to that network
+```conf
+# add to /etc/network/interfaces
+
+auto vmbr0.XXXX
+iface vmbr0.XXXX inet manual
+# opnsense vlan
+```
+9. continue with the opnsense setup
+
+## Opnsense
+
+A production system needs a dedicated firewall that has its own public ip. This will be the central gateway for all of our vms.
+
+1. download opnsense dvd image and create a vm inside of proxmox:
+    * bios OVMF (UEFI) - no efi partition (delete it)
+    * scsi for the hardware disk controller
+    * two nics, one in the public vlan one in the vmdata
+    * OS Type: other
+    * in the installer choose zfs, ufs is buggy
+2. in the terminal configure the lan ip to 10.0.7.254 with the subnet of 22 bits, after this you can ssh into one of the hosts and get the opnsense ui `ssh -L 8080:10.0.7.254:80 root@PROXMOX.HOST.IP.XXX`
+3. set your extra public ip you booked the wan interface aswell as create a gateway configuration
+
+# Backups
 
 For backups of vms use the normal proxmox backup server, there is a custom [proxmox cloud backup solution](https://registry.terraform.io/modules/Proxmox-Cloud/backup/pxc/latest) for k8s ceph csi volumes.
 
