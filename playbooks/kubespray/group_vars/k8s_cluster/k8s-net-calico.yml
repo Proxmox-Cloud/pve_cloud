@@ -112,7 +112,7 @@ calico_pool_blocksize: 26
 
 # Set FELIX_MTUIFACEPATTERN, Pattern used to discover the host’s interface for MTU auto-detection.
 # see https://projectcalico.docs.tigera.io/reference/felix/configuration
-# calico_felix_mtu_iface_pattern: "^((en|wl|ww|sl|ib)[opsx].*|(eth|wlan|wwan).*)"
+calico_felix_mtu_iface_pattern: "^((en|wl|ww|sl|ib)[opsx].*|(eth|wlan|wwan).*|(pve|cephfe).*)"
 
 # Choose the iptables insert mode for Calico: "Insert" or "Append".
 # calico_felix_chaininsertmode: Insert
