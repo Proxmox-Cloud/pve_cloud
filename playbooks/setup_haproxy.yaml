@@ -82,7 +82,7 @@
               auth_pass {{ haproxy_keepalived_password }}
             }
             virtual_ipaddress {
-              {{ pve_haproxy_floating_ip_external }}/24
+              {{ pve_haproxy_floating_ip_external }}/{{ pve_vm_subnet | ansible.utils.ipaddr('prefix') }}
             }
           }
           # internal proxy ip
@@ -97,7 +97,7 @@
               auth_pass {{ haproxy_keepalived_password }}
             }
             virtual_ipaddress {
-              {{ pve_haproxy_floating_ip_internal }}/24
+              {{ pve_haproxy_floating_ip_internal }}/{{ pve_vm_subnet | ansible.utils.ipaddr('prefix') }}
             }
           }
 
