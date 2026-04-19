@@ -79,7 +79,13 @@ def setup_pve_hosts(request, get_test_env, setup_control_node):
                     | get_test_env["pve_test_cloud_inv_cluster"],
                     get_test_env["pve_test_secondary_cluster_name"]: {
                         "pve_unique_cloud_services": [],
-                        "pve_host_vars": {},
+                        "pve_host_vars": (
+                            get_test_env["pve_test_host_vars"][
+                                get_test_env["pve_test_secondary_cluster_name"]
+                            ]
+                            if "pve_test_host_vars" in get_test_env
+                            else {}
+                        ),
                     }
                     | get_test_env["pve_test_cloud_inv_cluster"],
                 },
@@ -88,6 +94,8 @@ def setup_pve_hosts(request, get_test_env, setup_control_node):
             temp_cloud_inv,
         )
         temp_cloud_inv.flush()
+
+        logger.info(f"pve cloud inventory tmp path: {temp_cloud_inv.name}")
 
         if not request.config.getoption("--skip-fixture-init"):
             # run the main playbook
