@@ -9,8 +9,14 @@ display = Display()
 async def check_host_ssh_online(pve_host):
     try:
         reader, writer = await asyncio.wait_for(
-            asyncio.open_connection(pve_host.params["ansible_host"], 22), timeout=1
+            asyncio.open_connection(pve_host.params["ansible_host"], 22), timeout=2
         )
+
+        await asyncio.wait_for(reader.readline(), timeout=3)
+        
+        writer.write(b"SSH-2.0-PxcOnlineCheck_1.0\r\n")
+        await writer.drain()
+
         writer.close()
         await writer.wait_closed()
 
@@ -32,6 +38,11 @@ async def wait_for_ssh_open(ip):
                 reader, writer = await asyncio.wait_for(
                     asyncio.open_connection(ip, ssh_port), timeout=1
                 )
+                await asyncio.wait_for(reader.readline(), timeout=3)
+                
+                writer.write(b"SSH-2.0-PxcOnlineCheck_1.0\r\n")
+                await writer.drain()
+
                 writer.close()
                 await writer.wait_closed()
                 display.v(f"SSH is open on {ip}:{ssh_port}")
