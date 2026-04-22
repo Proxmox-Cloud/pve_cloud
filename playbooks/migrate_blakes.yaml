@@ -1,0 +1,62 @@
+- name: Migrate blakes (pre stack_name include to include)
+  hosts: target_pve
+  tasks:
+    - name: Get old blakes
+      pxc.cloud.blakes_for_inv:
+        vms: "{{ lxcs | default(qemus) }}"
+        stack_name: ""
+      register: old_blakes
+      run_once: true
+
+    - name: Get new blakes lxcs
+      pxc.cloud.blakes_for_inv:
+        vms: "{{ lxcs | default(qemus) }}"
+        stack_name: "{{ stack_name }}"
+      register: new_blakes
+      run_once: true
+
+    - debug:
+        msg: "{{ new_blakes.blakes | map('first') }}"
+      run_once: true
+
+    - set_fact:
+        old_new_map: "{{ dict((old_blakes.blakes | map('first')) | zip((new_blakes.blakes | map('first')))) }}"
+
+    - debug:
+        var: old_new_map
+      run_once: true
+
+    # get existing vms
+    - name: Get existing vms
+      command: pvesh get /cluster/resources --type vm --output-format json
+      register: pve_vms
+      run_once: true
+
+    - set_fact:
+        stack_vms: "{{ pve_vms.stdout | from_json |  selectattr('tags', 'defined') | selectattr('tags', 'search', stack_name + '.' + pve_cloud_domain) | list }}"
+      run_once: true
+
+    - set_fact:
+        override_values: "{{ (stack_vms | map(attribute='vmid') | list) | zip(stack_vms | map(attribute='tags') | list) }}"
+
+    - set_fact:
+        old_vms_dict: "{{ dict(blakes | zip(override_values)) }}"
+      vars:
+        blakes: "{{ stack_vms | map(attribute='tags') | map('split', ';') | map('select', 'search', '-blake$') | map('first') | list }}"
+      run_once: true
+
+    - debug:
+        var: old_vms_dict
+      run_once: true
+
+    - name: update lxc tags
+      command: "pct set {{ item.value.0 }} --tags '{{ item.value.1 | replace(item.key, old_new_map[item.key]) }}'"
+      loop: "{{ old_vms_dict | dict2items }}"
+      when: lxcs is defined
+      run_once: true
+
+    - name: update qemu tags
+      command: "qm set {{ item.value.0 }} --tags '{{ item.value.1 | replace(item.key, old_new_map[item.key]) }}'"
+      loop: "{{ old_vms_dict | dict2items }}"
+      when: qemus is defined
+      run_once: true
