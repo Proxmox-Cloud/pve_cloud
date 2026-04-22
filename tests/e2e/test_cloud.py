@@ -128,6 +128,16 @@ def test_create_lxc(request, get_proxmoxer, get_test_env, setup_haproxy_lxcs):
             logger.info(ddns_ips)
             assert ddns_ips  # assert ddns response
 
+            # run get blakes for lxcs
+            get_blakes_lxcs_run = ansible_runner.run(
+                project_dir=os.getcwd(),
+                playbook="playbooks/get_blakes.yaml",
+                inventory=temp_dyn_lxcs_inv.name,
+                verbosity=request.config.getoption("--ansible-verbosity"),
+            )
+
+            assert get_blakes_lxcs_run.rc == 0
+
         finally:
 
             if not request.config.getoption("--skip-cleanup"):
@@ -211,24 +221,36 @@ def test_create_qemu(request, get_test_env, setup_haproxy_lxcs):
             temp_qemu_inv,
         )
         temp_qemu_inv.flush()
+        try:
 
-        qemu_run = ansible_runner.run(
-            project_dir=os.getcwd(),
-            playbook="playbooks/sync_qemus.yaml",
-            inventory=temp_qemu_inv.name,
-            verbosity=request.config.getoption("--ansible-verbosity"),
-        )
-
-        assert qemu_run.rc == 0
-
-        if not request.config.getoption("--skip-cleanup"):
-            qemu_destroy_run = ansible_runner.run(
+            qemu_run = ansible_runner.run(
                 project_dir=os.getcwd(),
-                playbook="playbooks/destroy_qemus.yaml",
+                playbook="playbooks/sync_qemus.yaml",
                 inventory=temp_qemu_inv.name,
                 verbosity=request.config.getoption("--ansible-verbosity"),
             )
-            assert qemu_destroy_run.rc == 0
+
+            assert qemu_run.rc == 0
+
+            # run get blakes on qemus
+            get_blakes_qemu_run = ansible_runner.run(
+                project_dir=os.getcwd(),
+                playbook="playbooks/get_blakes.yaml",
+                inventory=temp_qemu_inv.name,
+                verbosity=request.config.getoption("--ansible-verbosity"),
+            )
+
+            assert get_blakes_qemu_run.rc == 0
+
+        finally:
+            if not request.config.getoption("--skip-cleanup"):
+                qemu_destroy_run = ansible_runner.run(
+                    project_dir=os.getcwd(),
+                    playbook="playbooks/destroy_qemus.yaml",
+                    inventory=temp_qemu_inv.name,
+                    verbosity=request.config.getoption("--ansible-verbosity"),
+                )
+                assert qemu_destroy_run.rc == 0
 
 
 def test_create_secondary_kubespray(

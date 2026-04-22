@@ -4,17 +4,19 @@ import copy
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.pxc.cloud.plugins.module_utils.identity import \
-    stack_vm_get_blake
+    stack_vm_get_blake, sort_and_hash
 
 
 def run_module():
     module_args = dict(
         inventory_vms=dict(type="list", required=True),
         stack_vms=dict(type="list", required=True),
+        stack_name=dict(type="str", required=True)
     )
     module = AnsibleModule(argument_spec=module_args)
 
-    inventory_vms = module.params["inventory_vms"]
+    blake_inv_vms_map = [(sort_and_hash(vm, module.params['stack_name']), vm) for vm in module.params["inventory_vms"]]
+
     stack_vms = module.params["stack_vms"]
 
     existing_blake_ids = [
@@ -22,7 +24,7 @@ def run_module():
     ]
 
     # get nodes that we have to create
-    vms_to_create = copy.deepcopy(inventory_vms)
+    vms_to_create = copy.deepcopy(blake_inv_vms_map)
 
     # keep substracting until only vms that we need to create are left
     for blake_id in existing_blake_ids:
@@ -34,7 +36,7 @@ def run_module():
     # determine nodes we have to delete, by substracting the inventory from what exists, the leftovers are what we need to delete
     vms_to_delete = copy.deepcopy(stack_vms)
 
-    for inventory_vm in inventory_vms:
+    for inventory_vm in blake_inv_vms_map:
         for i, stack_vm in enumerate(vms_to_delete):
             if inventory_vm[0] == stack_vm_get_blake(stack_vm):
                 vms_to_delete.pop(i)
