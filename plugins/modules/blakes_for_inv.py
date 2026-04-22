@@ -7,13 +7,15 @@ from ansible_collections.pxc.cloud.plugins.module_utils.identity import \
 
 def run_module():
     module_args = dict(
-        vms=dict(type="list", required=True),
-        stack_name=dict(type="str", required=True)
+        vms=dict(type="list", required=True), stack_name=dict(type="str", required=True)
     )
     module = AnsibleModule(argument_spec=module_args)
 
     result = dict(
-        blakes=[(f"{sort_and_hash(vm, module.params['stack_name'])}-blake", vm) for vm in module.params["vms"]]
+        blakes=[
+            (f"{sort_and_hash(vm, module.params['stack_name'])}-blake", vm)
+            for vm in module.params["vms"]
+        ]
     )
 
     module.exit_json(**result)

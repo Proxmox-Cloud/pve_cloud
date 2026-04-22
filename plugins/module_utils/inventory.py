@@ -470,7 +470,7 @@ async def init_plugin(loader, inventory, yaml_data, plugin_dir):
 
     # generate map, id hash of vm => variables specific for vm
     vm_vars_blake = {
-        sort_and_hash(vm, yaml_data['stack_name']): vm["vars"] if "vars" in vm else {}
+        sort_and_hash(vm, yaml_data["stack_name"]): vm["vars"] if "vars" in vm else {}
         for vm in yaml_data["lxcs" if "lxcs" in yaml_data else "qemus"]
     }
 

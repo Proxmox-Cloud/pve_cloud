@@ -20,7 +20,7 @@ def sort_and_hash(vm_params, stack_name):
         del hash_core["vars"]
 
     # this gives uniqueness to vms with the same parameters in different stacks
-    if stack_name: # none logic for update playbook
+    if stack_name:  # none logic for update playbook
         hash_core["stack_name"] = stack_name
 
     # we are after the sort_keys parameter, which recursively sorts the input nested dict
