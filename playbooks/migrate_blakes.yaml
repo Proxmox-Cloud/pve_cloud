@@ -37,8 +37,11 @@
       run_once: true
 
     - set_fact:
-        override_values: "{{ (stack_vms | map(attribute='vmid') | list) | zip(stack_vms | map(attribute='tags') | list) }}"
+        override_values: "{{ (stack_vms | map(attribute='vmid') | list) | zip(stack_vms | map(attribute='tags') | list) | zip(stack_vms | map(attribute='node') | list) }}"
 
+    - debug:
+        var: override_values
+        
     - set_fact:
         old_vms_dict: "{{ dict(blakes | zip(override_values)) }}"
       vars:
@@ -50,13 +53,12 @@
       run_once: true
 
     - name: update lxc tags
-      command: "pct set {{ item.value.0 }} --tags '{{ item.value.1 | replace(item.key, old_new_map[item.key]) }}'"
+      command: "pct set {{ item.value.0.0 }} --tags '{{ item.value.0.1 | replace(item.key, old_new_map[item.key]) }}'"
       loop: "{{ old_vms_dict | dict2items }}"
-      when: lxcs is defined
-      run_once: true
+      when: lxcs is defined and inventory_hostname == item.value.1 + "." + pve_cluster
 
     - name: update qemu tags
-      command: "qm set {{ item.value.0 }} --tags '{{ item.value.1 | replace(item.key, old_new_map[item.key]) }}'"
+      command: "qm set {{ item.value.0.0 }} --tags '{{ item.value.0.1 | replace(item.key, old_new_map[item.key]) }}'"
       loop: "{{ old_vms_dict | dict2items }}"
-      when: qemus is defined
-      run_once: true
+      when: qemus is defined and inventory_hostname == item.value.1 + "." + pve_cluster
+
