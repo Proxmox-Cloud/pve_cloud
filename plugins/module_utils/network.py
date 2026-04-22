@@ -13,7 +13,7 @@ async def check_host_ssh_online(pve_host):
         )
 
         await asyncio.wait_for(reader.readline(), timeout=3)
-        
+
         writer.write(b"SSH-2.0-PxcOnlineCheck_1.0\r\n")
         await writer.drain()
 
@@ -39,7 +39,7 @@ async def wait_for_ssh_open(ip):
                     asyncio.open_connection(ip, ssh_port), timeout=1
                 )
                 await asyncio.wait_for(reader.readline(), timeout=3)
-                
+
                 writer.write(b"SSH-2.0-PxcOnlineCheck_1.0\r\n")
                 await writer.drain()
 
