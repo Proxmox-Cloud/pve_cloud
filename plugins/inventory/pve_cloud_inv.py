@@ -1,5 +1,4 @@
 import os
-import socket
 
 from ansible.errors import AnsibleParserError
 from ansible.plugins.inventory import BaseInventoryPlugin
