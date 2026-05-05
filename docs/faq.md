@@ -86,7 +86,6 @@ ZFS is the general preferred choice for proxmox as its more integrated. On dedic
 
 The absolute minimum setup every dedicated hosting provider should provide is a debian installer you can run through. In this case you can setup a btrfs raid 1/10 for your os and vm disks. 
 
-
 ## Btrfs
 
 If you choose btrfs for your os and vm disks, be it for performance reasons or limitations in your installer you need to enable degraded boot, especially on a dedicated server, where you dont have access to the grub boot command line.
@@ -94,7 +93,6 @@ If you choose btrfs for your os and vm disks, be it for performance reasons or l
 Add `rootflags=degraded` to `GRUB_CMDLINE_LINUX_DEFAULT="... rootflags=degraded"` in `/etc/default/grub` and run `update-grub`, enable monitoring by setting `install_btrfs_root_prom_exporter` in your [pve cloud inventory host vars](schemas/pve_cloud_inv_schema.md).
 
 To recover after a disk outage run `btrfs scrub start /`, this also cleans up errors from monitoring. To see live stats run `btrfs device stats /`.
-
 
 ### Consumer SSDs
 
@@ -143,3 +141,16 @@ fsync-1: (groupid=0, jobs=1): err= 0: pid=1025: Fri Mar  6 21:41:51 2026
 ```
 
 To bypass the kernel caching mechanisms and get better performance there is also rbd-nbd and [client caching options](https://docs.ceph.com/en/squid/rbd/rbd-config-ref/), support for ceph csi driver is in alpha.
+
+## Kubespray certificates
+
+Newest proxmox cloud versions deploy kubernetes clusters with automatic cert renewal jobs turned on (control plane). If you use the `pvcli print-kubeconfig ...` you will receive a kubeconfig that uses expiring certificates. You would have to run the command again if it expires.
+
+To get a non expiring access to your cluster you have to create a dedicated service account and fetch an access token from that, using that to authenticate.
+
+Older versions / to manually refresh you need to login to each master node and run the following commands:
+
+```bash
+/usr/local/bin/k8s-certs-renew.sh
+# then run the `pvcli print-kubeconfig ...` command again
+```

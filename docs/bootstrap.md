@@ -1,6 +1,6 @@
 # Setup/Bootstrap
 
-You need a development machine (preferably apt based distro) in the same subnet/vlan segment as your proxmox hosts for running playbooks and applying terraform configurations.
+You need a development machine (preferably apt based distro) in the same subnet/vlan segment as your proxmox hosts for running playbooks and applying terraform configurations. If you come from the dedicated setups you will already have your [control node lxc](proxmox-setup/demo.md#control-node-ansibleterraform).
 
 This can also be an lxc created manually on your proxmox cluster.
 
@@ -18,35 +18,6 @@ Next install the following packages/tools on your development machine (most of t
 * [age](https://github.com/FiloSottile/age) if you want to use encrypted secrets in your infra strucutre as code repositories - [pxc_cloud_age_secret resource](https://registry.terraform.io/providers/Proxmox-Cloud/pxc/latest/docs/resources/cloud_age_secret)
 * nfs-common (if you want to use caching of setup artifacts)
 * [docker](https://docs.docker.com/engine/install/) (if you want to use caching / [tdd development](tdd.md))
-
-
-## Dedicated Systems
-
-### Firewall
-
-A dedicated system needs a central entry point for your traffic. For that you might setup an opnsense firewall in a virtual machine that has an allocated public ip.
-
-This firewall should then be set as the default gateway in your proxmox cloud dhcp options. 
-
-You also then can setup forwards from the opnsense for ports 80,443,6443 to the external floating ip of your proxmox clouds haproxy. For 6443 you want to add ippsec to further protect your control planes.
-
-Setup forward in OPNSense:
-
-1. Firewall/Rules(New), click +
-2. Set Interface: WAN, Type: TCP/UDP, Destination: This Firewall, Destination Port:HTTPS/HTTP/CUSTOM => Apply
-3. Goto Firewall/NAT/Destination NAT, click +
-4. Set Interface: WAN, Version: IPv4, Protocol: TCP/UDP, Destination: This Firewall, Destination Port: Any, Redirect Target IP: External floating ip, Port:HTTPS/HTTP/CUSTOM => Apply
-
-### Control Node
-
-When deploying the collection on dedicated rented servers you need to create the machine on the remote proxmox cluster, from where we will run all the playbooks.
-
-For ease of use you might set it up like this:
-
-1. Create lxc on your remote pve cluster
-2. Connect via console and install a vscode server
-3. Connect via jump host on your local machine `ssh -L 8080:localhost:8080 -o ProxyJump=root@PUBLIC_IP_OF_PVE_HOST root@PRIVATE_IP_OF_LXC`
-4. Now you can access vscode server ui via browser, install your ssh keys and deploy the collection
 
 ## Choose your proxmox cloud domain
 
@@ -90,7 +61,7 @@ Then simply run `service avahi-daemon restart` and now we can discover our host.
 
 Depending on how you do your vlan segmentation you either need the firewall to act as an mdns repeater (most firewall support repetition accross interfaces/ports) or create a dedicated reflector vm/lxc that has an interface in both vlans.
 
-## Bootstrap
+## Cloud Repository
 
 Create a git repository for your cloud instance for example company-xyz-cloud and setup your environment:
 
@@ -123,21 +94,23 @@ host_key_checking = False
 any_unparsed_is_failed = True
 ```
 
-## CLI Fallback Approach
+### CLI Fallback Approach
 
 If you network limits mdns you can still work with the collection, at the cost of having to manage proxmox inventories on each development machine. This is almost certainly needed on dedicated hosting providers.
 
 After you have finished the setup of your python venv and ran the `ansible-playbook pxc.cloud.setup_control_node` you should have the cli tool `pvcli` available to you.
 
-Run `pvcli connect-cluster --pve-host $PROXMOX_HOST` to connect to one of your proxmox clusters / set them up to be part of your proxmox cloud instance (run once per cluster, per cloud domain).
+Run `pvcli connect-cluster --pve-host $PROXMOX_HOST` to connect to one of your proxmox clusters / set them up to be part of your proxmox cloud instance (run once per cluster, per cloud domain). For dedicated systems pass the parameter `--mgmt-iface`, set to vmbr0.X depending on where the interface was configured.
 
 The cli will ask you for a cloud domain if the cluster has not already one assigned.
 
 With this approach its up to you to keep the inventory on your developer machine in sync. To refresh the local inventory, after you added a new host to a cluster, simply run the `connect-cluster` command again, also passing the `--force` flag to update it.
 
-### Repository setup
+### Inventory files
 
 Have a look at the [cloud instance sample repository](https://github.com/Proxmox-Cloud/pve_cloud/tree/master/samples/cloud-instance) to see what proxmox cloud looks like in action.
+
+It is recommended counting backwards from the end of your vm data network while assinging static ips for your service lxcs.
 
 The code for your infrastructure will live inside a git repository that needs the following definitions:
 
@@ -148,6 +121,51 @@ The code for your infrastructure will live inside a git repository that needs th
   * three lxcs for patroni postgres => `pxc.cloud.setup_postgres` playbook - no special schema
   * two haproxy lxcs => `pxc.cloud.setup_haproxy` playbook - [haproxy inv schema](schemas/setup_haproxy_schema_ext.md)
 
-From here you can start deploying your first kubernetes cluster, which will serve as the basis for most deployments/services.
+
+## Ingress / Control Plane Forwarding
+
+Now that you have chosen the internal ips of your services we need to forward external traffic to the selected adresses.
+
+The main goal is to have an external ipv4 address that forwards traffic from tcp 80,443,6443 to our external floating ips.
+
+### Dedicated
+
+For dedicated remote systems we have setupped an opnsense software firewall, this will be the central gateway for allowing traffic into our cluster. For that we create forwarding rules pointing to the dedicated floating ip of our central HAProxy:
+
+* 80,443 Traffic => this will be SNI filtered and distributed to our clusters
+* 6443 => Exposing kubernetes control planes of our cluster
+* Custom Ports for example 5432 for postgres => will route via the haproxy to kubernetes Nodeport / VM / LXCs
+
+To create the rules do the following:
+
+1. Open a host forwarding to one of your proxmox hosts and from there to the opnsense
+2. If you dont have a dedicated WAN Address for your opnsense, change the admin ui port from 443 to 8443 under System/Settings/Administration also check the box "Disable web GUI redirect rule"
+3. Go to Firewall/NAT/Destination NAT, hit the little + Icon
+4. Create Entries with the following settings: Interface: WAN (LAN if you dont have a dedicated public ip), Protocol: TCP, Destination Address: This Firewall, Destination Port: 80, 443, 6443 (one rule for each), Redirect Target IP: Single host or Network - External Floating ip of you Proxmox Cloud Haproxy, Redirect Target Port: Same as Destination Port
+5. Goto Firewall/Rules (New), again hit the little + Icon
+6. Create Rules with the following settings: Interface: WAN (LAN if you dont have a dedicated public ip), Action: Pass, Direction: In, Protocol: TCP, Destination Address: External Floating ip of you Proxmox Cloud Haproxy, Destination Port: 80, 443, 6443 (one rule for each)
+
+If you dont have a dedicated external ip you need to use the public ips of your proxmox hosts. In this case setup forwarding like in the demo setup on each proxmox host to the opnsense:
+
+```bash
+# forward http, https, kubeapi
+iptables -t nat -A PREROUTING -i vmbr0 -p tcp --dport 443 -j DNAT --to-destination OPNSENSE_LAN_IP:443
+iptables -t nat -A PREROUTING -i vmbr0 -p tcp --dport 80 -j DNAT --to-destination OPNSENSE_LAN_IP:80
+iptables -t nat -A PREROUTING -i vmbr0 -p tcp --dport 6443 -j DNAT --to-destination OPNSENSE_LAN_IP:6443
+
+iptables-save > /etc/iptables/rules.v4
+```
+
+You also need to create outbound nat rules for [lan to lan forwarding](https://docs.opnsense.org/manual/how-tos/nat_reflection.html#one-to-one-nat-reflection) to work.
+
+For this go to Firewall/Nat/Outbound and create 3 additional rules (for 80,443 and 6443) - set Mode to Hybrid:
+
+* Interface: LAN
+* Protocol: TCP
+* Source Address: LAN net, Port: Any
+* Destination Address: EXTENRAL_HAPROXY_FLOATING_IP/32
+* Destionation Port: 80/443/6443
+* Translation / target: LAN address
 
 
+In this case you also need to set the proxmox host itself as the gateway (make sure its set at System/Gateways/Configuration).

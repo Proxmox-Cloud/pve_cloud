@@ -2,7 +2,10 @@ site_name: PVE Cloud Documentation
 
 nav:
   - index.md
-  - proxmox-arch.md
+  - Proxmox Setup:
+    - proxmox-setup/arch.md
+    - proxmox-setup/demo.md
+    - proxmox-setup/extensible.md
   - cloud-arch.md
   - bootstrap.md
   - kubernetes.md
