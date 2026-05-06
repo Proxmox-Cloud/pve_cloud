@@ -1,4 +1,4 @@
-# Extensible production cluster (dedicated)
+# Extensible production cluster (hosted)
 
 In this setup we will run through a full production setup, either starting with one or multiple servers. This setup is extensible in the sense that you can add more hosts to your cluster later on and also start with just a single node.
 
@@ -6,13 +6,15 @@ You need at minimum a 10G link between your hosts. Depending on the link you are
 
 Run through the [demo setup](demo.md) up until finally step 6. then continue with the following instructions:
 
-7. Go to the https://PUBLIC-IP:8006 of your proxmox hosts and create Linux VLANs under System/Network for on all Nodes. These vlans and their IDs should correspond with the virtual networks / vswitches your create in the web interface of your hosting provider. The following IDs / networks are just suggestions:
-    * vmbr0.2, 10.0.0.X/24, management (X is the num of the host)
+7. Go to the https://PUBLIC-IP:8006 of your proxmox hosts and create Linux VLANs under System/Network for on all nodes. These vlans and their IDs should correspond with the virtual networks / vswitches your create in the web interface of your hosting provider. The following IDs / networks are just suggestions:
+    * vmbr0.2, 10.0.0.X/24, management (X is the number of the proxmox host)
     * vmbr0.10, 10.0.4.X/22, vm data
     * vmbr0.20, 10.0.8.X/22, ceph frontend
     * vmbr0.21, 10.0.12.X/24, ceph backend
-8. create proxmox cluster under Datacenter/Cluster on the mgmt interface, also under Datacenter/Storage enable "Snippets" for local storage
-9. add your apt repos refresh upgrade and install ceph squid
+8. initialize the proxmox cluster under Datacenter/Cluster on the management interface
+9. under Datacenter/Storage enable "Snippets" for local storage
+10. add your apt repos (no-subscriptions / your enterprise license) and also repositories for ceph squid, then refresh abd upgrade
+11. go to the Datacenter/Ceph and run through the installer.
 
 ## Single node ceph
 
@@ -33,9 +35,9 @@ ceph osd setcrushmap -i new_crush_map_compressed
 
 ## OPNSense Setup
 
-For production systems we recommend an OPNSense firewall as a virtual machine on your proxmox cluster. This vm should have its own public ip on a dedicated interface and will function as the default gateway for vms and lxcs. Give the opnsense the .254 address in your vm data network.
+For production systems we recommend an OPNSense firewall as a virtual machine on your proxmox cluster. This vm should have its own public ip on a dedicated interface and will function as the default gateway for vms and lxcs. 
 
-1. If you dont yet have a public ip you can also do the setup with just a lan interface and forwarding from the proxmox host to the opnsense instead. For this to work your proxmox host needs to act as a router, just like in the demo setup:
+1. If you dont yet have a public ip you can also do the setup with the wan interface on the management interface and using the proxmox host itself as the gateway. For this to work your proxmox host needs to act as a router, just like in the demo setup:
 
 ```bash
 # sign into your host, add your ssh key to the proxmox host itself under ~/.ssh/authorized_keys
@@ -44,28 +46,35 @@ For production systems we recommend an OPNSense firewall as a virtual machine on
 sysctl -w net.ipv4.ip_forward=1
 echo "net.ipv4.ip_forward=1" | tee /etc/sysctl.d/99-ip-forward.conf 
 
-# nat for outgoing vm connections
-apt install iptables-persistent
+# edit /etc/network/interfaces and add the following post-up and post-down commands under vmbr0
+iface vmbr0 inet static 
+        # ...
 
-# routing cidr is different than in the demo system, for prod we use 22 subnet for vms
-iptables -t nat -A POSTROUTING -s 10.0.4.0/22 -o vmbr0 -j MASQUERADE
-iptables-save > /etc/iptables/rules.v4
+        # routing cidr is different than in the demo system, we dont let the vms directly into the web
+        # but instead via the opnsenses WAN interface on the management interface/net
+        post-up iptables -t nat -A POSTROUTING -s 10.0.0.0/24 -o vmbr0 -j MASQUERADE
+        post-down iptables -t nat -D POSTROUTING -s 10.0.0.0/24 -o vmbr0 -j MASQUERADE
+        
+        # this is needed for masquerading to work with the pve fw enabled later on# this is needed for masquerading to work with the pve fw enabled later on
+        # https://forum.proxmox.com/threads/dnat-snat-via-pve-firewall-prerouting-postrouting.49192/#post-230641
+        post-up iptables -t raw -I PREROUTING -i fwbr+ -j CT --zone 1 
+        post-down iptables -t raw -I PREROUTING -i fwbr+ -j CT --zone 1
+
 ```
 2. download opnsense dvd image and create a vm inside of proxmox:
     * OS Type: other
     * scsi for the hardware disk controller, disk on ceph pool 50GB (discard, ssd emulation on)
     * 4 cores 8 gb ram
-    * two nics (model virtio), one on the vmbr0.10 for the lan interface. Wan interface recommended to add additionally after creating the vm.
+    * two nics (model virtio): vmbr0.10 for the lan interface, wan interface added after creating the vm. If you don't have a dedicated public ip, instead add the nic on the management interface. This will be used as the temporary WAN interface.
 3. boot the vm and login as "installer", password "opnsense", choose zfs, ufs is buggy. For the install you can choose a simple password and change it later in the ui.
 4. login to the terminal via proxmox vm console as root and select "Assign Interfaces"
-5. assign lan to the lan interface and wan optionally to the wan interface (leave blank if you don't have a dedicated public ip)
+5. assign lan and wan to the corresponding nics
 6. select "Set interface IP Address"
 7. set the lan address to 10.0.7.254 with the subnet of 22 bits
-8. for wan either set your public ip with the same gateway that the proxmox hosts are using, if you are lan only then set the gateway to the proxmox hosts vm data ip (10.0.4.1 ...)
-4. ssh into one of the hosts and forward the opnsense ui `ssh -L 8087:10.0.7.254:443 root@PROXMOX.HOST.IP.XXX`
-5. you can skip the setup wizard and continue with your configuration. Set a strong password for the root user now.
-
-You should also set the Listen Interfaces to LAN under System/Settings/Administration.
+8. for wan either set your public ip with the same gateway that the proxmox hosts are using, or if you dont have a public ip set the wan to management net .254 with the proxmox host as the gateway.
+9. ssh into one of the hosts and forward the opnsense ui `ssh -L 8087:10.0.7.254:443 root@PROXMOX.HOST.IP.XXX`
+10. you can skip the setup wizard and continue with your configuration. Set a strong password for the root user now.
+11. if you dont have a dedicated public ip, go to your WAN interface under Interfaces/WAN and uncheck the box "Block private Networks"
 
 ## Securing our Cluster
 
@@ -93,6 +102,6 @@ Upgrading to a multi node cluster is highly specific to the tools for configurat
 
 Upgrading will require a restart of your vms and modifying of their config. We will need to adjust the network devices they have mapped.
 
-You also need to undo all port forwardings, routing configuration on the proxmox hosts, aswell as undoing the ceph crush map changes.
+You also need to undo all port forwardings, routing configuration on the proxmox hosts, remove all post-up directives from /etc/network/interfaces, aswell as undoing the ceph crush map changes.
 
-You also need a dedicated public ip for the WAN interface of the opnsense vm, configure that in your opnsense, aswell as adjust destination NATs, outbound NAT and firewall rules.
+You also should have a dedicated public ip for the WAN interface of the opnsense vm and configure that as the new WAN interface in your opnsense.

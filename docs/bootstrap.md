@@ -139,33 +139,26 @@ For dedicated remote systems we have setupped an opnsense software firewall, thi
 To create the rules do the following:
 
 1. Open a host forwarding to one of your proxmox hosts and from there to the opnsense
-2. If you dont have a dedicated WAN Address for your opnsense, change the admin ui port from 443 to 8443 under System/Settings/Administration also check the box "Disable web GUI redirect rule"
 3. Go to Firewall/NAT/Destination NAT, hit the little + Icon
-4. Create Entries with the following settings: Interface: WAN (LAN if you dont have a dedicated public ip), Protocol: TCP, Destination Address: This Firewall, Destination Port: 80, 443, 6443 (one rule for each), Redirect Target IP: Single host or Network - External Floating ip of you Proxmox Cloud Haproxy, Redirect Target Port: Same as Destination Port
+4. Create Entries with the following settings: Interface: WAN, Protocol: TCP, Destination Address: This Firewall, Destination Port: 80, 443, 6443 (one rule for each), Redirect Target IP: Single host or Network - External Floating ip of you Proxmox Cloud Haproxy, Redirect Target Port: Same as Destination Port
 5. Goto Firewall/Rules (New), again hit the little + Icon
-6. Create Rules with the following settings: Interface: WAN (LAN if you dont have a dedicated public ip), Action: Pass, Direction: In, Protocol: TCP, Destination Address: External Floating ip of you Proxmox Cloud Haproxy, Destination Port: 80, 443, 6443 (one rule for each)
+6. Create Rules with the following settings: Interface: WAN, Action: Pass, Direction: In, Protocol: TCP, Destination Address: External Floating ip of you Proxmox Cloud Haproxy, Destination Port: 80, 443, 6443 (one rule for each)
 
 If you dont have a dedicated external ip you need to use the public ips of your proxmox hosts. In this case setup forwarding like in the demo setup on each proxmox host to the opnsense:
 
 ```bash
-# forward http, https, kubeapi
-iptables -t nat -A PREROUTING -i vmbr0 -p tcp --dport 443 -j DNAT --to-destination OPNSENSE_LAN_IP:443
-iptables -t nat -A PREROUTING -i vmbr0 -p tcp --dport 80 -j DNAT --to-destination OPNSENSE_LAN_IP:80
-iptables -t nat -A PREROUTING -i vmbr0 -p tcp --dport 6443 -j DNAT --to-destination OPNSENSE_LAN_IP:6443
+# again add as post-up to /etc/network/interfaces vmbr0
 
-iptables-save > /etc/iptables/rules.v4
+iface vmbr0 inet static
+        # ...
+
+        # forward http, https, kubeapi
+        post-up iptables -t nat -A PREROUTING -i vmbr0 -p tcp --dport 443 -j DNAT --to-destination OPNSENSE_WAN_IP:443
+        post-down iptables -t nat -D PREROUTING -i vmbr0 -p tcp --dport 443 -j DNAT --to-destination OPNSENSE_WAN_IP:443
+
+        post-up iptables -t nat -A PREROUTING -i vmbr0 -p tcp --dport 80 -j DNAT --to-destination OPNSENSE_WAN_IP:80
+        post-down iptables -t nat -D PREROUTING -i vmbr0 -p tcp --dport 80 -j DNAT --to-destination OPNSENSE_WAN_IP:80
+
+        post-up iptables -t nat -A PREROUTING -i vmbr0 -p tcp --dport 6443 -j DNAT --to-destination OPNSENSE_WAN_IP:6443
+        post-down iptables -t nat -D PREROUTING -i vmbr0 -p tcp --dport 6443 -j DNAT --to-destination OPNSENSE_WAN_IP:6443
 ```
-
-You also need to create outbound nat rules for [lan to lan forwarding](https://docs.opnsense.org/manual/how-tos/nat_reflection.html#one-to-one-nat-reflection) to work.
-
-For this go to Firewall/Nat/Outbound and create 3 additional rules (for 80,443 and 6443) - set Mode to Hybrid:
-
-* Interface: LAN
-* Protocol: TCP
-* Source Address: LAN net, Port: Any
-* Destination Address: EXTENRAL_HAPROXY_FLOATING_IP/32
-* Destionation Port: 80/443/6443
-* Translation / target: LAN address
-
-
-In this case you also need to set the proxmox host itself as the gateway (make sure its set at System/Gateways/Configuration).

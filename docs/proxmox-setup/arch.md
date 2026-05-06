@@ -1,49 +1,67 @@
 # Architecture
 
-For a proxmox cluster to work optimally with the collection, it needs to be configured in a certain way to handle interoperability.
+For a proxmox cluster to work optimally with this project, it needs to be configured fitting the available hardware.
 
-Depending on the available hardware we want to optimize for different things.
+Depending on the storage and network bandwidth, we want to optimize for different things.
 
 ## Requirements
 
-You need atleast one proxmox cluster to start (one host is enough). Later you can add multiple proxmox clusters to your pve cloud instance.
+You need atleast one proxmox cluster to start (a single host is enough, 3 are recommended).
 
-The cluster needs to meet these minimum requirements:
+If you just want to test the project, you need the minimum requirements:
 
-* seperate free vlan (proxmox cloud runs its own mandatory dhcp)
 * 4 cores
 * 32 gb of ram
 * 500 gb of free disk space for vms
-* subnet with at least 20 free allocatable addresses
+
+For a production system you would want:
+
+* Server CPU
+* 128GB+ Ram (per host)
+* 2, preferably 4 disks (SSDs / NVMEs only)
+
+The project itself has a very minimal resource footprint.
 
 ## Onprem
 
 If you have your own machines and network architecture, an ideal setup would look like this:
 
-* strong enough dedicated network link dedicated for ceph
+* dedicated network with enough bandwidth (preferably 10/25G) dedicated for ceph
 * small dedicated disks for the os, zfs raid1 is optimal here
 * a seperate enterprise grade firewall with public ips / router for configuring incoming traffic
 
-The firewall can then forward 443, 80 and 6443 to the clouds haproxy loadbalancer instances.
+The firewall will then forward 443, 80, 6443 and any other service ports you need, to the clouds haproxy loadbalancer instances.
 
 ## Dedicated Hosts / Limited network hardware
 
-If you dont have a dedicated switch for ceph, you might run into a bottleneck. Dedicated server providers often dont allow you / provide buggy / poorly configured setups for proxmox.
+If you dont have a dedicated switch for ceph, you might run into a bottleneck. Dedicated server providers often don't support proxmox directly / provide buggy / poorly configured setups for this projects architecture.
 
-One solution to optimally use disks that dont fit a good proxmox setup quite right, is to split partitions up for local-zfs + ceph osd on the remaining partition.
-50/50 is a good starting point for allocating disk space to local-zfs for vm disks / ceph osds. This can be adjusted later on.
+Ideally we want two small disks for the OS, good network and large disks for our ceph osds. Often providers don't have hardware that matches these requirements prefectly. 
 
-## Address Ranges
+To work around this limitation efficiently we do the following:
 
-You will need to choose different private network ranges for different cloud services.
+* since the network is limited often to 10G we use ceph primarily for our kubernetes volumes
+* vm disks use host exclusive storage in the form of a replicated zfs volumes
 
-* Management: a /24 network is enough for this. Here each proxmox host will have its own ip by number, for example 10.0.0.1 / 10.0.0.2 ..., the control node will also get an ip here, for conviniece start counting backwards 10.0.0.254/24
-* Virtual machine data: for a production system you should choose a /22 so you have enough room for all your vms. Again the hosts get their own ip at the beginning, leave as much room as needed for adding hosts later on. Again the proxmox hosts start at 10.0.4.1, ...
-* Ceph Frontend: this should also get a /22 since kubespray vms need access to the ceph frontend for pvc csi driver. The pve hosts again get a static ip here
-* Ceph Backend: this only needs a /24 net
+If your network is limited to 10G, you should allocate 50% of your storage to ceph and the remaining 50% to zfs. During the proxmox installer, when creating zfs, you can simply choose to not use the entire disk and later on use the free partition as a ceph osd.
 
-Additionally you can create vlans for corosync and vm migration.
+## Private Networks
+
+Although the network architecture can vary drastically from setup to setup, you generally want the following private networks:
+
+* Management network: /24 network, that is used for accessing the hosts, the proxmox admin ui and corosync
+* Virtual machine data: /22 network, here our vms and lxcs will get their primary ip via dhcp
+* Ceph Frontend: /22 network, here kubernetes vms will get an additional address to directly communicate with ceph (for volume csi driver)
+* Ceph Backend: /24 network, used for ceph backend synchronization
+
+Within the networks each proxmox host has its own static ip, starting at .1 counting upwards. Gateways generally are recommended to get a static ip at the end of the network (.254), while service vms with static ips should get their address by counting backwards from the end of the network (.253, .252). 
+
+DHCP allocation pools will sit in the middle (for example 10.0.4.25 - 10.0.7.225 for a /22 network).
+
+Additionally you can create seperate networks for corosync and vm migration.
 
 ## Backups
 
-For backups of vms use the normal proxmox backup server, there is a custom [proxmox cloud backup solution](https://registry.terraform.io/modules/Proxmox-Cloud/backup/pxc/latest) for k8s ceph csi volumes.
+For backups of vms use the normal proxmox backup server, for kuberentes there is a custom [proxmox cloud backup solution](https://registry.terraform.io/modules/Proxmox-Cloud/backup/pxc/latest). 
+
+With these two backup systems you can also migrate any workload/project accross systems using proxmox cloud.

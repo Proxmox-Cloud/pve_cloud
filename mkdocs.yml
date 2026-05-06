@@ -33,3 +33,6 @@ plugins:
       puml_url: https://www.plantuml.com/plantuml/
       theme:
         dark: material/indigo-dark
+
+markdown_extensions:
+  - sane_lists

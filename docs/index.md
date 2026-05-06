@@ -1,20 +1,20 @@
 # Introduction
 
-This project aims to provide a self hosted cloud platform, giving you the same features (DNS, Load Balancing, Managed Kubernetes, ACME Certificates) like AWS, Google Cloud, Azure, without being tied to any single one of them and their ridiculous prices. 
+This project aims to provide a self hosted cloud platform, build on top of [Proxmox](https://www.proxmox.com/), giving you the same features (DNS, Load Balancing, Managed Kubernetes, ACME Certificates) like AWS, Google Cloud, Azure, without being tied down to any single one of them. 
 
-You need [Proxmox cluster](https://proxmox.com/en/) that can run on your own hardware or on any rented dedicated server, of which there are hundreds of fair priced options (often 5-10x cheaper than what AWS & Co are offering).
+You need a proxmox cluster either with your own hardware or any rented dedicated server that has a rescue/custom iso system (almost all of the providers have this). There are lots of providers that offer fairly priced dedicated servers (often 5-10x cheaper than what AWS & Co are offering). Buying your own hardware in the long run will yield even greater results.
 
-It is not a opinionated, monolithic solution - instead it aims to give your freedom to implement according to your needs and preferences, while acting as solid platform foundation, configured with reasonable defaults.
+This project is not an opinionated, monolithic solution - instead it aims to give your freedom to implement according to your needs and preferences. It acts as solid platform, configured with reasonable defaults. It does not seek to sell you the illusion of a managed system that doesn't need any know how or maintanence. Running this platform you will not run into any black boxes that only the cloud provider can help you with (for additional fees of course), instead you have full access to any anspect of the system. It is build using open source software exclusively.
 
-To work with this collection, basic understanding of the following tools / concepts is required:
+To work with this collection, basic understanding of the following tools / concepts is highly recommended:
 
 * python and ansible
 * terraform
 * containerization and orchestration (k8s)
 * virtualization (proxmox)
-* networking, dhcp and dns (kea, bind)
+* networking, dhcp, dns (opnsense, kea, bind)
 
-Check out the [samples directory](https://github.com/Proxmox-Cloud/pve_cloud/tree/master/samples) to get an idea about how the collection works in action.
+Check out the [samples directory](https://github.com/Proxmox-Cloud/pve_cloud/tree/master/samples) to get an idea about how the infrastructure as code side of this project looks in action.
 
 ## Getting started
 
@@ -22,7 +22,7 @@ First you need to create your proxmox cluster, check out the [proxmox architectu
 
 After that you can progress to the [bootstrapping section](bootstrap.md), followed by the [kubernetes guide](kubernetes.md).
 
-If you run into problems / have questions about the platform as a whole, checkout the [FAQ](faq.md) and the [documentation on the cloud architecture](cloud-arch.md)
+If you run into problems / have questions about the platform as a whole, checkout the [FAQ](faq.md) and the [documentation on the cloud architecture](cloud-arch.md).
 
 ## Compatibility
 
