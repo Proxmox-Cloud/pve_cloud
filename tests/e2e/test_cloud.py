@@ -493,6 +493,32 @@ def test_create_kubespray(
     if tdd_ip:
         extra_vars["test_repos_ip"] = tdd_ip
 
+    # create custom kubespray vars for testing mem limits on worker
+    k8s_cluster_vars_path = "/tmp/group_vars/kube_node.yaml"
+    os.makedirs(os.path.dirname(k8s_cluster_vars_path), exist_ok=True)
+    if os.path.exists(k8s_cluster_vars_path):
+        os.remove(k8s_cluster_vars_path)
+
+    # according to the kubernetes.md documentation
+    yaml_content = """
+kube_reserved: true
+kube_reserved_cgroups_for_service_slice: kube.slice
+kube_reserved_cgroups: "/{{ kube_reserved_cgroups_for_service_slice }}"
+kube_memory_reserved: 512Mi
+
+system_reserved: true
+system_reserved_cgroups_for_service_slice: system.slice
+system_reserved_cgroups: "/{{ system_reserved_cgroups_for_service_slice }}"
+system_memory_reserved: 756Mi
+
+eviction_hard:
+  memory.available: 1.5Gi
+
+"""
+
+    with open(k8s_cluster_vars_path, "w") as file:
+        file.write(yaml_content)
+
     kubespray_run = ansible_runner.run(
         project_dir=os.getcwd(),
         playbook="playbooks/sync_kubespray.yaml",
@@ -502,6 +528,10 @@ def test_create_kubespray(
     )
 
     assert kubespray_run.rc == 0
+
+    # always cleanup custom vars
+    if os.path.exists(k8s_cluster_vars_path):
+        os.remove(k8s_cluster_vars_path)
 
     if not request.config.getoption("--skip-cleanup"):
         kubespray_destroy_run = ansible_runner.run(

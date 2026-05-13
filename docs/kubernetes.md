@@ -94,20 +94,28 @@ Here are some interesting kubespray settings you might want to set (k8s_cluster 
 kube_network_node_prefix: 22
 kubelet_max_pods: 1024
 ```
-* set strict eviction limits, this is a good safe guard for node availability incase you have memory hungry deployments without any requests / limits defined 
+* for the workers you might want to set strict eviction limits. this is a good safe guard for node availability incase you have memory hungry deployments without any requests / limits defined. for that create the file `group_vars/kube_node.yml`
 ```yaml
 # this will enable reservations with the default values, see kubespray sample inventory
 kube_reserved: true
+# these two need to be as per kubespray sample var documentation
 kube_reserved_cgroups_for_service_slice: kube.slice
 kube_reserved_cgroups: "/{{ kube_reserved_cgroups_for_service_slice }}"
 
+# define reserved memory for kubernetes processes
+kube_memory_reserved: 512Mi
+
 system_reserved: true
+# these two need to be as per kubespray sample var documentation
 system_reserved_cgroups_for_service_slice: system.slice
 system_reserved_cgroups: "/{{ system_reserved_cgroups_for_service_slice }}"
-system_memory_reserved: 1024Mi
 
+# limit for system service (like networking)
+system_memory_reserved: 1Gi
+
+# extra limits calculated on top when evictions will be initialized
 eviction_hard:
-  memory.available: 1000Mi
+  memory.available: 3Gi # should be kube reserved + system reserved + buffer
 ```
 => this, in addition to the `pxc.cloud.` role, will allow k8s nodes to run even if we got memory hungry, ram hogging deployments. eviction hard and reservations alone are not enough, in oom scenarios it will cause the networkd service to stop working. This role is automatically executed via the `pxc.cloud.sync_kubespray` playbook.
 

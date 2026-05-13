@@ -27,10 +27,12 @@
   vars:
     # only monitory systemd services
     systemd_exporter_unit_include: '.*\\.service'
-
+    smartctl_exporter_system_user: root
+    smartctl_exporter_system_group: root
   roles:
     - proxmox_host_avahi
     - prometheus.prometheus.systemd_exporter
+    - prometheus.prometheus.smartctl_exporter
   tasks:
     - name: install prometheus-node-exporter
       ansible.builtin.apt:
