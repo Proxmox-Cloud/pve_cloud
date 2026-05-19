@@ -11,6 +11,7 @@ Run through the [demo setup](demo.md) up until finally step 6. then continue wit
     * vmbr0.10, 10.0.4.X/22, vm data
     * vmbr0.20, 10.0.8.X/22, ceph frontend
     * vmbr0.21, 10.0.12.X/24, ceph backend
+    * vmbr0.30, 10.0.13.X/24, opnsense pseudo wan (you only need this if you dont have a dedicated ip for the opnsense)
 8. initialize the proxmox cluster under Datacenter/Cluster on the management interface
 9. under Datacenter/Storage enable "Snippets" for local storage
 10. add your apt repos (no-subscriptions / your enterprise license) and also repositories for ceph squid, then refresh abd upgrade
@@ -37,7 +38,7 @@ ceph osd setcrushmap -i new_crush_map_compressed
 
 For production systems we recommend an OPNSense firewall as a virtual machine on your proxmox cluster. This vm should have its own public ip on a dedicated interface and will function as the default gateway for vms and lxcs. 
 
-1. If you dont yet have a public ip you can also do the setup with the wan interface on the management interface and using the proxmox host itself as the gateway. For this to work your proxmox host needs to act as a router, just like in the demo setup:
+1. If you don't yet have a public ip you can also do the setup with the wan interface on the management interface and using the proxmox host itself as the gateway. For this to work your proxmox host needs to act as a router, just like in the demo setup:
 
 ```bash
 # sign into your host, add your ssh key to the proxmox host itself under ~/.ssh/authorized_keys
@@ -51,9 +52,9 @@ iface vmbr0 inet static
         # ...
 
         # routing cidr is different than in the demo system, we dont let the vms directly into the web
-        # but instead via the opnsenses WAN interface on the management interface/net
-        post-up iptables -t nat -A POSTROUTING -s 10.0.0.0/24 -o vmbr0 -j MASQUERADE
-        post-down iptables -t nat -D POSTROUTING -s 10.0.0.0/24 -o vmbr0 -j MASQUERADE
+        # but instead allow the opnsense on its pseudo wan interface to access the web through the proxmox host
+        post-up iptables -t nat -A POSTROUTING -s 10.0.13.0/24 -o vmbr0 -j MASQUERADE
+        post-down iptables -t nat -D POSTROUTING -s 10.0.13.0/24 -o vmbr0 -j MASQUERADE
         
         # this is needed for masquerading to work with the pve fw enabled later on# this is needed for masquerading to work with the pve fw enabled later on
         # https://forum.proxmox.com/threads/dnat-snat-via-pve-firewall-prerouting-postrouting.49192/#post-230641
@@ -87,7 +88,8 @@ We now also want to restrict access to our proxmox hosts by activating the proxm
 Next create Security Groups + Rules:
 
 * admin-in: add Protocol: tcp rules for destination port 22 and 8006 with the pve-public IPSet as destination, optionally set your ipsec IPset as source
-* ceph: source cephfe, destination ceph fe allow in all, do the same for cephbe
+* ceph-fe: source ceph-fe, destination ceph-fe allow in all
+* ceph-be: source ceph-be, destination ceph-be allow in all
 
 Make sure all rules have enabled checkbox checked.
 
@@ -100,8 +102,6 @@ Now go to Datacenter/Firewall and activate / insert all the security groups we j
 
 Upgrading to a multi node cluster is highly specific to the tools for configuration your dedicated hosting provider has.
 
-Upgrading will require a restart of your vms and modifying of their config. We will need to adjust the network devices they have mapped.
+Depending on what changes you have to adjust configs, remove itable rules and network interfaces.
 
-You also need to undo all port forwardings, routing configuration on the proxmox hosts, remove all post-up directives from /etc/network/interfaces, aswell as undoing the ceph crush map changes.
-
-You also should have a dedicated public ip for the WAN interface of the opnsense vm and configure that as the new WAN interface in your opnsense.
+You also get a dedicated public ip for the WAN interface of the opnsense vm and configure that as the new WAN interface in your opnsense.

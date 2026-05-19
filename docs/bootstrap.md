@@ -128,7 +128,29 @@ Now that you have chosen the internal ips of your services we need to forward ex
 
 The main goal is to have an external ipv4 address that forwards traffic from tcp 80,443,6443 to our external floating ips.
 
-### Dedicated
+### Demo system
+
+If you are just setting up a demo system you only need to forward on the proxmox hosts level to the haproxy.
+
+For that add post-up rules:
+```bash
+iface vmbr0 inet static
+        # ...
+
+        # forward http, https, kubeapi
+        post-up iptables -t nat -A PREROUTING -i vmbr0 -p tcp -d PUBLIC_IP_OF_PVE_HOST --dport 443 -j DNAT --to-destination HAPROXY_INTERNAL_FLOATING_IP:443
+        post-down iptables -t nat -D PREROUTING -i vmbr0 -p tcp -d PUBLIC_IP_OF_PVE_HOST --dport 443 -j DNAT --to-destination HAPROXY_INTERNAL_FLOATING_IP:443
+
+        post-up iptables -t nat -A PREROUTING -i vmbr0 -p tcp -d PUBLIC_IP_OF_PVE_HOST --dport 80 -j DNAT --to-destination HAPROXY_INTERNAL_FLOATING_IP:80
+        post-down iptables -t nat -D PREROUTING -i vmbr0 -p tcp -d PUBLIC_IP_OF_PVE_HOST --dport 80 -j DNAT --to-destination HAPROXY_INTERNAL_FLOATING_IP:80
+
+        post-up iptables -t nat -A PREROUTING -i vmbr0 -p tcp -d PUBLIC_IP_OF_PVE_HOST --dport 6443 -j DNAT --to-destination HAPROXY_INTERNAL_FLOATING_IP:6443
+        post-down iptables -t nat -D PREROUTING -i vmbr0 -p tcp -d PUBLIC_IP_OF_PVE_HOST --dport 6443 -j DNAT --to-destination HAPROXY_INTERNAL_FLOATING_IP:6443
+```
+
+After that reboot / run `systemctl restart networking`.
+
+### Dedicated systems
 
 For dedicated remote systems we have setupped an opnsense software firewall, this will be the central gateway for allowing traffic into our cluster. For that we create forwarding rules pointing to the dedicated floating ip of our central HAProxy:
 
@@ -136,7 +158,7 @@ For dedicated remote systems we have setupped an opnsense software firewall, thi
 * 6443 => Exposing kubernetes control planes of our cluster
 * Custom Ports for example 5432 for postgres => will route via the haproxy to kubernetes Nodeport / VM / LXCs
 
-To create the rules do the following:
+To create the rules do the following in the opnsense ui:
 
 1. Open a host forwarding to one of your proxmox hosts and from there to the opnsense
 3. Go to Firewall/NAT/Destination NAT, hit the little + Icon
@@ -144,7 +166,7 @@ To create the rules do the following:
 5. Goto Firewall/Rules (New), again hit the little + Icon
 6. Create Rules with the following settings: Interface: WAN, Action: Pass, Direction: In, Protocol: TCP, Destination Address: External Floating ip of you Proxmox Cloud Haproxy, Destination Port: 80, 443, 6443 (one rule for each)
 
-If you dont have a dedicated external ip you need to use the public ips of your proxmox hosts. In this case setup forwarding like in the demo setup on each proxmox host to the opnsense:
+If you dont have a dedicated external ip, you need to setup forwarding from the public ips of your proxmox hosts to your pseudo opnsense wan ip:
 
 ```bash
 # again add as post-up to /etc/network/interfaces vmbr0
@@ -153,12 +175,12 @@ iface vmbr0 inet static
         # ...
 
         # forward http, https, kubeapi
-        post-up iptables -t nat -A PREROUTING -i vmbr0 -p tcp --dport 443 -j DNAT --to-destination OPNSENSE_WAN_IP:443
-        post-down iptables -t nat -D PREROUTING -i vmbr0 -p tcp --dport 443 -j DNAT --to-destination OPNSENSE_WAN_IP:443
+        post-up iptables -t nat -A PREROUTING -i vmbr0 -p tcp -d PUBLIC_IP_OF_PVE_HOST --dport 443 -j DNAT --to-destination OPNSENSE_WAN_IP:443
+        post-down iptables -t nat -D PREROUTING -i vmbr0 -p tcp -d PUBLIC_IP_OF_PVE_HOST --dport 443 -j DNAT --to-destination OPNSENSE_WAN_IP:443
 
-        post-up iptables -t nat -A PREROUTING -i vmbr0 -p tcp --dport 80 -j DNAT --to-destination OPNSENSE_WAN_IP:80
-        post-down iptables -t nat -D PREROUTING -i vmbr0 -p tcp --dport 80 -j DNAT --to-destination OPNSENSE_WAN_IP:80
+        post-up iptables -t nat -A PREROUTING -i vmbr0 -p tcp -d PUBLIC_IP_OF_PVE_HOST --dport 80 -j DNAT --to-destination OPNSENSE_WAN_IP:80
+        post-down iptables -t nat -D PREROUTING -i vmbr0 -p tcp -d PUBLIC_IP_OF_PVE_HOST --dport 80 -j DNAT --to-destination OPNSENSE_WAN_IP:80
 
-        post-up iptables -t nat -A PREROUTING -i vmbr0 -p tcp --dport 6443 -j DNAT --to-destination OPNSENSE_WAN_IP:6443
-        post-down iptables -t nat -D PREROUTING -i vmbr0 -p tcp --dport 6443 -j DNAT --to-destination OPNSENSE_WAN_IP:6443
+        post-up iptables -t nat -A PREROUTING -i vmbr0 -p tcp -d PUBLIC_IP_OF_PVE_HOST --dport 6443 -j DNAT --to-destination OPNSENSE_WAN_IP:6443
+        post-down iptables -t nat -D PREROUTING -i vmbr0 -p tcp -d PUBLIC_IP_OF_PVE_HOST --dport 6443 -j DNAT --to-destination OPNSENSE_WAN_IP:6443
 ```

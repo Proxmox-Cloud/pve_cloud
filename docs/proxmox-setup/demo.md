@@ -83,6 +83,12 @@ iface vmbr0 inet static
         bridge-fd 0
         bridge-vlan-aware yes
         bridge-vids 2-4094
+        
+        # ! hack configuration for demo system only !
+        # enable routing nat for our virtual machines (so they can connect to the www)
+        post-up iptables -t nat -A POSTROUTING -s 10.0.1.0/24 -o vmbr0 -j MASQUERADE
+        post-down iptables -t nat -D POSTROUTING -s 10.0.1.0/24 -o vmbr0 -j MASQUERADE
+
 
 # we will add additional vlans via the ui later
 ```
@@ -101,22 +107,10 @@ iface vmbr0 inet static
 sysctl -w net.ipv4.ip_forward=1
 echo "net.ipv4.ip_forward=1" | tee /etc/sysctl.d/99-ip-forward.conf 
 
-# nat for outgoing vm connections
-apt install iptables-persistent
-
-iptables -t nat -A POSTROUTING -s 10.0.1.0/24 -o vmbr0 -j MASQUERADE # allows it for the vm net defined in step 8.
-iptables-save > /etc/iptables/rules.v4
 ```
 12. Setup your [control node lxc](#control-node-ansibleterraform) for deploying and working with the collection
-13. Continue with the [bootstrap section](./bootstrap.md), to deploy proxmox cloud. In this setup you will select a floating ip for the central haproxy loadbalancer of the cloud:
-```bash
-# forward http, https, kubeapi
-iptables -t nat -A PREROUTING -i vmbr0 -p tcp --dport 443 -j DNAT --to-destination YOUR_INTERNAL_FLOATING_IP:443
-iptables -t nat -A PREROUTING -i vmbr0 -p tcp --dport 80 -j DNAT --to-destination YOUR_INTERNAL_FLOATING_IP:80
-iptables -t nat -A PREROUTING -i vmbr0 -p tcp --dport 6443 -j DNAT --to-destination YOUR_INTERNAL_FLOATING_IP:6443
+13. Continue with the [bootstrap section](./bootstrap.md), to deploy proxmox cloud. In this setup you will select a floating ip for the central haproxy loadbalancer of the cloud.
 
-iptables-save > /etc/iptables/rules.v4
-```
 
 ### Sources
 
