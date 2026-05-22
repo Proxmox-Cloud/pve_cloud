@@ -511,15 +511,15 @@ def test_create_kubespray(
 kube_reserved: true
 kube_reserved_cgroups_for_service_slice: kube.slice
 kube_reserved_cgroups: "/{{ kube_reserved_cgroups_for_service_slice }}"
-kube_memory_reserved: 512Mi
+kube_memory_reserved: 256Mi
 
 system_reserved: true
 system_reserved_cgroups_for_service_slice: system.slice
 system_reserved_cgroups: "/{{ system_reserved_cgroups_for_service_slice }}"
-system_memory_reserved: 756Mi
+system_memory_reserved: 500Mi
 
 eviction_hard:
-  memory.available: 1.5Gi
+  memory.available: 1Gi
 
 """
 
