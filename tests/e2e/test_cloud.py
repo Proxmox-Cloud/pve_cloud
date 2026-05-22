@@ -66,18 +66,20 @@ def test_create_lxc(request, get_proxmoxer, get_test_env, setup_haproxy_lxcs):
                 "lxcs": [
                     {
                         "parameters": {
-                            "rootfs": f"volume={get_test_env["pve_test_disk_storage_id"]}:10",
+                            "rootfs": f"volume={get_test_env['pve_test_disk_storage_id']}:10",
                             "cores": 1,
                             "memory": 512,
-                            "net0": f"name=pve,bridge=vmbr0,firewall=1,ip=dhcp",
+                            "net0": f"name=pve,bridge=vmbr0,firewall=1,ip=dhcp" + 
+                                f"{get_test_env['net0_vlan_tag_rendered'] if 'net0_vlan_tag_rendered' in get_test_env else ''}",
                         }
                     },
                     {
                         "parameters": {
-                            "rootfs": f"volume={get_test_env["pve_test_disk_storage_id"]}:10",
+                            "rootfs": f"volume={get_test_env['pve_test_disk_storage_id']}:10",
                             "cores": 1,
                             "memory": 512,
-                            "net0": f"name=pve,bridge=vmbr0,firewall=1,ip=dhcp",
+                            "net0": f"name=pve,bridge=vmbr0,firewall=1,ip=dhcp" + 
+                                f"{get_test_env['net0_vlan_tag_rendered'] if 'net0_vlan_tag_rendered' in get_test_env else ''}",
                         }
                     },
                 ],
@@ -165,8 +167,9 @@ def test_create_qemu(request, get_test_env, setup_haproxy_lxcs):
                 + get_test_env["pve_test_cloud_domain"],
                 "stack_name": "pytest-qemu",
                 "qemu_base_parameters": {
-                    "cpu": "x86-64-v2-AES",
-                    "net0": "virtio,bridge=vmbr0,firewall=1",
+                    "cpu": "host",
+                    "net0": "virtio,bridge=vmbr0,firewall=1" + 
+                        f"{get_test_env['net0_vlan_tag_rendered'] if 'net0_vlan_tag_rendered' in get_test_env else ''}",
                     "sockets": 1,
                 },
                 "tcp_proxies": [
@@ -260,6 +263,10 @@ def test_create_secondary_kubespray(
     setup_cache_lxcs,
     get_secondary_kubespray_inv,
 ):
+    if "pve_test_secondary_cluster_name" not in get_test_env:
+        logger.info("skipping secondary pve cluster test mechanism since not defined in test env")
+        return # skip if not defined
+
     # in this case we copy an existing prod cert
     if (
         "pve_test_k8s_tls_copy_target_pve" in get_test_env
@@ -300,7 +307,7 @@ def test_create_secondary_kubespray(
             cur.execute(
                 query,
                 (
-                    f"{get_test_env["pve_test_k8s_tls_copy_stack_name"]}.{cluster_vars["pve_cloud_domain"]}",
+                    f"{get_test_env['pve_test_k8s_tls_copy_stack_name']}.{cluster_vars['pve_cloud_domain']}",
                 ),
             )
             record = cur.fetchone()
@@ -335,7 +342,7 @@ def test_create_secondary_kubespray(
         # update certs and mirror pull secret
         with Session(engine) as session:
             copy_cert = AcmeX509(
-                stack_fqdn=f"pytest-secondary-k8s.{get_test_env["pve_test_cloud_domain"]}",
+                stack_fqdn=f"pytest-secondary-k8s.{get_test_env['pve_test_cloud_domain']}",
                 config={},
                 ec_csr={},
                 ec_crt={},
@@ -398,7 +405,7 @@ def test_create_secondary_kubespray(
 
 
 def test_create_kubespray(
-    request, get_test_env, get_kubespray_inv, setup_haproxy_lxcs, setup_cache_lxcs
+    request, get_test_env, get_kubespray_inv, setup_haproxy_lxcs, setup_cache_lxcs, setup_ceph_dhcp_lxcs
 ):
     logger.info("create kubespray")
 
@@ -423,10 +430,10 @@ def test_create_kubespray(
         _, stdout, _ = ssh.exec_command("cat /etc/pve/cloud/cluster_vars.yaml")
 
         cluster_vars = yaml.safe_load(stdout.read().decode("utf-8"))
-
+        logger.info(cluster_vars["pve_haproxy_floating_ip_internal"])
         _, stdout, _ = ssh.exec_command("cat /etc/pve/cloud/secrets/patroni.pass")
 
-        patroni_pass = stdout.read().decode("utf-8")
+        patroni_pass = stdout.read().decode("utf-8").strip()
         logger.info(patroni_pass)
 
         conn = psycopg2.connect(
@@ -443,7 +450,7 @@ def test_create_kubespray(
             cur.execute(
                 query,
                 (
-                    f"{get_test_env["pve_test_k8s_tls_copy_stack_name"]}.{cluster_vars["pve_cloud_domain"]}",
+                    f"{get_test_env['pve_test_k8s_tls_copy_stack_name']}.{cluster_vars['pve_cloud_domain']}",
                 ),
             )
             record = cur.fetchone()
@@ -478,7 +485,7 @@ def test_create_kubespray(
         # update certs and mirror pull secret
         with Session(engine) as session:
             copy_cert = AcmeX509(
-                stack_fqdn=f"pytest-k8s.{get_test_env["pve_test_cloud_domain"]}",
+                stack_fqdn=f"pytest-k8s.{get_test_env['pve_test_cloud_domain']}",
                 config={},
                 ec_csr={},
                 ec_crt={},

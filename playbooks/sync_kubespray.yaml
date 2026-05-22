@@ -216,62 +216,28 @@
         state: restarted 
 
 # kubespray!
+# todo: caching should be replaced by something like rsync or ceph s3 sync instead
+# right now is not compatible with lxcs
 - name: Setup kubespray cache on dev machine
   hosts: localhost
   tags:
     - kubespray
   tasks:
-    - name: create cache mnt dir
+    # first we need to determine if we are inside an lxc. mounting an nfs can lead to problems.
+    - name: Slurp proc 1 env
       become: true
-      file:
-        path: /mnt/kubespray_cache
-        state: directory
-        mode: '0777'
-      when: "'cache_stack' in groups"
+      slurp: 
+        src: /proc/1/environ
+      register: env_1_raw
+    
+    - name: Container env check
+      set_fact:
+        env_1_is_container: "{{ (env_1_raw.content | b64decode).split('\u0000') | select('match', '^container=') | list | length > 0 }}"
 
-    - name: unmount old cache dir if mounted
-      become: true
-      mount:
-        path: /mnt/kubespray_cache
-        src: localhost:/srv/kubespray_cache
-        fstype: nfs4
-        state: unmounted
-      when: "'cache_stack' in groups"
-
-    - name: kill old tunnel if running
-      shell: |
-        if [ -f /tmp/kc_tunnel.pid ]; then
-            kill $(cat /tmp/kc_tunnel.pid) 2>/dev/null || true
-            rm -f /tmp/kc_tunnel.pid
-        fi
-      ignore_errors: yes
-      when: "'cache_stack' in groups"
-
-    - name: Wait for old tunnel to release port
-      wait_for:
-        port: 3049
-        host: 127.0.0.1
-        state: drained
-        timeout: 5
-      when: "'cache_stack' in groups"
-
-    - name: create tunnel
-      shell: |
-        nohup ssh -fNv -L 3049:localhost:2049 root@main-{{ static_includes['cache_stack'] }}>/dev/null 2>&1 &
-        echo $! > /tmp/kc_tunnel.pid
-      args:
-        creates: /tmp/kc_tunnel.pid
-      when: "'cache_stack' in groups"
-
-    - name: mount cache dir
-      become: true
-      mount:
-        path: /mnt/kubespray_cache
-        src: localhost:/srv/kubespray_cache
-        fstype: nfs4
-        state: ephemeral # dont create fstab
-        opts: "port=3049"
-      when: "'cache_stack' in groups"
+    - name: Mount Cache NFS
+      include_role:
+        name: nfs_cache_mount
+      when: not env_1_is_container
 
 # ! warning this is incomplete and does not 100% work like original ansible mechanisms, it assumes
 # the same structure of the sample kubespray inventory vars

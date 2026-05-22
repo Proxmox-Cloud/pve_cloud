@@ -27,10 +27,16 @@
     state: directory
     recurse: yes
 
+- name: Check if image exists
+  stat:
+    path: "/opt/images/{{ qemu_image_url.split('/')[-1] }}"
+  register: image_file
+
 - name: Download image
   get_url:
     url: "{{ qemu_image_url }}"
     dest: "/opt/images/{{ qemu_image_url.split('/')[-1] }}"
+  when: not image_file.stat.exists
 
 - name: Create user.yaml snippet
   template:
