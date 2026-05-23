@@ -94,7 +94,7 @@ Next create an avahi service file (`/etc/avahi/services/pxc.service`) on the hos
 
 ![Proxmox cluster name](cluster-name.png)
 
-Also set `use-ipv6=no` in `/etc/avahi/avahi-daemon.conf`.
+Also set `use-ipv6=no` and `allow-interface=MGMT-IFACE` under the `[server]` section in `/etc/avahi/avahi-daemon.conf`.
 
 Then simply run `service avahi-daemon reload` and now we can discover our host. You can validate the discovery by running `avahi-browse -rpt _pxc._tcp` on your development machine. 
 
