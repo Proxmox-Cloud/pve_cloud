@@ -69,8 +69,8 @@ def test_create_lxc(request, get_proxmoxer, get_test_env, setup_haproxy_lxcs):
                             "rootfs": f"volume={get_test_env['pve_test_disk_storage_id']}:10",
                             "cores": 1,
                             "memory": 512,
-                            "net0": f"name=pve,bridge=vmbr0,firewall=1,ip=dhcp" + 
-                                f"{get_test_env['net0_vlan_tag_rendered'] if 'net0_vlan_tag_rendered' in get_test_env else ''}",
+                            "net0": f"name=pve,bridge=vmbr0,firewall=1,ip=dhcp"
+                            + f"{get_test_env['net0_vlan_tag_rendered'] if 'net0_vlan_tag_rendered' in get_test_env else ''}",
                         }
                     },
                     {
@@ -78,8 +78,8 @@ def test_create_lxc(request, get_proxmoxer, get_test_env, setup_haproxy_lxcs):
                             "rootfs": f"volume={get_test_env['pve_test_disk_storage_id']}:10",
                             "cores": 1,
                             "memory": 512,
-                            "net0": f"name=pve,bridge=vmbr0,firewall=1,ip=dhcp" + 
-                                f"{get_test_env['net0_vlan_tag_rendered'] if 'net0_vlan_tag_rendered' in get_test_env else ''}",
+                            "net0": f"name=pve,bridge=vmbr0,firewall=1,ip=dhcp"
+                            + f"{get_test_env['net0_vlan_tag_rendered'] if 'net0_vlan_tag_rendered' in get_test_env else ''}",
                         }
                     },
                 ],
@@ -168,8 +168,8 @@ def test_create_qemu(request, get_test_env, setup_haproxy_lxcs):
                 "stack_name": "pytest-qemu",
                 "qemu_base_parameters": {
                     "cpu": "host",
-                    "net0": "virtio,bridge=vmbr0,firewall=1" + 
-                        f"{get_test_env['net0_vlan_tag_rendered'] if 'net0_vlan_tag_rendered' in get_test_env else ''}",
+                    "net0": "virtio,bridge=vmbr0,firewall=1"
+                    + f"{get_test_env['net0_vlan_tag_rendered'] if 'net0_vlan_tag_rendered' in get_test_env else ''}",
                     "sockets": 1,
                 },
                 "tcp_proxies": [
@@ -264,8 +264,10 @@ def test_create_secondary_kubespray(
     get_secondary_kubespray_inv,
 ):
     if "pve_test_secondary_cluster_name" not in get_test_env:
-        logger.info("skipping secondary pve cluster test mechanism since not defined in test env")
-        return # skip if not defined
+        logger.info(
+            "skipping secondary pve cluster test mechanism since not defined in test env"
+        )
+        return  # skip if not defined
 
     # in this case we copy an existing prod cert
     if (
@@ -405,7 +407,12 @@ def test_create_secondary_kubespray(
 
 
 def test_create_kubespray(
-    request, get_test_env, get_kubespray_inv, setup_haproxy_lxcs, setup_cache_lxcs, setup_ceph_dhcp_lxcs
+    request,
+    get_test_env,
+    get_kubespray_inv,
+    setup_haproxy_lxcs,
+    setup_cache_lxcs,
+    setup_ceph_dhcp_lxcs,
 ):
     logger.info("create kubespray")
 
