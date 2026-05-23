@@ -26,7 +26,7 @@ If cluster nodes get out of sync and are restarted while the control plane is of
 
 In this case once you startet all your nodes, you can run `kubectl delete --all volumeattachments` to reset all attachments, after rebooting your worker nodes the pods should be able to mount and start again!
 
-To avoid this all together you should never shut down control plane and workers at the same time, always shutdown workers first and only then the masters/control plane.
+To avoid this all together you should never shut down control plane and workers at the same time, always shutdown workers first and only then the masters/control plane. If you have slow hardware you should consider passing `--grace-period=300` to your `kubectl drain` command.
 
 ## Containerd 
 
