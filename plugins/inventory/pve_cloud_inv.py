@@ -1,5 +1,4 @@
 import os
-import socket
 
 from ansible.errors import AnsibleParserError
 from ansible.plugins.inventory import BaseInventoryPlugin
@@ -11,14 +10,6 @@ from pve_cloud.lib.inventory import *
 from pve_cloud_schemas.validate import validate_inventory
 
 display = Display()
-
-
-def check_ssh_open(host):
-    try:
-        with socket.create_connection((host, 22), timeout=3):
-            return True
-    except (socket.timeout, ConnectionRefusedError, OSError):
-        return False
 
 
 class InventoryModule(BaseInventoryPlugin):

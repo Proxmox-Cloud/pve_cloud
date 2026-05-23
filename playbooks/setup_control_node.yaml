@@ -4,5 +4,14 @@
     - name: Install pve cloud collection requirements
       ansible.builtin.pip:
         requirements: "{{ playbook_dir | dirname }}/meta/ee-requirements.txt"
-    
+
+    - name: install packages for caching
+      become: true
+      apt:
+        update_cache: yes
+        pkg:
+          - nfs-common
+          - rsync
+
+
     # todo: apt install avahi? / other reqs

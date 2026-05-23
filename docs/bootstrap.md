@@ -55,7 +55,7 @@ Next create an avahi service file (`/etc/avahi/services/pxc.service`) on the hos
 
 ![Proxmox cluster name](cluster-name.png)
 
-Also set `use-ipv6=no` in `/etc/avahi/avahi-daemon.conf`.
+Also set `use-ipv6=no` and `allow-interface=MGMT-IFACE` under the `[server]` section in `/etc/avahi/avahi-daemon.conf`.
 
 Then simply run `service avahi-daemon restart` and now we can discover our host. You can validate the discovery by running `avahi-browse -rpt _pxc._tcp` on your development machine. 
 
@@ -130,7 +130,7 @@ The main goal is to have an external ipv4 address that forwards traffic from tcp
 
 ### Demo system
 
-If you are just setting up a demo system you only need to forward on the proxmox hosts level to the haproxy.
+If you are just setting up a demo system you only need to forward on the proxmox hosts level to the haproxy. You don't need to bother with any firewall settings.
 
 For that add post-up rules:
 ```bash

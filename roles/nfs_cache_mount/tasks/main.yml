@@ -1,0 +1,53 @@
+---
+# tasks file for nfs_cache_mount
+- name: create cache mnt dir
+  become: true
+  file:
+    path: /mnt/kubespray_cache
+    state: directory
+    mode: '0777'
+  when: "'cache_stack' in groups"
+
+- name: unmount old cache dir if mounted
+  become: true
+  mount:
+    path: /mnt/kubespray_cache
+    src: localhost:/srv/kubespray_cache
+    fstype: nfs4
+    state: unmounted
+  when: "'cache_stack' in groups"
+
+- name: kill old tunnel if running
+  shell: |
+    if [ -f /tmp/kc_tunnel.pid ]; then
+        kill $(cat /tmp/kc_tunnel.pid) 2>/dev/null || true
+        rm -f /tmp/kc_tunnel.pid
+    fi
+  ignore_errors: yes
+  when: "'cache_stack' in groups"
+
+- name: Wait for old tunnel to release port
+  wait_for:
+    port: 3049
+    host: 127.0.0.1
+    state: drained
+    timeout: 5
+  when: "'cache_stack' in groups"
+
+- name: create tunnel
+  shell: |
+    nohup ssh -fNv -L 3049:localhost:2049 root@main-{{ static_includes['cache_stack'] }}>/dev/null 2>&1 &
+    echo $! > /tmp/kc_tunnel.pid
+  args:
+    creates: /tmp/kc_tunnel.pid
+  when: "'cache_stack' in groups"
+
+- name: mount cache dir
+  become: true
+  mount:
+    path: /mnt/kubespray_cache
+    src: localhost:/srv/kubespray_cache
+    fstype: nfs4
+    state: ephemeral # dont create fstab
+    opts: "port=3049"
+  when: "'cache_stack' in groups"

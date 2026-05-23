@@ -66,18 +66,20 @@ def test_create_lxc(request, get_proxmoxer, get_test_env, setup_haproxy_lxcs):
                 "lxcs": [
                     {
                         "parameters": {
-                            "rootfs": f"volume={get_test_env["pve_test_disk_storage_id"]}:10",
+                            "rootfs": f"volume={get_test_env['pve_test_disk_storage_id']}:10",
                             "cores": 1,
                             "memory": 512,
-                            "net0": f"name=pve,bridge=vmbr0,firewall=1,ip=dhcp",
+                            "net0": f"name=pve,bridge=vmbr0,firewall=1,ip=dhcp"
+                            + f"{get_test_env['net0_vlan_tag_rendered'] if 'net0_vlan_tag_rendered' in get_test_env else ''}",
                         }
                     },
                     {
                         "parameters": {
-                            "rootfs": f"volume={get_test_env["pve_test_disk_storage_id"]}:10",
+                            "rootfs": f"volume={get_test_env['pve_test_disk_storage_id']}:10",
                             "cores": 1,
                             "memory": 512,
-                            "net0": f"name=pve,bridge=vmbr0,firewall=1,ip=dhcp",
+                            "net0": f"name=pve,bridge=vmbr0,firewall=1,ip=dhcp"
+                            + f"{get_test_env['net0_vlan_tag_rendered'] if 'net0_vlan_tag_rendered' in get_test_env else ''}",
                         }
                     },
                 ],
@@ -128,6 +130,16 @@ def test_create_lxc(request, get_proxmoxer, get_test_env, setup_haproxy_lxcs):
             logger.info(ddns_ips)
             assert ddns_ips  # assert ddns response
 
+            # run get blakes for lxcs
+            get_blakes_lxcs_run = ansible_runner.run(
+                project_dir=os.getcwd(),
+                playbook="playbooks/get_blakes.yaml",
+                inventory=temp_dyn_lxcs_inv.name,
+                verbosity=request.config.getoption("--ansible-verbosity"),
+            )
+
+            assert get_blakes_lxcs_run.rc == 0
+
         finally:
 
             if not request.config.getoption("--skip-cleanup"):
@@ -155,8 +167,9 @@ def test_create_qemu(request, get_test_env, setup_haproxy_lxcs):
                 + get_test_env["pve_test_cloud_domain"],
                 "stack_name": "pytest-qemu",
                 "qemu_base_parameters": {
-                    "cpu": "x86-64-v2-AES",
-                    "net0": "virtio,bridge=vmbr0,firewall=1",
+                    "cpu": "host",
+                    "net0": "virtio,bridge=vmbr0,firewall=1"
+                    + f"{get_test_env['net0_vlan_tag_rendered'] if 'net0_vlan_tag_rendered' in get_test_env else ''}",
                     "sockets": 1,
                 },
                 "tcp_proxies": [
@@ -187,12 +200,17 @@ def test_create_qemu(request, get_test_env, setup_haproxy_lxcs):
                         "hostname": "test-vm",
                         "disk": {
                             "size": "25G",
-                            "options": {"discard": "on", "iothread": "on", "ssd": "on"},
+                            "options": {
+                                "discard": "on",
+                                "iothread": "on",
+                                "ssd": "on",
+                                "cache": "unsafe",
+                            },
                             "pool": get_test_env["pve_test_disk_storage_id"],
                         },
                         "parameters": {
-                            "cores": 4,
-                            "memory": 4096,
+                            "cores": 2,
+                            "memory": 1024,
                         },
                     },
                 ],
@@ -206,24 +224,36 @@ def test_create_qemu(request, get_test_env, setup_haproxy_lxcs):
             temp_qemu_inv,
         )
         temp_qemu_inv.flush()
+        try:
 
-        qemu_run = ansible_runner.run(
-            project_dir=os.getcwd(),
-            playbook="playbooks/sync_qemus.yaml",
-            inventory=temp_qemu_inv.name,
-            verbosity=request.config.getoption("--ansible-verbosity"),
-        )
-
-        assert qemu_run.rc == 0
-
-        if not request.config.getoption("--skip-cleanup"):
-            qemu_destroy_run = ansible_runner.run(
+            qemu_run = ansible_runner.run(
                 project_dir=os.getcwd(),
-                playbook="playbooks/destroy_qemus.yaml",
+                playbook="playbooks/sync_qemus.yaml",
                 inventory=temp_qemu_inv.name,
                 verbosity=request.config.getoption("--ansible-verbosity"),
             )
-            assert qemu_destroy_run.rc == 0
+
+            assert qemu_run.rc == 0
+
+            # run get blakes on qemus
+            get_blakes_qemu_run = ansible_runner.run(
+                project_dir=os.getcwd(),
+                playbook="playbooks/get_blakes.yaml",
+                inventory=temp_qemu_inv.name,
+                verbosity=request.config.getoption("--ansible-verbosity"),
+            )
+
+            assert get_blakes_qemu_run.rc == 0
+
+        finally:
+            if not request.config.getoption("--skip-cleanup"):
+                qemu_destroy_run = ansible_runner.run(
+                    project_dir=os.getcwd(),
+                    playbook="playbooks/destroy_qemus.yaml",
+                    inventory=temp_qemu_inv.name,
+                    verbosity=request.config.getoption("--ansible-verbosity"),
+                )
+                assert qemu_destroy_run.rc == 0
 
 
 def test_create_secondary_kubespray(
@@ -233,6 +263,12 @@ def test_create_secondary_kubespray(
     setup_cache_lxcs,
     get_secondary_kubespray_inv,
 ):
+    if "pve_test_secondary_cluster_name" not in get_test_env:
+        logger.info(
+            "skipping secondary pve cluster test mechanism since not defined in test env"
+        )
+        return  # skip if not defined
+
     # in this case we copy an existing prod cert
     if (
         "pve_test_k8s_tls_copy_target_pve" in get_test_env
@@ -273,7 +309,7 @@ def test_create_secondary_kubespray(
             cur.execute(
                 query,
                 (
-                    f"{get_test_env["pve_test_k8s_tls_copy_stack_name"]}.{cluster_vars["pve_cloud_domain"]}",
+                    f"{get_test_env['pve_test_k8s_tls_copy_stack_name']}.{cluster_vars['pve_cloud_domain']}",
                 ),
             )
             record = cur.fetchone()
@@ -308,7 +344,7 @@ def test_create_secondary_kubespray(
         # update certs and mirror pull secret
         with Session(engine) as session:
             copy_cert = AcmeX509(
-                stack_fqdn=f"pytest-secondary-k8s.{get_test_env["pve_test_cloud_domain"]}",
+                stack_fqdn=f"pytest-secondary-k8s.{get_test_env['pve_test_cloud_domain']}",
                 config={},
                 ec_csr={},
                 ec_crt={},
@@ -371,7 +407,12 @@ def test_create_secondary_kubespray(
 
 
 def test_create_kubespray(
-    request, get_test_env, get_kubespray_inv, setup_haproxy_lxcs, setup_cache_lxcs
+    request,
+    get_test_env,
+    get_kubespray_inv,
+    setup_haproxy_lxcs,
+    setup_cache_lxcs,
+    setup_ceph_dhcp_lxcs,
 ):
     logger.info("create kubespray")
 
@@ -396,10 +437,10 @@ def test_create_kubespray(
         _, stdout, _ = ssh.exec_command("cat /etc/pve/cloud/cluster_vars.yaml")
 
         cluster_vars = yaml.safe_load(stdout.read().decode("utf-8"))
-
+        logger.info(cluster_vars["pve_haproxy_floating_ip_internal"])
         _, stdout, _ = ssh.exec_command("cat /etc/pve/cloud/secrets/patroni.pass")
 
-        patroni_pass = stdout.read().decode("utf-8")
+        patroni_pass = stdout.read().decode("utf-8").strip()
         logger.info(patroni_pass)
 
         conn = psycopg2.connect(
@@ -416,7 +457,7 @@ def test_create_kubespray(
             cur.execute(
                 query,
                 (
-                    f"{get_test_env["pve_test_k8s_tls_copy_stack_name"]}.{cluster_vars["pve_cloud_domain"]}",
+                    f"{get_test_env['pve_test_k8s_tls_copy_stack_name']}.{cluster_vars['pve_cloud_domain']}",
                 ),
             )
             record = cur.fetchone()
@@ -451,7 +492,7 @@ def test_create_kubespray(
         # update certs and mirror pull secret
         with Session(engine) as session:
             copy_cert = AcmeX509(
-                stack_fqdn=f"pytest-k8s.{get_test_env["pve_test_cloud_domain"]}",
+                stack_fqdn=f"pytest-k8s.{get_test_env['pve_test_cloud_domain']}",
                 config={},
                 ec_csr={},
                 ec_crt={},
@@ -466,6 +507,32 @@ def test_create_kubespray(
     if tdd_ip:
         extra_vars["test_repos_ip"] = tdd_ip
 
+    # create custom kubespray vars for testing mem limits on worker
+    k8s_cluster_vars_path = "/tmp/group_vars/kube_node.yaml"
+    os.makedirs(os.path.dirname(k8s_cluster_vars_path), exist_ok=True)
+    if os.path.exists(k8s_cluster_vars_path):
+        os.remove(k8s_cluster_vars_path)
+
+    # according to the kubernetes.md documentation
+    yaml_content = """
+kube_reserved: true
+kube_reserved_cgroups_for_service_slice: kube.slice
+kube_reserved_cgroups: "/{{ kube_reserved_cgroups_for_service_slice }}"
+kube_memory_reserved: 256Mi
+
+system_reserved: true
+system_reserved_cgroups_for_service_slice: system.slice
+system_reserved_cgroups: "/{{ system_reserved_cgroups_for_service_slice }}"
+system_memory_reserved: 500Mi
+
+eviction_hard:
+  memory.available: 1Gi
+
+"""
+
+    with open(k8s_cluster_vars_path, "w") as file:
+        file.write(yaml_content)
+
     kubespray_run = ansible_runner.run(
         project_dir=os.getcwd(),
         playbook="playbooks/sync_kubespray.yaml",
@@ -475,6 +542,10 @@ def test_create_kubespray(
     )
 
     assert kubespray_run.rc == 0
+
+    # always cleanup custom vars
+    if os.path.exists(k8s_cluster_vars_path):
+        os.remove(k8s_cluster_vars_path)
 
     if not request.config.getoption("--skip-cleanup"):
         kubespray_destroy_run = ansible_runner.run(

@@ -64,9 +64,9 @@
       set_fact:
         resolv_conf: "{{ resolv_conf_raw.content | b64decode }}"
 
-    - name: Extract nameservers from resolv.conf
+    - name: Extract ipv4 nameservers from resolv.conf
       set_fact:
-        nameservers: "{{ resolv_conf | regex_findall('^nameserver\\s+([0-9\\.]+)', multiline=True) }}"
+        nameservers: "{{ resolv_conf | regex_findall('^nameserver\\s+([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3})') }}"
 
     - name: Show extracted nameservers
       debug:
