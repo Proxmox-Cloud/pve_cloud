@@ -1,0 +1,21 @@
+[Unit]
+Description=bdd cron verify: {{ verify_data }} 
+After=network.target
+
+[Service]
+Type=oneshot
+User={{ 'root' if PXC_BACKUP_BASE_DIR is defined else 'backup' }}
+WorkingDirectory=/opt/bdd
+ExecStart=/opt/bdd/cron.sh
+Environment="VERIFY_DATA={{ 'true' if verify_data else 'false' }}"
+{% if PXC_REMOVABLE_DATASTORES is defined %}
+Environment="BORG_BASE_DIR=/srv/backup/borg"
+{% endif %}
+{% if PXC_BACKUP_BASE_DIR is defined %}
+Environment="PXC_BACKUP_BASE_DIR={{ PXC_BACKUP_BASE_DIR }}"
+{% elif PXC_REMOVABLE_DATASTORES is defined %}
+Environment="PXC_REMOVABLE_DATASTORES={{ PXC_REMOVABLE_DATASTORES }}"
+{% endif %}
+
+[Install]
+WantedBy=imers.target

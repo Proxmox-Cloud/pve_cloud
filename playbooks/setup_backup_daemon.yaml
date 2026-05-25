@@ -59,3 +59,59 @@
         name: "bdd"
         state: restarted
         enabled: yes
+
+    # install cron cleanup / check jobs
+    - name: copy script
+      copy:
+        src: bdd-cron.sh
+        dest: /opt/bdd/cron.sh
+        mode: '0755'
+
+    - name: create bdd cron weekly service
+      template:
+        dest: "/etc/systemd/system/bdd-cron.service"
+        src: ./bdd-cron.service.j2
+      vars:
+        verify_data: false
+    
+    - name: create bdd weekly timer
+      template:
+        dest: "/etc/systemd/system/bdd-cron.timer"
+        src: ./bdd-cron.timer.j2
+      vars:
+        verify_data: false
+        # every monday we run basic check + prune
+        timer_pattern: "Tue *-*-* 03:00:00"
+
+    - name: create bdd cron monthly service
+      template:
+        dest: "/etc/systemd/system/bdd-cron-monthly.service"
+        src: ./bdd-cron.service.j2
+      vars:
+        verify_data: true
+    
+    - name: create bdd monthly timer
+      template:
+        dest: "/etc/systemd/system/bdd-cron-monthly.timer"
+        src: ./bdd-cron.timer.j2
+      vars:
+        verify_data: true
+        # run on the first tuesday of the month
+        # this includes borg --verify-data option 
+        # which will result in longer runtime
+        timer_pattern: "Mon *-*-01..07 03:00:00"
+
+    - name: Reload systemd daemon
+      command: systemctl daemon-reload
+
+    - name: enable weekly cron
+      systemd:
+        name: "bdd-cron.timer"
+        state: started
+        enabled: yes
+
+    - name: enable monthly cron
+      systemd:
+        name: "bdd-cron-monthly.timer"
+        state: started
+        enabled: yes

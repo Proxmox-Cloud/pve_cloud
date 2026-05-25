@@ -1,0 +1,8 @@
+[Unit]
+Description=bdd check verify: {{ verify_data }} 
+
+[Timer]
+OnCalendar={{ timer_pattern }}
+
+[Install]
+WantedBy=timers.target
