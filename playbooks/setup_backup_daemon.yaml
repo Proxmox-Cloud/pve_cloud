@@ -1,3 +1,15 @@
+- name: Slurp screts from pve
+  hosts: target_pve
+  roles:
+    - slurp_cluster_secrets
+
+- name: Create server tls certificates
+  hosts: localhost
+  roles:
+    - parse_cluster_secrets
+    - bdd_server_tls_certs
+
+
 - name: Install requirements on debian 12 lxc/vm
   hosts: lxcs:qemus
   vars:
