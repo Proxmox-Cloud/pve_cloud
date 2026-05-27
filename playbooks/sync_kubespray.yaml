@@ -440,3 +440,4 @@
         release_namespace: nginx-ingress
         create_namespace: true
         update_repo_cache: true
+        timeout: 15m # slow tdd systems

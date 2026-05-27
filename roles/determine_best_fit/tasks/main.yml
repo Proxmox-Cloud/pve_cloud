@@ -7,6 +7,12 @@
   when: pve_ha_group is not defined or (hostvars[item].pve_ha_groups is defined and pve_ha_group in hostvars[item].pve_ha_groups)
   loop: "{{ groups['target_pve'] }}"
 
+- name: Check that no reserved memory exceeds total memory
+  fail:
+    msg: "Reserved memory ({{ item.reserved }} MB) exceeds total memory ({{ item.mem_total }} MB) for host {{ item.hostname }}"
+  when: item.reserved > item.mem_total
+  loop: "{{ host_mem_list }}"
+
 - backtrack_fit:
     host_mem_list: "{{ host_mem_list }}"
     nodes_to_create: "{{ delete_create['vms_to_create'] }}"

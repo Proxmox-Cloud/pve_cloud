@@ -303,6 +303,8 @@ def setup_ceph_dhcp_lxcs(request, get_test_env, setup_dhcp_lxcs):
             verbosity=request.config.getoption("--ansible-verbosity"),
         )
         assert destroy_kea_lxcs_run.rc == 0
+    else:
+        yield
 
 
 @cloud_fixture("bind")
