@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="../qemu_schema_base/">
+        <link rel="prev" href="../arch/">
       
       
-        <link rel="next" href="../setup_ceph_kea_schema_ext/">
+        <link rel="next" href="../extensible/">
       
       
         
@@ -23,7 +23,7 @@
     
     
       
-        <title>Setup bind schema ext - PVE Cloud Documentation</title>
+        <title>Demo system (hosted) - PVE Cloud Documentation</title>
       
     
     
@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#35-property-bind-dns-inventory-lxcs" class="md-skip">
+        <a href="#demo-system-hosted" class="md-skip">
           Skip to content
         </a>
       
@@ -112,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Setup bind schema ext
+              Demo system (hosted)
             
           </span>
         </div>
@@ -236,18 +236,20 @@
       
   
   
+    
   
   
+  
     
     
     
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
         
           
           <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
@@ -268,7 +270,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
             
@@ -286,7 +288,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../proxmox-setup/arch/" class="md-nav__link">
+      <a href="../arch/" class="md-nav__link">
         
   
   
@@ -311,10 +313,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../proxmox-setup/demo/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Demo system (hosted)
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -330,6 +359,65 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setup
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Setup">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#sources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sources
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#control-node-ansibleterraform" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Control Node Ansible/Terraform
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -342,7 +430,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../proxmox-setup/extensible/" class="md-nav__link">
+      <a href="../extensible/" class="md-nav__link">
         
   
   
@@ -563,20 +651,18 @@
       
   
   
-    
   
   
-  
     
     
     
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" >
         
           
           <label class="md-nav__link" for="__nav_10" id="__nav_10_label" tabindex="0">
@@ -597,7 +683,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_10">
             <span class="md-nav__icon md-icon"></span>
             
@@ -615,7 +701,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../kubespray_inv_schema/" class="md-nav__link">
+      <a href="../../schemas/kubespray_inv_schema/" class="md-nav__link">
         
   
   
@@ -643,7 +729,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../lxc_inv_schema/" class="md-nav__link">
+      <a href="../../schemas/lxc_inv_schema/" class="md-nav__link">
         
   
   
@@ -671,7 +757,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../pve_cloud_inv_schema/" class="md-nav__link">
+      <a href="../../schemas/pve_cloud_inv_schema/" class="md-nav__link">
         
   
   
@@ -699,7 +785,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../qemu_inv_schema/" class="md-nav__link">
+      <a href="../../schemas/qemu_inv_schema/" class="md-nav__link">
         
   
   
@@ -727,7 +813,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../qemu_schema_base/" class="md-nav__link">
+      <a href="../../schemas/qemu_schema_base/" class="md-nav__link">
         
   
   
@@ -752,35 +838,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Setup bind schema ext
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../schemas/setup_bind_schema_ext/" class="md-nav__link">
         
   
   
@@ -796,86 +857,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#35-property-bind-dns-inventory-lxcs" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        35. Property Bind Dns Inventory &gt; lxcs
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="35. Property Bind Dns Inventory &gt; lxcs">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#351-bind-dns-inventory-lxcs-lxcs-items" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        35.1. Bind Dns Inventory &gt; lxcs &gt; lxcs items
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="35.1. Bind Dns Inventory &gt; lxcs &gt; lxcs items">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#3511-property-bind-dns-inventory-lxcs-lxcs-items-vars" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        35.1.1. Property Bind Dns Inventory &gt; lxcs &gt; lxcs items &gt; vars
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="35.1.1. Property Bind Dns Inventory &gt; lxcs &gt; lxcs items &gt; vars">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#35111-property-bind-dns-inventory-lxcs-lxcs-items-vars-bind_master" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        35.1.1.1. Property Bind Dns Inventory &gt; lxcs &gt; lxcs items &gt; vars &gt; bind_master
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -888,7 +869,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../setup_ceph_kea_schema_ext/" class="md-nav__link">
+      <a href="../../schemas/setup_ceph_kea_schema_ext/" class="md-nav__link">
         
   
   
@@ -916,7 +897,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../setup_haproxy_schema_ext/" class="md-nav__link">
+      <a href="../../schemas/setup_haproxy_schema_ext/" class="md-nav__link">
         
   
   
@@ -944,7 +925,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../setup_kea_schema_ext/" class="md-nav__link">
+      <a href="../../schemas/setup_kea_schema_ext/" class="md-nav__link">
         
   
   
@@ -972,7 +953,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../vm_schema_base/" class="md-nav__link">
+      <a href="../../schemas/vm_schema_base/" class="md-nav__link">
         
   
   
@@ -1017,230 +998,159 @@
 
 
 
-  <h1>Setup bind schema ext</h1>
+<h1 id="demo-system-hosted">Demo system (hosted)</h1>
+<p>To get startet with proxmox cloud you can simply rent any single dedicated server, the following example covers hetzner/ionos on a single 64GB machine.</p>
+<p>This setup is not suitable for a scalable production environment, setting that up requires specialized steps per provider (guides can be found in the <a href="../extensible/">extensible setup</a>).</p>
+<h2 id="setup">Setup</h2>
+<ol>
+<li>first want to do a install with an basic os from the hosting provider (like debian) to get the network mac addressses, dns servers and the routing configuration.</li>
+</ol>
+<pre><code class="language-bash"># save the output of these commands somewhere
+cat /etc/network/interfaces
+ip a
+ip route
+cat /etc/resolv.conf
 
-<p><strong>Title:</strong> Bind Dns Inventory</p>
-<table>
-<thead>
-<tr>
-<th></th>
-<th></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Type</strong></td>
-<td><code>object</code></td>
-</tr>
-<tr>
-<td><strong>Required</strong></td>
-<td>No</td>
-</tr>
-<tr>
-<td><strong>Additional properties</strong></td>
-<td>Any type allowed</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Description:</strong> LXC Inventory extension for the setup_bind playbook. This extends the LXC Inventory schema.</p>
-<table>
-<thead>
-<tr>
-<th>Property</th>
-<th>Pattern</th>
-<th>Type</th>
-<th>Deprecated</th>
-<th>Definition</th>
-<th>Title/Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>- <a href="#lxcs">lxcs</a></td>
-<td>No</td>
-<td>array of object</td>
-<td>No</td>
-<td>-</td>
-<td>List of lxcs that will be created for the stack.</td>
-</tr>
-</tbody>
-</table>
-<h2 id="35-property-bind-dns-inventory-lxcs"><a name="lxcs"></a>35. Property <code>Bind Dns Inventory &gt; lxcs</code></h2>
-<table>
-<thead>
-<tr>
-<th></th>
-<th></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Type</strong></td>
-<td><code>array of object</code></td>
-</tr>
-<tr>
-<td><strong>Required</strong></td>
-<td>No</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Description:</strong> List of lxcs that will be created for the stack.</p>
-<table>
-<thead>
-<tr>
-<th></th>
-<th>Array restrictions</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Min items</strong></td>
-<td>N/A</td>
-</tr>
-<tr>
-<td><strong>Max items</strong></td>
-<td>N/A</td>
-</tr>
-<tr>
-<td><strong>Items unicity</strong></td>
-<td>False</td>
-</tr>
-<tr>
-<td><strong>Additional items</strong></td>
-<td>False</td>
-</tr>
-<tr>
-<td><strong>Tuple validation</strong></td>
-<td>See below</td>
-</tr>
-</tbody>
-</table>
-<table>
-<thead>
-<tr>
-<th>Each item of this array must be</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><a href="#lxcs_items">lxcs items</a></td>
-<td>-</td>
-</tr>
-</tbody>
-</table>
-<h3 id="351-bind-dns-inventory-lxcs-lxcs-items"><a name="lxcs_items"></a>35.1. Bind Dns Inventory &gt; lxcs &gt; lxcs items</h3>
-<table>
-<thead>
-<tr>
-<th></th>
-<th></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Type</strong></td>
-<td><code>object</code></td>
-</tr>
-<tr>
-<td><strong>Required</strong></td>
-<td>No</td>
-</tr>
-<tr>
-<td><strong>Additional properties</strong></td>
-<td>Any type allowed</td>
-</tr>
-</tbody>
-</table>
-<table>
-<thead>
-<tr>
-<th>Property</th>
-<th>Pattern</th>
-<th>Type</th>
-<th>Deprecated</th>
-<th>Definition</th>
-<th>Title/Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>+ <a href="#lxcs_items_vars">vars</a></td>
-<td>No</td>
-<td>object</td>
-<td>No</td>
-<td>-</td>
-<td>For the dns to work we need to tell the playbooks which lxc will serve as the master and which as the slave.</td>
-</tr>
-</tbody>
-</table>
-<h4 id="3511-property-bind-dns-inventory-lxcs-lxcs-items-vars"><a name="lxcs_items_vars"></a>35.1.1. Property <code>Bind Dns Inventory &gt; lxcs &gt; lxcs items &gt; vars</code></h4>
-<table>
-<thead>
-<tr>
-<th></th>
-<th></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Type</strong></td>
-<td><code>object</code></td>
-</tr>
-<tr>
-<td><strong>Required</strong></td>
-<td>Yes</td>
-</tr>
-<tr>
-<td><strong>Additional properties</strong></td>
-<td>Any type allowed</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Description:</strong> For the dns to work we need to tell the playbooks which lxc will serve as the master and which as the slave.</p>
-<table>
-<thead>
-<tr>
-<th>Property</th>
-<th>Pattern</th>
-<th>Type</th>
-<th>Deprecated</th>
-<th>Definition</th>
-<th>Title/Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>+ <a href="#lxcs_items_vars_bind_master">bind_master</a></td>
-<td>No</td>
-<td>boolean</td>
-<td>No</td>
-<td>-</td>
-<td>The default pve cloud configured dns uses only a master slave combination. You should create two lxcs,<br />one that has this flag set to true, the other to false.<br /></td>
-</tr>
-</tbody>
-</table>
-<h5 id="35111-property-bind-dns-inventory-lxcs-lxcs-items-vars-bind_master"><a name="lxcs_items_vars_bind_master"></a>35.1.1.1. Property <code>Bind Dns Inventory &gt; lxcs &gt; lxcs items &gt; vars &gt; bind_master</code></h5>
-<table>
-<thead>
-<tr>
-<th></th>
-<th></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Type</strong></td>
-<td><code>boolean</code></td>
-</tr>
-<tr>
-<td><strong>Required</strong></td>
-<td>Yes</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Description:</strong> The default pve cloud configured dns uses only a master slave combination. You should create two lxcs,
-one that has this flag set to true, the other to false.</p>
+# shutdown the server
+shutdown now
+</code></pre>
+<ol start="2">
+<li>activate and boot into the rescue system, from here we use qemu to install proxmox directly onto the hosts disks:</li>
+</ol>
+<pre><code class="language-bash"># install qemu + uefi files
+apt update &amp;&amp; apt-get -y install ca-certificates qemu-system-x86
+
+# mount tmpfs for saving the proxmox iso (rescue systems are limited in disk space)
+mount -t tmpfs -o size=4G tmpfs /mnt &amp;&amp; cd /mnt/
+
+# download proxmox iso
+wget https://enterprise.proxmox.com/iso/proxmox-ve_8.4-1.iso
+
+# get your disk device names for passing to the qemu vm
+lsblk # ! you might need to wipe existing software raids from the base installer !
+# to wipe md raid run `mdadm --stop /dev/md2 /dev/md1 /dev/md0` on all md devices `cat /proc/mdstat`
+# then zero all superblock on partitions that had an md device on it `mdadm --zero-superblock /dev/nvme0n1p1 /dev/nvme0n1p2 /dev/nvme0n1p3 ...`
+# follow that up by wiping `wipefs -a /dev/nvme0n1 ...`
+
+# check if your BIOS is UEFI or LEGACY
+[ -d &quot;/sys/firmware/efi&quot; ] &amp;&amp; echo &quot;UEFI&quot; || echo &quot;LEGACY&quot;
+
+# if it is UEFI, pass run `apt install ovmf` and pass the parameter -bios /usr/share/ovmf/OVMF.fd to the qemu setup command
+# ! if you dont do this correctly the server might not be able to boot later
+
+# launch the installer vm - select Install Proxmox VE (Terminal UI, Serial Console)
+# for ionos omit --enable-kvm and replace -cpu host with -cpu max, this emulated setup
+# will take significantly longer, especially on the last &quot;make system bootable&quot; step.
+# allow up to 25 minutes for this to complete
+qemu-system-x86_64 -boot d -cdrom proxmox-ve_8.4-1.iso \
+  -drive file=/dev/nvme0n1,format=raw,if=virtio -drive file=/dev/nvme1n1,format=raw,if=virtio \
+  -m 4G -nographic -serial mon:stdio -cpu host --enable-kvm
+
+# ctrl + a =&gt; c open qemu console, type `quit` to exit it if stuck / after finish
+</code></pre>
+<ol start="3">
+<li>now we want to boot up the vm again, but without the iso mounted so we can access our proxmox</li>
+</ol>
+<pre><code class="language-bash"># run the command again without the -boot d and -cdrom proxmox-ve... parameters to enter the vm
+qemu-system-x86_64 -cpu host --enable-kvm -drive file=/dev/nvme0n1,format=raw,if=virtio -drive file=/dev/nvme1n1,format=raw,if=virtio -m 4G -nographic -serial mon:stdio
+</code></pre>
+<ol start="4">
+<li>inside your proxmox vm create <code>/etc/systemd/network/10-nic0.link</code> to ensure proper nic naming on reboot</li>
+</ol>
+<pre><code class="language-conf">[Match]
+MACAddress=a8:a1:59:0f:22:60 # mac you noted down in step 1. ;)
+
+[Link]
+Name=nic0
+</code></pre>
+<ol start="5">
+<li>we also need to update <code>/etc/network/interfaces</code></li>
+</ol>
+<pre><code class="language-conf">auto lo
+iface lo inet loopback
+
+iface nic0 inet manual # renamed via .link file
+
+# the bridge is a seperate interface we attach our vms to, you need to seperate
+# this from the main uplink port and set bridge-ports none, otherwise hetzner
+# will trigger an abuse case because you used forbidden macs for vms etc.
+auto vmbr0
+iface vmbr0 inet static
+        address XXX.XXX.XXX.XXX/XX # insert from step 1.
+        gateway XXX.XXX.XXX.XXX # insert from step 1.
+        bridge-ports nic0
+        bridge-stp off
+        bridge-fd 0
+        bridge-vlan-aware yes
+        bridge-vids 2-4094
+
+        # ! hack configuration for demo system only !
+        # enable routing nat for our virtual machines (so they can connect to the www)
+        post-up iptables -t nat -A POSTROUTING -s 10.0.1.0/24 -o vmbr0 -j MASQUERADE
+        post-down iptables -t nat -D POSTROUTING -s 10.0.1.0/24 -o vmbr0 -j MASQUERADE
+
+
+# we will add additional vlans via the ui later
+</code></pre>
+<ol start="5">
+<li>update <code>/etc/resolv.conf</code> with your original values from step 1., update <code>/etc/hosts</code> to match your hosts ip</li>
+<li>exit the vm with <code>shutdown now</code> and run it again to shut down the rescue system (then disable it inside hetzner console and boot your server up again)</li>
+<li>go to your https://PUBLIC-IP:8006 and access the proxmox ui and create a new Linux VLAN in the System/Network tab. Name it vmbr0.2 and assign the static ip 10.0.0.1/24. This will be used by the proxmox cluster and the control node later</li>
+<li>create a network for vm communication: vmbr0.10 10.0.1.1/24</li>
+<li>create proxmox cluster under Datacenter/Cluster on the management interface vmbr0.2</li>
+<li>under Datacenter/Storage enable "Snippets" for local storage</li>
+<li>add no subscription pve apt repos refresh and upgrade</li>
+<li>now to make virtual machines have access to the internet we need to configure the proxmox host to act as a router (this is a hack for the demo system only!)</li>
+</ol>
+<pre><code class="language-bash"># sign into your host, add your ssh key to the proxmox host itself under ~/.ssh/authorized_keys
+
+# enable forwarding and persist
+sysctl -w net.ipv4.ip_forward=1
+echo &quot;net.ipv4.ip_forward=1&quot; | tee /etc/sysctl.d/99-ip-forward.conf 
+
+</code></pre>
+<ol start="12">
+<li>Setup your <a href="#control-node-ansibleterraform">control node lxc</a> for deploying and working with the collection</li>
+<li>Continue with the <a href="./bootstrap.md">bootstrap section</a>, to deploy proxmox cloud. In this setup you will select a floating ip for the central haproxy loadbalancer of the cloud.</li>
+</ol>
+<h3 id="sources">Sources</h3>
+<p>This rescue mode setup was distilled from:</p>
+<ul>
+<li><a href="https://www.ionos.com/digitalguide/server/configuration/install-an-alternative-server-operating-system/">Ionos rescue setup</a></li>
+<li><a href="https://community.hetzner.com/tutorials/install-and-configure-proxmox_ve">Hetzner rescue setup</a></li>
+</ul>
+<h2 id="control-node-ansibleterraform">Control Node Ansible/Terraform</h2>
+<p>Since this is a dedicated system you need a machine / container with direct access to all vms and proxmox hosts. for that we manually create an lxc, as a control node for running ansible and terraform configuration (proxmox cloud does not yet support remote access). On a local setup where your personal computer has access to the same private network where your vms live, you dont need a seperate machine / container.</p>
+<p>The machine needs a nic on the management switch / vlan, aswell as the vmdata vlan.</p>
+<pre><code class="language-bash"># On your freshly created proxmox cluster in the gui go to storage and download a template of your choice (debian/ubuntu recommended)
+
+# create your control node container with a network interface on the vm data bridge vlan and one on the management interface
+# for demo systems use the proxmox host as the gateway, for extensible the opnsense
+# assign it .254 or .253 on both network interfaces statically
+
+# then connect to your lxc connect to it using this command:
+ssh -L 8081:localhost:8080 -o ProxyJump=root@PROXMOX_HOST_IP root@STATIC_VM_DATA_IP.253/254
+
+# download the latest vscode server release https://github.com/coder/code-server/releases/:
+wget https://github.com/coder/code-server/releases/download/v4.112.0/code-server_4.112.0_amd64.deb
+dpkg -i code-server_4.112.0_amd64.deb
+systemctl enable --now code-server@root
+
+# open the vscode config file and set auth to &quot;none&quot;, so its easily accessible via ssh port forwarding
+nano /root/.config/code-server/config.yaml 
+systemctl restart code-server@root
+
+# now you should be able to access your vscode server at localhost:8081 in the browser
+
+# you need to set the locale for the lxc container for certain later playbooks to work
+dpkg-reconfigure locales # generate and set your default locale
+# =&gt; reboot the lxc after setting locales
+
+# generate a ssh key for your private git repos and proxmox host access (add it to one of your proxmox hosts under /root/.ssh/authorized_keys)
+ssh-keygen -t ed25519
+cat ~/.ssh/id_ed25519.pub
+</code></pre>
+<p>From here you can start with the <a href="../../bootstrap/">bootstrap process</a>.</p>
 
 
 

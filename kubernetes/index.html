@@ -219,7 +219,7 @@
   <span class="md-ellipsis">
     
   
-    General
+    Introduction
   
 
     
@@ -238,15 +238,153 @@
   
   
   
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Proxmox Setup
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Proxmox Setup
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
     <li class="md-nav__item">
-      <a href="../proxmox-arch/" class="md-nav__link">
+      <a href="../proxmox-setup/arch/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Proxmox Architecture
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../proxmox-setup/demo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Demo system (hosted)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../proxmox-setup/extensible/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Extensible production cluster (hosted)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cloud-arch/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cloud Architecture
   
 
     
@@ -477,33 +615,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../tdd/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Test Driven Development
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../faq/" class="md-nav__link">
         
   
@@ -557,6 +668,33 @@
   
   
   
+    <li class="md-nav__item">
+      <a href="../tdd/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Test Driven Development
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
     
     
     
@@ -566,10 +704,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" >
         
           
-          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_10" id="__nav_10_label" tabindex="0">
             
   
   
@@ -587,8 +725,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_9">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_10">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -958,28 +1096,34 @@ If you dont care about that security you can just use <a href="https://registry.
 <p>Then run the upgrade playbook <code>ansible-playbook -i YOUR-KUBESPRAY-INV.yaml pxc.cloud.upgrade_kubespray</code>.</p>
 <h2 id="custom-kubespray-vars">Custom kubespray vars</h2>
 <p>To define your own kubespray vars just create <code>group_vars/all</code> and <code>group_vars/k8s_cluster</code> directories alongside your kubespray inventory yaml file.</p>
-<p>Here are some interesting kubespray settings you might want to set (k8s_cluster vars):</p>
+<p>Here are some interesting kubespray settings you might want to set (<code>group_vars/k8s_cluster/k8s-cluster.yaml</code> vars):</p>
 <ul>
 <li>increase amount of schedulable pods per node (if you have big nodes)</li>
 </ul>
-<pre><code class="language-yaml">kube_network_node_prefix: 22
-kubelet_max_pods: 1024
+<pre><code class="language-yaml">kubelet_max_pods: 1024
 </code></pre>
 <ul>
-<li>set strict eviction limits, this is a good safe guard for node availability incase you have memory hungry deployments without any requests / limits defined </li>
+<li>for the workers you might want to set strict eviction limits. this is a good safe guard for node availability incase you have memory hungry deployments without any requests / limits defined. for that create the file <code>group_vars/kube_node.yml</code></li>
 </ul>
 <pre><code class="language-yaml"># this will enable reservations with the default values, see kubespray sample inventory
 kube_reserved: true
+# these two need to be as per kubespray sample var documentation
 kube_reserved_cgroups_for_service_slice: kube.slice
-kube_reserved_cgroups: &quot;/{{ kube_reserved_cgroups_for_service_slice }}&quot;
+kube_reserved_cgroups: &quot;{{ kube_reserved_cgroups_for_service_slice }}&quot;
+# define reserved memory for kubernetes processes
+kube_memory_reserved: 512Mi
 
 system_reserved: true
+# these two need to be as per kubespray sample var documentation
 system_reserved_cgroups_for_service_slice: system.slice
-system_reserved_cgroups: &quot;/{{ system_reserved_cgroups_for_service_slice }}&quot;
-system_memory_reserved: 1024Mi
+system_reserved_cgroups: &quot;{{ system_reserved_cgroups_for_service_slice }}&quot;
+# limit for system service (like networking)
+system_memory_reserved: 1Gi
 
+# extra limits calculated on top when evictions will be initialized
 eviction_hard:
-  memory.available: 1000Mi
+  memory.available: 3Gi # should be kube reserved + system reserved + buffer
+
 </code></pre>
 <p>=&gt; this, in addition to the <code>pxc.cloud.</code> role, will allow k8s nodes to run even if we got memory hungry, ram hogging deployments. eviction hard and reservations alone are not enough, in oom scenarios it will cause the networkd service to stop working. This role is automatically executed via the <code>pxc.cloud.sync_kubespray</code> playbook.</p>
 <h2 id="exposing-k8s-controlplane-api">Exposing K8S Controlplane API</h2>

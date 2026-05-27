@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="../qemu_schema_base/">
+        <link rel="prev" href="../demo/">
       
       
-        <link rel="next" href="../setup_ceph_kea_schema_ext/">
+        <link rel="next" href="../../cloud-arch/">
       
       
         
@@ -23,7 +23,7 @@
     
     
       
-        <title>Setup bind schema ext - PVE Cloud Documentation</title>
+        <title>Extensible production cluster (hosted) - PVE Cloud Documentation</title>
       
     
     
@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#35-property-bind-dns-inventory-lxcs" class="md-skip">
+        <a href="#extensible-production-cluster-hosted" class="md-skip">
           Skip to content
         </a>
       
@@ -112,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Setup bind schema ext
+              Extensible production cluster (hosted)
             
           </span>
         </div>
@@ -236,18 +236,20 @@
       
   
   
+    
   
   
+  
     
     
     
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
         
           
           <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
@@ -268,7 +270,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
             
@@ -286,7 +288,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../proxmox-setup/arch/" class="md-nav__link">
+      <a href="../arch/" class="md-nav__link">
         
   
   
@@ -314,7 +316,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../proxmox-setup/demo/" class="md-nav__link">
+      <a href="../demo/" class="md-nav__link">
         
   
   
@@ -339,10 +341,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../proxmox-setup/extensible/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Extensible production cluster (hosted)
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -358,6 +387,70 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#single-node-ceph" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Single node ceph
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#opnsense-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OPNSense Setup
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#securing-our-cluster" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Securing our Cluster
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#uprading-to-multi-node-cluster" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Uprading to multi node cluster
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -563,20 +656,18 @@
       
   
   
-    
   
   
-  
     
     
     
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" >
         
           
           <label class="md-nav__link" for="__nav_10" id="__nav_10_label" tabindex="0">
@@ -597,7 +688,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_10">
             <span class="md-nav__icon md-icon"></span>
             
@@ -615,7 +706,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../kubespray_inv_schema/" class="md-nav__link">
+      <a href="../../schemas/kubespray_inv_schema/" class="md-nav__link">
         
   
   
@@ -643,7 +734,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../lxc_inv_schema/" class="md-nav__link">
+      <a href="../../schemas/lxc_inv_schema/" class="md-nav__link">
         
   
   
@@ -671,7 +762,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../pve_cloud_inv_schema/" class="md-nav__link">
+      <a href="../../schemas/pve_cloud_inv_schema/" class="md-nav__link">
         
   
   
@@ -699,7 +790,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../qemu_inv_schema/" class="md-nav__link">
+      <a href="../../schemas/qemu_inv_schema/" class="md-nav__link">
         
   
   
@@ -727,7 +818,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../qemu_schema_base/" class="md-nav__link">
+      <a href="../../schemas/qemu_schema_base/" class="md-nav__link">
         
   
   
@@ -752,35 +843,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Setup bind schema ext
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../schemas/setup_bind_schema_ext/" class="md-nav__link">
         
   
   
@@ -796,86 +862,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#35-property-bind-dns-inventory-lxcs" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        35. Property Bind Dns Inventory &gt; lxcs
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="35. Property Bind Dns Inventory &gt; lxcs">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#351-bind-dns-inventory-lxcs-lxcs-items" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        35.1. Bind Dns Inventory &gt; lxcs &gt; lxcs items
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="35.1. Bind Dns Inventory &gt; lxcs &gt; lxcs items">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#3511-property-bind-dns-inventory-lxcs-lxcs-items-vars" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        35.1.1. Property Bind Dns Inventory &gt; lxcs &gt; lxcs items &gt; vars
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="35.1.1. Property Bind Dns Inventory &gt; lxcs &gt; lxcs items &gt; vars">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#35111-property-bind-dns-inventory-lxcs-lxcs-items-vars-bind_master" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        35.1.1.1. Property Bind Dns Inventory &gt; lxcs &gt; lxcs items &gt; vars &gt; bind_master
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -888,7 +874,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../setup_ceph_kea_schema_ext/" class="md-nav__link">
+      <a href="../../schemas/setup_ceph_kea_schema_ext/" class="md-nav__link">
         
   
   
@@ -916,7 +902,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../setup_haproxy_schema_ext/" class="md-nav__link">
+      <a href="../../schemas/setup_haproxy_schema_ext/" class="md-nav__link">
         
   
   
@@ -944,7 +930,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../setup_kea_schema_ext/" class="md-nav__link">
+      <a href="../../schemas/setup_kea_schema_ext/" class="md-nav__link">
         
   
   
@@ -972,7 +958,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../vm_schema_base/" class="md-nav__link">
+      <a href="../../schemas/vm_schema_base/" class="md-nav__link">
         
   
   
@@ -1017,230 +1003,104 @@
 
 
 
-  <h1>Setup bind schema ext</h1>
+<h1 id="extensible-production-cluster-hosted">Extensible production cluster (hosted)</h1>
+<p>In this setup we will run through a full production setup, either starting with one or multiple servers. This setup is extensible in the sense that you can add more hosts to your cluster later on and also start with just a single node.</p>
+<p>You need at minimum a 10G link between your hosts. Depending on the link you are limited in the number of proxmox hosts and vms you can have running in a single cluster. The sizes of your subnets should correspond to the bandwidth of your network.</p>
+<p>Run through the <a href="../demo/">demo setup</a> up until finally step 6. then continue with the following instructions:</p>
+<ol start="7">
+<li>Go to the https://PUBLIC-IP:8006 of your proxmox hosts and create Linux VLANs under System/Network for on all nodes. These vlans and their IDs should correspond with the virtual networks / vswitches your create in the web interface of your hosting provider. The following IDs / networks are just suggestions:<ul>
+<li>vmbr0.2, 10.0.0.X/24, management (X is the number of the proxmox host)</li>
+<li>vmbr0.10, 10.0.4.X/22, vm data</li>
+<li>vmbr0.20, 10.0.8.X/22, ceph frontend</li>
+<li>vmbr0.21, 10.0.12.X/24, ceph backend</li>
+<li>vmbr0.30, 10.0.13.X/24, opnsense pseudo wan (you only need this if you dont have a dedicated ip for the opnsense)</li>
+</ul>
+</li>
+<li>initialize the proxmox cluster under Datacenter/Cluster on the management interface</li>
+<li>under Datacenter/Storage enable "Snippets" for local storage</li>
+<li>add your apt repos (no-subscriptions / your enterprise license) and also repositories for ceph squid, then refresh abd upgrade</li>
+<li>go to the Datacenter/Ceph and run through the installer.</li>
+</ol>
+<h2 id="single-node-ceph">Single node ceph</h2>
+<p>If you only have a single host for starters you need still need to use ceph for volumes / vm disks. Do the following to switch ceph into single node mode:</p>
+<ol>
+<li>edit /etc/pve/ceph.conf and set <code>osd_pool_default_min_size</code> to 1 and <code>osd_pool_default_size</code> to 2.</li>
+<li>on your proxmox host run</li>
+</ol>
+<pre><code class="language-bash">ceph osd getcrushmap -o crush_map_compressed
+crushtool -d crush_map_compressed -o crush_map_decompressed
+</code></pre>
+<ol start="3">
+<li>edit the new <code>crush_map_decompressed</code> and replace the line under the rules block <code>step chooseleaf firstn 0 type host</code> with this <code>step chooseleaf firstn 0 type osd</code>. this changes the failure / replication domain to osds, keeping your data safe this way.</li>
+<li>then run these commands to load the updated crushmap</li>
+</ol>
+<pre><code class="language-bash">crushtool -c crush_map_decompressed -o new_crush_map_compressed
+ceph osd setcrushmap -i new_crush_map_compressed
+</code></pre>
+<h2 id="opnsense-setup">OPNSense Setup</h2>
+<p>For production systems we recommend an OPNSense firewall as a virtual machine on your proxmox cluster. This vm should have its own public ip on a dedicated interface and will function as the default gateway for vms and lxcs. </p>
+<ol>
+<li>If you don't yet have a public ip you can also do the setup with the wan interface on the management interface and using the proxmox host itself as the gateway. For this to work your proxmox host needs to act as a router, just like in the demo setup:</li>
+</ol>
+<pre><code class="language-bash"># sign into your host, add your ssh key to the proxmox host itself under ~/.ssh/authorized_keys
 
-<p><strong>Title:</strong> Bind Dns Inventory</p>
-<table>
-<thead>
-<tr>
-<th></th>
-<th></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Type</strong></td>
-<td><code>object</code></td>
-</tr>
-<tr>
-<td><strong>Required</strong></td>
-<td>No</td>
-</tr>
-<tr>
-<td><strong>Additional properties</strong></td>
-<td>Any type allowed</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Description:</strong> LXC Inventory extension for the setup_bind playbook. This extends the LXC Inventory schema.</p>
-<table>
-<thead>
-<tr>
-<th>Property</th>
-<th>Pattern</th>
-<th>Type</th>
-<th>Deprecated</th>
-<th>Definition</th>
-<th>Title/Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>- <a href="#lxcs">lxcs</a></td>
-<td>No</td>
-<td>array of object</td>
-<td>No</td>
-<td>-</td>
-<td>List of lxcs that will be created for the stack.</td>
-</tr>
-</tbody>
-</table>
-<h2 id="35-property-bind-dns-inventory-lxcs"><a name="lxcs"></a>35. Property <code>Bind Dns Inventory &gt; lxcs</code></h2>
-<table>
-<thead>
-<tr>
-<th></th>
-<th></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Type</strong></td>
-<td><code>array of object</code></td>
-</tr>
-<tr>
-<td><strong>Required</strong></td>
-<td>No</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Description:</strong> List of lxcs that will be created for the stack.</p>
-<table>
-<thead>
-<tr>
-<th></th>
-<th>Array restrictions</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Min items</strong></td>
-<td>N/A</td>
-</tr>
-<tr>
-<td><strong>Max items</strong></td>
-<td>N/A</td>
-</tr>
-<tr>
-<td><strong>Items unicity</strong></td>
-<td>False</td>
-</tr>
-<tr>
-<td><strong>Additional items</strong></td>
-<td>False</td>
-</tr>
-<tr>
-<td><strong>Tuple validation</strong></td>
-<td>See below</td>
-</tr>
-</tbody>
-</table>
-<table>
-<thead>
-<tr>
-<th>Each item of this array must be</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><a href="#lxcs_items">lxcs items</a></td>
-<td>-</td>
-</tr>
-</tbody>
-</table>
-<h3 id="351-bind-dns-inventory-lxcs-lxcs-items"><a name="lxcs_items"></a>35.1. Bind Dns Inventory &gt; lxcs &gt; lxcs items</h3>
-<table>
-<thead>
-<tr>
-<th></th>
-<th></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Type</strong></td>
-<td><code>object</code></td>
-</tr>
-<tr>
-<td><strong>Required</strong></td>
-<td>No</td>
-</tr>
-<tr>
-<td><strong>Additional properties</strong></td>
-<td>Any type allowed</td>
-</tr>
-</tbody>
-</table>
-<table>
-<thead>
-<tr>
-<th>Property</th>
-<th>Pattern</th>
-<th>Type</th>
-<th>Deprecated</th>
-<th>Definition</th>
-<th>Title/Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>+ <a href="#lxcs_items_vars">vars</a></td>
-<td>No</td>
-<td>object</td>
-<td>No</td>
-<td>-</td>
-<td>For the dns to work we need to tell the playbooks which lxc will serve as the master and which as the slave.</td>
-</tr>
-</tbody>
-</table>
-<h4 id="3511-property-bind-dns-inventory-lxcs-lxcs-items-vars"><a name="lxcs_items_vars"></a>35.1.1. Property <code>Bind Dns Inventory &gt; lxcs &gt; lxcs items &gt; vars</code></h4>
-<table>
-<thead>
-<tr>
-<th></th>
-<th></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Type</strong></td>
-<td><code>object</code></td>
-</tr>
-<tr>
-<td><strong>Required</strong></td>
-<td>Yes</td>
-</tr>
-<tr>
-<td><strong>Additional properties</strong></td>
-<td>Any type allowed</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Description:</strong> For the dns to work we need to tell the playbooks which lxc will serve as the master and which as the slave.</p>
-<table>
-<thead>
-<tr>
-<th>Property</th>
-<th>Pattern</th>
-<th>Type</th>
-<th>Deprecated</th>
-<th>Definition</th>
-<th>Title/Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>+ <a href="#lxcs_items_vars_bind_master">bind_master</a></td>
-<td>No</td>
-<td>boolean</td>
-<td>No</td>
-<td>-</td>
-<td>The default pve cloud configured dns uses only a master slave combination. You should create two lxcs,<br />one that has this flag set to true, the other to false.<br /></td>
-</tr>
-</tbody>
-</table>
-<h5 id="35111-property-bind-dns-inventory-lxcs-lxcs-items-vars-bind_master"><a name="lxcs_items_vars_bind_master"></a>35.1.1.1. Property <code>Bind Dns Inventory &gt; lxcs &gt; lxcs items &gt; vars &gt; bind_master</code></h5>
-<table>
-<thead>
-<tr>
-<th></th>
-<th></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Type</strong></td>
-<td><code>boolean</code></td>
-</tr>
-<tr>
-<td><strong>Required</strong></td>
-<td>Yes</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Description:</strong> The default pve cloud configured dns uses only a master slave combination. You should create two lxcs,
-one that has this flag set to true, the other to false.</p>
+# enable forwarding and persist
+sysctl -w net.ipv4.ip_forward=1
+echo &quot;net.ipv4.ip_forward=1&quot; | tee /etc/sysctl.d/99-ip-forward.conf 
+
+# edit /etc/network/interfaces and add the following post-up and post-down commands under vmbr0
+iface vmbr0 inet static 
+        # ...
+
+        # routing cidr is different than in the demo system, we dont let the vms directly into the web
+        # but instead allow the opnsense on its pseudo wan interface to access the web through the proxmox host
+        post-up iptables -t nat -A POSTROUTING -s 10.0.13.0/24 -o vmbr0 -j MASQUERADE
+        post-down iptables -t nat -D POSTROUTING -s 10.0.13.0/24 -o vmbr0 -j MASQUERADE
+
+        # this is needed for masquerading to work with the pve fw enabled later on# this is needed for masquerading to work with the pve fw enabled later on
+        # https://forum.proxmox.com/threads/dnat-snat-via-pve-firewall-prerouting-postrouting.49192/#post-230641
+        post-up iptables -t raw -I PREROUTING -i fwbr+ -j CT --zone 1 
+        post-down iptables -t raw -I PREROUTING -i fwbr+ -j CT --zone 1
+
+</code></pre>
+<ol start="2">
+<li>download opnsense dvd image and create a vm inside of proxmox:<ul>
+<li>OS Type: other</li>
+<li>scsi for the hardware disk controller, disk on ceph pool 50GB (discard, ssd emulation on)</li>
+<li>4 cores 8 gb ram</li>
+<li>two nics (model virtio): vmbr0.10 for the lan interface, wan interface added after creating the vm. If you don't have a dedicated public ip, instead add the nic on the management interface. This will be used as the temporary WAN interface.</li>
+</ul>
+</li>
+<li>boot the vm and login as "installer", password "opnsense", choose zfs, ufs is buggy. For the install you can choose a simple password and change it later in the ui.</li>
+<li>login to the terminal via proxmox vm console as root and select "Assign Interfaces"</li>
+<li>assign lan and wan to the corresponding nics</li>
+<li>select "Set interface IP Address"</li>
+<li>set the lan address to 10.0.7.254 with the subnet of 22 bits</li>
+<li>for wan either set your public ip with the same gateway that the proxmox hosts are using, or if you dont have a public ip set the wan to management net .254 with the proxmox host as the gateway.</li>
+<li>ssh into one of the hosts and forward the opnsense ui <code>ssh -L 8087:10.0.7.254:443 root@PROXMOX.HOST.IP.XXX</code></li>
+<li>you can skip the setup wizard and continue with your configuration. Set a strong password for the root user now.</li>
+<li>if you dont have a dedicated public ip, go to your WAN interface under Interfaces/WAN and uncheck the box "Block private Networks"</li>
+</ol>
+<h2 id="securing-our-cluster">Securing our Cluster</h2>
+<p>We now also want to restrict access to our proxmox hosts by activating the proxmox firewall. Sadly we need to define a bunch of rules manually to allow our proxmox cluster to continue to function.</p>
+<ul>
+<li>Go to Datacenter/Firewall/Alias, create 3 aliases with the public ip of each node (node1, node2, node3, ...)</li>
+<li>Go to IPSet and create one called pve-public, add the 3 aliases. Then create IPSets for cephfe, cephbe and migration, adding the cidrs directly.</li>
+<li>Create an additional optional IPSet for IPSec, this should be the public static ip of your companies internet connection. This way noone from outside the company can even connect to your proxmox hosts.</li>
+</ul>
+<p>Next create Security Groups + Rules:</p>
+<ul>
+<li>admin-in: add Protocol: tcp rules for destination port 22 and 8006 with the pve-public IPSet as destination, optionally set your ipsec IPset as source</li>
+<li>ceph-fe: source ceph-fe, destination ceph-fe allow in all</li>
+<li>ceph-be: source ceph-be, destination ceph-be allow in all</li>
+</ul>
+<p>Make sure all rules have enabled checkbox checked.</p>
+<p>Now go to Datacenter/Firewall and activate / insert all the security groups we just created (again marking them as enabled), then under Firewall/Options enable the firewall.</p>
+<p>! This security setup is by no means complete and needs to be used with caution !</p>
+<h2 id="uprading-to-multi-node-cluster">Uprading to multi node cluster</h2>
+<p>Upgrading to a multi node cluster is highly specific to the tools for configuration your dedicated hosting provider has.</p>
+<p>Depending on what changes you have to adjust configs, remove itable rules and network interfaces.</p>
+<p>You also get a dedicated public ip for the WAN interface of the opnsense vm and configure that as the new WAN interface in your opnsense.</p>
 
 
 

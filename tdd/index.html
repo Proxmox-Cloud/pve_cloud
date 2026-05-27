@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="../terraform/">
+        <link rel="prev" href="../contributing/">
       
       
-        <link rel="next" href="../faq/">
+        <link rel="next" href="../schemas/kubespray_inv_schema/">
       
       
         
@@ -219,7 +219,7 @@
   <span class="md-ellipsis">
     
   
-    General
+    Introduction
   
 
     
@@ -238,15 +238,153 @@
   
   
   
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Proxmox Setup
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Proxmox Setup
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
     <li class="md-nav__item">
-      <a href="../proxmox-arch/" class="md-nav__link">
+      <a href="../proxmox-setup/arch/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Proxmox Architecture
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../proxmox-setup/demo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Demo system (hosted)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../proxmox-setup/extensible/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Extensible production cluster (hosted)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cloud-arch/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cloud Architecture
   
 
     
@@ -328,6 +466,60 @@
     
   
     Terraform
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../faq/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    FAQ
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
   
 
     
@@ -498,60 +690,6 @@
   
   
   
-    <li class="md-nav__item">
-      <a href="../faq/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    FAQ
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../contributing/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Contributing
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
     
     
     
@@ -561,10 +699,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" >
         
           
-          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_10" id="__nav_10_label" tabindex="0">
             
   
   
@@ -582,8 +720,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_9">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_10">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -898,9 +1036,9 @@
 
 
 <h1 id="test-driven-development">Test Driven Development</h1>
-<p>For development you will need a dedicated proxmox cluster (a small one will suffice), and another dedicated vlan. The testing suite deploys and configures a proxmox cloud with locally build artifacts.</p>
+<p>For development you will need a two single node proxmox clusters (a small one will suffice), and another dedicated vlan. The testing suite deploys and configures a proxmox cloud with locally build artifacts.</p>
 <h2 id="avahi-mdns">Avahi mdns</h2>
-<p>Make you test proxmox cluster also discoverable via avahi as described in the <a href="../bootstrap/">bootstrap section</a> and setup reflector/repeaters as required.</p>
+<p>Make you test proxmox clusters discoverable via avahi as described in the <a href="../bootstrap/">bootstrap section</a> and setup reflector/repeaters as required.</p>
 <h2 id="e2e-architecture">E2E Architecture</h2>
 <p>Pytest is our core testing framework, in combination with ansible_runner and the terraform cli we build and test the entire collection end to end.</p>
 <p>Our pytest fixtures contain the core setup of the cloud. And from them branch out one or more tests at every level. The fixtures are called only once (pytest session scope).</p>
@@ -945,11 +1083,11 @@ test-env-conf.yaml
 <li>install ansible as described in the <a href="../bootstrap/">bootstrap section</a> and also run the control node setup</li>
 <li>launch local registries for watchdog rebuilds and fast deployment</li>
 </ol>
-<pre><code class="language-bash">docker run -d -p 5000:5000 --name pxc-local-registry registry:3 # local docker registry
+<pre><code class="language-bash">docker run -d -p 5000:5000 --name pxc-local-registry -e REGISTRY_STORAGE_DELETE_ENABLED=true registry:3 # local docker registry
 docker run -d -p 8088:8080 --name pxc-local-pypi pypiserver/pypiserver:latest run -P . -a . # local pypi registry without auth
 docker run -d --name pxc-local-redis -p 6379:6379 redis:latest # redis broker for triggering dependent builds
 </code></pre>
-<ol>
+<ol start="4">
 <li>run <code>tddog --recursive</code> from your top level created <code>pve-cloud</code> folder. This will monitor src folders, rebuild artifacts and their dependants and also run <code>pip install -e .</code> on libraries that are needed locally.</li>
 <li>run the e2e tests:</li>
 </ol>

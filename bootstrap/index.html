@@ -9,7 +9,7 @@
       
       
       
-        <link rel="prev" href="../proxmox-arch/">
+        <link rel="prev" href="../cloud-arch/">
       
       
         <link rel="next" href="../kubernetes/">
@@ -219,7 +219,7 @@
   <span class="md-ellipsis">
     
   
-    General
+    Introduction
   
 
     
@@ -238,15 +238,153 @@
   
   
   
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Proxmox Setup
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Proxmox Setup
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
     <li class="md-nav__item">
-      <a href="../proxmox-arch/" class="md-nav__link">
+      <a href="../proxmox-setup/arch/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Proxmox Architecture
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../proxmox-setup/demo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Demo system (hosted)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../proxmox-setup/extensible/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Extensible production cluster (hosted)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cloud-arch/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cloud Architecture
   
 
     
@@ -326,56 +464,6 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#control-nodedeployment-machine" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Control Node/Deployment machine
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#dedicated-systems" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Dedicated Systems
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Dedicated Systems">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#firewall" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Firewall
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#control-node" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Control Node
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#choose-your-proxmox-cloud-domain" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -398,17 +486,18 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#bootstrap" class="md-nav__link">
+  <a href="#cloud-repository" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Bootstrap
+        Cloud Repository
       
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
+    <nav class="md-nav" aria-label="Cloud Repository">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#cli-fallback-approach" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -417,14 +506,52 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="CLI Fallback Approach">
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#inventory-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Inventory files
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ingress-control-plane-forwarding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ingress / Control Plane Forwarding
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Ingress / Control Plane Forwarding">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#repository-setup" class="md-nav__link">
+  <a href="#demo-system" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Repository setup
+        Demo system
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dedicated-systems" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dedicated systems
       
     </span>
   </a>
@@ -505,33 +632,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../tdd/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Test Driven Development
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../faq/" class="md-nav__link">
         
   
@@ -585,6 +685,33 @@
   
   
   
+    <li class="md-nav__item">
+      <a href="../tdd/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Test Driven Development
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
     
     
     
@@ -594,10 +721,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" >
         
           
-          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_10" id="__nav_10_label" tabindex="0">
             
   
   
@@ -615,8 +742,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_9">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_10">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -931,18 +1058,9 @@
 
 
 <h1 id="setupbootstrap">Setup/Bootstrap</h1>
-<p>You need atleast one proxmox cluster to start (one host is enough). Later you can add multiple proxmox clusters to your pve cloud instance.</p>
-<p>The cluster needs to meet these minimum requirements:</p>
-<ul>
-<li>seperate free vlan (proxmox cloud runs its own mandatory dhcp)</li>
-<li>4 cores</li>
-<li>32 gb of ram</li>
-<li>500 gb of free disk space for vms</li>
-<li>subnet with at least 20 free allocatable addresses</li>
-</ul>
-<h2 id="control-nodedeployment-machine">Control Node/Deployment machine</h2>
-<p>You need a development machine (preferably apt based distro) in the same subnet/vlan segment as your proxmox hosts for running playbooks and applying terraform configurations.</p>
-<p>This machine needs ssh access to the root user of your proxmox clusters. Generate / install a key (<code>ssh-keygen -t ed25519</code>) and add it to <code>~/.ssh/authorized_keys</code> on one of the proxmox hosts (simply copy the <code>id_ed25519.pub</code> files contentto one host, proxmox automatically syncs this file accross all hosts in a cluster).</p>
+<p>You need a development machine (preferably apt based distro) in the same subnet/vlan segment as your proxmox hosts for running playbooks and applying terraform configurations. If you come from the dedicated setups you will already have your <a href="../proxmox-setup/demo/#control-node-ansibleterraform">control node lxc</a>.</p>
+<p>This can also be an lxc created manually on your proxmox cluster.</p>
+<p>This machine needs root ssh access to your proxmox clusters. Generate / install a key (<code>ssh-keygen -t ed25519</code>) and add it to <code>~/.ssh/authorized_keys</code> on one of the proxmox hosts (simply copy the <code>id_ed25519.pub</code> files contentto one host, proxmox automatically syncs this file accross all hosts in a cluster).</p>
 <p>Next install the following packages/tools on your development machine (most of these can be comfortably installed using <a href="https://brew.sh/">brew</a>):</p>
 <ul>
 <li><code>apt install avahi-utils</code> (with this we can discover our proxmox hosts and clusters, don't install if your network doesn't support mdns discovery and you need to use the <a href="./#cli-fallback-approach">fallback approach</a>)</li>
@@ -956,27 +1074,6 @@
 <li>nfs-common (if you want to use caching of setup artifacts)</li>
 <li><a href="https://docs.docker.com/engine/install/">docker</a> (if you want to use caching / <a href="../tdd/">tdd development</a>)</li>
 </ul>
-<h2 id="dedicated-systems">Dedicated Systems</h2>
-<h3 id="firewall">Firewall</h3>
-<p>A dedicated system needs a central entry point for your traffic. For that you might setup an opnsense firewall in a virtual machine that has an allocated public ip.</p>
-<p>This firewall should then be set as the default gateway in your proxmox cloud dhcp options. </p>
-<p>You also then can setup forwards from the opnsense for ports 80,443,6443 to the external floating ip of your proxmox clouds haproxy. For 6443 you want to add ippsec to further protect your control planes.</p>
-<p>Setup forward in OPNSense:</p>
-<ol>
-<li>Firewall/Rules(New), click +</li>
-<li>Set Interface: WAN, Type: TCP/UDP, Destination: This Firewall, Destination Port:HTTPS/HTTP/CUSTOM =&gt; Apply</li>
-<li>Goto Firewall/NAT/Destination NAT, click +</li>
-<li>Set Interface: WAN, Version: IPv4, Protocol: TCP/UDP, Destination: This Firewall, Destination Port: Any, Redirect Target IP: External floating ip, Port:HTTPS/HTTP/CUSTOM =&gt; Apply</li>
-</ol>
-<h3 id="control-node">Control Node</h3>
-<p>When deploying the collection on dedicated rented servers you need to create the machine on the remote proxmox cluster, from where we will run all the playbooks.</p>
-<p>For ease of use you might set it up like this:</p>
-<ol>
-<li>Create lxc on your remote pve cluster</li>
-<li>Connect via console and install a vscode server</li>
-<li>Connect via jump host on your local machine <code>ssh -L 8080:localhost:8080 -o ProxyJump=root@PUBLIC_IP_OF_PVE_HOST root@PRIVATE_IP_OF_LXC</code></li>
-<li>Now you can access vscode server ui via browser, install your ssh keys and deploy the collection</li>
-</ol>
 <h2 id="choose-your-proxmox-cloud-domain">Choose your proxmox cloud domain</h2>
 <p>Proxmox cloud uses KEA DHCP + DDNS for hostnames into bind. Any lxc/vm that is created will automatically be resolvable via its hostname through the BIND DNS server proxmox cloud deploys.</p>
 <p>For this and for service identification we need a unique domain, that should not overlap / be used with other services you host.</p>
@@ -1002,17 +1099,17 @@
 &lt;/service-group&gt;
 </code></pre>
 <p><img alt="Proxmox cluster name" src="../cluster-name.png" /></p>
-<p>Also set <code>use-ipv6=no</code> in <code>/etc/avahi/avahi-daemon.conf</code>.</p>
-<p>Then simply run <code>service avahi-daemon reload</code> and now we can discover our host. You can validate the discovery by running <code>avahi-browse -rpt _pxc._tcp</code> on your development machine. </p>
+<p>Also set <code>use-ipv6=no</code> and <code>allow-interface=MGMT-IFACE</code> under the <code>[server]</code> section in <code>/etc/avahi/avahi-daemon.conf</code>.</p>
+<p>Then simply run <code>service avahi-daemon restart</code> and now we can discover our host. You can validate the discovery by running <code>avahi-browse -rpt _pxc._tcp</code> on your development machine. </p>
 <p>Depending on how you do your vlan segmentation you either need the firewall to act as an mdns repeater (most firewall support repetition accross interfaces/ports) or create a dedicated reflector vm/lxc that has an interface in both vlans.</p>
-<h2 id="bootstrap">Bootstrap</h2>
+<h2 id="cloud-repository">Cloud Repository</h2>
 <p>Create a git repository for your cloud instance for example company-xyz-cloud and setup your environment:</p>
 <ul>
 <li>create a python virtual environment, activate it and install ansible</li>
 </ul>
 <pre><code class="language-bash">python3 -m venv ~/.pve-cloud-venv
 source ~/.pve-cloud-venv/bin/activate
-pip install ansible==9.13.0
+pip install ansible==9.13.0 distlib==0.4.0
 </code></pre>
 <ul>
 <li>create <code>requirements.yaml</code> in your repository like this (get versions from <a href="../#compatibility">here</a>):</li>
@@ -1038,14 +1135,15 @@ host_key_checking = False
 # playbook execution gets halted
 any_unparsed_is_failed = True
 </code></pre>
-<h2 id="cli-fallback-approach">CLI Fallback Approach</h2>
-<p>If you network limits mdns you can still work with the collection, at the cost of having to manage proxmox inventories on each development machine.</p>
+<h3 id="cli-fallback-approach">CLI Fallback Approach</h3>
+<p>If you network limits mdns you can still work with the collection, at the cost of having to manage proxmox inventories on each development machine. This is almost certainly needed on dedicated hosting providers.</p>
 <p>After you have finished the setup of your python venv and ran the <code>ansible-playbook pxc.cloud.setup_control_node</code> you should have the cli tool <code>pvcli</code> available to you.</p>
-<p>Run <code>pvcli connect-cluster --pve-host $PROXMOX_HOST</code> to connect to one of your proxmox clusters / set them up to be part of your proxmox cloud instance (run once per cluster, per cloud domain).</p>
+<p>Run <code>pvcli connect-cluster --pve-host $PROXMOX_HOST</code> to connect to one of your proxmox clusters / set them up to be part of your proxmox cloud instance (run once per cluster, per cloud domain). For dedicated systems pass the parameter <code>--mgmt-iface</code>, set to vmbr0.X depending on where the interface was configured.</p>
 <p>The cli will ask you for a cloud domain if the cluster has not already one assigned.</p>
 <p>With this approach its up to you to keep the inventory on your developer machine in sync. To refresh the local inventory, after you added a new host to a cluster, simply run the <code>connect-cluster</code> command again, also passing the <code>--force</code> flag to update it.</p>
-<h3 id="repository-setup">Repository setup</h3>
+<h3 id="inventory-files">Inventory files</h3>
 <p>Have a look at the <a href="https://github.com/Proxmox-Cloud/pve_cloud/tree/master/samples/cloud-instance">cloud instance sample repository</a> to see what proxmox cloud looks like in action.</p>
+<p>It is recommended counting backwards from the end of your vm data network while assinging static ips for your service lxcs.</p>
 <p>The code for your infrastructure will live inside a git repository that needs the following definitions:</p>
 <ul>
 <li>pve cloud inventory file - <a href="../schemas/pve_cloud_inv_schema/">cloud schema</a> =&gt; for the <code>pxc.cloud.setup_pve_clusters</code> playbook</li>
@@ -1055,7 +1153,57 @@ any_unparsed_is_failed = True
 <li>three lxcs for patroni postgres =&gt; <code>pxc.cloud.setup_postgres</code> playbook - no special schema</li>
 <li>two haproxy lxcs =&gt; <code>pxc.cloud.setup_haproxy</code> playbook - <a href="../schemas/setup_haproxy_schema_ext/">haproxy inv schema</a></li>
 </ul>
-<p>From here you can start deploying your first kubernetes cluster, which will serve as the basis for most deployments/services.</p>
+<h2 id="ingress-control-plane-forwarding">Ingress / Control Plane Forwarding</h2>
+<p>Now that you have chosen the internal ips of your services we need to forward external traffic to the selected adresses.</p>
+<p>The main goal is to have an external ipv4 address that forwards traffic from tcp 80,443,6443 to our external floating ips.</p>
+<h3 id="demo-system">Demo system</h3>
+<p>If you are just setting up a demo system you only need to forward on the proxmox hosts level to the haproxy. You don't need to bother with any firewall settings.</p>
+<p>For that add post-up rules:</p>
+<pre><code class="language-bash">iface vmbr0 inet static
+        # ...
+
+        # forward http, https, kubeapi
+        post-up iptables -t nat -A PREROUTING -i vmbr0 -p tcp -d PUBLIC_IP_OF_PVE_HOST --dport 443 -j DNAT --to-destination HAPROXY_INTERNAL_FLOATING_IP:443
+        post-down iptables -t nat -D PREROUTING -i vmbr0 -p tcp -d PUBLIC_IP_OF_PVE_HOST --dport 443 -j DNAT --to-destination HAPROXY_INTERNAL_FLOATING_IP:443
+
+        post-up iptables -t nat -A PREROUTING -i vmbr0 -p tcp -d PUBLIC_IP_OF_PVE_HOST --dport 80 -j DNAT --to-destination HAPROXY_INTERNAL_FLOATING_IP:80
+        post-down iptables -t nat -D PREROUTING -i vmbr0 -p tcp -d PUBLIC_IP_OF_PVE_HOST --dport 80 -j DNAT --to-destination HAPROXY_INTERNAL_FLOATING_IP:80
+
+        post-up iptables -t nat -A PREROUTING -i vmbr0 -p tcp -d PUBLIC_IP_OF_PVE_HOST --dport 6443 -j DNAT --to-destination HAPROXY_INTERNAL_FLOATING_IP:6443
+        post-down iptables -t nat -D PREROUTING -i vmbr0 -p tcp -d PUBLIC_IP_OF_PVE_HOST --dport 6443 -j DNAT --to-destination HAPROXY_INTERNAL_FLOATING_IP:6443
+</code></pre>
+<p>After that reboot / run <code>systemctl restart networking</code>.</p>
+<h3 id="dedicated-systems">Dedicated systems</h3>
+<p>For dedicated remote systems we have setupped an opnsense software firewall, this will be the central gateway for allowing traffic into our cluster. For that we create forwarding rules pointing to the dedicated floating ip of our central HAProxy:</p>
+<ul>
+<li>80,443 Traffic =&gt; this will be SNI filtered and distributed to our clusters</li>
+<li>6443 =&gt; Exposing kubernetes control planes of our cluster</li>
+<li>Custom Ports for example 5432 for postgres =&gt; will route via the haproxy to kubernetes Nodeport / VM / LXCs</li>
+</ul>
+<p>To create the rules do the following in the opnsense ui:</p>
+<ol>
+<li>Open a host forwarding to one of your proxmox hosts and from there to the opnsense</li>
+<li>Go to Firewall/NAT/Destination NAT, hit the little + Icon</li>
+<li>Create Entries with the following settings: Interface: WAN, Protocol: TCP, Destination Address: This Firewall, Destination Port: 80, 443, 6443 (one rule for each), Redirect Target IP: Single host or Network - External Floating ip of you Proxmox Cloud Haproxy, Redirect Target Port: Same as Destination Port</li>
+<li>Goto Firewall/Rules (New), again hit the little + Icon</li>
+<li>Create Rules with the following settings: Interface: WAN, Action: Pass, Direction: In, Protocol: TCP, Destination Address: External Floating ip of you Proxmox Cloud Haproxy, Destination Port: 80, 443, 6443 (one rule for each)</li>
+</ol>
+<p>If you dont have a dedicated external ip, you need to setup forwarding from the public ips of your proxmox hosts to your pseudo opnsense wan ip:</p>
+<pre><code class="language-bash"># again add as post-up to /etc/network/interfaces vmbr0
+
+iface vmbr0 inet static
+        # ...
+
+        # forward http, https, kubeapi
+        post-up iptables -t nat -A PREROUTING -i vmbr0 -p tcp -d PUBLIC_IP_OF_PVE_HOST --dport 443 -j DNAT --to-destination OPNSENSE_WAN_IP:443
+        post-down iptables -t nat -D PREROUTING -i vmbr0 -p tcp -d PUBLIC_IP_OF_PVE_HOST --dport 443 -j DNAT --to-destination OPNSENSE_WAN_IP:443
+
+        post-up iptables -t nat -A PREROUTING -i vmbr0 -p tcp -d PUBLIC_IP_OF_PVE_HOST --dport 80 -j DNAT --to-destination OPNSENSE_WAN_IP:80
+        post-down iptables -t nat -D PREROUTING -i vmbr0 -p tcp -d PUBLIC_IP_OF_PVE_HOST --dport 80 -j DNAT --to-destination OPNSENSE_WAN_IP:80
+
+        post-up iptables -t nat -A PREROUTING -i vmbr0 -p tcp -d PUBLIC_IP_OF_PVE_HOST --dport 6443 -j DNAT --to-destination OPNSENSE_WAN_IP:6443
+        post-down iptables -t nat -D PREROUTING -i vmbr0 -p tcp -d PUBLIC_IP_OF_PVE_HOST --dport 6443 -j DNAT --to-destination OPNSENSE_WAN_IP:6443
+</code></pre>
 
 
 
