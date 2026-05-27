@@ -13,7 +13,7 @@
   hosts: lxcs:qemus
   vars:
     # increment this on releasing a new pve-cloud-backup version
-    py_pve_cloud_backup_version: "3.0.8"
+    py_pve_cloud_backup_version: "3.1.0"
   roles:
     - parse_cluster_secrets
   tasks:
