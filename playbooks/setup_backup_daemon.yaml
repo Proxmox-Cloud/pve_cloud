@@ -24,6 +24,11 @@
           - borgbackup
         state: present
         update_cache: yes
+        
+    - name: install systemd prom exporter
+      include_role:
+        name: prometheus.prometheus.systemd_exporter
+      when: install_prom_systemd_exporter is defined and install_prom_systemd_exporter
 
     # install bdd service
     - name: Ensure /opt/bdd directory exists
