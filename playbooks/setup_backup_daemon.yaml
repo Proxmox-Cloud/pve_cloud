@@ -9,12 +9,13 @@
     - parse_cluster_secrets
     - bdd_server_tls_certs
 
-
 - name: Install requirements on debian 12 lxc/vm
   hosts: lxcs:qemus
   vars:
     # increment this on releasing a new pve-cloud-backup version
     py_pve_cloud_backup_version: "3.0.8"
+  roles:
+    - parse_cluster_secrets
   tasks:
     - name: install core apt packages
       ansible.builtin.apt:
@@ -29,6 +30,30 @@
       ansible.builtin.file:
         path: /opt/bdd
         state: directory
+
+    - name: Ensure /opt/bdd/certs directory exists
+      ansible.builtin.file:
+        path: /opt/bdd/certs
+        state: directory
+
+    - name: Fetch bdd-tls-certs from postgres
+      alchemy_read:
+        pg_conn_str: "{{ pg_conn_str }}"
+        table: px_cloud_secrets
+        where:
+          cloud_domain: "{{ pve_cloud_domain }}"
+          secret_name: "{{ stack_name }}-bdd-tls-certs"
+      delegate_to: localhost
+      register: fetched_bdd_tls
+
+    - name: Write bdd tls certs to /opt/bdd/certs
+      ansible.builtin.copy:
+        content: "{{ item.value }}"
+        dest: "/opt/bdd/certs/{{ item.key }}"
+        mode: '0644'
+      loop: "{{ fetched_bdd_tls.query_result[0].secret_data | dict2items }}"
+      loop_control:
+        label: "{{ item.key }}"
 
     - name: Create borg home for backup user
       file:
