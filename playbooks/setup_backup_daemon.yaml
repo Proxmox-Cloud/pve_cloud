@@ -3,12 +3,6 @@
   roles:
     - slurp_cluster_secrets
 
-- name: Create server tls certificates
-  hosts: localhost
-  roles:
-    - parse_cluster_secrets
-    - bdd_server_tls_certs
-
 - name: Install requirements on debian 12 lxc/vm
   hosts: lxcs:qemus
   vars:
@@ -17,6 +11,11 @@
   roles:
     - parse_cluster_secrets
   tasks:
+    - name: generate certificates
+      include_role:
+        name: bdd_server_tls_certs
+      delegate_to: localhost
+
     - name: install core apt packages
       ansible.builtin.apt:
         name: 

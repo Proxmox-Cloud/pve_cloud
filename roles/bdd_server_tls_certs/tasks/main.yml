@@ -34,13 +34,12 @@
 - name: generate server csr
   community.crypto.openssl_csr_pipe:
     privatekey_content: "{{ server_privatekey.privatekey }}"
-    common_name: "bdd.{{ pve_cloud_domain }}"
+    common_name: "{{ ansible_hostname }}.{{ pve_cloud_domain }}"
     use_common_name_for_san: false
     subject_alt_name:
-      - "DNS:bdd.{{ pve_cloud_domain }}"
+      - "DNS:{{ ansible_hostname }}.{{ pve_cloud_domain }}"
       - "DNS:*.{{ pve_cloud_domain }}"
-      - "IP:127.0.0.1"
-      - "IP:::1"
+      - "DNS:{{ ansible_default_ipv4.address }}"
   register: server_csr
 
 - name: sign server certificate with ca
