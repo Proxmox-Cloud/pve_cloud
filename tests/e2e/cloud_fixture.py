@@ -2,9 +2,9 @@ import logging
 import os
 import subprocess
 import tempfile
-import paramiko
 
 import ansible_runner
+import paramiko
 import pytest
 import yaml
 from pve_cloud_test.cloud_fixtures import *
@@ -22,11 +22,15 @@ def fetch_default_gw_ns(test_env):
 
     client.connect(pve_host["ansible_host"], username="root")
 
-    _, stdout, _ = client.exec_command("ip route show default 2>/dev/null | awk '{print $3}'")
+    _, stdout, _ = client.exec_command(
+        "ip route show default 2>/dev/null | awk '{print $3}'"
+    )
     gateway = stdout.read().decode("utf-8").strip()
     logger.info(gateway)
 
-    _, stdout, _ = client.exec_command("grep -E '^nameserver [0-9]+' /etc/resolv.conf 2>/dev/null | awk '{print $2}'")
+    _, stdout, _ = client.exec_command(
+        "grep -E '^nameserver [0-9]+' /etc/resolv.conf 2>/dev/null | awk '{print $2}'"
+    )
     nameservers = stdout.read().decode("utf-8").strip().splitlines()
     logger.info(nameservers)
 
@@ -91,8 +95,12 @@ def setup_pve_hosts(request, get_test_env, setup_control_node):
                     if "pve_test_cluster_host_vars" in get_test_env
                     else {}
                 ),
-                "pve_haproxy_floating_ip_external": get_test_env["pve_test_cluster_floating_external"],
-                "pve_haproxy_floating_ip_internal": get_test_env["pve_test_cluster_floating_internal"]
+                "pve_haproxy_floating_ip_external": get_test_env[
+                    "pve_test_cluster_floating_external"
+                ],
+                "pve_haproxy_floating_ip_internal": get_test_env[
+                    "pve_test_cluster_floating_internal"
+                ],
             }
         }
 
@@ -141,9 +149,7 @@ def setup_pve_hosts(request, get_test_env, setup_control_node):
 def setup_dhcp_lxcs(request, get_test_env, setup_bind_lxcs):
     logger.info("setup dhcp")
 
-    test_vm_subnet_mask = get_test_env["cloud_inventory"]["pve_vm_subnet"].split(
-        "/"
-    )[1]
+    test_vm_subnet_mask = get_test_env["cloud_inventory"]["pve_vm_subnet"].split("/")[1]
 
     gateway, nameservers = fetch_default_gw_ns(get_test_env)
 
@@ -186,9 +192,7 @@ def setup_dhcp_lxcs(request, get_test_env, setup_bind_lxcs):
                 ],
                 "lxc_global_vars": {"install_prom_systemd_exporter": True},
                 "lxc_base_parameters": {"onboot": 1},
-                "target_pve_hosts": list(
-                    get_test_env["pve_test_cluster_hosts"].keys()
-                ),
+                "target_pve_hosts": list(get_test_env["pve_test_cluster_hosts"].keys()),
                 "root_ssh_pub_key": get_test_env["ssh_pub_key"],
             },
             temp_kea_lxcs_inv,
@@ -314,9 +318,7 @@ def setup_ceph_dhcp_lxcs(request, get_test_env, setup_dhcp_lxcs):
 def setup_bind_lxcs(request, get_test_env, setup_pve_hosts):
     logger.info("setup bind")
 
-    test_vm_subnet_mask = get_test_env["cloud_inventory"]["pve_vm_subnet"].split(
-        "/"
-    )[1]
+    test_vm_subnet_mask = get_test_env["cloud_inventory"]["pve_vm_subnet"].split("/")[1]
 
     gateway, nameservers = fetch_default_gw_ns(get_test_env)
 
@@ -359,9 +361,7 @@ def setup_bind_lxcs(request, get_test_env, setup_pve_hosts):
                 ],
                 "lxc_global_vars": {"install_prom_systemd_exporter": True},
                 "lxc_base_parameters": {"onboot": 1},
-                "target_pve_hosts": list(
-                    get_test_env["pve_test_cluster_hosts"].keys()
-                ),
+                "target_pve_hosts": list(get_test_env["pve_test_cluster_hosts"].keys()),
                 "root_ssh_pub_key": get_test_env["ssh_pub_key"],
             },
             temp_bind_lxcs_inv,
@@ -447,9 +447,7 @@ def setup_patroni_lxcs(request, get_test_env, setup_dhcp_lxcs):
                     },
                 ],
                 "lxc_global_vars": {"install_prom_systemd_exporter": True},
-                "target_pve_hosts": list(
-                    get_test_env["pve_test_cluster_hosts"].keys()
-                ),
+                "target_pve_hosts": list(get_test_env["pve_test_cluster_hosts"].keys()),
                 "root_ssh_pub_key": get_test_env["ssh_pub_key"],
             },
             temp_postgres_lxcs_inv,
@@ -539,9 +537,7 @@ def setup_haproxy_lxcs(request, get_test_env, setup_patroni_lxcs):
                     "install_prom_systemd_exporter": True,
                     "haproxy_defaults_section": "timeout client 3m\ntimeout server 3m",
                 },
-                "target_pve_hosts": list(
-                    get_test_env["pve_test_cluster_hosts"].keys()
-                ),
+                "target_pve_hosts": list(get_test_env["pve_test_cluster_hosts"].keys()),
                 "root_ssh_pub_key": get_test_env["ssh_pub_key"],
             },
             temp_haproxy_lxcs_inv,
@@ -613,9 +609,7 @@ def setup_cache_lxcs(request, get_test_env, setup_dhcp_lxcs):
                         },
                     },
                 ],
-                "target_pve_hosts": list(
-                    get_test_env["pve_test_cluster_hosts"].keys()
-                ),
+                "target_pve_hosts": list(get_test_env["pve_test_cluster_hosts"].keys()),
                 "root_ssh_pub_key": get_test_env["ssh_pub_key"],
             },
             temp_cache_lxcs_inv,

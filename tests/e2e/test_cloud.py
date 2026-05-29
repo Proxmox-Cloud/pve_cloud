@@ -83,9 +83,7 @@ def test_create_lxc(request, get_proxmoxer, get_test_env, setup_haproxy_lxcs):
                         }
                     },
                 ],
-                "target_pve_hosts": list(
-                    get_test_env["pve_test_cluster_hosts"].keys()
-                ),
+                "target_pve_hosts": list(get_test_env["pve_test_cluster_hosts"].keys()),
                 "root_ssh_pub_key": get_test_env["ssh_pub_key"],
             },
             temp_dyn_lxcs_inv,
@@ -117,9 +115,7 @@ def test_create_lxc(request, get_proxmoxer, get_test_env, setup_haproxy_lxcs):
             logger.info(test_lxc)
 
             resolver = dns.resolver.Resolver()
-            resolver.nameservers = [
-                get_test_env["cloud_inventory"]["bind_master_ip"]
-            ]
+            resolver.nameservers = [get_test_env["cloud_inventory"]["bind_master_ip"]]
 
             ddns_answer = resolver.resolve(
                 f"{test_lxc['name']}.{get_test_env['cloud_inventory']['pve_cloud_domain']}"
@@ -186,12 +182,14 @@ def test_create_qemu(request, get_test_env, setup_haproxy_lxcs):
                     }
                 ],
                 "static_includes": {
-                    "dhcp_stack": "ha-dhcp." + get_test_env["cloud_inventory"]["pve_cloud_domain"],
+                    "dhcp_stack": "ha-dhcp."
+                    + get_test_env["cloud_inventory"]["pve_cloud_domain"],
                     "proxy_stack": "ha-haproxy."
                     + get_test_env["cloud_inventory"]["pve_cloud_domain"],
                     "postgres_stack": "ha-postgres."
                     + get_test_env["cloud_inventory"]["pve_cloud_domain"],
-                    "bind_stack": "ha-bind." + get_test_env["cloud_inventory"]["pve_cloud_domain"],
+                    "bind_stack": "ha-bind."
+                    + get_test_env["cloud_inventory"]["pve_cloud_domain"],
                 },
                 "qemus": [
                     {
@@ -212,9 +210,7 @@ def test_create_qemu(request, get_test_env, setup_haproxy_lxcs):
                         },
                     },
                 ],
-                "target_pve_hosts": list(
-                    get_test_env["pve_test_cluster_hosts"].keys()
-                ),
+                "target_pve_hosts": list(get_test_env["pve_test_cluster_hosts"].keys()),
                 "root_ssh_pub_key": get_test_env["ssh_pub_key"],
             },
             temp_qemu_inv,
@@ -258,8 +254,10 @@ def test_create_secondary_kubespray(
     setup_haproxy_lxcs,
     setup_cache_lxcs,
     get_secondary_kubespray_inv,
-):       
-    pve_host = get_online_pve_host(get_test_env["kubernetes"]["k8s_tls_copy_target_pve"])
+):
+    pve_host = get_online_pve_host(
+        get_test_env["kubernetes"]["k8s_tls_copy_target_pve"]
+    )
     logger.info(pve_host)
 
     # we connect to the test host to get the patroni secret of the cluster, aswell as the vars
@@ -356,11 +354,7 @@ def test_create_secondary_kubespray(
         assert kubespray_destroy_run.rc == 0
     else:
         # write the local kubeconfig for developer access
-        first_host = list(
-            list(
-                get_test_env["pve_test_cluster_hosts"].keys()
-            )
-        )[0]
+        first_host = list(list(get_test_env["pve_test_cluster_hosts"].keys()))[0]
 
         # connect to the first pve host in the dyn inv, assumes they are all online
         ssh = paramiko.SSHClient()
@@ -389,7 +383,9 @@ def test_create_kubespray(
 ):
     logger.info("create kubespray")
 
-    pve_host = get_online_pve_host(get_test_env["kubernetes"]["k8s_tls_copy_target_pve"])
+    pve_host = get_online_pve_host(
+        get_test_env["kubernetes"]["k8s_tls_copy_target_pve"]
+    )
     logger.info(pve_host)
 
     # we connect to the test host to get the patroni secret of the cluster, aswell as the vars
@@ -516,11 +512,7 @@ eviction_hard:
         assert kubespray_destroy_run.rc == 0
     else:
         # write the local kubeconfig for developer access
-        first_host = list(
-            list(
-                get_test_env["pve_test_cluster_hosts"].keys()
-            )
-        )[0]
+        first_host = list(list(get_test_env["pve_test_cluster_hosts"].keys()))[0]
 
         # connect to the first pve host in the dyn inv, assumes they are all online
         ssh = paramiko.SSHClient()
