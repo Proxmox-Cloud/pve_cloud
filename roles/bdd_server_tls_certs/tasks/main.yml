@@ -5,6 +5,7 @@
   community.crypto.openssl_privatekey_pipe:
     type: "Ed25519"
   register: ca_privatekey
+  delegate_to: localhost
 
 - name: generate ca csr
   community.crypto.openssl_csr_pipe:
@@ -17,6 +18,7 @@
       - keyCertSign
     key_usage_critical: true
   register: ca_csr
+  delegate_to: localhost
 
 - name: generate self-signed ca certificate
   community.crypto.x509_certificate_pipe:
@@ -25,11 +27,13 @@
     provider: selfsigned
     selfsigned_not_after: "+3650d"
   register: ca_cert
+  delegate_to: localhost
 
 - name: generate server private key
   community.crypto.openssl_privatekey_pipe:
     type: "Ed25519"
   register: server_privatekey
+  delegate_to: localhost
 
 - name: generate server csr
   community.crypto.openssl_csr_pipe:
@@ -41,6 +45,7 @@
       - "DNS:*.{{ pve_cloud_domain }}"
       - "DNS:{{ ansible_default_ipv4.address }}"
   register: server_csr
+  delegate_to: localhost
 
 - name: sign server certificate with ca
   community.crypto.x509_certificate_pipe:
@@ -50,6 +55,7 @@
     ownca_privatekey_content: "{{ ca_privatekey.privatekey }}"
     ownca_not_after: "+3650d"
   register: server_cert
+  delegate_to: localhost
 
 - name: compile tls secrets row
   set_fact:
@@ -69,6 +75,7 @@
     where:
       cloud_domain: "{{ pve_cloud_domain }}"
       secret_name: "{{ stack_name }}-bdd-tls-certs"
+  delegate_to: localhost
 
 - name: write bdd-tls-certs to postgres
   alchemy_write:
@@ -76,3 +83,4 @@
     table: px_cloud_secrets
     rows:
       - "{{ bdd_tls_row }}"
+  delegate_to: localhost

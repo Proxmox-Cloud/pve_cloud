@@ -2,6 +2,7 @@ import logging
 import os
 import subprocess
 import tempfile
+import paramiko
 
 import ansible_runner
 import pytest
@@ -9,6 +10,27 @@ import yaml
 from pve_cloud_test.cloud_fixtures import *
 
 logger = logging.getLogger(__name__)
+
+
+def fetch_default_gw_ns(test_env):
+    client = paramiko.SSHClient()
+    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+
+    pve_host = test_env["pve_test_cluster_hosts"][
+        next(iter(test_env["pve_test_cluster_hosts"]))
+    ]
+
+    client.connect(pve_host["ansible_host"], username="root")
+
+    _, stdout, _ = client.exec_command("ip route show default 2>/dev/null | awk '{print $3}'")
+    gateway = stdout.read().decode("utf-8").strip()
+    logger.info(gateway)
+
+    _, stdout, _ = client.exec_command("grep -E '^nameserver [0-9]+' /etc/resolv.conf 2>/dev/null | awk '{print $2}'")
+    nameservers = stdout.read().decode("utf-8").strip().splitlines()
+    logger.info(nameservers)
+
+    return gateway, " ".join(nameservers)
 
 
 @cloud_fixture("localhost")
@@ -62,38 +84,25 @@ def setup_pve_hosts(request, get_test_env, setup_control_node):
     ) as temp_cloud_inv:
         # write pve cloud inventory file for main pve cluster setup playbook
         pve_clusters = {
-            get_test_env["pve_test_primary_cluster_name"]: {
+            get_test_env["pve_test_cluster_name"]: {
                 "pve_unique_cloud_services": ["dns", "dhcp", "psql-state"],
                 "pve_host_vars": (
-                    get_test_env["pve_test_host_vars"][
-                        get_test_env["pve_test_primary_cluster_name"]
-                    ]
-                    if "pve_test_host_vars" in get_test_env
+                    get_test_env["pve_test_cluster_host_vars"]
+                    if "pve_test_cluster_host_vars" in get_test_env
                     else {}
                 ),
+                "pve_haproxy_floating_ip_external": get_test_env["pve_test_cluster_floating_external"],
+                "pve_haproxy_floating_ip_internal": get_test_env["pve_test_cluster_floating_internal"]
             }
-            | get_test_env["pve_test_cloud_inv_cluster"]
         }
-
-        if "pve_test_secondary_cluster_name" in get_test_env:
-            pve_clusters[get_test_env["pve_test_secondary_cluster_name"]] = {
-                "pve_unique_cloud_services": [],
-                "pve_host_vars": (
-                    get_test_env["pve_test_host_vars"][
-                        get_test_env["pve_test_secondary_cluster_name"]
-                    ]
-                    if "pve_test_host_vars" in get_test_env
-                    else {}
-                ),
-            } | get_test_env["pve_test_cloud_inv_cluster"]
 
         yaml.dump(
             {
                 "plugin": "pxc.cloud.pve_cloud_inv",
-                "pve_cloud_domain": get_test_env["pve_test_cloud_domain"],
+                "pve_cloud_domain": get_test_env["cloud_inventory"]["pve_cloud_domain"],
                 "pve_clusters": pve_clusters,
             }
-            | get_test_env["pve_test_cloud_inv"],
+            | get_test_env["cloud_inventory"],
             temp_cloud_inv,
         )
         temp_cloud_inv.flush()
@@ -132,9 +141,11 @@ def setup_pve_hosts(request, get_test_env, setup_control_node):
 def setup_dhcp_lxcs(request, get_test_env, setup_bind_lxcs):
     logger.info("setup dhcp")
 
-    test_vm_subnet_mask = get_test_env["pve_test_cloud_inv"]["pve_vm_subnet"].split(
+    test_vm_subnet_mask = get_test_env["cloud_inventory"]["pve_vm_subnet"].split(
         "/"
     )[1]
+
+    gateway, nameservers = fetch_default_gw_ns(get_test_env)
 
     with tempfile.NamedTemporaryFile(
         "w", suffix=".yaml", delete=False
@@ -143,36 +154,32 @@ def setup_dhcp_lxcs(request, get_test_env, setup_bind_lxcs):
         yaml.dump(
             {
                 "plugin": "pxc.cloud.lxc_inv",
-                "target_pve": get_test_env["pve_test_primary_cluster_name"]
+                "target_pve": get_test_env["pve_test_cluster_name"]
                 + "."
-                + get_test_env["pve_test_cloud_domain"],
+                + get_test_env["cloud_inventory"]["pve_cloud_domain"],
                 "stack_name": "ha-dhcp",
                 "lxcs": [
                     {
                         "hostname": "main",
                         "parameters": {
-                            "rootfs": f"volume={get_test_env['pve_test_disk_storage_id']}:10",
+                            "rootfs": f"volume={get_test_env['pve_vm_storage_id']}:10",
                             "cores": 1,
                             "memory": 512,
-                            "net0": f"name=pve,bridge=vmbr0,firewall=1,ip={get_test_env['pve_test_cloud_inv']['kea_dhcp_main_ip']}/{test_vm_subnet_mask},gw={get_test_env['pve_test_service_lxcs_gateway']}"
+                            "net0": f"name=pve,bridge=vmbr0,firewall=1,ip={get_test_env['cloud_inventory']['kea_dhcp_main_ip']}/{test_vm_subnet_mask},gw={gateway}"
                             + f"{get_test_env['net0_vlan_tag_rendered'] if 'net0_vlan_tag_rendered' in get_test_env else ''}",
-                            "nameserver": get_test_env[
-                                "pve_test_service_lxcs_nameserver"
-                            ],
+                            "nameserver": nameservers,
                         },
                         "vars": {"kea_dhcp_main": True},
                     },
                     {
                         "hostname": "failover",
                         "parameters": {
-                            "rootfs": f"volume={get_test_env['pve_test_disk_storage_id']}:10",
+                            "rootfs": f"volume={get_test_env['pve_vm_storage_id']}:10",
                             "cores": 1,
                             "memory": 512,
-                            "net0": f"name=pve,bridge=vmbr0,firewall=1,ip={get_test_env['pve_test_cloud_inv']['kea_dhcp_failover_ip']}/{test_vm_subnet_mask},gw={get_test_env['pve_test_service_lxcs_gateway']}"
+                            "net0": f"name=pve,bridge=vmbr0,firewall=1,ip={get_test_env['cloud_inventory']['kea_dhcp_failover_ip']}/{test_vm_subnet_mask},gw={gateway}"
                             + f"{get_test_env['net0_vlan_tag_rendered'] if 'net0_vlan_tag_rendered' in get_test_env else ''}",
-                            "nameserver": get_test_env[
-                                "pve_test_service_lxcs_nameserver"
-                            ],
+                            "nameserver": nameservers,
                         },
                         "vars": {"kea_dhcp_main": False},
                     },
@@ -180,11 +187,9 @@ def setup_dhcp_lxcs(request, get_test_env, setup_bind_lxcs):
                 "lxc_global_vars": {"install_prom_systemd_exporter": True},
                 "lxc_base_parameters": {"onboot": 1},
                 "target_pve_hosts": list(
-                    get_test_env["pve_test_clusters"][
-                        get_test_env["pve_test_primary_cluster_name"]
-                    ].keys()
+                    get_test_env["pve_test_cluster_hosts"].keys()
                 ),
-                "root_ssh_pub_key": get_test_env["pve_test_ssh_pub_key"],
+                "root_ssh_pub_key": get_test_env["ssh_pub_key"],
             },
             temp_kea_lxcs_inv,
         )
@@ -235,14 +240,14 @@ def setup_ceph_dhcp_lxcs(request, get_test_env, setup_dhcp_lxcs):
             yaml.dump(
                 {
                     "plugin": "pxc.cloud.lxc_inv",
-                    "target_pve": get_test_env["pve_test_primary_cluster_name"]
+                    "target_pve": get_test_env["pve_test_cluster_name"]
                     + "."
-                    + get_test_env["pve_test_cloud_domain"],
+                    + get_test_env["cloud_inventory"]["pve_cloud_domain"],
                     "stack_name": "ceph-dhcp",
                     "lxcs": [
                         {
                             "parameters": {
-                                "rootfs": f"volume={get_test_env['pve_test_disk_storage_id']}:10",
+                                "rootfs": f"volume={get_test_env['pve_vm_storage_id']}:10",
                                 "cores": 1,
                                 "memory": 512,
                                 "net0": f"name=pve,bridge=vmbr0,firewall=1,ip=dhcp"
@@ -262,11 +267,9 @@ def setup_ceph_dhcp_lxcs(request, get_test_env, setup_dhcp_lxcs):
                     "lxc_global_vars": {"install_prom_systemd_exporter": True},
                     "lxc_base_parameters": {"onboot": 1},
                     "target_pve_hosts": list(
-                        get_test_env["pve_test_clusters"][
-                            get_test_env["pve_test_primary_cluster_name"]
-                        ].keys()
+                        get_test_env["pve_test_cluster_hosts"].keys()
                     ),
-                    "root_ssh_pub_key": get_test_env["pve_test_ssh_pub_key"],
+                    "root_ssh_pub_key": get_test_env["ssh_pub_key"],
                 },
                 temp_kea_lxcs_inv,
             )
@@ -311,9 +314,11 @@ def setup_ceph_dhcp_lxcs(request, get_test_env, setup_dhcp_lxcs):
 def setup_bind_lxcs(request, get_test_env, setup_pve_hosts):
     logger.info("setup bind")
 
-    test_vm_subnet_mask = get_test_env["pve_test_cloud_inv"]["pve_vm_subnet"].split(
+    test_vm_subnet_mask = get_test_env["cloud_inventory"]["pve_vm_subnet"].split(
         "/"
     )[1]
+
+    gateway, nameservers = fetch_default_gw_ns(get_test_env)
 
     with tempfile.NamedTemporaryFile(
         "w", suffix=".yaml", delete=False
@@ -322,36 +327,32 @@ def setup_bind_lxcs(request, get_test_env, setup_pve_hosts):
         yaml.dump(
             {
                 "plugin": "pxc.cloud.lxc_inv",
-                "target_pve": get_test_env["pve_test_primary_cluster_name"]
+                "target_pve": get_test_env["pve_test_cluster_name"]
                 + "."
-                + get_test_env["pve_test_cloud_domain"],
+                + get_test_env["cloud_inventory"]["pve_cloud_domain"],
                 "stack_name": "ha-bind",
                 "lxcs": [
                     {
                         "hostname": "master",
                         "parameters": {
-                            "rootfs": f"volume={get_test_env['pve_test_disk_storage_id']}:10",
+                            "rootfs": f"volume={get_test_env['pve_vm_storage_id']}:10",
                             "cores": 1,
                             "memory": 512,
-                            "net0": f"name=pve,bridge=vmbr0,firewall=1,ip={get_test_env['pve_test_cloud_inv']['bind_master_ip']}/{test_vm_subnet_mask},gw={get_test_env['pve_test_service_lxcs_gateway']}"
+                            "net0": f"name=pve,bridge=vmbr0,firewall=1,ip={get_test_env['cloud_inventory']['bind_master_ip']}/{test_vm_subnet_mask},gw={gateway}"
                             + f"{get_test_env['net0_vlan_tag_rendered'] if 'net0_vlan_tag_rendered' in get_test_env else ''}",
-                            "nameserver": get_test_env[
-                                "pve_test_service_lxcs_nameserver"
-                            ],
+                            "nameserver": nameservers,
                         },
                         "vars": {"bind_master": True},
                     },
                     {
                         "hostname": "failover",
                         "parameters": {
-                            "rootfs": f"volume={get_test_env['pve_test_disk_storage_id']}:10",
+                            "rootfs": f"volume={get_test_env['pve_vm_storage_id']}:10",
                             "cores": 1,
                             "memory": 512,
-                            "net0": f"name=pve,bridge=vmbr0,firewall=1,ip={get_test_env['pve_test_cloud_inv']['bind_slave_ip']}/{test_vm_subnet_mask},gw={get_test_env['pve_test_service_lxcs_gateway']}"
+                            "net0": f"name=pve,bridge=vmbr0,firewall=1,ip={get_test_env['cloud_inventory']['bind_slave_ip']}/{test_vm_subnet_mask},gw={gateway}"
                             + f"{get_test_env['net0_vlan_tag_rendered'] if 'net0_vlan_tag_rendered' in get_test_env else ''}",
-                            "nameserver": get_test_env[
-                                "pve_test_service_lxcs_nameserver"
-                            ],
+                            "nameserver": nameservers,
                         },
                         "vars": {"bind_master": False},
                     },
@@ -359,11 +360,9 @@ def setup_bind_lxcs(request, get_test_env, setup_pve_hosts):
                 "lxc_global_vars": {"install_prom_systemd_exporter": True},
                 "lxc_base_parameters": {"onboot": 1},
                 "target_pve_hosts": list(
-                    get_test_env["pve_test_clusters"][
-                        get_test_env["pve_test_primary_cluster_name"]
-                    ].keys()
+                    get_test_env["pve_test_cluster_hosts"].keys()
                 ),
-                "root_ssh_pub_key": get_test_env["pve_test_ssh_pub_key"],
+                "root_ssh_pub_key": get_test_env["ssh_pub_key"],
             },
             temp_bind_lxcs_inv,
         )
@@ -414,14 +413,14 @@ def setup_patroni_lxcs(request, get_test_env, setup_dhcp_lxcs):
         yaml.dump(
             {
                 "plugin": "pxc.cloud.lxc_inv",
-                "target_pve": get_test_env["pve_test_primary_cluster_name"]
+                "target_pve": get_test_env["pve_test_cluster_name"]
                 + "."
-                + get_test_env["pve_test_cloud_domain"],
+                + get_test_env["cloud_inventory"]["pve_cloud_domain"],
                 "stack_name": "ha-postgres",
                 "lxcs": [
                     {
                         "parameters": {
-                            "rootfs": f"volume={get_test_env['pve_test_disk_storage_id']}:10",
+                            "rootfs": f"volume={get_test_env['pve_vm_storage_id']}:10",
                             "cores": 1,
                             "memory": 512,
                             "net0": f"name=pve,bridge=vmbr0,firewall=1,ip=dhcp"
@@ -430,7 +429,7 @@ def setup_patroni_lxcs(request, get_test_env, setup_dhcp_lxcs):
                     },
                     {
                         "parameters": {
-                            "rootfs": f"volume={get_test_env['pve_test_disk_storage_id']}:10",
+                            "rootfs": f"volume={get_test_env['pve_vm_storage_id']}:10",
                             "cores": 1,
                             "memory": 512,
                             "net0": f"name=pve,bridge=vmbr0,firewall=1,ip=dhcp"
@@ -439,7 +438,7 @@ def setup_patroni_lxcs(request, get_test_env, setup_dhcp_lxcs):
                     },
                     {
                         "parameters": {
-                            "rootfs": f"volume={get_test_env['pve_test_disk_storage_id']}:10",
+                            "rootfs": f"volume={get_test_env['pve_vm_storage_id']}:10",
                             "cores": 1,
                             "memory": 512,
                             "net0": f"name=pve,bridge=vmbr0,firewall=1,ip=dhcp"
@@ -449,11 +448,9 @@ def setup_patroni_lxcs(request, get_test_env, setup_dhcp_lxcs):
                 ],
                 "lxc_global_vars": {"install_prom_systemd_exporter": True},
                 "target_pve_hosts": list(
-                    get_test_env["pve_test_clusters"][
-                        get_test_env["pve_test_primary_cluster_name"]
-                    ].keys()
+                    get_test_env["pve_test_cluster_hosts"].keys()
                 ),
-                "root_ssh_pub_key": get_test_env["pve_test_ssh_pub_key"],
+                "root_ssh_pub_key": get_test_env["ssh_pub_key"],
             },
             temp_postgres_lxcs_inv,
         )
@@ -505,19 +502,19 @@ def setup_haproxy_lxcs(request, get_test_env, setup_patroni_lxcs):
         yaml.dump(
             {
                 "plugin": "pxc.cloud.lxc_inv",
-                "target_pve": get_test_env["pve_test_primary_cluster_name"]
+                "target_pve": get_test_env["pve_test_cluster_name"]
                 + "."
-                + get_test_env["pve_test_cloud_domain"],
+                + get_test_env["cloud_inventory"]["pve_cloud_domain"],
                 "stack_name": "ha-haproxy",
                 "static_includes": {
                     "postgres_stack": "ha-postgres."
-                    + get_test_env["pve_test_cloud_domain"],
+                    + get_test_env["cloud_inventory"]["pve_cloud_domain"],
                 },
                 "lxcs": [
                     {
                         "hostname": "master",
                         "parameters": {
-                            "rootfs": f"volume={get_test_env['pve_test_disk_storage_id']}:10",
+                            "rootfs": f"volume={get_test_env['pve_vm_storage_id']}:10",
                             "cores": 1,
                             "memory": 512,
                             # todo: schema ext fix iface name
@@ -529,7 +526,7 @@ def setup_haproxy_lxcs(request, get_test_env, setup_patroni_lxcs):
                     {
                         "hostname": "failover",
                         "parameters": {
-                            "rootfs": f"volume={get_test_env['pve_test_disk_storage_id']}:10",
+                            "rootfs": f"volume={get_test_env['pve_vm_storage_id']}:10",
                             "cores": 1,
                             "memory": 512,
                             "net0": f"name=eth0,bridge=vmbr0,firewall=1,ip=dhcp"
@@ -543,11 +540,9 @@ def setup_haproxy_lxcs(request, get_test_env, setup_patroni_lxcs):
                     "haproxy_defaults_section": "timeout client 3m\ntimeout server 3m",
                 },
                 "target_pve_hosts": list(
-                    get_test_env["pve_test_clusters"][
-                        get_test_env["pve_test_primary_cluster_name"]
-                    ].keys()
+                    get_test_env["pve_test_cluster_hosts"].keys()
                 ),
-                "root_ssh_pub_key": get_test_env["pve_test_ssh_pub_key"],
+                "root_ssh_pub_key": get_test_env["ssh_pub_key"],
             },
             temp_haproxy_lxcs_inv,
         )
@@ -598,15 +593,15 @@ def setup_cache_lxcs(request, get_test_env, setup_dhcp_lxcs):
         yaml.dump(
             {
                 "plugin": "pxc.cloud.lxc_inv",
-                "target_pve": get_test_env["pve_test_primary_cluster_name"]
+                "target_pve": get_test_env["pve_test_cluster_name"]
                 + "."
-                + get_test_env["pve_test_cloud_domain"],
+                + get_test_env["cloud_inventory"]["pve_cloud_domain"],
                 "stack_name": "cloud-cache",
                 "lxcs": [
                     {
                         "hostname": "main",
                         "parameters": {
-                            "rootfs": f"volume={get_test_env['pve_test_disk_storage_id']}:200",
+                            "rootfs": f"volume={get_test_env['pve_vm_storage_id']}:200",
                             "cores": 2,
                             "memory": 256,
                             "net0": f"name=eth0,bridge=vmbr0,firewall=1,ip=dhcp"
@@ -619,11 +614,9 @@ def setup_cache_lxcs(request, get_test_env, setup_dhcp_lxcs):
                     },
                 ],
                 "target_pve_hosts": list(
-                    get_test_env["pve_test_clusters"][
-                        get_test_env["pve_test_primary_cluster_name"]
-                    ].keys()
+                    get_test_env["pve_test_cluster_hosts"].keys()
                 ),
-                "root_ssh_pub_key": get_test_env["pve_test_ssh_pub_key"],
+                "root_ssh_pub_key": get_test_env["ssh_pub_key"],
             },
             temp_cache_lxcs_inv,
         )

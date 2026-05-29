@@ -10,12 +10,8 @@
     py_pve_cloud_backup_version: "3.1.0"
   roles:
     - parse_cluster_secrets
+    - bdd_server_tls_certs
   tasks:
-    - name: generate certificates
-      include_role:
-        name: bdd_server_tls_certs
-      delegate_to: localhost
-
     - name: install core apt packages
       ansible.builtin.apt:
         name: 
