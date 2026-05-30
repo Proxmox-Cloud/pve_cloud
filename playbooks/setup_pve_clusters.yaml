@@ -289,6 +289,7 @@
       alchemy_migrate:
         pg_conn_str: "{{ pg_conn_str }}"
       when: postgres_connection_check is succeeded
+      run_once: true
 
     - name: install vector journald exporter
       include_role:
@@ -329,6 +330,7 @@
       alchemy_migrate:
         pg_conn_str: "{{ pg_conn_str }}"
       when: postgres_connection_check is succeeded
+      run_once: true
 
     - slurp_cloud_secrets_async:
       register: slurped_secrets
