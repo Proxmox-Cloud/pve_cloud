@@ -86,3 +86,14 @@
 
 - include_role:
     name: pxc.cloud.acme_workflow
+
+- name: Update certificate in postgres
+  when: ret_acme_collect.changed
+  alchemy_update:
+    pg_conn_str: "{{ pg_conn_str }}"
+    table: acme_x509
+    values:
+      ec_crt: "{{ tmp_psql_crt_update }}"
+      k8s: "{{ tmp_k8s_update }}"
+    where:
+      stack_fqdn: "{{ acme_x509.stack_fqdn }}"
