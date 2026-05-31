@@ -55,7 +55,7 @@ Next create an avahi service file (`/etc/avahi/services/pxc.service`) on the hos
 
 ![Proxmox cluster name](cluster-name.png)
 
-Also set `use-ipv6=no` and `allow-interface=MGMT-IFACE` under the `[server]` section in `/etc/avahi/avahi-daemon.conf`.
+Also set `use-ipv6=no` and `allow-interface=HOST-IFACE` under the `[server]` section in `/etc/avahi/avahi-daemon.conf`.
 
 Then simply run `service avahi-daemon restart` and now we can discover our host. You can validate the discovery by running `avahi-browse -rpt _pxc._tcp` on your development machine. 
 
@@ -100,7 +100,7 @@ If you network limits mdns you can still work with the collection, at the cost o
 
 After you have finished the setup of your python venv and ran the `ansible-playbook pxc.cloud.setup_control_node` you should have the cli tool `pvcli` available to you.
 
-Run `pvcli connect-cluster --pve-host $PROXMOX_HOST` to connect to one of your proxmox clusters / set them up to be part of your proxmox cloud instance (run once per cluster, per cloud domain). For dedicated systems pass the parameter `--mgmt-iface`, set to vmbr0.X depending on where the interface was configured.
+Run `pvcli connect-cluster --pve-host $PROXMOX_HOST` to connect to one of your proxmox clusters / set them up to be part of your proxmox cloud instance (run once per cluster, per cloud domain). For dedicated systems pass the parameter `--host-iface`, set to vmbr0.X depending on where the vm data interface was configured.
 
 The cli will ask you for a cloud domain if the cluster has not already one assigned.
 

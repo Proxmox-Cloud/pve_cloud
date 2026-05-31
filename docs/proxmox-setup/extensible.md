@@ -83,11 +83,12 @@ We now also want to restrict access to our proxmox hosts by activating the proxm
 
 * Go to Datacenter/Firewall/Alias, create 3 aliases with the public ip of each node (node1, node2, node3, ...)
 * Go to IPSet and create one called pve-public, add the 3 aliases. Then create IPSets for cephfe, cephbe and migration, adding the cidrs directly.
-* Create an additional optional IPSet for IPSec, this should be the public static ip of your companies internet connection. This way noone from outside the company can even connect to your proxmox hosts.
+* Create an additional IPSet for IPSec, this should be the public static ip of your companies internet connection. This way noone from outside the company can even connect to your proxmox hosts.
 
 Next create Security Groups + Rules:
 
-* admin-in: add Protocol: tcp rules for destination port 22 and 8006 with the pve-public IPSet as destination, optionally set your ipsec IPset as source
+* admin-in: add Protocol: tcp rules for destination port 22 and 8006 with the pve-public IPSet as destination, with your ipsec IPset and control node as source
+* mon-in: add rule to allow source 10.0.4.0/22 to reach destination 10.0.4.0/22. This is needed for the vms / lxcs to connect to the proxmox hosts and scrape prometheus metrics (systemd etc.), allow destination ports: 9100,9633,9558
 * ceph-fe: source ceph-fe, destination ceph-fe allow in all
 * ceph-be: source ceph-be, destination ceph-be allow in all
 

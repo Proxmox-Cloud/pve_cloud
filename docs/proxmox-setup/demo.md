@@ -124,8 +124,6 @@ This rescue mode setup was distilled from:
 
 Since this is a dedicated system you need a machine / container with direct access to all vms and proxmox hosts. for that we manually create an lxc, as a control node for running ansible and terraform configuration (proxmox cloud does not yet support remote access). On a local setup where your personal computer has access to the same private network where your vms live, you dont need a seperate machine / container.
 
-The machine needs a nic on the management switch / vlan, aswell as the vmdata vlan.
-
 ```bash
 # On your freshly created proxmox cluster in the gui go to storage and download a template of your choice (debian/ubuntu recommended)
 
@@ -156,4 +154,4 @@ ssh-keygen -t ed25519
 cat ~/.ssh/id_ed25519.pub
 ```
 
-From here you can start with the [bootstrap process](../bootstrap.md).
+From here you can start with the [bootstrap process](../bootstrap.md), after you have created your bind nameservers, you should assign those instead of the hosts defaults to the lxc.

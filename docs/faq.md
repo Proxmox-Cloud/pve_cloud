@@ -1,5 +1,11 @@
 # FAQ
 
+## Discovery quirks
+
+The collection uses a lot of discovery mechanisms in the playbooks aswell as the terraform modules. For setup running everything once is not enough at the moment.
+
+If some services (monitoring, alerting, multi cloud) does not get picked up, you need to run the playbooks a second time aswell as apply terraform twice.
+
 ## Patroni recovery
 
 If one patroni node fails, abrupt restart etc., delete /opt/ha-postgres data dir contents (`rf -rf *` inside the folder) and restart the patroni service.
