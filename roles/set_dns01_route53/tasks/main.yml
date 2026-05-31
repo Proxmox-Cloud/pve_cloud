@@ -1,17 +1,5 @@
 ---
 # tasks file for set_dns01_route53
-- name: try to select existing data
-  alchemy_read:
-    pg_conn_str: "{{ pg_conn_str }}"
-    table: px_cloud_secrets
-    where:
-      cloud_domain: "{{ pve_cloud_domain }}"
-      secret_name: "aws-route53-global"
-  register: aws_route53_query
-
-- set_fact:
-    aws_route53_global: "{{ aws_route53_query.query_result[0]['secret_data'] }}"
-
 - name: "Get all Zones from Route53"
   register: ret_r53zones
   amazon.aws.route53_info:

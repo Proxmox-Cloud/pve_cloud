@@ -82,6 +82,11 @@
     - debug:
         var: ret_acme_challenge
 
+    - name: dns solver load secrets custom
+      include_role:
+        name: "secrets_dns01_{{ acme_method }}"
+      when: load_method_secrets
+      
     - name: dns solver challenge custom
       include_role:
         name: "set_dns01_{{ acme_method }}"

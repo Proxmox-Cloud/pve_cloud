@@ -1,0 +1,16 @@
+---
+# tasks file for secrets_dns01_ionos_cloud
+- name: try to select existing data
+  alchemy_read:
+    pg_conn_str: "{{ pg_conn_str }}"
+    table: px_cloud_secrets
+    where:
+      cloud_domain: "{{ pve_cloud_domain }}"
+      secret_name: "ionos-cloud-token"
+  register: ionos_secret_query
+
+- set_fact:
+    ionos_cloud_token: "{{ ionos_secret_query.query_result[0]['secret_data'] }}"
+
+- debug:
+    var: ionos_cloud_token

@@ -1,3 +1,4 @@
 ---
 # defaults file for acme_workflow
 acme_staging: true
+load_method_secrets: true # run the secrets_dns01_METHOD roles
