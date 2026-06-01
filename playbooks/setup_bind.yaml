@@ -63,14 +63,22 @@
     - name: Decode resolv.conf content to string
       set_fact:
         resolv_conf: "{{ resolv_conf_raw.content | b64decode }}"
+        ns_regexp: '^nameserver\s+([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})'
 
     - name: Extract ipv4 nameservers from resolv.conf
       set_fact:
-        nameservers: "{{ resolv_conf | regex_findall('^nameserver\\s+([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3})') }}"
+        nameservers: "{{ resolv_conf | regex_findall(ns_regexp, multiline=true) }}"
 
     - name: Show extracted nameservers
       debug:
         var: nameservers
+
+    - name: verify that host ipv4 addresses found
+      ansible.builtin.assert:
+        that:
+          - nameservers | length > 0
+        fail_msg: "No ipv4 nameserver found on host!"
+        success_msg: "Ipv4 nameservers found on host!"
 
     - name: template default options
       template:
