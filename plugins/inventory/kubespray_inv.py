@@ -27,14 +27,15 @@ class InventoryModule(BaseInventoryPlugin):
         if target_cluster.first_online_host.jump_host:
             jumpbox = paramiko.SSHClient()
             jumpbox.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            jumpbox.connect(target_cluster.first_online_host.jump_host, username='root')
+            jumpbox.connect(target_cluster.first_online_host.jump_host, username="root")
 
             jumpbox_transport = jumpbox.get_transport()
             src_addr = ("127.0.0.1", 0)
             dest_addr = (target_cluster.first_online_host.params["ansible_host"], 22)
 
-            jumpbox_channel = jumpbox_transport.open_channel("direct-tcpip", dest_addr, src_addr)
-
+            jumpbox_channel = jumpbox_transport.open_channel(
+                "direct-tcpip", dest_addr, src_addr
+            )
 
         client = paramiko.SSHClient()  # connect to any of the pve hosts
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -42,7 +43,7 @@ class InventoryModule(BaseInventoryPlugin):
             target_cluster.first_online_host.params["ansible_host"],
             port=22,
             username="root",
-            sock=jumpbox_channel
+            sock=jumpbox_channel,
         )
 
         stdin, stdout, stderr = client.exec_command(

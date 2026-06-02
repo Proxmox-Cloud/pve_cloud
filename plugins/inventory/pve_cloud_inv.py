@@ -90,17 +90,23 @@ class InventoryModule(BaseInventoryPlugin):
                 for jump_host in pve_inventory[pve_cluster]["pve_jump_hosts"]:
                     if check_ssh_open(jump_host):
                         cluster_jump_host = jump_host
-                        display.display(f"found online jump host {cluster_jump_host} for {pve_cluster}")
+                        display.display(
+                            f"found online jump host {cluster_jump_host} for {pve_cluster}"
+                        )
                         break
-            
+
                 if not cluster_jump_host:
-                    display.display(f"jump hosts defined for {pve_cluster} but not reachable / offline!")
+                    display.display(
+                        f"jump hosts defined for {pve_cluster} but not reachable / offline!"
+                    )
                     continue
 
             for host, params in pve_inventory[pve_cluster]["pve_hosts"].items():
                 if "pve_jump_hosts" in pve_inventory[pve_cluster]:
                     display.v(f"found jump host config for {pve_cluster}")
-                    if not check_ssh_open_jumphost(params["ansible_host"], cluster_jump_host):
+                    if not check_ssh_open_jumphost(
+                        params["ansible_host"], cluster_jump_host
+                    ):
                         display.display(f"skipping offline host {host}")
                         continue
                 else:
@@ -126,8 +132,10 @@ class InventoryModule(BaseInventoryPlugin):
                 # enable jump host functionality for ssh
                 if cluster_jump_host:
                     inventory.set_variable(
-                        fqdn_host, "ansible_ssh_common_args", f"-o ProxyJump=root@{cluster_jump_host}"
-                    )      
+                        fqdn_host,
+                        "ansible_ssh_common_args",
+                        f"-o ProxyJump=root@{cluster_jump_host}",
+                    )
 
                 inventory.set_variable(
                     fqdn_host, "pve_cloud_domain", yaml_data["pve_cloud_domain"]

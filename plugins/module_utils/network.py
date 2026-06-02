@@ -27,7 +27,12 @@ async def check_host_ssh_online(pve_host, tunnel=None):
         await writer.wait_closed()
 
         return True, pve_host
-    except (asyncio.TimeoutError, OSError, ConnectionRefusedError, ChannelOpenError) as e:
+    except (
+        asyncio.TimeoutError,
+        OSError,
+        ConnectionRefusedError,
+        ChannelOpenError,
+    ) as e:
         display.v(f"Error checking host online {e} {type(e)}")
         return False, pve_host
 
@@ -58,7 +63,12 @@ async def wait_for_ssh_open(ip, tunnel=None):
                 await writer.wait_closed()
                 display.v(f"SSH is open on {ip}:{ssh_port}")
                 return ssh_port
-            except (asyncio.TimeoutError, OSError, ConnectionRefusedError, ChannelOpenError) as e:
+            except (
+                asyncio.TimeoutError,
+                OSError,
+                ConnectionRefusedError,
+                ChannelOpenError,
+            ) as e:
                 display.v(f"Error waiting for ssh {e} {type(e)}")
                 retries += 1
                 await asyncio.sleep(1)
