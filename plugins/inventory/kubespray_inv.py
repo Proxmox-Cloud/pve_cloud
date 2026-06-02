@@ -22,7 +22,8 @@ class InventoryModule(BaseInventoryPlugin):
         return valid
 
     def get_or_create_kubeadm_cert_key(self, target_cluster, stack_fqdn):
-        # optionally go through jumphost
+        # optionally go through jumphost defined in the ~/.pve-cloud-dyn-inv.yaml
+
         jumpbox_channel = None
         if target_cluster.first_online_host.jump_host:
             jumpbox = paramiko.SSHClient()
@@ -43,16 +44,16 @@ class InventoryModule(BaseInventoryPlugin):
             target_cluster.first_online_host.params["ansible_host"],
             port=22,
             username="root",
-            sock=jumpbox_channel,
+            sock=jumpbox_channel, # if this is passed paramiko uses this as jumphost
         )
 
-        stdin, stdout, stderr = client.exec_command(
+        _, stdout, _ = client.exec_command(
             f"test -f /etc/pve/cloud/kubespray-kubeadm-cert-keys/{stack_fqdn} && echo exists || echo notexists"
         )
         file_exists = stdout.read().strip().decode("utf-8") == "exists"
 
         if file_exists:
-            stdin, stdout, stderr = client.exec_command(
+            _, stdout, _ = client.exec_command(
                 f"cat /etc/pve/cloud/kubespray-kubeadm-cert-keys/{stack_fqdn}"
             )
             kubeadm_cert_key = stdout.read().strip().decode("utf-8")
@@ -60,17 +61,19 @@ class InventoryModule(BaseInventoryPlugin):
             kubeadm_cert_key = "".join(
                 secrets.choice("0123456789abcdef") for _ in range(64)
             )
-            stdin, stdout, stderr = client.exec_command(
+            _, stdout, _ = client.exec_command(
                 f'echo "{kubeadm_cert_key}" > /etc/pve/cloud/kubespray-kubeadm-cert-keys/{stack_fqdn}'
             )
 
         client.close()
         return kubeadm_cert_key
 
+    # sets all keys 1:1 of the input inventory yaml as values on all hosts (target_pve, stack_name, etc.)
     def set_global_vars(self, yaml_data, inventory):
         for key in yaml_data:
             inventory.set_variable("all", key, yaml_data[key])
 
+    # adds qemus (k8s nodes) to the inventory, getting their ip via proxmox api + qemu guest agent
     async def stack_qemus(self, inventory, stack_vms, target_cluster):
         add_tasks = []
         for vm in stack_vms:
@@ -83,7 +86,8 @@ class InventoryModule(BaseInventoryPlugin):
         super(InventoryModule, self).parse(inventory, loader, path, cache)
         yaml_data = loader.load_from_file(path)
 
-        vm_vars_blake, stack_vms, online_pve_hosts, cluster_map = asyncio.run(
+        # generic init function
+        vm_vars_blake, stack_vms, _, cluster_map = asyncio.run(
             init_plugin(
                 loader,
                 inventory,

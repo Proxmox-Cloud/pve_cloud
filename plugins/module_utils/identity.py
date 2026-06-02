@@ -3,6 +3,7 @@ import hashlib
 import json
 
 
+# extracts the unqiue blake hash (created based on vm/lxc creation parameters)
 def stack_vm_get_blake(vm):
     for tag in vm["tags"].split(";"):
         if tag.endswith("-blake"):
