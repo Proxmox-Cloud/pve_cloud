@@ -44,7 +44,7 @@ class InventoryModule(BaseInventoryPlugin):
             target_cluster.first_online_host.params["ansible_host"],
             port=22,
             username="root",
-            sock=jumpbox_channel, # if this is passed paramiko uses this as jumphost
+            sock=jumpbox_channel,  # if this is passed paramiko uses this as jumphost
         )
 
         _, stdout, _ = client.exec_command(
