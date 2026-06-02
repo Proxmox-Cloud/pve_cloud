@@ -16,6 +16,7 @@ from ansible_collections.pxc.cloud.plugins.module_utils.network import (
 from jsonschema.exceptions import ValidationError
 from pve_cloud.lib.inventory import *
 from pve_cloud_schemas.validate import validate_inventory
+from typing import Optional
 
 
 @dataclass
@@ -24,6 +25,7 @@ class PveHost:
     cloud_domain: str
     cluster_name: str
     params: dict
+    jump_host: Optional[str] = None
 
 
 @dataclass
@@ -44,17 +46,53 @@ async def get_online_pve_hosts(loader, yaml_data):
 
     # determine online hosts async
     online_host_tasks = []
+    jump_host_conns = []
     for pve in pve_inventory:
-        for host, params in pve_inventory[pve].items():
-            online_host_tasks.append(
-                check_host_ssh_online(PveHost(host, pve_cloud_domain, pve, params))
-            )
+        if "pve_jump_hosts" in pve_inventory[pve]:
+            # remote cluster, first we identify an jump host that is online
+            cluster_jump_host = None
+            for jump_host in pve_inventory[pve]["pve_jump_hosts"]:
+                if check_ssh_open(jump_host):
+                    cluster_jump_host = jump_host
+                    display.display(f"Found open cluster jump host {cluster_jump_host}")
+                    break
 
-    return [
+            if not cluster_jump_host:
+                display.display(f"jump hosts defined for {pve} but not reachable / offline!")
+                continue
+            
+            # connect to jumphost
+            jc = await asyncssh.connect(
+                cluster_jump_host,
+                username="root",
+                known_hosts=None
+            )
+            jump_host_conns.append(jc)
+
+            # validate online hosts via tunnel
+            for host, params in pve_inventory[pve]["pve_hosts"].items():
+                online_host_tasks.append(
+                    check_host_ssh_online(PveHost(host, pve_cloud_domain, pve, params, cluster_jump_host), tunnel=jc)
+                )
+        else:
+            # locally accessible cluster
+            for host, params in pve_inventory[pve]["pve_hosts"].items():
+                online_host_tasks.append(
+                    check_host_ssh_online(PveHost(host, pve_cloud_domain, pve, params))
+                )
+
+    gathered_checks = [
         fqdn_host[1]
         for fqdn_host in (await asyncio.gather(*online_host_tasks))
         if fqdn_host[0]
     ]
+
+    # close the jump host conns
+    for jc in jump_host_conns:
+        jc.close()
+        await jc.wait_closed()
+
+    return gathered_checks
 
 
 async def fetch_task(conn, command, ret_key):
@@ -66,8 +104,16 @@ async def fetch_task(conn, command, ret_key):
 async def fetch_pve_cluster_info(pve_host_of_cluster):
     fetch_tasks = []
 
+    # jumphost conn
+    jc = None
+    if pve_host_of_cluster.jump_host:
+        jc = await asyncssh.connect(
+            pve_host_of_cluster.jump_host, username="root", known_hosts=None
+        )
+
+    # optionally pass tunnel here
     async with asyncssh.connect(
-        pve_host_of_cluster.params["ansible_host"], username="root", known_hosts=None
+        pve_host_of_cluster.params["ansible_host"], username="root", known_hosts=None, tunnel=jc
     ) as conn:
         fetch_tasks.append(
             fetch_task(conn, "cat /etc/pve/cloud/cluster_vars.yaml", "cluster_vars")
@@ -105,10 +151,15 @@ async def fetch_pve_cluster_info(pve_host_of_cluster):
 
                 host_ha_groups[parsed_host].append(group["group"])
 
-        return (
-            pve_host_of_cluster.cluster_name + "." + pve_host_of_cluster.cloud_domain,
-            Information(cluster_vars, pvesh_vms, host_ha_groups, pve_host_of_cluster),
-        )
+    # close the jumphost
+    if jc:
+        jc.close()
+        await jc.wait_closed()
+
+    return (
+        pve_host_of_cluster.cluster_name + "." + pve_host_of_cluster.cloud_domain,
+        Information(cluster_vars, pvesh_vms, host_ha_groups, pve_host_of_cluster),
+    )
 
 
 async def get_cluster_map(inventory, online_pve_hosts):
@@ -174,6 +225,12 @@ def build_pve_inventory(inventory, yaml_data, online_pve_hosts, cluster_map):
             host_fqdn, "ansible_host", pve_host.params["ansible_host"]
         )
 
+        # set the jump host for connecting to the proxmox host
+        if pve_host.jump_host:
+            inventory.set_variable(
+                host_fqdn, "ansible_ssh_common_args", f"-o ProxyJump=root@{pve_host.jump_host}"
+            )      
+
         # set custom variables
         if "vars" in pve_host.params:
             for var in pve_host.params["vars"]:
@@ -200,11 +257,18 @@ async def add_lxc_to_inv(inventory, online_pve_hosts, target_pve, vm):
     if hosting_pve is None:
         raise AnsibleError(f"PVE Host of lxc {vm['vmid']} is offline!")
 
+    # jumphost conn
+    jc = None
+    if hosting_pve.jump_host:
+        jc = await asyncssh.connect(
+            hosting_pve.jump_host, username="root", known_hosts=None
+        )
+
     # attempt to get the ip of the lxc
     ip = None
 
     async with asyncssh.connect(
-        hosting_pve.params["ansible_host"], username="root", known_hosts=None
+        hosting_pve.params["ansible_host"], username="root", known_hosts=None, tunnel=jc
     ) as pve_conn:
         max_retries = 30
         for attempt in range(max_retries):
@@ -230,13 +294,13 @@ async def add_lxc_to_inv(inventory, online_pve_hosts, target_pve, vm):
                     await asyncio.sleep(1)
                 else:
                     raise AnsibleError(f"All attempts failed for {vm['vmid']}.")
-
+                
     if ip is None:
         raise AnsibleError(f"Could not get ip for vm {vm['vmid']}")
 
     inventory.set_variable(vm["name"], "ansible_host", ip)
 
-    open_ssh_port = await wait_for_ssh_open(ip)
+    open_ssh_port = await wait_for_ssh_open(ip, tunnel=jc)
 
     if open_ssh_port is None:
         raise AnsibleError(f"Can't reach SSH server on {ip}")
@@ -244,9 +308,15 @@ async def add_lxc_to_inv(inventory, online_pve_hosts, target_pve, vm):
     if open_ssh_port != 22:
         inventory.set_variable(vm["name"], "ansible_port", open_ssh_port)
 
+    display.display(f"jump host for lxc: {hosting_pve.jump_host}")
+    if hosting_pve.jump_host:
+        inventory.set_variable(
+            vm["name"], "ansible_ssh_common_args", f"-o ProxyJump=root@{hosting_pve.jump_host}"
+        )  
+
     # try load cloud vars for container if they exist
     async with asyncssh.connect(
-        ip, username="root", known_hosts=None, port=open_ssh_port
+        ip, username="root", known_hosts=None, port=open_ssh_port, tunnel=jc
     ) as lxc_conn:
         try:
             cat_lxc_cloud_vars = await lxc_conn.run(
@@ -264,12 +334,26 @@ async def add_lxc_to_inv(inventory, online_pve_hosts, target_pve, vm):
             display.warning(f"Error trying to load pve-cloud-vars.yaml on lxc {e}")
 
 
+    # close the jumphost
+    if jc:
+        jc.close()
+        await jc.wait_closed()
+
+
 async def add_qemu_to_inv(inventory, cluster, vm):
+    # jumphost conn
+    jc = None
+    if cluster.first_online_host.jump_host: # jump host is set for all pve hosts always
+        jc = await asyncssh.connect(
+            cluster.first_online_host.jump_host, username="root", known_hosts=None
+        )
+
     ip = None
     async with asyncssh.connect(
         cluster.first_online_host.params["ansible_host"],
         username="root",
         known_hosts=None,
+        tunnel=jc
     ) as pve_conn:
         max_retries = 80
         ip = None
@@ -311,10 +395,20 @@ async def add_qemu_to_inv(inventory, cluster, vm):
 
         inventory.set_variable(vm["name"], "ansible_host", ip)
 
-        open_ssh_port = await wait_for_ssh_open(ip)
+        open_ssh_port = await wait_for_ssh_open(ip, tunnel=jc)
 
         if open_ssh_port is None:
             raise AnsibleError(f"Can't reach SSH server on {ip}")
+        
+        if cluster.first_online_host.jump_host:
+            inventory.set_variable(
+                vm["name"], "ansible_ssh_common_args", f"-o ProxyJump=root@{cluster.first_online_host.jump_host}"
+            )  
+
+    # close the jumphost
+    if jc:
+        jc.close()
+        await jc.wait_closed()
 
 
 async def include_stack(

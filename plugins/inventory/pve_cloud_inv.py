@@ -83,10 +83,30 @@ class InventoryModule(BaseInventoryPlugin):
             # cluster rep group
             first = True
 
-            for host, params in pve_inventory[pve_cluster].items():
-                if not check_ssh_open(params["ansible_host"]):
-                    display.display(f"skipping offline host {host}")
+            # optionally determine online jump host for the cluster
+            cluster_jump_host = None
+            if "pve_jump_hosts" in pve_inventory[pve_cluster]:
+                # jump hosts for cluster configured => find an online one
+                for jump_host in pve_inventory[pve_cluster]["pve_jump_hosts"]:
+                    if check_ssh_open(jump_host):
+                        cluster_jump_host = jump_host
+                        display.display(f"found online jump host {cluster_jump_host} for {pve_cluster}")
+                        break
+            
+                if not cluster_jump_host:
+                    display.display(f"jump hosts defined for {pve_cluster} but not reachable / offline!")
                     continue
+
+            for host, params in pve_inventory[pve_cluster]["pve_hosts"].items():
+                if "pve_jump_hosts" in pve_inventory[pve_cluster]:
+                    display.v(f"found jump host config for {pve_cluster}")
+                    if not check_ssh_open_jumphost(params["ansible_host"], cluster_jump_host):
+                        display.display(f"skipping offline host {host}")
+                        continue
+                else:
+                    if not check_ssh_open(params["ansible_host"]):
+                        display.display(f"skipping offline host {host}")
+                        continue
 
                 fqdn_host = f"{host}.{pve_cluster}"
                 inventory.add_host(fqdn_host, group="all_pve_hosts")
@@ -102,6 +122,12 @@ class InventoryModule(BaseInventoryPlugin):
                 inventory.set_variable(
                     fqdn_host, "ansible_host", params["ansible_host"]
                 )
+
+                # enable jump host functionality for ssh
+                if cluster_jump_host:
+                    inventory.set_variable(
+                        fqdn_host, "ansible_ssh_common_args", f"-o ProxyJump=root@{cluster_jump_host}"
+                    )      
 
                 inventory.set_variable(
                     fqdn_host, "pve_cloud_domain", yaml_data["pve_cloud_domain"]
