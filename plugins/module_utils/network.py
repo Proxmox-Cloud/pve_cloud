@@ -9,7 +9,7 @@ display = Display()
 # determine online pve hosts
 async def check_host_ssh_online(pve_host, tunnel=None):
     try:
-        if tunnel: # ProxyJump equivalent
+        if tunnel:  # ProxyJump equivalent
             reader, writer = await asyncio.wait_for(
                 tunnel.open_connection(pve_host.params["ansible_host"], 22), timeout=2
             )
