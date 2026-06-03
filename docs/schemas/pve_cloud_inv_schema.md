@@ -252,12 +252,12 @@ must respect the following conditions
 
 **Description:** This object contains configuration parameters for a proxmox cluster within a proxmox cloud.
 
-| Property                                                                                       | Pattern | Type                      | Deprecated | Definition | Title/Description                                                                                                                                                                                                                                                                                                                                                                            |
-| ---------------------------------------------------------------------------------------------- | ------- | ------------------------- | ---------- | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| - [pve_haproxy_floating_ip_internal](#pve_clusters_pattern1_pve_haproxy_floating_ip_internal ) | No      | string                    | No         | -          | Floating ip that is exclusively accessible from inside the cloud / location. External forwardings should be made to pve_haproxy_floating_ip_external.<br />Inside the cloud if you define a certificate entry, some nodeport forward or default kubeapi access, this will all be available automatically on this ip.<br />                                                                   |
-| - [pve_haproxy_floating_ip_external](#pve_clusters_pattern1_pve_haproxy_floating_ip_external ) | No      | string                    | No         | -          | Floating ip of our central cluster HAProxy.                                                                                                                                                                                                                                                                                                                                                  |
-| + [pve_unique_cloud_services](#pve_clusters_pattern1_pve_unique_cloud_services )               | No      | array of enum (of string) | No         | -          | Unique service the cluster provides for its cloud. Unique in the sense that only one cluster may provide each of the services for the entire cloud.<br />Services like haproxy and backup servers can and should be provided by multiple clusters. <br />                                                                                                                                    |
-| - [pve_host_vars](#pve_clusters_pattern1_pve_host_vars )                                       | No      | object                    | No         | -          | Optional variables that will be specifically set for a pve host. Key is the simple host name. <br />This can be used to build your specialized pve cluster setup playbooks. You can do things like<br />wakeonlan, driver and network configuration with these easily. Simply create your own playbook and<br />run it even before the pxc.cloud.setup_pve_clusters on this inventory.<br /> |
+| Property                                                                                       | Pattern | Type                      | Deprecated | Definition | Title/Description                                                                                                                                                                                                                                                                                                          |
+| ---------------------------------------------------------------------------------------------- | ------- | ------------------------- | ---------- | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| - [pve_haproxy_floating_ip_internal](#pve_clusters_pattern1_pve_haproxy_floating_ip_internal ) | No      | string                    | No         | -          | Floating ip that is exclusively accessible from inside the cloud / location. External forwardings should be made to pve_haproxy_floating_ip_external.<br />Inside the cloud if you define a certificate entry, some nodeport forward or default kubeapi access, this will all be available automatically on this ip.<br /> |
+| - [pve_haproxy_floating_ip_external](#pve_clusters_pattern1_pve_haproxy_floating_ip_external ) | No      | string                    | No         | -          | Floating ip of our central cluster HAProxy.                                                                                                                                                                                                                                                                                |
+| + [pve_unique_cloud_services](#pve_clusters_pattern1_pve_unique_cloud_services )               | No      | array of enum (of string) | No         | -          | Unique service the cluster provides for its cloud. Unique in the sense that only one cluster may provide each of the services for the entire cloud.<br />Services like haproxy and backup servers can and should be provided by multiple clusters. <br />                                                                  |
+| - [pve_host_vars](#pve_clusters_pattern1_pve_host_vars )                                       | No      | object                    | No         | -          | Optional variables that will be specifically set for a pve host. Key is the simple host name.<br />                                                                                                                                                                                                                        |
 
 #### <a name="pve_clusters_pattern1_pve_haproxy_floating_ip_internal"></a>12.1.1. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_haproxy_floating_ip_internal`
 
@@ -327,16 +327,13 @@ Must be one of:
 
 #### <a name="pve_clusters_pattern1_pve_host_vars"></a>12.1.4. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars`
 
-|                           |                  |
-| ------------------------- | ---------------- |
-| **Type**                  | `object`         |
-| **Required**              | No               |
-| **Additional properties** | Any type allowed |
+|                           |             |
+| ------------------------- | ----------- |
+| **Type**                  | `object`    |
+| **Required**              | No          |
+| **Additional properties** | Not allowed |
 
-**Description:** Optional variables that will be specifically set for a pve host. Key is the simple host name. 
-This can be used to build your specialized pve cluster setup playbooks. You can do things like
-wakeonlan, driver and network configuration with these easily. Simply create your own playbook and
-run it even before the pxc.cloud.setup_pve_clusters on this inventory.
+**Description:** Optional variables that will be specifically set for a pve host. Key is the simple host name.
 
 | Property                                                                                                     | Pattern | Type            | Deprecated | Definition | Title/Description                                                                                                                                                                                                                                                                                                                                                            |
 | ------------------------------------------------------------------------------------------------------------ | ------- | --------------- | ---------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -344,8 +341,7 @@ run it even before the pxc.cloud.setup_pve_clusters on this inventory.
 | - [install_log2ram](#pve_clusters_pattern1_pve_host_vars_install_log2ram )                                   | No      | boolean         | No         | -          | This will install log2ram, moving logs to ram. If you are using the same disks for the os aswell as virtual machines, you should enable it,<br />to ensure proxmox doesnt freeze up because of vm disk usage.<br />                                                                                                                                                          |
 | - [disable_ipmi](#pve_clusters_pattern1_pve_host_vars_disable_ipmi )                                         | No      | boolean         | No         | -          | If specified will disable the openipmi power managemend systemd service. This might fail on proxmox<br />hosts that dont support it and clutters up monitoring.<br />                                                                                                                                                                                                        |
 | - [wol](#pve_clusters_pattern1_pve_host_vars_wol )                                                           | No      | object          | No         | -          | Definition for wakeonlan network interface. Will use ethtool and post-up commands to keep it enabled on the nic.<br />You also might have to adjust settings in the bios, enable WoL there and also tune the power options for receiving the<br />magic package. Turn off settings like low power soft off, then you can use \`wakeonlan MAC_ADDR\` to boot your host.<br /> |
-| - [tso_gso_fixxes](#pve_clusters_pattern1_pve_host_vars_tso_gso_fixxes )                                     | No      | array of object | No         | -          | List of network interfaces that should have certain features turned off (for old network hardware).                                                                                                                                                                                                                                                                          |
-| - [](#pve_clusters_pattern1_pve_host_vars_additionalProperties )                                             | No      | object          | No         | -          | -                                                                                                                                                                                                                                                                                                                                                                            |
+| - [net_offloading_fixxes](#pve_clusters_pattern1_pve_host_vars_net_offloading_fixxes )                       | No      | array of object | No         | -          | Disable pesky network offloaing features that break upon virtualization.                                                                                                                                                                                                                                                                                                     |
 
 ##### <a name="pve_clusters_pattern1_pve_host_vars_install_btrfs_root_prom_exporter"></a>12.1.4.1. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > install_btrfs_root_prom_exporter`
 
@@ -411,14 +407,14 @@ magic package. Turn off settings like low power soft off, then you can use `wake
 
 **Description:** The bridge that gets the post-up definition for wol.
 
-##### <a name="pve_clusters_pattern1_pve_host_vars_tso_gso_fixxes"></a>12.1.4.5. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > tso_gso_fixxes`
+##### <a name="pve_clusters_pattern1_pve_host_vars_net_offloading_fixxes"></a>12.1.4.5. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > net_offloading_fixxes`
 
 |              |                   |
 | ------------ | ----------------- |
 | **Type**     | `array of object` |
 | **Required** | No                |
 
-**Description:** List of network interfaces that should have certain features turned off (for old network hardware).
+**Description:** Disable pesky network offloaing features that break upon virtualization.
 
 |                      | Array restrictions |
 | -------------------- | ------------------ |
@@ -428,11 +424,11 @@ magic package. Turn off settings like low power soft off, then you can use `wake
 | **Additional items** | False              |
 | **Tuple validation** | See below          |
 
-| Each item of this array must be                                                   | Description |
-| --------------------------------------------------------------------------------- | ----------- |
-| [tso_gso_fixxes items](#pve_clusters_pattern1_pve_host_vars_tso_gso_fixxes_items) | -           |
+| Each item of this array must be                                                                 | Description |
+| ----------------------------------------------------------------------------------------------- | ----------- |
+| [net_offloading_fixxes items](#pve_clusters_pattern1_pve_host_vars_net_offloading_fixxes_items) | -           |
 
-###### <a name="pve_clusters_pattern1_pve_host_vars_tso_gso_fixxes_items"></a>12.1.4.5.1. Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > tso_gso_fixxes > tso_gso_fixxes items
+###### <a name="pve_clusters_pattern1_pve_host_vars_net_offloading_fixxes_items"></a>12.1.4.5.1. Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > net_offloading_fixxes > net_offloading_fixxes items
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -440,26 +436,71 @@ magic package. Turn off settings like low power soft off, then you can use `wake
 | **Required**              | No               |
 | **Additional properties** | Any type allowed |
 
-| Property                                                                      | Pattern | Type   | Deprecated | Definition | Title/Description                                                                                |
-| ----------------------------------------------------------------------------- | ------- | ------ | ---------- | ---------- | ------------------------------------------------------------------------------------------------ |
-| - [iface](#pve_clusters_pattern1_pve_host_vars_tso_gso_fixxes_items_iface )   | No      | string | No         | -          | -                                                                                                |
-| - [bridge](#pve_clusters_pattern1_pve_host_vars_tso_gso_fixxes_items_bridge ) | No      | string | No         | -          | The bridge that gets the post-up definition for applying the fix (turning off network features). |
+| Property                                                                                                 | Pattern | Type            | Deprecated | Definition | Title/Description                                                                                         |
+| -------------------------------------------------------------------------------------------------------- | ------- | --------------- | ---------- | ---------- | --------------------------------------------------------------------------------------------------------- |
+| - [iface](#pve_clusters_pattern1_pve_host_vars_net_offloading_fixxes_items_iface )                       | No      | string          | No         | -          | The interface for which to disable specified network offloading features.                                 |
+| - [bridge](#pve_clusters_pattern1_pve_host_vars_net_offloading_fixxes_items_bridge )                     | No      | string          | No         | -          | The bridge that gets the post-up definition for applying the fix that will receive the post-up directive. |
+| - [disable_features](#pve_clusters_pattern1_pve_host_vars_net_offloading_fixxes_items_disable_features ) | No      | array of string | No         | -          | List of network features to disable for the interface.                                                    |
 
-###### <a name="pve_clusters_pattern1_pve_host_vars_tso_gso_fixxes_items_iface"></a>12.1.4.5.1.1. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > tso_gso_fixxes > tso_gso_fixxes items > iface`
-
-|              |          |
-| ------------ | -------- |
-| **Type**     | `string` |
-| **Required** | No       |
-
-###### <a name="pve_clusters_pattern1_pve_host_vars_tso_gso_fixxes_items_bridge"></a>12.1.4.5.1.2. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > tso_gso_fixxes > tso_gso_fixxes items > bridge`
+###### <a name="pve_clusters_pattern1_pve_host_vars_net_offloading_fixxes_items_iface"></a>12.1.4.5.1.1. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > net_offloading_fixxes > net_offloading_fixxes items > iface`
 
 |              |          |
 | ------------ | -------- |
 | **Type**     | `string` |
 | **Required** | No       |
 
-**Description:** The bridge that gets the post-up definition for applying the fix (turning off network features).
+**Description:** The interface for which to disable specified network offloading features.
+
+###### <a name="pve_clusters_pattern1_pve_host_vars_net_offloading_fixxes_items_bridge"></a>12.1.4.5.1.2. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > net_offloading_fixxes > net_offloading_fixxes items > bridge`
+
+|              |          |
+| ------------ | -------- |
+| **Type**     | `string` |
+| **Required** | No       |
+
+**Description:** The bridge that gets the post-up definition for applying the fix that will receive the post-up directive.
+
+###### <a name="pve_clusters_pattern1_pve_host_vars_net_offloading_fixxes_items_disable_features"></a>12.1.4.5.1.3. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > net_offloading_fixxes > net_offloading_fixxes items > disable_features`
+
+|              |                   |
+| ------------ | ----------------- |
+| **Type**     | `array of string` |
+| **Required** | No                |
+
+**Description:** List of network features to disable for the interface.
+
+|                      | Array restrictions |
+| -------------------- | ------------------ |
+| **Min items**        | N/A                |
+| **Max items**        | N/A                |
+| **Items unicity**    | False              |
+| **Additional items** | False              |
+| **Tuple validation** | See below          |
+
+| Each item of this array must be                                                                                   | Description |
+| ----------------------------------------------------------------------------------------------------------------- | ----------- |
+| [disable_features items](#pve_clusters_pattern1_pve_host_vars_net_offloading_fixxes_items_disable_features_items) | -           |
+
+###### <a name="pve_clusters_pattern1_pve_host_vars_net_offloading_fixxes_items_disable_features_items"></a>12.1.4.5.1.3.1. Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > net_offloading_fixxes > net_offloading_fixxes items > disable_features > disable_features items
+
+|              |          |
+| ------------ | -------- |
+| **Type**     | `string` |
+| **Required** | No       |
+
+**Examples:**
+
+```json
+"tso"
+```
+
+```json
+"gso"
+```
+
+```json
+"gro"
+```
 
 ## <a name="bind_zone_admin_email"></a>13. Property `Cloud Inventory > bind_zone_admin_email`
 
