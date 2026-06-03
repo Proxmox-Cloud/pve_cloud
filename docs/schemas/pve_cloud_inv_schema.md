@@ -335,15 +335,32 @@ Must be one of:
 
 **Description:** Optional variables that will be specifically set for a pve host. Key is the simple host name.
 
-| Property                                                                                                     | Pattern | Type            | Deprecated | Definition | Title/Description                                                                                                                                                                                                                                                                                                                                                            |
-| ------------------------------------------------------------------------------------------------------------ | ------- | --------------- | ---------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| - [install_btrfs_root_prom_exporter](#pve_clusters_pattern1_pve_host_vars_install_btrfs_root_prom_exporter ) | No      | boolean         | No         | -          | Set this to true if you installed the os on btrfs. This will install a prometheus exporter for btrfs aswell as enable degraded booting.<br />                                                                                                                                                                                                                                |
-| - [install_log2ram](#pve_clusters_pattern1_pve_host_vars_install_log2ram )                                   | No      | boolean         | No         | -          | This will install log2ram, moving logs to ram. If you are using the same disks for the os aswell as virtual machines, you should enable it,<br />to ensure proxmox doesnt freeze up because of vm disk usage.<br />                                                                                                                                                          |
-| - [disable_ipmi](#pve_clusters_pattern1_pve_host_vars_disable_ipmi )                                         | No      | boolean         | No         | -          | If specified will disable the openipmi power managemend systemd service. This might fail on proxmox<br />hosts that dont support it and clutters up monitoring.<br />                                                                                                                                                                                                        |
-| - [wol](#pve_clusters_pattern1_pve_host_vars_wol )                                                           | No      | object          | No         | -          | Definition for wakeonlan network interface. Will use ethtool and post-up commands to keep it enabled on the nic.<br />You also might have to adjust settings in the bios, enable WoL there and also tune the power options for receiving the<br />magic package. Turn off settings like low power soft off, then you can use \`wakeonlan MAC_ADDR\` to boot your host.<br /> |
-| - [net_offloading_fixxes](#pve_clusters_pattern1_pve_host_vars_net_offloading_fixxes )                       | No      | array of object | No         | -          | Disable pesky network offloaing features that break upon virtualization.                                                                                                                                                                                                                                                                                                     |
+| Property                                                                                                | Pattern | Type   | Deprecated | Definition | Title/Description |
+| ------------------------------------------------------------------------------------------------------- | ------- | ------ | ---------- | ---------- | ----------------- |
+| - [^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)$](#pve_clusters_pattern1_pve_host_vars_pattern1 ) | Yes     | object | No         | -          | Proxmox hostname  |
 
-##### <a name="pve_clusters_pattern1_pve_host_vars_install_btrfs_root_prom_exporter"></a>12.1.4.1. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > install_btrfs_root_prom_exporter`
+##### <a name="pve_clusters_pattern1_pve_host_vars_pattern1"></a>12.1.4.1. Pattern Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > Proxmox hostname`
+> All properties whose name matches the regular expression
+```^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)$``` ([Test](https://regex101.com/?regex=%5E%28%3F%3A%5Ba-zA-Z0-9%5D%28%3F%3A%5Ba-zA-Z0-9-%5D%7B0%2C61%7D%5Ba-zA-Z0-9%5D%29%3F%29%24))
+must respect the following conditions
+
+**Title:** Proxmox hostname
+
+|                           |             |
+| ------------------------- | ----------- |
+| **Type**                  | `object`    |
+| **Required**              | No          |
+| **Additional properties** | Not allowed |
+
+| Property                                                                                                              | Pattern | Type            | Deprecated | Definition | Title/Description                                                                                                                                                                                                                                                                                                                                                            |
+| --------------------------------------------------------------------------------------------------------------------- | ------- | --------------- | ---------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| - [install_btrfs_root_prom_exporter](#pve_clusters_pattern1_pve_host_vars_pattern1_install_btrfs_root_prom_exporter ) | No      | boolean         | No         | -          | Set this to true if you installed the os on btrfs. This will install a prometheus exporter for btrfs aswell as enable degraded booting.<br />                                                                                                                                                                                                                                |
+| - [install_log2ram](#pve_clusters_pattern1_pve_host_vars_pattern1_install_log2ram )                                   | No      | boolean         | No         | -          | This will install log2ram, moving logs to ram. If you are using the same disks for the os aswell as virtual machines, you should enable it,<br />to ensure proxmox doesnt freeze up because of vm disk usage.<br />                                                                                                                                                          |
+| - [disable_ipmi](#pve_clusters_pattern1_pve_host_vars_pattern1_disable_ipmi )                                         | No      | boolean         | No         | -          | If specified will disable the openipmi power managemend systemd service. This might fail on proxmox<br />hosts that dont support it and clutters up monitoring.<br />                                                                                                                                                                                                        |
+| - [wol](#pve_clusters_pattern1_pve_host_vars_pattern1_wol )                                                           | No      | object          | No         | -          | Definition for wakeonlan network interface. Will use ethtool and post-up commands to keep it enabled on the nic.<br />You also might have to adjust settings in the bios, enable WoL there and also tune the power options for receiving the<br />magic package. Turn off settings like low power soft off, then you can use \`wakeonlan MAC_ADDR\` to boot your host.<br /> |
+| - [net_offloading_fixxes](#pve_clusters_pattern1_pve_host_vars_pattern1_net_offloading_fixxes )                       | No      | array of object | No         | -          | Disable pesky network offloaing features that break upon virtualization.                                                                                                                                                                                                                                                                                                     |
+
+###### <a name="pve_clusters_pattern1_pve_host_vars_pattern1_install_btrfs_root_prom_exporter"></a>12.1.4.1.1. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > Proxmox hostname > install_btrfs_root_prom_exporter`
 
 |              |           |
 | ------------ | --------- |
@@ -352,7 +369,7 @@ Must be one of:
 
 **Description:** Set this to true if you installed the os on btrfs. This will install a prometheus exporter for btrfs aswell as enable degraded booting.
 
-##### <a name="pve_clusters_pattern1_pve_host_vars_install_log2ram"></a>12.1.4.2. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > install_log2ram`
+###### <a name="pve_clusters_pattern1_pve_host_vars_pattern1_install_log2ram"></a>12.1.4.1.2. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > Proxmox hostname > install_log2ram`
 
 |              |           |
 | ------------ | --------- |
@@ -362,7 +379,7 @@ Must be one of:
 **Description:** This will install log2ram, moving logs to ram. If you are using the same disks for the os aswell as virtual machines, you should enable it,
 to ensure proxmox doesnt freeze up because of vm disk usage.
 
-##### <a name="pve_clusters_pattern1_pve_host_vars_disable_ipmi"></a>12.1.4.3. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > disable_ipmi`
+###### <a name="pve_clusters_pattern1_pve_host_vars_pattern1_disable_ipmi"></a>12.1.4.1.3. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > Proxmox hostname > disable_ipmi`
 
 |              |           |
 | ------------ | --------- |
@@ -372,7 +389,7 @@ to ensure proxmox doesnt freeze up because of vm disk usage.
 **Description:** If specified will disable the openipmi power managemend systemd service. This might fail on proxmox
 hosts that dont support it and clutters up monitoring.
 
-##### <a name="pve_clusters_pattern1_pve_host_vars_wol"></a>12.1.4.4. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > wol`
+###### <a name="pve_clusters_pattern1_pve_host_vars_pattern1_wol"></a>12.1.4.1.4. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > Proxmox hostname > wol`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -384,12 +401,12 @@ hosts that dont support it and clutters up monitoring.
 You also might have to adjust settings in the bios, enable WoL there and also tune the power options for receiving the
 magic package. Turn off settings like low power soft off, then you can use `wakeonlan MAC_ADDR` to boot your host.
 
-| Property                                                     | Pattern | Type   | Deprecated | Definition | Title/Description                                      |
-| ------------------------------------------------------------ | ------- | ------ | ---------- | ---------- | ------------------------------------------------------ |
-| - [iface](#pve_clusters_pattern1_pve_host_vars_wol_iface )   | No      | string | No         | -          | The interface for which wakeonlan should be activated. |
-| - [bridge](#pve_clusters_pattern1_pve_host_vars_wol_bridge ) | No      | string | No         | -          | The bridge that gets the post-up definition for wol.   |
+| Property                                                              | Pattern | Type   | Deprecated | Definition | Title/Description                                      |
+| --------------------------------------------------------------------- | ------- | ------ | ---------- | ---------- | ------------------------------------------------------ |
+| - [iface](#pve_clusters_pattern1_pve_host_vars_pattern1_wol_iface )   | No      | string | No         | -          | The interface for which wakeonlan should be activated. |
+| - [bridge](#pve_clusters_pattern1_pve_host_vars_pattern1_wol_bridge ) | No      | string | No         | -          | The bridge that gets the post-up definition for wol.   |
 
-###### <a name="pve_clusters_pattern1_pve_host_vars_wol_iface"></a>12.1.4.4.1. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > wol > iface`
+###### <a name="pve_clusters_pattern1_pve_host_vars_pattern1_wol_iface"></a>12.1.4.1.4.1. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > Proxmox hostname > wol > iface`
 
 |              |          |
 | ------------ | -------- |
@@ -398,7 +415,7 @@ magic package. Turn off settings like low power soft off, then you can use `wake
 
 **Description:** The interface for which wakeonlan should be activated.
 
-###### <a name="pve_clusters_pattern1_pve_host_vars_wol_bridge"></a>12.1.4.4.2. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > wol > bridge`
+###### <a name="pve_clusters_pattern1_pve_host_vars_pattern1_wol_bridge"></a>12.1.4.1.4.2. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > Proxmox hostname > wol > bridge`
 
 |              |          |
 | ------------ | -------- |
@@ -407,7 +424,7 @@ magic package. Turn off settings like low power soft off, then you can use `wake
 
 **Description:** The bridge that gets the post-up definition for wol.
 
-##### <a name="pve_clusters_pattern1_pve_host_vars_net_offloading_fixxes"></a>12.1.4.5. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > net_offloading_fixxes`
+###### <a name="pve_clusters_pattern1_pve_host_vars_pattern1_net_offloading_fixxes"></a>12.1.4.1.5. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > Proxmox hostname > net_offloading_fixxes`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -424,11 +441,11 @@ magic package. Turn off settings like low power soft off, then you can use `wake
 | **Additional items** | False              |
 | **Tuple validation** | See below          |
 
-| Each item of this array must be                                                                 | Description |
-| ----------------------------------------------------------------------------------------------- | ----------- |
-| [net_offloading_fixxes items](#pve_clusters_pattern1_pve_host_vars_net_offloading_fixxes_items) | -           |
+| Each item of this array must be                                                                          | Description |
+| -------------------------------------------------------------------------------------------------------- | ----------- |
+| [net_offloading_fixxes items](#pve_clusters_pattern1_pve_host_vars_pattern1_net_offloading_fixxes_items) | -           |
 
-###### <a name="pve_clusters_pattern1_pve_host_vars_net_offloading_fixxes_items"></a>12.1.4.5.1. Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > net_offloading_fixxes > net_offloading_fixxes items
+###### <a name="pve_clusters_pattern1_pve_host_vars_pattern1_net_offloading_fixxes_items"></a>12.1.4.1.5.1. Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > Proxmox hostname > net_offloading_fixxes > net_offloading_fixxes items
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -436,13 +453,13 @@ magic package. Turn off settings like low power soft off, then you can use `wake
 | **Required**              | No               |
 | **Additional properties** | Any type allowed |
 
-| Property                                                                                                 | Pattern | Type            | Deprecated | Definition | Title/Description                                                                                         |
-| -------------------------------------------------------------------------------------------------------- | ------- | --------------- | ---------- | ---------- | --------------------------------------------------------------------------------------------------------- |
-| - [iface](#pve_clusters_pattern1_pve_host_vars_net_offloading_fixxes_items_iface )                       | No      | string          | No         | -          | The interface for which to disable specified network offloading features.                                 |
-| - [bridge](#pve_clusters_pattern1_pve_host_vars_net_offloading_fixxes_items_bridge )                     | No      | string          | No         | -          | The bridge that gets the post-up definition for applying the fix that will receive the post-up directive. |
-| - [disable_features](#pve_clusters_pattern1_pve_host_vars_net_offloading_fixxes_items_disable_features ) | No      | array of string | No         | -          | List of network features to disable for the interface.                                                    |
+| Property                                                                                                          | Pattern | Type            | Deprecated | Definition | Title/Description                                                                                         |
+| ----------------------------------------------------------------------------------------------------------------- | ------- | --------------- | ---------- | ---------- | --------------------------------------------------------------------------------------------------------- |
+| - [iface](#pve_clusters_pattern1_pve_host_vars_pattern1_net_offloading_fixxes_items_iface )                       | No      | string          | No         | -          | The interface for which to disable specified network offloading features.                                 |
+| - [bridge](#pve_clusters_pattern1_pve_host_vars_pattern1_net_offloading_fixxes_items_bridge )                     | No      | string          | No         | -          | The bridge that gets the post-up definition for applying the fix that will receive the post-up directive. |
+| - [disable_features](#pve_clusters_pattern1_pve_host_vars_pattern1_net_offloading_fixxes_items_disable_features ) | No      | array of string | No         | -          | List of network features to disable for the interface.                                                    |
 
-###### <a name="pve_clusters_pattern1_pve_host_vars_net_offloading_fixxes_items_iface"></a>12.1.4.5.1.1. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > net_offloading_fixxes > net_offloading_fixxes items > iface`
+###### <a name="pve_clusters_pattern1_pve_host_vars_pattern1_net_offloading_fixxes_items_iface"></a>12.1.4.1.5.1.1. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > Proxmox hostname > net_offloading_fixxes > net_offloading_fixxes items > iface`
 
 |              |          |
 | ------------ | -------- |
@@ -451,7 +468,7 @@ magic package. Turn off settings like low power soft off, then you can use `wake
 
 **Description:** The interface for which to disable specified network offloading features.
 
-###### <a name="pve_clusters_pattern1_pve_host_vars_net_offloading_fixxes_items_bridge"></a>12.1.4.5.1.2. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > net_offloading_fixxes > net_offloading_fixxes items > bridge`
+###### <a name="pve_clusters_pattern1_pve_host_vars_pattern1_net_offloading_fixxes_items_bridge"></a>12.1.4.1.5.1.2. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > Proxmox hostname > net_offloading_fixxes > net_offloading_fixxes items > bridge`
 
 |              |          |
 | ------------ | -------- |
@@ -460,7 +477,7 @@ magic package. Turn off settings like low power soft off, then you can use `wake
 
 **Description:** The bridge that gets the post-up definition for applying the fix that will receive the post-up directive.
 
-###### <a name="pve_clusters_pattern1_pve_host_vars_net_offloading_fixxes_items_disable_features"></a>12.1.4.5.1.3. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > net_offloading_fixxes > net_offloading_fixxes items > disable_features`
+###### <a name="pve_clusters_pattern1_pve_host_vars_pattern1_net_offloading_fixxes_items_disable_features"></a>12.1.4.1.5.1.3. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > Proxmox hostname > net_offloading_fixxes > net_offloading_fixxes items > disable_features`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -477,11 +494,11 @@ magic package. Turn off settings like low power soft off, then you can use `wake
 | **Additional items** | False              |
 | **Tuple validation** | See below          |
 
-| Each item of this array must be                                                                                   | Description |
-| ----------------------------------------------------------------------------------------------------------------- | ----------- |
-| [disable_features items](#pve_clusters_pattern1_pve_host_vars_net_offloading_fixxes_items_disable_features_items) | -           |
+| Each item of this array must be                                                                                            | Description |
+| -------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| [disable_features items](#pve_clusters_pattern1_pve_host_vars_pattern1_net_offloading_fixxes_items_disable_features_items) | -           |
 
-###### <a name="pve_clusters_pattern1_pve_host_vars_net_offloading_fixxes_items_disable_features_items"></a>12.1.4.5.1.3.1. Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > net_offloading_fixxes > net_offloading_fixxes items > disable_features > disable_features items
+###### <a name="pve_clusters_pattern1_pve_host_vars_pattern1_net_offloading_fixxes_items_disable_features_items"></a>12.1.4.1.5.1.3.1. Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > Proxmox hostname > net_offloading_fixxes > net_offloading_fixxes items > disable_features > disable_features items
 
 |              |          |
 | ------------ | -------- |
