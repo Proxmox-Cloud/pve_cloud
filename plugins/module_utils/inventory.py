@@ -19,15 +19,19 @@ from pve_cloud.lib.inventory import *
 from pve_cloud_schemas.validate import validate_inventory
 
 
+# collector class for a proxmox host, its cloud membership and config
 @dataclass
 class PveHost:
     hostname: str
     cloud_domain: str
     cluster_name: str
     params: dict
+    # when this is set the proxmox host will be accessed through
+    # this jump host. Currently it assumes another proxmox root user host
     jump_host: Optional[str] = None
 
 
+# proxmox cluster information (vars, running vms)
 @dataclass
 class Information:
     cluster_vars: dict
@@ -90,7 +94,7 @@ async def get_online_pve_hosts(loader, yaml_data):
         if fqdn_host[0]
     ]
 
-    # close the jump host conns
+    # close the jump host conns (if any were made)
     for jc in jump_host_conns:
         jc.close()
         await jc.wait_closed()
@@ -107,18 +111,18 @@ async def fetch_task(conn, command, ret_key):
 async def fetch_pve_cluster_info(pve_host_of_cluster):
     fetch_tasks = []
 
-    # jumphost conn
+    # optional jumphost conn
     jc = None
     if pve_host_of_cluster.jump_host:
         jc = await asyncssh.connect(
             pve_host_of_cluster.jump_host, username="root", known_hosts=None
         )
 
-    # optionally pass tunnel here
     async with asyncssh.connect(
         pve_host_of_cluster.params["ansible_host"],
         username="root",
         known_hosts=None,
+        # optionally pass tunnel here => equivalent to ansible ProxyJump
         tunnel=jc,
     ) as conn:
         fetch_tasks.append(
@@ -157,7 +161,7 @@ async def fetch_pve_cluster_info(pve_host_of_cluster):
 
                 host_ha_groups[parsed_host].append(group["group"])
 
-    # close the jumphost
+    # close the jumphost if it was defined
     if jc:
         jc.close()
         await jc.wait_closed()
@@ -265,7 +269,7 @@ async def add_lxc_to_inv(inventory, online_pve_hosts, target_pve, vm):
     if hosting_pve is None:
         raise AnsibleError(f"PVE Host of lxc {vm['vmid']} is offline!")
 
-    # jumphost conn
+    # jumphost conn if defined
     jc = None
     if hosting_pve.jump_host:
         jc = await asyncssh.connect(
@@ -343,7 +347,7 @@ async def add_lxc_to_inv(inventory, online_pve_hosts, target_pve, vm):
         except asyncssh.ProcessError as e:
             display.warning(f"Error trying to load pve-cloud-vars.yaml on lxc {e}")
 
-    # close the jumphost
+    # close the jumphost if defined
     if jc:
         jc.close()
         await jc.wait_closed()

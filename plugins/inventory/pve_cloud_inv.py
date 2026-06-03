@@ -84,6 +84,7 @@ class InventoryModule(BaseInventoryPlugin):
             first = True
 
             # optionally determine online jump host for the cluster
+            # if cluster was added through `pvcli connect-remote-cluster`
             cluster_jump_host = None
             if "pve_jump_hosts" in pve_inventory[pve_cluster]:
                 # jump hosts for cluster configured => find an online one
@@ -96,13 +97,14 @@ class InventoryModule(BaseInventoryPlugin):
                         break
 
                 if not cluster_jump_host:
-                    display.display(
-                        f"jump hosts defined for {pve_cluster} but not reachable / offline!"
+                    display.error(
+                        f"jump hosts defined for {pve_cluster} but all offline / unreachable!"
                     )
                     continue
 
             for host, params in pve_inventory[pve_cluster]["pve_hosts"].items():
-                if "pve_jump_hosts" in pve_inventory[pve_cluster]:
+                # use jump host for online check if defined + available
+                if cluster_jump_host:
                     display.v(f"found jump host config for {pve_cluster}")
                     if not check_ssh_open_jumphost(
                         params["ansible_host"], cluster_jump_host
@@ -110,6 +112,7 @@ class InventoryModule(BaseInventoryPlugin):
                         display.display(f"skipping offline host {host}")
                         continue
                 else:
+                    # else connect directly
                     if not check_ssh_open(params["ansible_host"]):
                         display.display(f"skipping offline host {host}")
                         continue
@@ -129,7 +132,7 @@ class InventoryModule(BaseInventoryPlugin):
                     fqdn_host, "ansible_host", params["ansible_host"]
                 )
 
-                # enable jump host functionality for ssh
+                # enable jump host functionality for ansible via ssh
                 if cluster_jump_host:
                     inventory.set_variable(
                         fqdn_host,
