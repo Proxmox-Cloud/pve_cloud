@@ -319,7 +319,7 @@ def test_create_secondary_kubespray(
 
         jumpbox_transport = jumpbox.get_transport()
         src_addr = ("127.0.0.1", 0)
-        dest_addr = (first_test_host, 22)
+        dest_addr = (first_test_host["ansible_host"], 22)
 
         jumpbox_channel = jumpbox_transport.open_channel(
             "direct-tcpip", dest_addr, src_addr
@@ -342,15 +342,8 @@ def test_create_secondary_kubespray(
 
     # start pxrpc server for injecting
     if "pve_test_cluster_jump_host" in get_test_env:
-        with launch_pxrpc(get_test_env["pve_test_cluster_jump_host"], tdd_ip) as (
-            pxrpc,
-            jump_host,
-        ):
-            pxrpc.root.e2e_inject_cert(
-                pg_conn_str_orm,
-                f"pytest-secondary-k8s.{get_test_env['cloud_inventory']['pve_cloud_domain']}",
-                record[0],
-            )
+        with launch_pxrpc(get_test_env["pve_test_cluster_jump_host"], first_test_host["ansible_host"], tdd_ip) as (pxrpc, jump_host):
+            pxrpc.root.e2e_inject_cert(pg_conn_str_orm, f"pytest-secondary-k8s.{get_test_env['cloud_inventory']['pve_cloud_domain']}", record[0])
     else:
         engine = create_engine(pg_conn_str_orm)
 
