@@ -43,7 +43,7 @@
         where:
           cloud_domain: "{{ pve_cloud_domain }}"
           secret_name: "{{ stack_name }}-bdd-tls-certs"
-      delegate_to: localhost
+      delegate_to: "{{ groups['target_pve'][0] }}"
       register: fetched_bdd_tls
 
     - name: Write bdd tls certs to /opt/bdd/certs

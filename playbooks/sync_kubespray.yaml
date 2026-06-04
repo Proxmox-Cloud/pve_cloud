@@ -170,6 +170,15 @@
         - { key: 'fs.inotify.max_user_instances', value: "{{ [1024, [recommended_instances | int, 8192] | min] | max }}" }
         - { key: 'fs.inotify.max_user_watches', value: "{{ [524288, [recommended_watches | int, 2097152] | min] | max }}" }
 
+    - name: select discovery secret log export
+      delegate_to: "{{ groups['target_pve'][0] }}"
+      alchemy_read:
+        pg_conn_str: "{{ pg_conn_str }}"
+        table: px_cloud_secrets
+        where:
+          secret_type: "vlogs-cluster-journald"
+      register: vlogs_journald_ds # discovery secrets
+
     # vector logs export for node services
     - name: install vector journald exporter
       include_role:

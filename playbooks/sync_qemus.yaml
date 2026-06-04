@@ -135,6 +135,7 @@
     - parse_cluster_secrets
   tasks:
     - name: clear tcp proxies
+      delegate_to: "{{ groups['target_pve'][0] }}"
       alchemy_delete:
         pg_conn_str: "{{ pg_conn_str }}"
         table: k8s_tcp_proxies
@@ -144,6 +145,7 @@
       when: tcp_proxies is defined
 
     - name: insert tcp proxies
+      delegate_to: "{{ groups['target_pve'][0] }}"
       alchemy_write:
         pg_conn_str: "{{ pg_conn_str }}"
         table: k8s_tcp_proxies

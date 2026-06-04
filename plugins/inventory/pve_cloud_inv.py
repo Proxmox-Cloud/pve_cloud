@@ -77,6 +77,8 @@ class InventoryModule(BaseInventoryPlugin):
             raise AnsibleParserError(
                 "Could not identify py-pve-cloud version in meta/ee-requirements.txt"
             )
+        
+        inventory.set_variable("all", "py_pve_cloud_version", py_pve_cloud_version)
 
         # load pve clusters and set cluster variables for them
         for pve_cluster in yaml_data["pve_clusters"]:
@@ -86,9 +88,9 @@ class InventoryModule(BaseInventoryPlugin):
             # optionally determine online jump host for the cluster
             # if cluster was added through `pvcli connect-remote-cluster`
             cluster_jump_host = None
-            if "pve_jump_hosts" in pve_inventory[pve_cluster]:
+            if "jump_hosts" in pve_inventory[pve_cluster]:
                 # jump hosts for cluster configured => find an online one
-                for jump_host in pve_inventory[pve_cluster]["pve_jump_hosts"]:
+                for jump_host in pve_inventory[pve_cluster]["jump_hosts"]:
                     if check_ssh_open(jump_host):
                         cluster_jump_host = jump_host
                         display.display(

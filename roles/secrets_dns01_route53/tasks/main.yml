@@ -1,6 +1,7 @@
 ---
 # tasks file for secrets_dns01_route53
 - name: try to select existing data
+  delegate_to: "{{ groups['target_pve'][0] }}"
   alchemy_read:
     pg_conn_str: "{{ pg_conn_str }}"
     table: px_cloud_secrets

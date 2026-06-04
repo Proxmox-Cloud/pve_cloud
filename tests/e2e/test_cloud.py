@@ -10,12 +10,14 @@ import pytest
 import redis
 import yaml
 from cloud_fixture import *
-from pve_cloud.cli.pvclu import get_ssh_master_kubeconfig
+from pve_cloud.cli.pvclu import get_ssh_master_kubeconfig, get_ssh_remote_master_kubeconfig
+
 from pve_cloud.lib.inventory import get_online_pve_host
 from pve_cloud.orm.alchemy import AcmeX509
 from pve_cloud_test.tdd_watchdog import get_ipv4
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session
+from pve_cloud.cli.pxrpc import launch_pxrpc
 
 logger = logging.getLogger(__name__)
 
@@ -255,9 +257,12 @@ def test_create_secondary_kubespray(
     setup_cache_lxcs,
     get_secondary_kubespray_inv,
 ):
-    pve_host = get_online_pve_host(
+    pve_host, jump_host = get_online_pve_host(
         get_test_env["kubernetes"]["k8s_tls_copy_target_pve"]
     )
+
+    assert jump_host is None # doesnt support jump host for copy cluster
+
     logger.info(pve_host)
 
     # we connect to the test host to get the patroni secret of the cluster, aswell as the vars
@@ -305,34 +310,54 @@ def test_create_secondary_kubespray(
         next(iter(get_test_env["pve_test_cluster_hosts"]))
     ]
 
+    # tunnel through jumphost if specified
+    jumpbox_channel = None
+    if "pve_test_cluster_jump_host" in get_test_env:
+        jumpbox = paramiko.SSHClient()
+        jumpbox.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        jumpbox.connect(get_test_env["pve_test_cluster_jump_host"], username="root")
+
+        jumpbox_transport = jumpbox.get_transport()
+        src_addr = ("127.0.0.1", 0)
+        dest_addr = (first_test_host, 22)
+
+        jumpbox_channel = jumpbox_transport.open_channel(
+            "direct-tcpip", dest_addr, src_addr
+        )
+
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    ssh.connect(first_test_host["ansible_host"], username="root")
+    ssh.connect(first_test_host["ansible_host"], username="root", sock=jumpbox_channel)
 
     _, stdout, _ = ssh.exec_command("sudo cat /etc/pve/cloud/secrets/patroni.pass")
     patroni_pass = stdout.read().decode("utf-8")
 
     pg_conn_str_orm = f"postgresql+psycopg2://postgres:{patroni_pass}@{get_test_env['pve_test_cluster_floating_internal']}:5000/pve_cloud?sslmode=disable"
-
-    engine = create_engine(pg_conn_str_orm)
-
-    # update certs and mirror pull secret
-    with Session(engine) as session:
-        copy_cert = AcmeX509(
-            stack_fqdn=f"pytest-secondary-k8s.{get_test_env['cloud_inventory']['pve_cloud_domain']}",
-            config={},
-            ec_csr={},
-            ec_crt={},
-            k8s=record[0],
-        )
-        session.merge(copy_cert)
-        session.commit()
-
+    
     # for local tdd with development watchdogs
     extra_vars = {}
     tdd_ip = get_tdd_ip()
     if tdd_ip:
         extra_vars["test_repos_ip"] = tdd_ip
+
+    # start pxrpc server for injecting
+    if "pve_test_cluster_jump_host" in get_test_env:
+        with launch_pxrpc(get_test_env["pve_test_cluster_jump_host"], tdd_ip) as (pxrpc, jump_host):
+            pxrpc.root.e2e_inject_cert(pg_conn_str_orm, f"pytest-secondary-k8s.{get_test_env['cloud_inventory']['pve_cloud_domain']}", record[0])
+    else:
+        engine = create_engine(pg_conn_str_orm)
+
+        # update certs and mirror pull secret
+        with Session(engine) as session:
+            copy_cert = AcmeX509(
+                stack_fqdn=f"pytest-secondary-k8s.{get_test_env['cloud_inventory']['pve_cloud_domain']}",
+                config={},
+                ec_csr={},
+                ec_crt={},
+                k8s=record[0],
+            )
+            session.merge(copy_cert)
+            session.commit()
 
     kubespray_run = ansible_runner.run(
         project_dir=os.getcwd(),
@@ -361,7 +386,7 @@ def test_create_secondary_kubespray(
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         ssh.connect(
             get_test_env["pve_test_cluster_hosts"][first_host]["ansible_host"],
-            username="root",
+            username="root", sock=jumpbox_channel
         )
 
         # since we need root we cant use sftp and root via ssh is disabled
@@ -369,8 +394,14 @@ def test_create_secondary_kubespray(
 
         cluster_vars = yaml.safe_load(stdout.read().decode("utf-8"))
 
-        with open(".test-secondary-kubeconfig.yaml", "w") as tk:
-            tk.write(get_ssh_master_kubeconfig(cluster_vars, "pytest-secondary-k8s"))
+        if "pve_test_cluster_jump_host" in get_test_env:
+            with open(".test-secondary-kubeconfig.yaml", "w") as tk:
+                tk.write(get_ssh_remote_master_kubeconfig(cluster_vars, "pytest-secondary-k8s", 
+                                                          f"cp-pytest-secondary.{get_test_env["kubernetes"]["deployments_domain"]}",
+                                                          get_test_env["pve_test_cluster_jump_host"]))
+        else:
+            with open(".test-secondary-kubeconfig.yaml", "w") as tk:
+                tk.write(get_ssh_master_kubeconfig(cluster_vars, "pytest-secondary-k8s"))
 
 
 def test_create_kubespray(
@@ -383,9 +414,11 @@ def test_create_kubespray(
 ):
     logger.info("create kubespray")
 
-    pve_host = get_online_pve_host(
+    pve_host, jump_host = get_online_pve_host(
         get_test_env["kubernetes"]["k8s_tls_copy_target_pve"]
     )
+
+    assert jump_host is None # no jump host testing
     logger.info(pve_host)
 
     # we connect to the test host to get the patroni secret of the cluster, aswell as the vars

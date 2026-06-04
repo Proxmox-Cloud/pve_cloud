@@ -75,7 +75,7 @@
     where:
       cloud_domain: "{{ pve_cloud_domain }}"
       secret_name: "{{ stack_name }}-bdd-tls-certs"
-  delegate_to: localhost
+  delegate_to: "{{ groups['target_pve'][0] }}"
 
 - name: write bdd-tls-certs to postgres
   alchemy_write:
@@ -83,4 +83,4 @@
     table: px_cloud_secrets
     rows:
       - "{{ bdd_tls_row }}"
-  delegate_to: localhost
+  delegate_to: "{{ groups['target_pve'][0] }}"

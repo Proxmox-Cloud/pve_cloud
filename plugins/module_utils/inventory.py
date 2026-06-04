@@ -52,10 +52,10 @@ async def get_online_pve_hosts(loader, yaml_data):
     online_host_tasks = []
     jump_host_conns = []
     for pve in pve_inventory:
-        if "pve_jump_hosts" in pve_inventory[pve]:
+        if "jump_hosts" in pve_inventory[pve]:
             # remote cluster, first we identify an jump host that is online
             cluster_jump_host = None
-            for jump_host in pve_inventory[pve]["pve_jump_hosts"]:
+            for jump_host in pve_inventory[pve]["jump_hosts"]:
                 if check_ssh_open(jump_host):
                     cluster_jump_host = jump_host
                     display.display(f"Found open cluster jump host {cluster_jump_host}")
@@ -234,6 +234,9 @@ def build_pve_inventory(inventory, yaml_data, online_pve_hosts, cluster_map):
         inventory.set_variable(
             host_fqdn, "ansible_host", pve_host.params["ansible_host"]
         )
+
+        # generically set the interpreter to our venv created in setup_pve_clusters playbook
+        inventory.set_variable(host_fqdn, "ansible_python_interpreter", "/root/.pxc-venv/bin/python")
 
         # set the jump host for connecting to the proxmox host
         if pve_host.jump_host:

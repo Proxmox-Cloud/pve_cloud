@@ -50,10 +50,10 @@ must respect the following conditions
 
 | Property                                               | Pattern | Type            | Deprecated | Definition | Title/Description                                                                                                  |
 | ------------------------------------------------------ | ------- | --------------- | ---------- | ---------- | ------------------------------------------------------------------------------------------------------------------ |
-| - [pve_jump_hosts](#pattern1_pattern4_pve_jump_hosts ) | No      | array of string | No         | -          | Optional ip list of proxmox jump hosts (they will be used cluster wide for accessing other proxmox hosts and vms). |
+| - [jump_hosts](#pattern1_pattern4_jump_hosts ) | No      | array of string | No         | -          | Optional ip list of proxmox jump hosts (they will be used cluster wide for accessing other proxmox hosts and vms). |
 | + [pve_hosts](#pattern1_pattern4_pve_hosts )           | No      | object          | No         | -          | Hosts in the cluster, should be added via local ip and the --host-iface parameter in \`pvcli connect...\`          |
 
-#### <a name="pattern1_pattern4_pve_jump_hosts"></a>100.1.1. Property `Dynamic local pve cloud schema. > Inventory cloud domain. > Proxmox cluster name. > pve_jump_hosts`
+#### <a name="pattern1_pattern4_jump_hosts"></a>100.1.1. Property `Dynamic local pve cloud schema. > Inventory cloud domain. > Proxmox cluster name. > jump_hosts`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -72,9 +72,9 @@ must respect the following conditions
 
 | Each item of this array must be                                 | Description |
 | --------------------------------------------------------------- | ----------- |
-| [pve_jump_hosts items](#pattern1_pattern4_pve_jump_hosts_items) | -           |
+| [jump_hosts items](#pattern1_pattern4_jump_hosts_items) | -           |
 
-##### <a name="pattern1_pattern4_pve_jump_hosts_items"></a>100.1.1.1. Dynamic local pve cloud schema. > Inventory cloud domain. > Proxmox cluster name. > pve_jump_hosts > pve_jump_hosts items
+##### <a name="pattern1_pattern4_jump_hosts_items"></a>100.1.1.1. Dynamic local pve cloud schema. > Inventory cloud domain. > Proxmox cluster name. > jump_hosts > jump_hosts items
 
 |              |          |
 | ------------ | -------- |

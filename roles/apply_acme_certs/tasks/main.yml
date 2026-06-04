@@ -23,6 +23,7 @@
       workflow: 'acme'
 
 - name: try to select existing data
+  delegate_to: "{{ groups['target_pve'][0] }}"
   alchemy_read:
     pg_conn_str: "{{ pg_conn_str }}"
     table: acme_x509
@@ -62,6 +63,7 @@
   when: acme_config_changed_or_new
 
 - name: upsert postgres config and cert data on init or when changed
+  delegate_to: "{{ groups['target_pve'][0] }}"
   alchemy_upsert:
     pg_conn_str: "{{ pg_conn_str }}"
     table: acme_x509
@@ -74,6 +76,7 @@
   when: acme_config_changed_or_new
 
 - name: select full acme row from postgres again
+  delegate_to: "{{ groups['target_pve'][0] }}"
   alchemy_read:
     pg_conn_str: "{{ pg_conn_str }}"
     table: acme_x509
@@ -89,6 +92,7 @@
 
 - name: Update certificate in postgres
   when: ret_acme_collect.changed
+  delegate_to: "{{ groups['target_pve'][0] }}"
   alchemy_update:
     pg_conn_str: "{{ pg_conn_str }}"
     table: acme_x509

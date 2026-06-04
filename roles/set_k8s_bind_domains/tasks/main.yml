@@ -2,7 +2,7 @@
 # tasks file for k8s_bind_domains
 # insert domains
 - name: wipe bind domains
-  delegate_to: localhost
+  delegate_to: "{{ groups['target_pve'][0] }}"
   run_once: true
   alchemy_delete:
     pg_conn_str: "{{ pg_conn_str }}"
@@ -11,7 +11,7 @@
       stack_fqdn: "{{ stack_name }}.{{ pve_cloud_domain }}"
 
 - name: insert bind domains
-  delegate_to: localhost
+  delegate_to: "{{ groups['target_pve'][0] }}"
   alchemy_write:
     pg_conn_str: "{{ pg_conn_str }}"
     table: bind_domains

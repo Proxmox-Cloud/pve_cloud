@@ -1,14 +1,5 @@
 ---
 # tasks file for vector_journald_exporter
-- name: select discovery secret log export
-  delegate_to: localhost
-  alchemy_read:
-    pg_conn_str: "{{ pg_conn_str }}"
-    table: px_cloud_secrets
-    where:
-      secret_type: "vlogs-cluster-journald"
-  register: vlogs_journald_ds # discovery secrets
-
 - set_fact:
     vlogs_discovery_secret: "{{ vlogs_journald_ds.query_result | selectattr('secret_data.target_pve', 'equalto', target_pve) | first | default({}) }}"
   # when: vlogs_journald_ds.rowcount > 0

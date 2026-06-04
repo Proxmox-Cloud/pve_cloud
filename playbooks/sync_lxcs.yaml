@@ -124,7 +124,7 @@
 
     # todo: write delete functionality and implement for qemus
     - name: write vm_vars_blake to patroni
-      delegate_to: localhost
+      delegate_to: "{{ groups['target_pve'][0] }}"
       alchemy_upsert:
         pg_conn_str: "{{ pg_conn_str }}"
         table: vm_vars_blake
@@ -145,6 +145,15 @@
         path: /root/.ssh/authorized_keys
         line: "{{ cluster_automation_pub_key | b64decode | trim }}"
         state: present
+
+    - name: select discovery secret log export
+      delegate_to: "{{ groups['target_pve'][0] }}"
+      alchemy_read:
+        pg_conn_str: "{{ pg_conn_str }}"
+        table: px_cloud_secrets
+        where:
+          secret_type: "vlogs-cluster-journald"
+      register: vlogs_journald_ds # discovery secrets
 
     # todo: also generify this
     # this logic sets up vector log exporter to victoria logs db if that is configured

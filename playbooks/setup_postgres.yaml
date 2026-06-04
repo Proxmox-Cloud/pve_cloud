@@ -117,7 +117,7 @@
       ignore_errors: true # only one needs to succeed
 
     - name: create db for albemic managed schemas
-      delegate_to: localhost
+      delegate_to: "{{ groups['target_pve'][0] }}"
       community.postgresql.postgresql_db:
         name: pve_cloud
         login_password: "{{ postgres_password }}"
@@ -126,13 +126,13 @@
       when: leader_response.status == 200
 
     - name: run albemic migrations
-      delegate_to: localhost
+      delegate_to: "{{ groups['target_pve'][0] }}"
       alchemy_migrate:
         pg_conn_str: "postgresql+psycopg2://postgres:{{ postgres_password }}@{{ ansible_default_ipv4.address }}:5432/pve_cloud?sslmode=disable"
       when: leader_response.status == 200
 
     - name: create db for tf states
-      delegate_to: localhost
+      delegate_to: "{{ groups['target_pve'][0] }}"
       community.postgresql.postgresql_db:
         name: tf_states
         login_password: "{{ postgres_password }}"

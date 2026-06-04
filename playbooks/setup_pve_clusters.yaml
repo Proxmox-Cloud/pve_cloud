@@ -24,6 +24,27 @@
       fail:
         msg: "Installed version {{ existing_cluster_vars['pve_cloud_collection_version'] }} is ahead of local version {{ cluster_vars['pve_cloud_collection_version'] }}"
       when: cvars_stat.stat.exists and 'pve_cloud_collection_version' in existing_cluster_vars and existing_cluster_vars['pve_cloud_collection_version'] is version(cluster_vars['pve_cloud_collection_version'], '>', version_type='semver')
+    
+    # setup pxc venv
+    - name: install python venv
+      apt:
+        name: python3-venv
+        state: present
+        update_cache: yes
+
+    - name: create pxc venv
+      ansible.builtin.pip:
+        name: 
+          - "py-pve-cloud~={{ py_pve_cloud_version }}"
+          - "aiofiles==25.1.0" # fast slurp
+        virtualenv: /root/.pxc-venv
+        virtualenv_command: python3 -m venv
+
+    - name: switch to pxc venv
+      ansible.builtin.set_fact:
+        ansible_python_interpreter: /root/.pxc-venv/bin/python
+
+    # todo: tdd install version
   vars:
     # only monitory systemd services
     systemd_exporter_unit_include: '.*\\.service'
@@ -66,15 +87,6 @@
     # download newest lxc templates on hosts
     - name: Update lxc templates
       command: "pveam update"
-    
-    # install aio files for fast slurp module
-    - name: install pip3
-      ansible.builtin.apt:
-        name: python3-pip
-        state: present
-    
-    - name: install aiofiles
-      command: pip3 install aiofiles==25.1.0 --break-system-packages
 
     # disable openipmi if set
     - name: disable openipmi
@@ -104,23 +116,27 @@
     - name: Disable network offloading features
       blockinfile:
         path: /etc/network/interfaces
-        marker: "        # {mark} FIX BLOCK {{ item }}"
+        marker: "        # {mark} FIX BLOCK {{ item.iface }}"
         insertafter: "^iface {{ item.bridge }} inet static"
         block: |
           {% filter indent(width=8, first=true) %}
-          post-up ethtool -K {{ item.iface }}  {% for feature item.disable_features in %} {% endfor %}
+          post-up ethtool -K {{ item.iface }} {% for feature in item.disable_features %}{{ feature }} off {% endfor %}
           {% endfilter %}
       when: net_offloading_fixxes is defined
       loop: "{{ net_offloading_fixxes }}"
 
-    - name: Apply fix now
-      shell: "ethtool -K {{ item.iface }} tso off gso off"
+    - name: Apply network offloading fix now
+      shell: "ethtool -K {{ item.iface }} {% for feature in item.disable_features %}{{ feature }} off {% endfor %}"
       when: net_offloading_fixxes is defined
       loop: "{{ net_offloading_fixxes }}"
 
 
 - name: Cluster reps setup
   hosts: pve_cluster_reps
+  vars:
+    # this has to be set here instead of the inventory because on first runs we use this very playbook
+    # to setup the venv. todo: would probably be cleaner if the inventory plugin did the setup in an async fashion
+    ansible_python_interpreter: /root/.pxc-venv/bin/python
   tasks:
     # install ssh trusted keys between clusters, needed for rsync
     - name: slurp ssh pub key
@@ -247,6 +263,8 @@
   tags:
     - rsync
   serial: 1
+  vars:
+    ansible_python_interpreter: /root/.pxc-venv/bin/python
   tasks:
     - name: rsync missing secrets
       ansible.builtin.command: "rsync -avz --inplace --ignore-existing -e 'ssh -o StrictHostKeyChecking=no' root@{{ hostvars[item]['ansible_default_ipv4']['address'] }}:/etc/pve/cloud/secrets/ /etc/pve/cloud/secrets/"
@@ -262,6 +280,8 @@
 # this fires only conditionally if the cluster has a monitoring stack configured
 - name: Vector Log setup
   hosts: all_pve_hosts
+  vars:
+    ansible_python_interpreter: /root/.pxc-venv/bin/python
   tasks:
     # slurp patroni password
     - name: Slurp file if it exists
@@ -284,11 +304,18 @@
       ignore_errors: yes
 
     - name: run albemic migrations
-      delegate_to: localhost
       alchemy_migrate:
         pg_conn_str: "{{ pg_conn_str }}"
       when: postgres_connection_check is succeeded
       run_once: true
+
+    - name: select discovery secret log export
+      alchemy_read:
+        pg_conn_str: "{{ pg_conn_str }}"
+        table: px_cloud_secrets
+        where:
+          secret_type: "vlogs-cluster-journald"
+      register: vlogs_journald_ds # discovery secrets
 
     - name: install vector journald exporter
       include_role:
@@ -304,13 +331,14 @@
 # this is mainly needed for multi cloud functionality (multi cloud gateway api is using these secrets)
 - name: sync secrets into postgres
   hosts: pve_cluster_reps
+  vars:
+    ansible_python_interpreter: /root/.pxc-venv/bin/python
   tasks:
     # slurp patroni password
     - name: Slurp file if it exists
       slurp:
         src: /etc/pve/cloud/secrets/patroni.pass
       register: patroni_pass
-      run_once: true
     
     - set_fact:
         pg_conn_str: "postgresql+psycopg2://postgres:{{ patroni_pass.content | b64decode | trim }}@{{ cluster_vars['pve_haproxy_floating_ip_internal'] }}:5000/pve_cloud?sslmode=disable"
@@ -325,7 +353,6 @@
       ignore_errors: yes
 
     - name: run albemic migrations
-      delegate_to: localhost
       alchemy_migrate:
         pg_conn_str: "{{ pg_conn_str }}"
       when: postgres_connection_check is succeeded
@@ -333,20 +360,17 @@
 
     - slurp_cloud_secrets_async:
       register: slurped_secrets
-      run_once: true
       when: postgres_connection_check is succeeded
 
     - name: create secret map
       set_fact:
         secret_map: "{{ secret_map | default({}) | combine({item.path | basename: item.content}) }}"
       loop: "{{ slurped_secrets.results }}"    
-      run_once: true
       loop_control:
         label: "hidden"
       when: postgres_connection_check is succeeded
 
     - name: write cluster vars
-      delegate_to: localhost
       alchemy_upsert:
         pg_conn_str: "{{ pg_conn_str }}"
         table: px_cloud_secrets
@@ -361,7 +385,6 @@
       when: postgres_connection_check is succeeded
 
     - name: write cluster secrets
-      delegate_to: localhost
       alchemy_upsert:
         pg_conn_str: "{{ pg_conn_str }}"
         table: px_cloud_secrets
