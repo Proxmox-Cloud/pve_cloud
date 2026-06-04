@@ -1,14 +1,15 @@
+import json
 import logging
 import os
+import re
 import tempfile
-import json
+
+import ansible_runner
 import dns.query
 import dns.rcode
+import dns.resolver
 import dns.tsigkeyring
 import dns.update
-import re
-import ansible_runner
-import dns.resolver
 import paramiko
 import psycopg2
 import pytest
@@ -337,7 +338,9 @@ def test_create_secondary_kubespray(
 
     # bind key
     _, stdout, _ = ssh.exec_command("sudo cat /etc/pve/cloud/secrets/internal.key")
-    bind_ns_update_key = re.search(r'secret\s+"([^"]+)";', stdout.read().decode("utf-8")).group(1)
+    bind_ns_update_key = re.search(
+        r'secret\s+"([^"]+)";', stdout.read().decode("utf-8")
+    ).group(1)
     logger.info(bind_ns_update_key)
 
     _, stdout, _ = ssh.exec_command("sudo cat /etc/pve/cloud/secrets/patroni.pass")
@@ -387,13 +390,10 @@ def test_create_secondary_kubespray(
 
     assert kubespray_run.rc == 0
 
-
     # set manual cp records (only for testing prod is manually manged)
     dns_update = dns.update.Update(
         get_test_env["kubernetes"]["deployments_domain"],
-        keyring=dns.tsigkeyring.from_text(
-            {"internal.": bind_ns_update_key}
-        ),
+        keyring=dns.tsigkeyring.from_text({"internal.": bind_ns_update_key}),
         keyname="internal.",
         keyalgorithm="hmac-sha256",
     )
@@ -404,7 +404,9 @@ def test_create_secondary_kubespray(
         "A",
         get_test_env["pve_test_cluster_floating_external"],
     )
-    response = dns.query.tcp(dns_update, get_test_env["cloud_inventory"]["bind_master_ip"])
+    response = dns.query.tcp(
+        dns_update, get_test_env["cloud_inventory"]["bind_master_ip"]
+    )
     logger.info(response.rcode())
 
     if not request.config.getoption("--skip-cleanup"):
@@ -455,8 +457,10 @@ def test_create_secondary_kubespray(
                         "pytest-secondary-k8s",
                         f"cp-pytest-secondary.{get_test_env["kubernetes"]["deployments_domain"]}",
                         get_test_env["pve_test_cluster_jump_host"],
-                        get_test_env["pve_test_cluster_hosts"][first_host]["ansible_host"],
-                        local_pypi_ip=tdd_ip
+                        get_test_env["pve_test_cluster_hosts"][first_host][
+                            "ansible_host"
+                        ],
+                        local_pypi_ip=tdd_ip,
                     )
                 )
         else:
@@ -549,9 +553,10 @@ def test_create_kubespray(
 
     # bind key
     _, stdout, _ = ssh.exec_command("sudo cat /etc/pve/cloud/secrets/internal.key")
-    bind_ns_update_key = re.search(r'secret\s+"([^"]+)";', stdout.read().decode("utf-8")).group(1)
+    bind_ns_update_key = re.search(
+        r'secret\s+"([^"]+)";', stdout.read().decode("utf-8")
+    ).group(1)
     logger.info(bind_ns_update_key)
-
 
     _, stdout, _ = ssh.exec_command("sudo cat /etc/pve/cloud/secrets/patroni.pass")
     patroni_pass = stdout.read().decode("utf-8")
@@ -629,9 +634,7 @@ eviction_hard:
     # set manual cp records (only for testing prod is manually manged)
     dns_update = dns.update.Update(
         get_test_env["kubernetes"]["deployments_domain"],
-        keyring=dns.tsigkeyring.from_text(
-            {"internal.": bind_ns_update_key}
-        ),
+        keyring=dns.tsigkeyring.from_text({"internal.": bind_ns_update_key}),
         keyname="internal.",
         keyalgorithm="hmac-sha256",
     )
@@ -642,7 +645,9 @@ eviction_hard:
         "A",
         get_test_env["pve_test_cluster_floating_external"],
     )
-    response = dns.query.tcp(dns_update, get_test_env["cloud_inventory"]["bind_master_ip"])
+    response = dns.query.tcp(
+        dns_update, get_test_env["cloud_inventory"]["bind_master_ip"]
+    )
     logger.info(response.rcode())
 
     # always cleanup custom vars
@@ -697,8 +702,10 @@ eviction_hard:
                         "pytest-k8s",
                         f"cp-pytest.{get_test_env["kubernetes"]["deployments_domain"]}",
                         get_test_env["pve_test_cluster_jump_host"],
-                        get_test_env["pve_test_cluster_hosts"][first_host]["ansible_host"],
-                        local_pypi_ip=tdd_ip
+                        get_test_env["pve_test_cluster_hosts"][first_host][
+                            "ansible_host"
+                        ],
+                        local_pypi_ip=tdd_ip,
                     )
                 )
         else:

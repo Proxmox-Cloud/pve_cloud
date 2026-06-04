@@ -78,7 +78,7 @@ def setup_control_node(request, get_test_env):
             project_dir=os.getcwd(),
             playbook="playbooks/setup_control_node.yaml",
             verbosity=request.config.getoption("--ansible-verbosity"),
-            extravars=extra_vars
+            extravars=extra_vars,
         )
 
         assert setup_run.rc == 0
@@ -99,7 +99,10 @@ def setup_control_node(request, get_test_env):
                     get_test_env["cloud_inventory"]["pve_cloud_domain"],
                     "--pve-host",
                     first_test_host["ansible_host"],
-                ] + ["--local-pypi-ip", tdd_ip] if tdd_ip else []
+                ]
+                + ["--local-pypi-ip", tdd_ip]
+                if tdd_ip
+                else []
             )
             connect_remote_cluster(parsed_args)
         else:
@@ -174,7 +177,7 @@ def setup_pve_hosts(request, get_test_env, setup_control_node):
                 playbook="playbooks/setup_pve_clusters.yaml",
                 inventory=temp_cloud_inv.name,
                 verbosity=request.config.getoption("--ansible-verbosity"),
-                extravars=extra_vars
+                extravars=extra_vars,
             )
 
             assert setup_run.rc == 0

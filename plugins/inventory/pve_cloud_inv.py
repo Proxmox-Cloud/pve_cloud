@@ -100,7 +100,6 @@ class InventoryModule(BaseInventoryPlugin):
                             f"found online jump host {jump_host} for {pve_cluster}"
                         )
 
-
                 if not online_jump_hosts:
                     display.error(
                         f"jump hosts defined for {pve_cluster} but all offline / unreachable!"
@@ -109,13 +108,8 @@ class InventoryModule(BaseInventoryPlugin):
 
             for jump_host in online_jump_hosts:
                 inventory.add_host(jump_host, group="jump_hosts")
-                inventory.set_variable(
-                    jump_host, "ansible_user", "root"
-                )
-                inventory.set_variable(
-                    jump_host, "ansible_host", jump_host
-                )
-
+                inventory.set_variable(jump_host, "ansible_user", "root")
+                inventory.set_variable(jump_host, "ansible_host", jump_host)
 
             for host, params in pve_inventory[pve_cluster]["pve_hosts"].items():
                 # use jump host for online check if defined + available
