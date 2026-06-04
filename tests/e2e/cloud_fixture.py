@@ -67,12 +67,18 @@ def setup_control_node(request, get_test_env):
             check=True,
         )
 
+        extra_vars = {}
+        tdd_ip = get_tdd_ip()
+        if tdd_ip:
+            extra_vars["test_repos_ip"] = tdd_ip
+
         # run the main playbook
         logger.info("run control node setup")
         setup_run = ansible_runner.run(
             project_dir=os.getcwd(),
             playbook="playbooks/setup_control_node.yaml",
             verbosity=request.config.getoption("--ansible-verbosity"),
+            extravars=extra_vars
         )
 
         assert setup_run.rc == 0
@@ -88,14 +94,12 @@ def setup_control_node(request, get_test_env):
                     "connect-remote-cluster",
                     "--jump-hosts",
                     get_test_env["pve_test_cluster_jump_host"],
-                    "--local-pypi-ip",
-                    get_tdd_ip(),
                     "--force",
                     "--pve-cloud-domain",
                     get_test_env["cloud_inventory"]["pve_cloud_domain"],
                     "--pve-host",
                     first_test_host["ansible_host"],
-                ]
+                ] + ["--local-pypi-ip", tdd_ip] if tdd_ip else []
             )
             connect_remote_cluster(parsed_args)
         else:
@@ -156,6 +160,12 @@ def setup_pve_hosts(request, get_test_env, setup_control_node):
 
         logger.info(f"pve cloud inventory tmp path: {temp_cloud_inv.name}")
 
+        extra_vars = {}
+        py_pve_cloud_vers, tdd_ip = get_tdd_version("py-pve-cloud")
+        if py_pve_cloud_vers:
+            extra_vars["test_repos_ip"] = tdd_ip
+            extra_vars["py_pve_cloud_version"] = py_pve_cloud_vers
+
         if not request.config.getoption("--skip-fixture-init"):
             # run the main playbook
             logger.info("run pve cluster setup")
@@ -164,6 +174,7 @@ def setup_pve_hosts(request, get_test_env, setup_control_node):
                 playbook="playbooks/setup_pve_clusters.yaml",
                 inventory=temp_cloud_inv.name,
                 verbosity=request.config.getoption("--ansible-verbosity"),
+                extravars=extra_vars
             )
 
             assert setup_run.rc == 0

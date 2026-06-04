@@ -114,7 +114,7 @@
     - parse_cluster_secrets
   tasks:
   - name: create bind host record
-    delegate_to: localhost
+    delegate_to: "{{ groups['target_pve'][0] }}"
     community.general.nsupdate:
       key_name: "internal."
       key_algorithm: "hmac-sha256"
@@ -125,7 +125,7 @@
       value: "{{ ansible_default_ipv4.address }}"
 
   - name: create ptr record
-    delegate_to: localhost
+    delegate_to: "{{ groups['target_pve'][0] }}"
     community.general.nsupdate:
       key_name: "internal."
       key_algorithm: "hmac-sha256"

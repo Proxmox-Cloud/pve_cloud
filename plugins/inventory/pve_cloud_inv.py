@@ -46,6 +46,9 @@ class InventoryModule(BaseInventoryPlugin):
         # contains only one pve host per pve cluster (since it uses corosync)
         inventory.add_group("pve_cluster_reps")
 
+        # jumphost config if present
+        inventory.add_group("jump_hosts")
+
         # get the collection version
         manifest_version = get_manifest_version()
 
@@ -87,29 +90,39 @@ class InventoryModule(BaseInventoryPlugin):
 
             # optionally determine online jump host for the cluster
             # if cluster was added through `pvcli connect-remote-cluster`
-            cluster_jump_host = None
+            online_jump_hosts = []
             if "jump_hosts" in pve_inventory[pve_cluster]:
                 # jump hosts for cluster configured => find an online one
                 for jump_host in pve_inventory[pve_cluster]["jump_hosts"]:
                     if check_ssh_open(jump_host):
-                        cluster_jump_host = jump_host
+                        online_jump_hosts.append(jump_host)
                         display.display(
-                            f"found online jump host {cluster_jump_host} for {pve_cluster}"
+                            f"found online jump host {jump_host} for {pve_cluster}"
                         )
-                        break
 
-                if not cluster_jump_host:
+
+                if not online_jump_hosts:
                     display.error(
                         f"jump hosts defined for {pve_cluster} but all offline / unreachable!"
                     )
                     continue
 
+            for jump_host in online_jump_hosts:
+                inventory.add_host(jump_host, group="jump_hosts")
+                inventory.set_variable(
+                    jump_host, "ansible_user", "root"
+                )
+                inventory.set_variable(
+                    jump_host, "ansible_host", jump_host
+                )
+
+
             for host, params in pve_inventory[pve_cluster]["pve_hosts"].items():
                 # use jump host for online check if defined + available
-                if cluster_jump_host:
+                if online_jump_hosts:
                     display.v(f"found jump host config for {pve_cluster}")
                     if not check_ssh_open_jumphost(
-                        params["ansible_host"], cluster_jump_host
+                        params["ansible_host"], online_jump_hosts[0]
                     ):
                         display.display(f"skipping offline host {host}")
                         continue
@@ -135,11 +148,11 @@ class InventoryModule(BaseInventoryPlugin):
                 )
 
                 # enable jump host functionality for ansible via ssh
-                if cluster_jump_host:
+                if online_jump_hosts:
                     inventory.set_variable(
                         fqdn_host,
                         "ansible_ssh_common_args",
-                        f"-o ProxyJump=root@{cluster_jump_host}",
+                        f"-o ProxyJump=root@{online_jump_hosts[0]}",
                     )
 
                 inventory.set_variable(

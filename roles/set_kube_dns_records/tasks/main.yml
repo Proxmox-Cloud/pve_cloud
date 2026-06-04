@@ -1,6 +1,7 @@
 ---
 # tasks file for set_stack_dns_records
 - name: create master entries
+  delegate_to: "{{ groups['target_pve'][0] }}"
   community.general.nsupdate:
     key_name: "internal."
     key_algorithm: "hmac-sha256"
@@ -12,6 +13,7 @@
     state: "{{ 'present' if (groups['kube_control_plane'] | length) > 0 else 'absent' }}"
 
 - name: create worker entries
+  delegate_to: "{{ groups['target_pve'][0] }}"
   community.general.nsupdate:
     key_name: "internal."
     key_algorithm: "hmac-sha256"
@@ -23,6 +25,7 @@
     state: "{{ 'present' if (groups['kube_node'] | length) > 0 else 'absent' }}"
   
 - name: create control plane entry
+  delegate_to: "{{ groups['target_pve'][0] }}"
   community.general.nsupdate:
     key_name: "internal."
     key_algorithm: "hmac-sha256"

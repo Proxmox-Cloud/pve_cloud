@@ -26,25 +26,36 @@
       when: cvars_stat.stat.exists and 'pve_cloud_collection_version' in existing_cluster_vars and existing_cluster_vars['pve_cloud_collection_version'] is version(cluster_vars['pve_cloud_collection_version'], '>', version_type='semver')
     
     # setup pxc venv
+    # todo: this should probably be handled by the inventory plugin for cleanliness
+    # then we can set interpreter path globally
     - name: install python venv
       apt:
         name: python3-venv
         state: present
         update_cache: yes
 
+    - set_fact:
+        pip_extra_args: >-
+          {% if test_repos_ip is defined %}
+          --index-url http://{{ test_repos_ip }}:8088/simple --trusted-host {{ test_repos_ip }}
+          {% else %}
+          ""
+          {% endif %}
+      
     - name: create pxc venv
       ansible.builtin.pip:
         name: 
-          - "py-pve-cloud~={{ py_pve_cloud_version }}"
+          - "py-pve-cloud=={{ py_pve_cloud_version }}"
           - "aiofiles==25.1.0" # fast slurp
         virtualenv: /root/.pxc-venv
         virtualenv_command: python3 -m venv
+        extra_args: "{{ pip_extra_args }}"
+
 
     - name: switch to pxc venv
       ansible.builtin.set_fact:
         ansible_python_interpreter: /root/.pxc-venv/bin/python
 
-    # todo: tdd install version
   vars:
     # only monitory systemd services
     systemd_exporter_unit_include: '.*\\.service'
@@ -130,6 +141,24 @@
       when: net_offloading_fixxes is defined
       loop: "{{ net_offloading_fixxes }}"
 
+- name: Jump host config
+  hosts: jump_hosts:all_pve_hosts
+  tasks:
+    - name: increase sshd max startups for excessive tunneling
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '(?i)^#?\s*MaxStartups'
+        line: 'MaxStartups 50:30:100'
+        state: present
+      notify: restart-sshd
+      # only configure when jump hosts defined
+      when: groups['jump_hosts'] | length > 0
+
+  handlers:
+    - name: restart-sshd
+      ansible.builtin.service:
+        name: sshd
+        state: restarted
 
 - name: Cluster reps setup
   hosts: pve_cluster_reps
