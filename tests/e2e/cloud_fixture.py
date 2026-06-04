@@ -2,11 +2,13 @@ import logging
 import os
 import subprocess
 import tempfile
-from pve_cloud.cli.pvcli import connect_remote_cluster, connect_cluster, get_parser
+
 import ansible_runner
 import paramiko
 import pytest
 import yaml
+from pve_cloud.cli.pvcli import (connect_cluster, connect_remote_cluster,
+                                 get_parser)
 from pve_cloud_test.cloud_fixtures import *
 
 logger = logging.getLogger(__name__)
@@ -74,21 +76,37 @@ def setup_control_node(request, get_test_env):
         )
 
         assert setup_run.rc == 0
-        
+
         # run the remote connect cluster functionality if jumphost is specified, otherwise normal connect cluster
         if "pve_test_cluster_jump_host" in get_test_env:
             logger.info("initializing local ~/.pve-cloud-dyn-inv.yaml with jumphosts")
-            parsed_args = get_parser().parse_args([
-                "connect-remote-cluster", "--pve-jump-hosts", get_test_env["pve_test_cluster_jump_host"],
-                "--local-pypi-ip", get_tdd_ip(), "--force", "--pve-cloud-domain", get_test_env["cloud_inventory"]["pve_cloud_domain"]
-            ])
+            parsed_args = get_parser().parse_args(
+                [
+                    "connect-remote-cluster",
+                    "--pve-jump-hosts",
+                    get_test_env["pve_test_cluster_jump_host"],
+                    "--local-pypi-ip",
+                    get_tdd_ip(),
+                    "--force",
+                    "--pve-cloud-domain",
+                    get_test_env["cloud_inventory"]["pve_cloud_domain"],
+                ]
+            )
             connect_remote_cluster(parsed_args)
         else:
-            logger.info("initializing local ~/.pve-cloud-dyn-inv.yaml with direct access")
-            parsed_args = get_parser().parse_args([
-                "connect-cluster", "--pve-jump-hosts", get_test_env["pve_test_cluster_jump_host"],
-                "--force", "--pve-cloud-domain", get_test_env["cloud_inventory"]["pve_cloud_domain"]
-            ])
+            logger.info(
+                "initializing local ~/.pve-cloud-dyn-inv.yaml with direct access"
+            )
+            parsed_args = get_parser().parse_args(
+                [
+                    "connect-cluster",
+                    "--pve-jump-hosts",
+                    get_test_env["pve_test_cluster_jump_host"],
+                    "--force",
+                    "--pve-cloud-domain",
+                    get_test_env["cloud_inventory"]["pve_cloud_domain"],
+                ]
+            )
             connect_cluster(parsed_args)
 
     yield

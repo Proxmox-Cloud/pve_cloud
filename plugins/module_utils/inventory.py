@@ -236,7 +236,9 @@ def build_pve_inventory(inventory, yaml_data, online_pve_hosts, cluster_map):
         )
 
         # generically set the interpreter to our venv created in setup_pve_clusters playbook
-        inventory.set_variable(host_fqdn, "ansible_python_interpreter", "/root/.pxc-venv/bin/python")
+        inventory.set_variable(
+            host_fqdn, "ansible_python_interpreter", "/root/.pxc-venv/bin/python"
+        )
 
         # set the jump host for connecting to the proxmox host
         if pve_host.jump_host:

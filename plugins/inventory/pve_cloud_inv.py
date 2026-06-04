@@ -77,7 +77,7 @@ class InventoryModule(BaseInventoryPlugin):
             raise AnsibleParserError(
                 "Could not identify py-pve-cloud version in meta/ee-requirements.txt"
             )
-        
+
         inventory.set_variable("all", "py_pve_cloud_version", py_pve_cloud_version)
 
         # load pve clusters and set cluster variables for them
