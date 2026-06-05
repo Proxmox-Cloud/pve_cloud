@@ -1,9 +1,10 @@
+import asyncio
 import json
 import logging
 import os
 import re
 import tempfile
-import asyncio
+
 import ansible_runner
 import dns.query
 import dns.rcode
@@ -27,6 +28,7 @@ from sqlalchemy.orm import Session
 
 logger = logging.getLogger(__name__)
 
+
 @pytest.mark.asyncio
 async def test_pxrpc_tunnel(get_test_env):
 
@@ -37,11 +39,18 @@ async def test_pxrpc_tunnel(get_test_env):
     # run the remote connect cluster functionality if jumphost is specified, otherwise normal connect cluster
     if "pve_test_cluster_jump_host" in get_test_env:
         logger.info("initializing local ~/.pve-cloud-dyn-inv.yaml with jumphosts")
-        
-        with launch_pxrpc(get_test_env["pve_test_cluster_jump_host"], first_test_host["ansible_host"], init_venv=True, local_pypi_ip=get_tdd_ip()) as (pxrpc, pve_host):
+
+        with launch_pxrpc(
+            get_test_env["pve_test_cluster_jump_host"],
+            first_test_host["ansible_host"],
+            init_venv=True,
+            local_pypi_ip=get_tdd_ip(),
+        ) as (pxrpc, pve_host):
             print("test sync", pxrpc.root.e2e_return())
 
-        async with launch_pxrpc_async(get_test_env["pve_test_cluster_jump_host"], first_test_host["ansible_host"]) as (pxrpc, pve_host):
+        async with launch_pxrpc_async(
+            get_test_env["pve_test_cluster_jump_host"], first_test_host["ansible_host"]
+        ) as (pxrpc, pve_host):
             res = await pxrpc.e2e_return()
             print("test processpool", res)
 
