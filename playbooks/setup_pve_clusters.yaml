@@ -51,7 +51,6 @@
         virtualenv_command: python3 -m venv
         extra_args: "{{ pip_extra_args }}"
 
-
     - name: switch to pxc venv
       ansible.builtin.set_fact:
         ansible_python_interpreter: /root/.pxc-venv/bin/python
@@ -148,7 +147,7 @@
       ansible.builtin.lineinfile:
         path: /etc/ssh/sshd_config
         regexp: '(?i)^#?\s*MaxStartups'
-        line: 'MaxStartups 50:30:100'
+        line: 'MaxStartups 100:30:200'
         state: present
       notify: restart-sshd
       # only configure when jump hosts defined

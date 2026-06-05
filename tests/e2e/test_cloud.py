@@ -3,7 +3,7 @@ import logging
 import os
 import re
 import tempfile
-
+import asyncio
 import ansible_runner
 import dns.query
 import dns.rcode
@@ -18,7 +18,7 @@ import yaml
 from cloud_fixture import *
 from pve_cloud.cli.pvclu import (get_ssh_master_kubeconfig,
                                  get_ssh_remote_master_kubeconfig)
-from pve_cloud.cli.pxrpc import launch_pxrpc
+from pve_cloud.cli.pxrpc import launch_pxrpc, launch_pxrpc_async
 from pve_cloud.lib.inventory import get_online_pve_host
 from pve_cloud.orm.alchemy import AcmeX509
 from pve_cloud_test.tdd_watchdog import get_ipv4
@@ -26,6 +26,33 @@ from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session
 
 logger = logging.getLogger(__name__)
+
+@pytest.mark.asyncio
+async def test_pxrpc_tunnel(get_test_env):
+
+    first_test_host = get_test_env["pve_test_cluster_hosts"][
+        next(iter(get_test_env["pve_test_cluster_hosts"]))
+    ]
+    logger.info(first_test_host["ansible_host"])
+    # run the remote connect cluster functionality if jumphost is specified, otherwise normal connect cluster
+    if "pve_test_cluster_jump_host" in get_test_env:
+        logger.info("initializing local ~/.pve-cloud-dyn-inv.yaml with jumphosts")
+        
+        with launch_pxrpc(get_test_env["pve_test_cluster_jump_host"], first_test_host["ansible_host"], init_venv=True, local_pypi_ip=get_tdd_ip()) as (pxrpc, pve_host):
+            print("test sync", pxrpc.root.e2e_return())
+
+        async with launch_pxrpc_async(get_test_env["pve_test_cluster_jump_host"], first_test_host["ansible_host"]) as (pxrpc, pve_host):
+            res = await pxrpc.e2e_return()
+            print("test processpool", res)
+
+            # test paralellism
+            tasks = []
+            for _ in range(30):
+                tasks.append(pxrpc.e2e_return())
+
+            await asyncio.gather(*tasks)
+
+        print("closed")
 
 
 def test_pve_host_setup(setup_pve_hosts):
@@ -460,7 +487,6 @@ def test_create_secondary_kubespray(
                         get_test_env["pve_test_cluster_hosts"][first_host][
                             "ansible_host"
                         ],
-                        local_pypi_ip=tdd_ip,
                     )
                 )
         else:
@@ -705,7 +731,6 @@ eviction_hard:
                         get_test_env["pve_test_cluster_hosts"][first_host][
                             "ansible_host"
                         ],
-                        local_pypi_ip=tdd_ip,
                     )
                 )
         else:
