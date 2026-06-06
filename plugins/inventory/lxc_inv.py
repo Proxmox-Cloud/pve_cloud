@@ -44,8 +44,7 @@ class InventoryModule(BaseInventoryPlugin):
             init_plugin(
                 loader,
                 inventory,
-                yaml_data,
-                os.path.dirname(os.path.realpath(__file__)),
+                yaml_data
             )
         )
         display.v("vm_vars_blake", vm_vars_blake)

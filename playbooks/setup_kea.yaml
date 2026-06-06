@@ -139,7 +139,7 @@
     ignore_errors: yes
 
   - name: create dhcp host record
-    delegate_to: "{{ groups['target_pve'][0] }}"
+    delegate_to: "pxc-executor-host"
     community.general.nsupdate:
       key_name: "internal."
       key_algorithm: "hmac-sha256"
@@ -151,7 +151,7 @@
     when: bind_connection_check is succeeded
 
   - name: create ptr record
-    delegate_to: "{{ groups['target_pve'][0] }}"
+    delegate_to: "pxc-executor-host"
     community.general.nsupdate:
       key_name: "internal."
       key_algorithm: "hmac-sha256"

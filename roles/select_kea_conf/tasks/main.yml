@@ -1,7 +1,7 @@
 ---
 # tasks file for select_kea_conf
 - name: select all reservations
-  delegate_to: "{{ groups['target_pve'][0] }}"
+  delegate_to: "pxc-executor-host"
   alchemy_read:
     pg_conn_str: "{{ pg_conn_str }}"
     table: kea_reservations
@@ -12,7 +12,7 @@
   when: db_reservations["failed"]
 
 - name: select class defs
-  delegate_to: "{{ groups['target_pve'][0] }}"
+  delegate_to: "pxc-executor-host"
   alchemy_read:
     pg_conn_str: "{{ pg_conn_str }}"
     table: kea_client_class_defs

@@ -10,7 +10,7 @@
   ignore_errors: yes
 
 - name: select all domains
-  delegate_to: "{{ groups['target_pve'][0] }}"
+  delegate_to: "pxc-executor-host"
   alchemy_read:
     pg_conn_str: "{{ pg_conn_str }}"
     table: bind_domains

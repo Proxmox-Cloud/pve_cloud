@@ -10,6 +10,21 @@ import yaml
 from pve_cloud.cli.pvcli import (connect_cluster, connect_remote_cluster,
                                  get_parser)
 from pve_cloud_test.cloud_fixtures import *
+import psycopg2
+from pve_cloud.lib.inventory import get_online_pve_host, get_pve_inventory, get_cloud_domain, get_target_cluster
+from pve_cloud.lib.ssh import connect_host
+import re
+from pve_cloud.cli.pxrpc import launch_pxrpc
+from pve_cloud.orm.alchemy import AcmeX509
+from sqlalchemy import create_engine
+from sqlalchemy.orm import Session
+import json
+import dns.query
+import dns.rcode
+import dns.resolver
+import dns.tsigkeyring
+import dns.update
+
 
 logger = logging.getLogger(__name__)
 
@@ -700,3 +715,139 @@ def setup_cache_lxcs(request, get_test_env, setup_dhcp_lxcs):
             verbosity=request.config.getoption("--ansible-verbosity"),
         )
         assert destroy_lxcs_run.rc == 0
+
+
+@pytest.fixture(scope="session")
+def setup_prepare_kubespray(
+    get_test_env,
+    setup_haproxy_lxcs,
+    setup_cache_lxcs,
+    setup_ceph_dhcp_lxcs,
+):
+    logger.info("setup environment for kubespray playbooks")
+
+    copy_cloud_domain = get_cloud_domain(get_test_env["kubernetes"]["k8s_tls_copy_target_pve"])
+    copy_pve_inventory = get_pve_inventory(copy_cloud_domain)
+    copy_target_cluster = get_target_cluster(copy_pve_inventory, get_test_env["kubernetes"]["k8s_tls_copy_target_pve"], copy_cloud_domain)
+
+    copy_pve_host, copy_jump_host = get_online_pve_host(copy_pve_inventory, copy_target_cluster)
+
+    # copy target has to be a directly accessible proxmox cluster (no jump hosts allowed)
+    assert copy_jump_host is None
+
+    # we connect to the test host to get the patroni secret of the cluster, aswell as the vars
+    ssh = paramiko.SSHClient()
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    ssh.connect(
+        copy_pve_host,
+        username="root",
+    )
+
+    # since we need root we cant use sftp and root via ssh is disabled
+    _, stdout, _ = ssh.exec_command("cat /etc/pve/cloud/cluster_vars.yaml")
+
+    cluster_vars = yaml.safe_load(stdout.read().decode("utf-8"))
+    logger.info(cluster_vars["pve_haproxy_floating_ip_internal"])
+    _, stdout, _ = ssh.exec_command("cat /etc/pve/cloud/secrets/patroni.pass")
+
+    patroni_pass = stdout.read().decode("utf-8").strip()
+    logger.info(patroni_pass)
+
+    conn = psycopg2.connect(
+        dbname="pve_cloud",
+        user="postgres",
+        password=patroni_pass,
+        host=cluster_vars["pve_haproxy_floating_ip_internal"],
+        port=5000,
+    )
+
+    with conn.cursor() as cur:
+        query = "SELECT k8s FROM acme_x509 WHERE stack_fqdn = %s;"
+
+        cur.execute(
+            query,
+            (
+                f"{get_test_env['kubernetes']['k8s_tls_copy_stack_name']}.{cluster_vars['pve_cloud_domain']}",
+            ),
+        )
+        record = cur.fetchone()
+
+        assert record
+        logger.info(record)
+    
+    # next the record needs to be inserted, for that we connect to our test cluster and fetch the secrets needed
+    first_test_host = get_test_env["pve_test_cluster_hosts"][
+        next(iter(get_test_env["pve_test_cluster_hosts"]))
+    ]["ansible_host"]
+
+    with connect_host(first_test_host, get_test_env.get("pve_test_cluster_jump_host")) as ssh:
+        _, stdout, _ = ssh.exec_command("cat /etc/pve/cloud/secrets/internal.key")
+        bind_ns_update_key = re.search(
+            r'secret\s+"([^"]+)";', stdout.read().decode("utf-8")
+        ).group(1)
+
+        logger.info(bind_ns_update_key)
+
+        _, stdout, _ = ssh.exec_command("cat /etc/pve/cloud/secrets/patroni.pass")
+        patroni_pass = stdout.read().decode("utf-8")
+
+    pg_conn_str_orm = f"postgresql+psycopg2://postgres:{patroni_pass}@{get_test_env['pve_test_cluster_floating_internal']}:5000/pve_cloud?sslmode=disable"
+
+    # start pxrpc server for injecting
+    if "pve_test_cluster_jump_host" in get_test_env:
+        with launch_pxrpc(
+            get_test_env["pve_test_cluster_jump_host"],
+            first_test_host,
+        ) as (pxrpc, jump_host):
+            pxrpc.e2e_inject_cert(
+                pg_conn_str_orm,
+                f"pytest-k8s.{get_test_env['cloud_inventory']['pve_cloud_domain']}",
+                json.dumps(record[0]),
+            )
+    else:
+        engine = create_engine(pg_conn_str_orm)
+
+        # update certs and mirror pull secret
+        with Session(engine) as session:
+            copy_cert = AcmeX509(
+                stack_fqdn=f"pytest-k8s.{get_test_env['cloud_inventory']['pve_cloud_domain']}",
+                config={},
+                ec_csr={},
+                ec_crt={},
+                k8s=record[0],
+            )
+            session.merge(copy_cert)
+            session.commit()
+    
+    
+    # set manual cp records (only for testing prod is manually manged)
+    dns_update = dns.update.Update(
+        get_test_env["kubernetes"]["deployments_domain"],
+        keyring=dns.tsigkeyring.from_text({"internal.": bind_ns_update_key}),
+        keyname="internal.",
+        keyalgorithm="hmac-sha256",
+    )
+
+    # main k8s
+    dns_update.replace(
+        "cp-pytest",
+        300,
+        "A",
+        get_test_env["pve_test_cluster_floating_external"],
+    )
+    response = dns.query.tcp(
+        dns_update, get_test_env["cloud_inventory"]["bind_master_ip"]
+    )
+    logger.info(response.rcode())
+
+    # secondary k8s
+    dns_update.replace(
+        "cp-pytest-secondary",
+        300,
+        "A",
+        get_test_env["pve_test_cluster_floating_external"],
+    )
+    response = dns.query.tcp(
+        dns_update, get_test_env["cloud_inventory"]["bind_master_ip"]
+    )
+    logger.info(response.rcode())

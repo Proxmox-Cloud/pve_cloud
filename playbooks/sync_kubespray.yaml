@@ -171,7 +171,7 @@
         - { key: 'fs.inotify.max_user_watches', value: "{{ [524288, [recommended_watches | int, 2097152] | min] | max }}" }
 
     - name: select discovery secret log export
-      delegate_to: "{{ groups['target_pve'][0] }}"
+      delegate_to: "pxc-executor-host"
       alchemy_read:
         pg_conn_str: "{{ pg_conn_str }}"
         table: px_cloud_secrets
@@ -300,7 +300,6 @@
       ignore_errors: yes
       when: "'cache_stack' in groups"
 
-
 - name: Allow locally hosted registry
   hosts: k8s_cluster
   tags:
@@ -332,7 +331,7 @@
 
 # Acme certificates
 - name: Acme 
-  hosts: localhost
+  hosts: "pxc-executor-host"
   tags:
     - acme
   roles:

@@ -6,7 +6,8 @@ from ansible.utils.display import Display
 from ansible_collections.pxc.cloud.plugins.module_utils.inventory import \
     get_manifest_version
 from jsonschema.exceptions import ValidationError
-from pve_cloud.lib.inventory import *
+from pve_cloud.lib.inventory import get_pve_inventory
+from pve_cloud.lib.ssh import check_ssh_open
 from pve_cloud_schemas.validate import validate_inventory
 
 display = Display()
@@ -115,7 +116,7 @@ class InventoryModule(BaseInventoryPlugin):
                 # use jump host for online check if defined + available
                 if online_jump_hosts:
                     display.v(f"found jump host config for {pve_cluster}")
-                    if not check_ssh_open_jumphost(
+                    if not check_ssh_open(
                         params["ansible_host"], online_jump_hosts[0]
                     ):
                         display.display(f"skipping offline host {host}")

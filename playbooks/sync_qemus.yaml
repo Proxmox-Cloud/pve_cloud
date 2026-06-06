@@ -123,7 +123,7 @@
     - config
 
 - name: Write stack config
-  hosts: localhost
+  hosts: "pxc-executor-host"
   tags:
     - config
   pre_tasks:
@@ -135,7 +135,6 @@
     - parse_cluster_secrets
   tasks:
     - name: clear tcp proxies
-      delegate_to: "{{ groups['target_pve'][0] }}"
       alchemy_delete:
         pg_conn_str: "{{ pg_conn_str }}"
         table: k8s_tcp_proxies
@@ -145,7 +144,6 @@
       when: tcp_proxies is defined
 
     - name: insert tcp proxies
-      delegate_to: "{{ groups['target_pve'][0] }}"
       alchemy_write:
         pg_conn_str: "{{ pg_conn_str }}"
         table: k8s_tcp_proxies
@@ -162,7 +160,6 @@
       when: tcp_proxies is defined
 
     - name: clear ingress domains
-      delegate_to: "{{ groups['target_pve'][0] }}"
       alchemy_delete:
         pg_conn_str: "{{ pg_conn_str }}"
         table: k8s_ingress_rules
@@ -172,7 +169,6 @@
       when: ingress_domains is defined
 
     - name: insert internal ingress domains from cert conf
-      delegate_to: "{{ groups['target_pve'][0] }}"
       alchemy_write:
         pg_conn_str: "{{ pg_conn_str }}"
         table: k8s_ingress_rules
@@ -190,7 +186,6 @@
     # add bind records for services
     # todo: code some kind of cleanup, also automatic auth zone creation if not exists
     - name: ingress dns entries
-      delegate_to: "{{ groups['target_pve'][0] }}"
       community.general.nsupdate:
         key_name: "internal."
         key_algorithm: "hmac-sha256"

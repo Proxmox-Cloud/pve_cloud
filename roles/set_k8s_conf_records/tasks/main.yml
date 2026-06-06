@@ -2,7 +2,7 @@
 # tasks file for set_k8s_conf_records
 # ingress
 - name: clear ingress domains
-  delegate_to: "{{ groups['target_pve'][0] }}"
+  delegate_to: "pxc-executor-host"
   alchemy_delete:
     pg_conn_str: "{{ pg_conn_str }}"
     table: k8s_ingress_rules
@@ -11,7 +11,7 @@
       stack_fqdn: "{{ stack_name }}.{{ pve_cloud_domain }}"
 
 - name: insert internal ingress domains from cert conf
-  delegate_to: "{{ groups['target_pve'][0] }}"
+  delegate_to: "pxc-executor-host"
   alchemy_write:
     pg_conn_str: "{{ pg_conn_str }}"
     table: k8s_ingress_rules
@@ -26,7 +26,7 @@
   loop: "{{ cluster_cert_entries | subelements('names') }}"
   
 - name: insert external expose domains
-  delegate_to: "{{ groups['target_pve'][0] }}"
+  delegate_to: "pxc-executor-host"
   alchemy_upsert:
     pg_conn_str: "{{ pg_conn_str }}"
     table: k8s_ingress_rules
@@ -45,7 +45,7 @@
   loop: "{{ external_domains | subelements('names') }}"
 
 - name: insert external expose tld domains
-  delegate_to: "{{ groups['target_pve'][0] }}"
+  delegate_to: "pxc-executor-host"
   alchemy_write:
     pg_conn_str: "{{ pg_conn_str }}"
     table: k8s_ingress_rules
@@ -62,7 +62,7 @@
 
 # tcp proxies
 - name: clear tcp proxies
-  delegate_to: "{{ groups['target_pve'][0] }}"
+  delegate_to: "pxc-executor-host"
   alchemy_delete:
     pg_conn_str: "{{ pg_conn_str }}"
     table: k8s_tcp_proxies
@@ -71,7 +71,7 @@
       proxy_stack_fqdn: "{{ proxy_stack_fqdn }}"
 
 - name: insert tcp proxies
-  delegate_to: "{{ groups['target_pve'][0] }}"
+  delegate_to: "pxc-executor-host"
   alchemy_write:
     pg_conn_str: "{{ pg_conn_str }}"
     table: k8s_tcp_proxies
@@ -88,7 +88,7 @@
 
 # external controlplane
 - name: clear external control planes
-  delegate_to: "{{ groups['target_pve'][0] }}"
+  delegate_to: "pxc-executor-host"
   alchemy_delete:
     pg_conn_str: "{{ pg_conn_str }}"
     table: k8s_ext_control_planes
@@ -96,7 +96,7 @@
       stack_fqdn: "{{ stack_name }}.{{ pve_cloud_domain }}"
 
 - name: insert external control plane sans
-  delegate_to: "{{ groups['target_pve'][0] }}"
+  delegate_to: "pxc-executor-host"
   alchemy_write:
     pg_conn_str: "{{ pg_conn_str }}"
     table: k8s_ext_control_planes

@@ -1,7 +1,7 @@
 ---
 # tasks file for select_haproxy_conf
 - name: select all ingress rules
-  delegate_to: "{{ groups['target_pve'][0] }}"
+  delegate_to: "pxc-executor-host"
   alchemy_read:
     pg_conn_str: "{{ pg_conn_str }}"
     table: k8s_ingress_rules
@@ -10,7 +10,7 @@
   register: k8s_ingress_rules
 
 - name: select all tcp proxy defs
-  delegate_to: "{{ groups['target_pve'][0] }}"
+  delegate_to: "pxc-executor-host"
   alchemy_read:
     pg_conn_str: "{{ pg_conn_str }}"
     table: k8s_tcp_proxies
@@ -19,7 +19,7 @@
   register: k8s_tcp_proxies
 
 - name: select all tcp proxy defs
-  delegate_to: "{{ groups['target_pve'][0] }}"
+  delegate_to: "pxc-executor-host"
   alchemy_read:
     pg_conn_str: "{{ pg_conn_str }}"
     table: k8s_tcp_proxies
@@ -28,7 +28,7 @@
   register: k8s_tcp_proxies
 
 - name: select kea reservations as base for ips
-  delegate_to: "{{ groups['target_pve'][0] }}"
+  delegate_to: "pxc-executor-host"
   alchemy_read:
     pg_conn_str: "{{ pg_conn_str }}"
     table: kea_reservations
@@ -81,7 +81,7 @@
       }}
 
 - name: select external control plane defs
-  delegate_to: "{{ groups['target_pve'][0] }}"
+  delegate_to: "pxc-executor-host"
   alchemy_read:
     pg_conn_str: "{{ pg_conn_str }}"
     table: k8s_ext_control_planes

@@ -10,8 +10,12 @@
     py_pve_cloud_backup_version: "3.1.2"
   roles:
     - parse_cluster_secrets
-    - bdd_server_tls_certs
   tasks:
+    - name: run bdd tls cert gen
+      include_role:
+        name: bdd_server_tls_certs
+      delegate_to: "pxc-executor-host"
+      
     - name: install core apt packages
       ansible.builtin.apt:
         name: 
@@ -43,7 +47,7 @@
         where:
           cloud_domain: "{{ pve_cloud_domain }}"
           secret_name: "{{ stack_name }}-bdd-tls-certs"
-      delegate_to: "{{ groups['target_pve'][0] }}"
+      delegate_to: "pxc-executor-host"
       register: fetched_bdd_tls
 
     - name: Write bdd tls certs to /opt/bdd/certs

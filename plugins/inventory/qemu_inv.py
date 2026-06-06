@@ -39,13 +39,10 @@ class InventoryModule(BaseInventoryPlugin):
                 loader,
                 inventory,
                 yaml_data,
-                os.path.dirname(os.path.realpath(__file__)),
             )
         )
 
         target_cluster = cluster_map[yaml_data["target_pve"]]
-
-        stack_fqdn = f"{yaml_data['stack_name']}.{target_cluster.cluster_vars['pve_cloud_domain']}"
 
         self.set_global_vars(yaml_data, inventory)
 

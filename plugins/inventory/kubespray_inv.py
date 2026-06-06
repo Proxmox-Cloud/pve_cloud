@@ -1,14 +1,13 @@
 import asyncio
-import os
 import secrets
 
-import paramiko
 from ansible.errors import AnsibleError
 from ansible.plugins.inventory import BaseInventoryPlugin
 from ansible_collections.pxc.cloud.plugins.module_utils.identity import \
     stack_vm_get_blake
 from ansible_collections.pxc.cloud.plugins.module_utils.inventory import (
     add_qemu_to_inv, init_plugin)
+from pve_cloud.lib.ssh import connect_host
 
 
 class InventoryModule(BaseInventoryPlugin):
@@ -24,48 +23,25 @@ class InventoryModule(BaseInventoryPlugin):
     def get_or_create_kubeadm_cert_key(self, target_cluster, stack_fqdn):
         # optionally go through jumphost defined in the ~/.pve-cloud-dyn-inv.yaml
 
-        jumpbox_channel = None
-        if target_cluster.first_online_host.jump_host:
-            jumpbox = paramiko.SSHClient()
-            jumpbox.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            jumpbox.connect(target_cluster.first_online_host.jump_host, username="root")
-
-            jumpbox_transport = jumpbox.get_transport()
-            src_addr = ("127.0.0.1", 0)
-            dest_addr = (target_cluster.first_online_host.params["ansible_host"], 22)
-
-            jumpbox_channel = jumpbox_transport.open_channel(
-                "direct-tcpip", dest_addr, src_addr
-            )
-
-        client = paramiko.SSHClient()  # connect to any of the pve hosts
-        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        client.connect(
-            target_cluster.first_online_host.params["ansible_host"],
-            port=22,
-            username="root",
-            sock=jumpbox_channel,  # if this is passed paramiko uses this as jumphost
-        )
-
-        _, stdout, _ = client.exec_command(
-            f"test -f /etc/pve/cloud/kubespray-kubeadm-cert-keys/{stack_fqdn} && echo exists || echo notexists"
-        )
-        file_exists = stdout.read().strip().decode("utf-8") == "exists"
-
-        if file_exists:
+        with connect_host(target_cluster.first_online_host.params["ansible_host"], target_cluster.first_online_host.jump_host) as client:
             _, stdout, _ = client.exec_command(
-                f"cat /etc/pve/cloud/kubespray-kubeadm-cert-keys/{stack_fqdn}"
+                f"test -f /etc/pve/cloud/kubespray-kubeadm-cert-keys/{stack_fqdn} && echo exists || echo notexists"
             )
-            kubeadm_cert_key = stdout.read().strip().decode("utf-8")
-        else:
-            kubeadm_cert_key = "".join(
-                secrets.choice("0123456789abcdef") for _ in range(64)
-            )
-            _, stdout, _ = client.exec_command(
-                f'echo "{kubeadm_cert_key}" > /etc/pve/cloud/kubespray-kubeadm-cert-keys/{stack_fqdn}'
-            )
+            file_exists = stdout.read().strip().decode("utf-8") == "exists"
 
-        client.close()
+            if file_exists:
+                _, stdout, _ = client.exec_command(
+                    f"cat /etc/pve/cloud/kubespray-kubeadm-cert-keys/{stack_fqdn}"
+                )
+                kubeadm_cert_key = stdout.read().strip().decode("utf-8")
+            else:
+                kubeadm_cert_key = "".join(
+                    secrets.choice("0123456789abcdef") for _ in range(64)
+                )
+                _, stdout, _ = client.exec_command(
+                    f'echo "{kubeadm_cert_key}" > /etc/pve/cloud/kubespray-kubeadm-cert-keys/{stack_fqdn}'
+                )
+
         return kubeadm_cert_key
 
     # sets all keys 1:1 of the input inventory yaml as values on all hosts (target_pve, stack_name, etc.)
@@ -91,8 +67,7 @@ class InventoryModule(BaseInventoryPlugin):
             init_plugin(
                 loader,
                 inventory,
-                yaml_data,
-                os.path.dirname(os.path.realpath(__file__)),
+                yaml_data
             )
         )
 

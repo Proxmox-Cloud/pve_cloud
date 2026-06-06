@@ -124,7 +124,7 @@
 
     # todo: write delete functionality and implement for qemus
     - name: write vm_vars_blake to patroni
-      delegate_to: "{{ groups['target_pve'][0] }}"
+      delegate_to: "pxc-executor-host"
       alchemy_upsert:
         pg_conn_str: "{{ pg_conn_str }}"
         table: vm_vars_blake
@@ -147,7 +147,7 @@
         state: present
 
     - name: select discovery secret log export
-      delegate_to: "{{ groups['target_pve'][0] }}"
+      delegate_to: "pxc-executor-host"
       alchemy_read:
         pg_conn_str: "{{ pg_conn_str }}"
         table: px_cloud_secrets
