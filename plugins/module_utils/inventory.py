@@ -3,9 +3,10 @@ import ipaddress
 import json
 import os
 import re
+import sys
 from dataclasses import dataclass
 from typing import Optional
-import sys
+
 import asyncssh
 import yaml
 from ansible.errors import AnsibleError, AnsibleParserError
@@ -13,9 +14,11 @@ from ansible.utils.display import Display
 from ansible_collections.pxc.cloud.plugins.module_utils.identity import \
     sort_and_hash
 from jsonschema.exceptions import ValidationError
-from pve_cloud.lib.inventory import get_online_jump_host, get_cloud_domain, get_pve_inventory
+from pve_cloud.lib.inventory import (get_cloud_domain, get_online_jump_host,
+                                     get_pve_inventory)
+from pve_cloud.lib.ssh import (check_ssh_open_async, connect_host_async,
+                               wait_for_ssh_open_async)
 from pve_cloud_schemas.validate import validate_inventory
-from pve_cloud.lib.ssh import check_ssh_open_async, connect_host_async, wait_for_ssh_open_async
 
 
 # collector class for a proxmox host, its cloud membership and config
@@ -59,21 +62,22 @@ async def get_online_pve_hosts(loader, yaml_data):
                 f"jump hosts defined for {pve} but not reachable / offline: {e}"
             )
             continue
-        
-        for host, params in pve_inventory[pve]["pve_hosts"].items():
-        
-            online_host_tasks.append(check_ssh_open_async(params["ansible_host"], online_jump_host))
-            input_hosts.append(PveHost(host, pve_cloud_domain, pve, params, online_jump_host))
 
+        for host, params in pve_inventory[pve]["pve_hosts"].items():
+
+            online_host_tasks.append(
+                check_ssh_open_async(params["ansible_host"], online_jump_host)
+            )
+            input_hosts.append(
+                PveHost(host, pve_cloud_domain, pve, params, online_jump_host)
+            )
 
     check_results = await asyncio.gather(*online_host_tasks)
 
     online_hosts = [
-        host_obj 
-        for host_obj, is_online in zip(input_hosts, check_results) 
-        if is_online
+        host_obj for host_obj, is_online in zip(input_hosts, check_results) if is_online
     ]
-    
+
     return online_hosts
 
 
@@ -86,7 +90,9 @@ async def fetch_task(conn, command, ret_key):
 async def fetch_pve_cluster_info(pve_host_of_cluster):
     fetch_tasks = []
 
-    async with connect_host_async(pve_host_of_cluster.params["ansible_host"], pve_host_of_cluster.jump_host) as conn:
+    async with connect_host_async(
+        pve_host_of_cluster.params["ansible_host"], pve_host_of_cluster.jump_host
+    ) as conn:
 
         fetch_tasks.append(
             fetch_task(conn, "cat /etc/pve/cloud/cluster_vars.yaml", "cluster_vars")
@@ -126,7 +132,9 @@ async def fetch_pve_cluster_info(pve_host_of_cluster):
 
     return (
         pve_host_of_cluster.cluster_name + "." + pve_host_of_cluster.cloud_domain,
-        ClusterInformation(cluster_vars, pvesh_vms, host_ha_groups, pve_host_of_cluster),
+        ClusterInformation(
+            cluster_vars, pvesh_vms, host_ha_groups, pve_host_of_cluster
+        ),
     )
 
 
@@ -192,9 +200,13 @@ def build_pve_inventory(inventory, yaml_data, online_pve_hosts, cluster_map):
                 inventory.add_host("pxc-executor-host")
 
                 inventory.set_variable("pxc-executor-host", "ansible_user", "root")
-                inventory.set_variable("pxc-executor-host", "ansible_host", pve_host.params["ansible_host"])
                 inventory.set_variable(
-                    "pxc-executor-host", "ansible_python_interpreter", "/root/.pxc-venv/bin/python"
+                    "pxc-executor-host", "ansible_host", pve_host.params["ansible_host"]
+                )
+                inventory.set_variable(
+                    "pxc-executor-host",
+                    "ansible_python_interpreter",
+                    "/root/.pxc-venv/bin/python",
                 )
 
                 pxc_executor_set = True
@@ -260,7 +272,9 @@ async def add_lxc_to_inv(inventory, online_pve_hosts, target_pve, vm):
     if hosting_pve is None:
         raise AnsibleError(f"PVE Host of lxc {vm['vmid']} is offline!")
 
-    async with connect_host_async(hosting_pve.params["ansible_host"], hosting_pve.jump_host) as pve_conn:
+    async with connect_host_async(
+        hosting_pve.params["ansible_host"], hosting_pve.jump_host
+    ) as pve_conn:
         max_retries = 30
         for attempt in range(max_retries):
             try:
@@ -298,7 +312,7 @@ async def add_lxc_to_inv(inventory, online_pve_hosts, target_pve, vm):
 
     if open_ssh_port != 22:
         inventory.set_variable(vm["name"], "ansible_port", open_ssh_port)
-    
+
     if hosting_pve.jump_host:
         display.display(f"jump host for lxc: {hosting_pve.jump_host}")
         inventory.set_variable(
@@ -325,11 +339,12 @@ async def add_lxc_to_inv(inventory, online_pve_hosts, target_pve, vm):
             display.warning(f"Error trying to load pve-cloud-vars.yaml on lxc {e}")
 
 
-
-
 async def add_qemu_to_inv(inventory, cluster, vm):
 
-    async with connect_host_async(cluster.first_online_host.params["ansible_host"], cluster.first_online_host.jump_host) as pve_conn:
+    async with connect_host_async(
+        cluster.first_online_host.params["ansible_host"],
+        cluster.first_online_host.jump_host,
+    ) as pve_conn:
 
         max_retries = 80
         ip = None
@@ -371,7 +386,9 @@ async def add_qemu_to_inv(inventory, cluster, vm):
 
         inventory.set_variable(vm["name"], "ansible_host", ip)
 
-        open_ssh_port = await wait_for_ssh_open_async(ip, cluster.first_online_host.jump_host)
+        open_ssh_port = await wait_for_ssh_open_async(
+            ip, cluster.first_online_host.jump_host
+        )
 
         if open_ssh_port is None:
             raise AnsibleError(f"Can't reach SSH server on {ip}")

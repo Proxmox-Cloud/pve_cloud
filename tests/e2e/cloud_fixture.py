@@ -1,30 +1,30 @@
+import json
 import logging
 import os
+import re
 import subprocess
 import tempfile
 
 import ansible_runner
-import paramiko
-import pytest
-import yaml
-from pve_cloud.cli.pvcli import (connect_cluster, connect_remote_cluster,
-                                 get_parser)
-from pve_cloud_test.cloud_fixtures import *
-import psycopg2
-from pve_cloud.lib.inventory import get_online_pve_host, get_pve_inventory, get_cloud_domain, get_target_cluster
-from pve_cloud.lib.ssh import connect_host
-import re
-from pve_cloud.cli.pxrpc import launch_pxrpc
-from pve_cloud.orm.alchemy import AcmeX509
-from sqlalchemy import create_engine
-from sqlalchemy.orm import Session
-import json
 import dns.query
 import dns.rcode
 import dns.resolver
 import dns.tsigkeyring
 import dns.update
-
+import paramiko
+import psycopg2
+import pytest
+import yaml
+from pve_cloud.cli.pvcli import (connect_cluster, connect_remote_cluster,
+                                 get_parser)
+from pve_cloud.cli.pxrpc import launch_pxrpc
+from pve_cloud.lib.inventory import (get_cloud_domain, get_online_pve_host,
+                                     get_pve_inventory, get_target_cluster)
+from pve_cloud.lib.ssh import connect_host
+from pve_cloud.orm.alchemy import AcmeX509
+from pve_cloud_test.cloud_fixtures import *
+from sqlalchemy import create_engine
+from sqlalchemy.orm import Session
 
 logger = logging.getLogger(__name__)
 
@@ -726,11 +726,19 @@ def setup_prepare_kubespray(
 ):
     logger.info("setup environment for kubespray playbooks")
 
-    copy_cloud_domain = get_cloud_domain(get_test_env["kubernetes"]["k8s_tls_copy_target_pve"])
+    copy_cloud_domain = get_cloud_domain(
+        get_test_env["kubernetes"]["k8s_tls_copy_target_pve"]
+    )
     copy_pve_inventory = get_pve_inventory(copy_cloud_domain)
-    copy_target_cluster = get_target_cluster(copy_pve_inventory, get_test_env["kubernetes"]["k8s_tls_copy_target_pve"], copy_cloud_domain)
+    copy_target_cluster = get_target_cluster(
+        copy_pve_inventory,
+        get_test_env["kubernetes"]["k8s_tls_copy_target_pve"],
+        copy_cloud_domain,
+    )
 
-    copy_pve_host, copy_jump_host = get_online_pve_host(copy_pve_inventory, copy_target_cluster)
+    copy_pve_host, copy_jump_host = get_online_pve_host(
+        copy_pve_inventory, copy_target_cluster
+    )
 
     # copy target has to be a directly accessible proxmox cluster (no jump hosts allowed)
     assert copy_jump_host is None
@@ -774,13 +782,15 @@ def setup_prepare_kubespray(
 
         assert record
         logger.info(record)
-    
+
     # next the record needs to be inserted, for that we connect to our test cluster and fetch the secrets needed
     first_test_host = get_test_env["pve_test_cluster_hosts"][
         next(iter(get_test_env["pve_test_cluster_hosts"]))
     ]["ansible_host"]
 
-    with connect_host(first_test_host, get_test_env.get("pve_test_cluster_jump_host")) as ssh:
+    with connect_host(
+        first_test_host, get_test_env.get("pve_test_cluster_jump_host")
+    ) as ssh:
         _, stdout, _ = ssh.exec_command("cat /etc/pve/cloud/secrets/internal.key")
         bind_ns_update_key = re.search(
             r'secret\s+"([^"]+)";', stdout.read().decode("utf-8")
@@ -818,8 +828,7 @@ def setup_prepare_kubespray(
             )
             session.merge(copy_cert)
             session.commit()
-    
-    
+
     # set manual cp records (only for testing prod is manually manged)
     dns_update = dns.update.Update(
         get_test_env["kubernetes"]["deployments_domain"],

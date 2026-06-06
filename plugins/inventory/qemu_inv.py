@@ -1,5 +1,4 @@
 import asyncio
-import os
 
 from ansible.plugins.inventory import BaseInventoryPlugin
 from ansible_collections.pxc.cloud.plugins.module_utils.identity import \

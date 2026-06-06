@@ -1,8 +1,6 @@
 import asyncio
-import json
 import logging
 import os
-import re
 import tempfile
 
 import ansible_runner
@@ -17,11 +15,12 @@ import pytest
 import redis
 import yaml
 from cloud_fixture import *
-from pve_cloud.lib.ssh import get_cluster_vars
 from pve_cloud.cli.pvclu import (get_ssh_master_kubeconfig,
                                  get_ssh_remote_master_kubeconfig)
 from pve_cloud.cli.pxrpc import launch_pxrpc, launch_pxrpc_async
-from pve_cloud.lib.inventory import get_online_pve_host, get_pve_inventory, get_cloud_domain, get_target_cluster
+from pve_cloud.lib.inventory import (get_cloud_domain, get_online_pve_host,
+                                     get_pve_inventory, get_target_cluster)
+from pve_cloud.lib.ssh import get_cluster_vars
 from pve_cloud.orm.alchemy import AcmeX509
 from pve_cloud_test.tdd_watchdog import get_ipv4
 from sqlalchemy import create_engine, select
@@ -304,7 +303,11 @@ def test_create_secondary_kubespray(
         playbook="playbooks/sync_kubespray.yaml",
         inventory=get_secondary_kubespray_inv,
         verbosity=request.config.getoption("--ansible-verbosity"),
-        cmdline="--skip-tags kubespray" if request.config.getoption("--skip-kubespray") else None
+        cmdline=(
+            "--skip-tags kubespray"
+            if request.config.getoption("--skip-kubespray")
+            else None
+        ),
     )
 
     assert kubespray_run.rc == 0
@@ -379,7 +382,11 @@ eviction_hard:
         playbook="playbooks/sync_kubespray.yaml",
         inventory=get_kubespray_inv,
         verbosity=request.config.getoption("--ansible-verbosity"),
-        cmdline="--skip-tags kubespray" if request.config.getoption("--skip-kubespray") else None
+        cmdline=(
+            "--skip-tags kubespray"
+            if request.config.getoption("--skip-kubespray")
+            else None
+        ),
     )
 
     assert kubespray_run.rc == 0
@@ -394,7 +401,6 @@ eviction_hard:
             playbook="playbooks/destroy_kubespray.yaml",
             inventory=get_kubespray_inv,
             verbosity=request.config.getoption("--ansible-verbosity"),
-            
         )
         assert kubespray_destroy_run.rc == 0
     else:

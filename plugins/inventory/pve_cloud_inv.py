@@ -116,9 +116,7 @@ class InventoryModule(BaseInventoryPlugin):
                 # use jump host for online check if defined + available
                 if online_jump_hosts:
                     display.v(f"found jump host config for {pve_cluster}")
-                    if not check_ssh_open(
-                        params["ansible_host"], online_jump_hosts[0]
-                    ):
+                    if not check_ssh_open(params["ansible_host"], online_jump_hosts[0]):
                         display.display(f"skipping offline host {host}")
                         continue
                 else:

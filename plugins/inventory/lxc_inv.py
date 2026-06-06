@@ -1,5 +1,4 @@
 import asyncio
-import os
 
 from ansible.plugins.inventory import BaseInventoryPlugin
 from ansible.utils.display import Display
@@ -41,11 +40,7 @@ class InventoryModule(BaseInventoryPlugin):
         yaml_data = loader.load_from_file(path)
 
         vm_vars_blake, stack_vms, online_pve_hosts, cluster_map = asyncio.run(
-            init_plugin(
-                loader,
-                inventory,
-                yaml_data
-            )
+            init_plugin(loader, inventory, yaml_data)
         )
         display.v("vm_vars_blake", vm_vars_blake)
         self.set_global_vars(yaml_data, inventory)

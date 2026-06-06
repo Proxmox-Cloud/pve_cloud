@@ -23,7 +23,10 @@ class InventoryModule(BaseInventoryPlugin):
     def get_or_create_kubeadm_cert_key(self, target_cluster, stack_fqdn):
         # optionally go through jumphost defined in the ~/.pve-cloud-dyn-inv.yaml
 
-        with connect_host(target_cluster.first_online_host.params["ansible_host"], target_cluster.first_online_host.jump_host) as client:
+        with connect_host(
+            target_cluster.first_online_host.params["ansible_host"],
+            target_cluster.first_online_host.jump_host,
+        ) as client:
             _, stdout, _ = client.exec_command(
                 f"test -f /etc/pve/cloud/kubespray-kubeadm-cert-keys/{stack_fqdn} && echo exists || echo notexists"
             )
@@ -64,11 +67,7 @@ class InventoryModule(BaseInventoryPlugin):
 
         # generic init function
         vm_vars_blake, stack_vms, _, cluster_map = asyncio.run(
-            init_plugin(
-                loader,
-                inventory,
-                yaml_data
-            )
+            init_plugin(loader, inventory, yaml_data)
         )
 
         target_cluster = cluster_map[yaml_data["target_pve"]]
