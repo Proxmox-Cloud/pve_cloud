@@ -322,9 +322,7 @@ async def add_lxc_to_inv(inventory, online_pve_hosts, target_pve, vm):
             f"-o ProxyJump=root@{hosting_pve.jump_host}",
         )
 
-    async with connect_host_async(
-        ip, hosting_pve.jump_host, host_port=open_ssh_port
-    ) as lxc_conn:
+    async with connect_host_async(ip, hosting_pve.jump_host, port=open_ssh_port) as lxc_conn:
         # try load cloud vars for container if they exist
         try:
             cat_lxc_cloud_vars = await lxc_conn.run(
