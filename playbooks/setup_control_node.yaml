@@ -2,12 +2,7 @@
   hosts: localhost
   tasks:
     - set_fact:
-        pip_extra_args: >-
-          {% if test_repos_ip is defined %}
-          --index-url http://{{ test_repos_ip }}:8088/simple --trusted-host {{ test_repos_ip }}
-          {% else %}
-          ""
-          {% endif %}
+        pip_extra_args: "{{ '--index-url http://' ~ test_repos_ip ~ ':8088/simple --trusted-host ' ~ test_repos_ip if test_repos_ip is defined else '' }}"
     
     - debug:
         var: pip_extra_args

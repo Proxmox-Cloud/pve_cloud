@@ -305,6 +305,7 @@ async def add_lxc_to_inv(inventory, online_pve_hosts, target_pve, vm):
 
     inventory.set_variable(vm["name"], "ansible_host", ip)
 
+    # lxc global vars gives the option to set use_alternate_ssh port to switch it to 2222
     open_ssh_port = await wait_for_ssh_open_async(ip, hosting_pve.jump_host)
 
     if open_ssh_port is None:
@@ -321,7 +322,7 @@ async def add_lxc_to_inv(inventory, online_pve_hosts, target_pve, vm):
             f"-o ProxyJump=root@{hosting_pve.jump_host}",
         )
 
-    async with connect_host_async(ip, hosting_pve.jump_host) as lxc_conn:
+    async with connect_host_async(ip, hosting_pve.jump_host, host_port=open_ssh_port) as lxc_conn:
         # try load cloud vars for container if they exist
         try:
             cat_lxc_cloud_vars = await lxc_conn.run(
