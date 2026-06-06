@@ -10,25 +10,25 @@
 
 **Description:** Definitions for a proxmox cloud, setup of proxmox clusters.
 
-| Property                                                       | Pattern | Type             | Deprecated | Definition | Title/Description                                                                                                                                                                                                                                                                         |
-| -------------------------------------------------------------- | ------- | ---------------- | ---------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| + [pve_vm_subnet](#pve_vm_subnet )                             | No      | string           | No         | -          | Subnet this PVE cluster uses for its VMs.                                                                                                                                                                                                                                                 |
-| + [pve_cloud_domain](#pve_cloud_domain )                       | No      | string           | No         | -          | The overarching domain for the cloud. Will also be used for ddns.                                                                                                                                                                                                                         |
-| + [kea_dhcp_main_ip](#kea_dhcp_main_ip )                       | No      | string           | No         | -          | Static assigned ip for the main dhcp server. This has to match your dhcp lxc inventory file!                                                                                                                                                                                              |
-| + [kea_dhcp_failover_ip](#kea_dhcp_failover_ip )               | No      | string           | No         | -          | Static ip for slave dhcp server. This has to match your dhcp lxc inventory file!                                                                                                                                                                                                          |
-| + [kea_dhcp_routers](#kea_dhcp_routers )                       | No      | string           | No         | -          | option-data for kea dhcp routers. The default route router that the dhcp will communicate.                                                                                                                                                                                                |
-| + [kea_dhcp_pools](#kea_dhcp_pools )                           | No      | array of string  | No         | -          | Address pools that the dhcp allocates from. Has to be within pve_vm_subnet cidr.                                                                                                                                                                                                          |
-| + [kea_dhcp_static_routes](#kea_dhcp_static_routes )           | No      | string           | No         | -          | classless-static-routes for kea option-data. You can pass comma seperated extra routes you want the dhcp to communicate, for example to a custom VPN gateway.<br />                                                                                                                       |
-| + [bind_master_ip](#bind_master_ip )                           | No      | string           | No         | -          | IP of the primary bind dns for this cluster, will be statically assigned. Has to match your bind lxc inventory file!                                                                                                                                                                      |
-| + [bind_slave_ip](#bind_slave_ip )                             | No      | string           | No         | -          | IP of the slave bind dns for this cluster. Has to match your bind lxc inventory file!                                                                                                                                                                                                     |
-| + [bind_arpa_zone_service_lxcs](#bind_arpa_zone_service_lxcs ) | No      | string           | No         | -          | Arpa zone in which service lxcs with static ips will manuall get their reverse dns entries.                                                                                                                                                                                               |
-| + [bind_additional_arpa_zones](#bind_additional_arpa_zones )   | No      | array of string  | No         | -          | Additional arpa zones which should be created and managed in the dns / dhcp ddns.                                                                                                                                                                                                         |
-| + [pve_clusters](#pve_clusters )                               | No      | object           | No         | -          | Definitions for specific Proxmox clusters that will be part of the cloud. Keys are hostnames.                                                                                                                                                                                             |
-| + [bind_zone_admin_email](#bind_zone_admin_email )             | No      | string           | No         | -          | Required adminstrator email in bind format for bind zones.                                                                                                                                                                                                                                |
-| - [bind_forward_zones](#bind_forward_zones )                   | No      | array of object  | No         | -          | Allows forwarding of specific zones to specific nameservers. This is useful for domains that are not owned by this cloud. For delegating sub zones <br />resort to the terraform dns provider alongside the kubernetes cluster that declares the parent zone in its inventory file.<br /> |
-| - [acme_contact](#acme_contact )                               | No      | string           | No         | -          | Email address to use for acme account creation.                                                                                                                                                                                                                                           |
-| - [acme_method](#acme_method )                                 | No      | enum (of string) | No         | -          | PVE Cloud included method for solving dns01 challenges. You need to have created the appropriate cloud secrets created.<br />                                                                                                                                                             |
-| - [plugin](#plugin )                                           | No      | enum (of string) | No         | -          | Id of ansible inventory plugin, needs to be set exactly.                                                                                                                                                                                                                                  |
+| Property                                                       | Pattern | Type             | Deprecated | Definition | Title/Description                                                                                                                                                                                                 |
+| -------------------------------------------------------------- | ------- | ---------------- | ---------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| + [pve_vm_subnet](#pve_vm_subnet )                             | No      | string           | No         | -          | Subnet this PVE cluster uses for its VMs.                                                                                                                                                                         |
+| + [pve_cloud_domain](#pve_cloud_domain )                       | No      | string           | No         | -          | The overarching domain for the cloud. Will also be used for ddns.                                                                                                                                                 |
+| + [kea_dhcp_main_ip](#kea_dhcp_main_ip )                       | No      | string           | No         | -          | Static assigned ip for the main dhcp server. This has to match your dhcp lxc inventory file!                                                                                                                      |
+| + [kea_dhcp_failover_ip](#kea_dhcp_failover_ip )               | No      | string           | No         | -          | Static ip for slave dhcp server. This has to match your dhcp lxc inventory file!                                                                                                                                  |
+| + [kea_dhcp_routers](#kea_dhcp_routers )                       | No      | string           | No         | -          | option-data for kea dhcp routers. The default route router that the dhcp will communicate.                                                                                                                        |
+| + [kea_dhcp_pools](#kea_dhcp_pools )                           | No      | array of string  | No         | -          | Address pools that the dhcp allocates from. Has to be within pve_vm_subnet cidr.                                                                                                                                  |
+| + [kea_dhcp_static_routes](#kea_dhcp_static_routes )           | No      | string           | No         | -          | classless-static-routes for kea option-data. You can pass comma seperated extra routes you want the dhcp to communicate, for example to a custom VPN gateway.<br />                                               |
+| + [bind_master_ip](#bind_master_ip )                           | No      | string           | No         | -          | IP of the primary bind dns for this cluster, will be statically assigned. Has to match your bind lxc inventory file!                                                                                              |
+| + [bind_slave_ip](#bind_slave_ip )                             | No      | string           | No         | -          | IP of the slave bind dns for this cluster. Has to match your bind lxc inventory file!                                                                                                                             |
+| + [bind_arpa_zone_service_lxcs](#bind_arpa_zone_service_lxcs ) | No      | string           | No         | -          | Arpa zone in which service lxcs with static ips will manuall get their reverse dns entries.                                                                                                                       |
+| + [bind_additional_arpa_zones](#bind_additional_arpa_zones )   | No      | array of string  | No         | -          | Additional arpa zones which should be created and managed in the dns / dhcp ddns.                                                                                                                                 |
+| + [pve_clusters](#pve_clusters )                               | No      | object           | No         | -          | Definitions for specific Proxmox clusters that will be part of the cloud. Keys are hostnames.                                                                                                                     |
+| + [bind_zone_admin_email](#bind_zone_admin_email )             | No      | string           | No         | -          | Required adminstrator email in bind format for bind zones.                                                                                                                                                        |
+| - [bind_forward_zones](#bind_forward_zones )                   | No      | array of object  | No         | -          | Creates zone in bind and delegation ns records to the specified nameservers. This is very useful if you have other nameservers with <br />their own authoritative zones you want resolved within the cloud.<br /> |
+| - [acme_contact](#acme_contact )                               | No      | string           | No         | -          | Email address to use for acme account creation.                                                                                                                                                                   |
+| - [acme_method](#acme_method )                                 | No      | enum (of string) | No         | -          | PVE Cloud included method for solving dns01 challenges. You need to have created the appropriate cloud secrets created.<br />                                                                                     |
+| - [plugin](#plugin )                                           | No      | enum (of string) | No         | -          | Id of ansible inventory plugin, needs to be set exactly.                                                                                                                                                          |
 
 ## <a name="pve_vm_subnet"></a>1. Property `Cloud Inventory > pve_vm_subnet`
 
@@ -252,12 +252,12 @@ must respect the following conditions
 
 **Description:** This object contains configuration parameters for a proxmox cluster within a proxmox cloud.
 
-| Property                                                                                       | Pattern | Type                      | Deprecated | Definition | Title/Description                                                                                                                                                                                                                                                                                                          |
-| ---------------------------------------------------------------------------------------------- | ------- | ------------------------- | ---------- | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| - [pve_haproxy_floating_ip_internal](#pve_clusters_pattern1_pve_haproxy_floating_ip_internal ) | No      | string                    | No         | -          | Floating ip that is exclusively accessible from inside the cloud / location. External forwardings should be made to pve_haproxy_floating_ip_external.<br />Inside the cloud if you define a certificate entry, some nodeport forward or default kubeapi access, this will all be available automatically on this ip.<br /> |
-| - [pve_haproxy_floating_ip_external](#pve_clusters_pattern1_pve_haproxy_floating_ip_external ) | No      | string                    | No         | -          | Floating ip of our central cluster HAProxy.                                                                                                                                                                                                                                                                                |
-| + [pve_unique_cloud_services](#pve_clusters_pattern1_pve_unique_cloud_services )               | No      | array of enum (of string) | No         | -          | Unique service the cluster provides for its cloud. Unique in the sense that only one cluster may provide each of the services for the entire cloud.<br />Services like haproxy and backup servers can and should be provided by multiple clusters. <br />                                                                  |
-| - [pve_host_vars](#pve_clusters_pattern1_pve_host_vars )                                       | No      | object                    | No         | -          | Optional variables that will be specifically set for a pve host. Key is the simple host name.<br />                                                                                                                                                                                                                        |
+| Property                                                                                       | Pattern | Type                      | Deprecated | Definition | Title/Description                                                                                                                                                                                                                                                                                                                                                                            |
+| ---------------------------------------------------------------------------------------------- | ------- | ------------------------- | ---------- | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| - [pve_haproxy_floating_ip_internal](#pve_clusters_pattern1_pve_haproxy_floating_ip_internal ) | No      | string                    | No         | -          | Floating ip that is exclusively accessible from inside the cloud / location. External forwardings should be made to pve_haproxy_floating_ip_external.<br />Inside the cloud if you define a certificate entry, some nodeport forward or default kubeapi access, this will all be available automatically on this ip.<br />                                                                   |
+| - [pve_haproxy_floating_ip_external](#pve_clusters_pattern1_pve_haproxy_floating_ip_external ) | No      | string                    | No         | -          | Floating ip of our central cluster HAProxy.                                                                                                                                                                                                                                                                                                                                                  |
+| + [pve_unique_cloud_services](#pve_clusters_pattern1_pve_unique_cloud_services )               | No      | array of enum (of string) | No         | -          | Unique service the cluster provides for its cloud. Unique in the sense that only one cluster may provide each of the services for the entire cloud.<br />Services like haproxy and backup servers can and should be provided by multiple clusters. <br />                                                                                                                                    |
+| - [pve_host_vars](#pve_clusters_pattern1_pve_host_vars )                                       | No      | object                    | No         | -          | Optional variables that will be specifically set for a pve host. Key is the simple host name. <br />This can be used to build your specialized pve cluster setup playbooks. You can do things like<br />wakeonlan, driver and network configuration with these easily. Simply create your own playbook and<br />run it even before the pxc.cloud.setup_pve_clusters on this inventory.<br /> |
 
 #### <a name="pve_clusters_pattern1_pve_haproxy_floating_ip_internal"></a>12.1.1. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_haproxy_floating_ip_internal`
 
@@ -327,40 +327,27 @@ Must be one of:
 
 #### <a name="pve_clusters_pattern1_pve_host_vars"></a>12.1.4. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars`
 
-|                           |             |
-| ------------------------- | ----------- |
-| **Type**                  | `object`    |
-| **Required**              | No          |
-| **Additional properties** | Not allowed |
+|                           |                  |
+| ------------------------- | ---------------- |
+| **Type**                  | `object`         |
+| **Required**              | No               |
+| **Additional properties** | Any type allowed |
 
-**Description:** Optional variables that will be specifically set for a pve host. Key is the simple host name.
+**Description:** Optional variables that will be specifically set for a pve host. Key is the simple host name. 
+This can be used to build your specialized pve cluster setup playbooks. You can do things like
+wakeonlan, driver and network configuration with these easily. Simply create your own playbook and
+run it even before the pxc.cloud.setup_pve_clusters on this inventory.
 
-| Property                                                                                                | Pattern | Type   | Deprecated | Definition | Title/Description |
-| ------------------------------------------------------------------------------------------------------- | ------- | ------ | ---------- | ---------- | ----------------- |
-| - [^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)$](#pve_clusters_pattern1_pve_host_vars_pattern1 ) | Yes     | object | No         | -          | Proxmox hostname  |
+| Property                                                                                                     | Pattern | Type            | Deprecated | Definition | Title/Description                                                                                                                                                                                                   |
+| ------------------------------------------------------------------------------------------------------------ | ------- | --------------- | ---------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| - [install_btrfs_root_prom_exporter](#pve_clusters_pattern1_pve_host_vars_install_btrfs_root_prom_exporter ) | No      | boolean         | No         | -          | Set this to true if you installed the os on btrfs. This will install a prometheus exporter for btrfs aswell as enable degraded booting.<br />                                                                       |
+| - [install_log2ram](#pve_clusters_pattern1_pve_host_vars_install_log2ram )                                   | No      | boolean         | No         | -          | This will install log2ram, moving logs to ram. If you are using the same disks for the os aswell as virtual machines, you should enable it,<br />to ensure proxmox doesnt freeze up because of vm disk usage.<br /> |
+| - [disable_ipmi](#pve_clusters_pattern1_pve_host_vars_disable_ipmi )                                         | No      | boolean         | No         | -          | If specified will disable the openipmi power managemend systemd service. This might fail on proxmox<br />hosts that dont support it and clutters up monitoring.<br />                                               |
+| - [wol](#pve_clusters_pattern1_pve_host_vars_wol )                                                           | No      | object          | No         | -          | Definition for wakeonlan network interface.                                                                                                                                                                         |
+| - [tso_gso_fixxes](#pve_clusters_pattern1_pve_host_vars_tso_gso_fixxes )                                     | No      | array of object | No         | -          | List of network interfaces that should have certain features turned off (for old network hardware).                                                                                                                 |
+| - [](#pve_clusters_pattern1_pve_host_vars_additionalProperties )                                             | No      | object          | No         | -          | -                                                                                                                                                                                                                   |
 
-##### <a name="pve_clusters_pattern1_pve_host_vars_pattern1"></a>12.1.4.1. Pattern Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > Proxmox hostname`
-> All properties whose name matches the regular expression
-```^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)$``` ([Test](https://regex101.com/?regex=%5E%28%3F%3A%5Ba-zA-Z0-9%5D%28%3F%3A%5Ba-zA-Z0-9-%5D%7B0%2C61%7D%5Ba-zA-Z0-9%5D%29%3F%29%24))
-must respect the following conditions
-
-**Title:** Proxmox hostname
-
-|                           |             |
-| ------------------------- | ----------- |
-| **Type**                  | `object`    |
-| **Required**              | No          |
-| **Additional properties** | Not allowed |
-
-| Property                                                                                                              | Pattern | Type            | Deprecated | Definition | Title/Description                                                                                                                                                                                                                                                                                                                                                            |
-| --------------------------------------------------------------------------------------------------------------------- | ------- | --------------- | ---------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| - [install_btrfs_root_prom_exporter](#pve_clusters_pattern1_pve_host_vars_pattern1_install_btrfs_root_prom_exporter ) | No      | boolean         | No         | -          | Set this to true if you installed the os on btrfs. This will install a prometheus exporter for btrfs aswell as enable degraded booting.<br />                                                                                                                                                                                                                                |
-| - [install_log2ram](#pve_clusters_pattern1_pve_host_vars_pattern1_install_log2ram )                                   | No      | boolean         | No         | -          | This will install log2ram, moving logs to ram. If you are using the same disks for the os aswell as virtual machines, you should enable it,<br />to ensure proxmox doesnt freeze up because of vm disk usage.<br />                                                                                                                                                          |
-| - [disable_ipmi](#pve_clusters_pattern1_pve_host_vars_pattern1_disable_ipmi )                                         | No      | boolean         | No         | -          | If specified will disable the openipmi power managemend systemd service. This might fail on proxmox<br />hosts that dont support it and clutters up monitoring.<br />                                                                                                                                                                                                        |
-| - [wol](#pve_clusters_pattern1_pve_host_vars_pattern1_wol )                                                           | No      | object          | No         | -          | Definition for wakeonlan network interface. Will use ethtool and post-up commands to keep it enabled on the nic.<br />You also might have to adjust settings in the bios, enable WoL there and also tune the power options for receiving the<br />magic package. Turn off settings like low power soft off, then you can use \`wakeonlan MAC_ADDR\` to boot your host.<br /> |
-| - [net_offloading_fixxes](#pve_clusters_pattern1_pve_host_vars_pattern1_net_offloading_fixxes )                       | No      | array of object | No         | -          | Disable pesky network offloaing features that break upon virtualization.                                                                                                                                                                                                                                                                                                     |
-
-###### <a name="pve_clusters_pattern1_pve_host_vars_pattern1_install_btrfs_root_prom_exporter"></a>12.1.4.1.1. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > Proxmox hostname > install_btrfs_root_prom_exporter`
+##### <a name="pve_clusters_pattern1_pve_host_vars_install_btrfs_root_prom_exporter"></a>12.1.4.1. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > install_btrfs_root_prom_exporter`
 
 |              |           |
 | ------------ | --------- |
@@ -369,7 +356,7 @@ must respect the following conditions
 
 **Description:** Set this to true if you installed the os on btrfs. This will install a prometheus exporter for btrfs aswell as enable degraded booting.
 
-###### <a name="pve_clusters_pattern1_pve_host_vars_pattern1_install_log2ram"></a>12.1.4.1.2. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > Proxmox hostname > install_log2ram`
+##### <a name="pve_clusters_pattern1_pve_host_vars_install_log2ram"></a>12.1.4.2. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > install_log2ram`
 
 |              |           |
 | ------------ | --------- |
@@ -379,7 +366,7 @@ must respect the following conditions
 **Description:** This will install log2ram, moving logs to ram. If you are using the same disks for the os aswell as virtual machines, you should enable it,
 to ensure proxmox doesnt freeze up because of vm disk usage.
 
-###### <a name="pve_clusters_pattern1_pve_host_vars_pattern1_disable_ipmi"></a>12.1.4.1.3. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > Proxmox hostname > disable_ipmi`
+##### <a name="pve_clusters_pattern1_pve_host_vars_disable_ipmi"></a>12.1.4.3. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > disable_ipmi`
 
 |              |           |
 | ------------ | --------- |
@@ -389,7 +376,7 @@ to ensure proxmox doesnt freeze up because of vm disk usage.
 **Description:** If specified will disable the openipmi power managemend systemd service. This might fail on proxmox
 hosts that dont support it and clutters up monitoring.
 
-###### <a name="pve_clusters_pattern1_pve_host_vars_pattern1_wol"></a>12.1.4.1.4. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > Proxmox hostname > wol`
+##### <a name="pve_clusters_pattern1_pve_host_vars_wol"></a>12.1.4.4. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > wol`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -397,16 +384,14 @@ hosts that dont support it and clutters up monitoring.
 | **Required**              | No               |
 | **Additional properties** | Any type allowed |
 
-**Description:** Definition for wakeonlan network interface. Will use ethtool and post-up commands to keep it enabled on the nic.
-You also might have to adjust settings in the bios, enable WoL there and also tune the power options for receiving the
-magic package. Turn off settings like low power soft off, then you can use `wakeonlan MAC_ADDR` to boot your host.
+**Description:** Definition for wakeonlan network interface.
 
-| Property                                                              | Pattern | Type   | Deprecated | Definition | Title/Description                                      |
-| --------------------------------------------------------------------- | ------- | ------ | ---------- | ---------- | ------------------------------------------------------ |
-| - [iface](#pve_clusters_pattern1_pve_host_vars_pattern1_wol_iface )   | No      | string | No         | -          | The interface for which wakeonlan should be activated. |
-| - [bridge](#pve_clusters_pattern1_pve_host_vars_pattern1_wol_bridge ) | No      | string | No         | -          | The bridge that gets the post-up definition for wol.   |
+| Property                                                     | Pattern | Type   | Deprecated | Definition | Title/Description                                      |
+| ------------------------------------------------------------ | ------- | ------ | ---------- | ---------- | ------------------------------------------------------ |
+| - [iface](#pve_clusters_pattern1_pve_host_vars_wol_iface )   | No      | string | No         | -          | The interface for which wakeonlan should be activated. |
+| - [bridge](#pve_clusters_pattern1_pve_host_vars_wol_bridge ) | No      | string | No         | -          | The bridge that gets the post-up definition for wol.   |
 
-###### <a name="pve_clusters_pattern1_pve_host_vars_pattern1_wol_iface"></a>12.1.4.1.4.1. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > Proxmox hostname > wol > iface`
+###### <a name="pve_clusters_pattern1_pve_host_vars_wol_iface"></a>12.1.4.4.1. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > wol > iface`
 
 |              |          |
 | ------------ | -------- |
@@ -415,7 +400,7 @@ magic package. Turn off settings like low power soft off, then you can use `wake
 
 **Description:** The interface for which wakeonlan should be activated.
 
-###### <a name="pve_clusters_pattern1_pve_host_vars_pattern1_wol_bridge"></a>12.1.4.1.4.2. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > Proxmox hostname > wol > bridge`
+###### <a name="pve_clusters_pattern1_pve_host_vars_wol_bridge"></a>12.1.4.4.2. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > wol > bridge`
 
 |              |          |
 | ------------ | -------- |
@@ -424,14 +409,14 @@ magic package. Turn off settings like low power soft off, then you can use `wake
 
 **Description:** The bridge that gets the post-up definition for wol.
 
-###### <a name="pve_clusters_pattern1_pve_host_vars_pattern1_net_offloading_fixxes"></a>12.1.4.1.5. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > Proxmox hostname > net_offloading_fixxes`
+##### <a name="pve_clusters_pattern1_pve_host_vars_tso_gso_fixxes"></a>12.1.4.5. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > tso_gso_fixxes`
 
 |              |                   |
 | ------------ | ----------------- |
 | **Type**     | `array of object` |
 | **Required** | No                |
 
-**Description:** Disable pesky network offloaing features that break upon virtualization.
+**Description:** List of network interfaces that should have certain features turned off (for old network hardware).
 
 |                      | Array restrictions |
 | -------------------- | ------------------ |
@@ -441,11 +426,11 @@ magic package. Turn off settings like low power soft off, then you can use `wake
 | **Additional items** | False              |
 | **Tuple validation** | See below          |
 
-| Each item of this array must be                                                                          | Description |
-| -------------------------------------------------------------------------------------------------------- | ----------- |
-| [net_offloading_fixxes items](#pve_clusters_pattern1_pve_host_vars_pattern1_net_offloading_fixxes_items) | -           |
+| Each item of this array must be                                                   | Description |
+| --------------------------------------------------------------------------------- | ----------- |
+| [tso_gso_fixxes items](#pve_clusters_pattern1_pve_host_vars_tso_gso_fixxes_items) | -           |
 
-###### <a name="pve_clusters_pattern1_pve_host_vars_pattern1_net_offloading_fixxes_items"></a>12.1.4.1.5.1. Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > Proxmox hostname > net_offloading_fixxes > net_offloading_fixxes items
+###### <a name="pve_clusters_pattern1_pve_host_vars_tso_gso_fixxes_items"></a>12.1.4.5.1. Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > tso_gso_fixxes > tso_gso_fixxes items
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -453,71 +438,26 @@ magic package. Turn off settings like low power soft off, then you can use `wake
 | **Required**              | No               |
 | **Additional properties** | Any type allowed |
 
-| Property                                                                                                          | Pattern | Type            | Deprecated | Definition | Title/Description                                                                                         |
-| ----------------------------------------------------------------------------------------------------------------- | ------- | --------------- | ---------- | ---------- | --------------------------------------------------------------------------------------------------------- |
-| - [iface](#pve_clusters_pattern1_pve_host_vars_pattern1_net_offloading_fixxes_items_iface )                       | No      | string          | No         | -          | The interface for which to disable specified network offloading features.                                 |
-| - [bridge](#pve_clusters_pattern1_pve_host_vars_pattern1_net_offloading_fixxes_items_bridge )                     | No      | string          | No         | -          | The bridge that gets the post-up definition for applying the fix that will receive the post-up directive. |
-| - [disable_features](#pve_clusters_pattern1_pve_host_vars_pattern1_net_offloading_fixxes_items_disable_features ) | No      | array of string | No         | -          | List of network features to disable for the interface.                                                    |
+| Property                                                                      | Pattern | Type   | Deprecated | Definition | Title/Description                                                                                |
+| ----------------------------------------------------------------------------- | ------- | ------ | ---------- | ---------- | ------------------------------------------------------------------------------------------------ |
+| - [iface](#pve_clusters_pattern1_pve_host_vars_tso_gso_fixxes_items_iface )   | No      | string | No         | -          | -                                                                                                |
+| - [bridge](#pve_clusters_pattern1_pve_host_vars_tso_gso_fixxes_items_bridge ) | No      | string | No         | -          | The bridge that gets the post-up definition for applying the fix (turning off network features). |
 
-###### <a name="pve_clusters_pattern1_pve_host_vars_pattern1_net_offloading_fixxes_items_iface"></a>12.1.4.1.5.1.1. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > Proxmox hostname > net_offloading_fixxes > net_offloading_fixxes items > iface`
-
-|              |          |
-| ------------ | -------- |
-| **Type**     | `string` |
-| **Required** | No       |
-
-**Description:** The interface for which to disable specified network offloading features.
-
-###### <a name="pve_clusters_pattern1_pve_host_vars_pattern1_net_offloading_fixxes_items_bridge"></a>12.1.4.1.5.1.2. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > Proxmox hostname > net_offloading_fixxes > net_offloading_fixxes items > bridge`
+###### <a name="pve_clusters_pattern1_pve_host_vars_tso_gso_fixxes_items_iface"></a>12.1.4.5.1.1. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > tso_gso_fixxes > tso_gso_fixxes items > iface`
 
 |              |          |
 | ------------ | -------- |
 | **Type**     | `string` |
 | **Required** | No       |
 
-**Description:** The bridge that gets the post-up definition for applying the fix that will receive the post-up directive.
-
-###### <a name="pve_clusters_pattern1_pve_host_vars_pattern1_net_offloading_fixxes_items_disable_features"></a>12.1.4.1.5.1.3. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > Proxmox hostname > net_offloading_fixxes > net_offloading_fixxes items > disable_features`
-
-|              |                   |
-| ------------ | ----------------- |
-| **Type**     | `array of string` |
-| **Required** | No                |
-
-**Description:** List of network features to disable for the interface.
-
-|                      | Array restrictions |
-| -------------------- | ------------------ |
-| **Min items**        | N/A                |
-| **Max items**        | N/A                |
-| **Items unicity**    | False              |
-| **Additional items** | False              |
-| **Tuple validation** | See below          |
-
-| Each item of this array must be                                                                                            | Description |
-| -------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| [disable_features items](#pve_clusters_pattern1_pve_host_vars_pattern1_net_offloading_fixxes_items_disable_features_items) | -           |
-
-###### <a name="pve_clusters_pattern1_pve_host_vars_pattern1_net_offloading_fixxes_items_disable_features_items"></a>12.1.4.1.5.1.3.1. Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > Proxmox hostname > net_offloading_fixxes > net_offloading_fixxes items > disable_features > disable_features items
+###### <a name="pve_clusters_pattern1_pve_host_vars_tso_gso_fixxes_items_bridge"></a>12.1.4.5.1.2. Property `Cloud Inventory > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > tso_gso_fixxes > tso_gso_fixxes items > bridge`
 
 |              |          |
 | ------------ | -------- |
 | **Type**     | `string` |
 | **Required** | No       |
 
-**Examples:**
-
-```json
-"tso"
-```
-
-```json
-"gso"
-```
-
-```json
-"gro"
-```
+**Description:** The bridge that gets the post-up definition for applying the fix (turning off network features).
 
 ## <a name="bind_zone_admin_email"></a>13. Property `Cloud Inventory > bind_zone_admin_email`
 
@@ -541,8 +481,8 @@ magic package. Turn off settings like low power soft off, then you can use `wake
 | **Type**     | `array of object` |
 | **Required** | No                |
 
-**Description:** Allows forwarding of specific zones to specific nameservers. This is useful for domains that are not owned by this cloud. For delegating sub zones 
-resort to the terraform dns provider alongside the kubernetes cluster that declares the parent zone in its inventory file.
+**Description:** Creates zone in bind and delegation ns records to the specified nameservers. This is very useful if you have other nameservers with 
+their own authoritative zones you want resolved within the cloud.
 
 |                      | Array restrictions |
 | -------------------- | ------------------ |

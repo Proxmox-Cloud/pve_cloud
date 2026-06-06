@@ -87,11 +87,10 @@ Then run the upgrade playbook `ansible-playbook -i YOUR-KUBESPRAY-INV.yaml pxc.c
 
 To define your own kubespray vars just create `group_vars/all` and `group_vars/k8s_cluster` directories alongside your kubespray inventory yaml file.
 
-Here are some interesting kubespray settings you might want to set (k8s_cluster vars):
+Here are some interesting kubespray settings you might want to set (`group_vars/k8s_cluster/k8s-cluster.yaml` vars):
 
 * increase amount of schedulable pods per node (if you have big nodes)
 ```yaml
-kube_network_node_prefix: 22
 kubelet_max_pods: 1024
 ```
 * for the workers you might want to set strict eviction limits. this is a good safe guard for node availability incase you have memory hungry deployments without any requests / limits defined. for that create the file `group_vars/kube_node.yml`
@@ -100,22 +99,21 @@ kubelet_max_pods: 1024
 kube_reserved: true
 # these two need to be as per kubespray sample var documentation
 kube_reserved_cgroups_for_service_slice: kube.slice
-kube_reserved_cgroups: "/{{ kube_reserved_cgroups_for_service_slice }}"
-
+kube_reserved_cgroups: "{{ kube_reserved_cgroups_for_service_slice }}"
 # define reserved memory for kubernetes processes
 kube_memory_reserved: 512Mi
 
 system_reserved: true
 # these two need to be as per kubespray sample var documentation
 system_reserved_cgroups_for_service_slice: system.slice
-system_reserved_cgroups: "/{{ system_reserved_cgroups_for_service_slice }}"
-
+system_reserved_cgroups: "{{ system_reserved_cgroups_for_service_slice }}"
 # limit for system service (like networking)
 system_memory_reserved: 1Gi
 
 # extra limits calculated on top when evictions will be initialized
 eviction_hard:
   memory.available: 3Gi # should be kube reserved + system reserved + buffer
+
 ```
 => this, in addition to the `pxc.cloud.` role, will allow k8s nodes to run even if we got memory hungry, ram hogging deployments. eviction hard and reservations alone are not enough, in oom scenarios it will cause the networkd service to stop working. This role is automatically executed via the `pxc.cloud.sync_kubespray` playbook.
 
@@ -126,4 +124,3 @@ If you want to expose your kubenetes clusters controlplane to integrate with ext
 Adding SANs there will also configure the pve cloud haproxy to route any control plane traffic (6443) on its external ip to respecive cluster.
 
 DNS Records for these SANs have to be created manually (for internal and external DNS servers), for that use terraforms dns, route53 and ionos provider.
-

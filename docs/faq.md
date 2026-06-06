@@ -1,8 +1,14 @@
 # FAQ
 
+## Discovery quirks
+
+The collection uses a lot of discovery mechanisms in the playbooks aswell as the terraform modules. For setup running everything once is not enough at the moment.
+
+If some services (monitoring, alerting, multi cloud) does not get picked up, you need to run the playbooks a second time aswell as apply terraform twice.
+
 ## Patroni recovery
 
-If one patroni node fails, abrupt restart etc., delete /opt/ha-postgres data dir and restart the patroni service.
+If one patroni node fails, abrupt restart etc., delete /opt/ha-postgres data dir contents (`rf -rf *` inside the folder) and restart the patroni service.
 
 ## Removing pve cluster host
 
@@ -17,6 +23,22 @@ Abrupt kea restarts might corrupt the lock file:
 `ls -ld /run/kea/kea-dhcp4.kea-dhcp4.pid`
 
 Lock file might block _kea user, either change systemd service to root user or try delete.
+
+## Ceph CSI Recovery
+
+If cluster nodes get out of sync and are restarted while the control plane is offline for example you might run into errors like this:
+
+`MountVolume.MountDevice failed for volume "pvc-cd3feb8d-02d5-4d6e-a216-69388fbad41d" : rpc error: code = Aborted desc = an operation with the given Volume ID 0001-0024-99b8185b-46d1-4ed6-be09-6f24c48665da-0000000000000002-da1724f7-dc8f-4aa6-aed7-cfe7e19631ff already exists`
+
+In this case once you startet all your nodes, you can run `kubectl delete --all volumeattachments` to reset all attachments, after rebooting your worker nodes the pods should be able to mount and start again!
+
+To avoid this all together you should never shut down control plane and workers at the same time, always shutdown workers first and only then the masters/control plane. If you have slow hardware you should consider passing `--grace-period=300` to your `kubectl drain` command.
+
+## Containerd 
+
+If you dont drain your node before rebooting it you might run into `failed to remove sandbox root directory \"/var/lib/containerd/io.containerd.grpc.v1.cri/sandboxes/f6fcf2d2e3854456b0fecb676e3b9085df918e132fbd96511a6827978628bee4\": unlinkat /var/lib/containerd/io.containerd.grpc.v1.cri/sandboxes/f6fcf2d2e3854456b0fecb676e3b9085df918e132fbd96511a6827978628bee4/resolv.conf: operation not permitted`
+
+To fix this run `sudo chattr -i /var/lib/containerd/io.containerd.grpc.v1.cri/sandboxes/*/resolv.conf` on the node to allow it unmount the unused conf.
 
 ## Renaming network interfaces
 
@@ -55,3 +77,52 @@ iface $IFACE inet static
     post-up /usr/sbin/ethtool -s $IFACE wol g
     ...
 ```
+
+## Disks
+
+Generally you need enterprise grade ssds with plp to properly use ceph and zfs, however there are a few workarounds to making consumer ssds work aswell.
+
+### Hardware raid
+
+For a hardware raid you usually just want lvm + lvm thin for virtual machine disks. 
+
+### Software raid
+
+ZFS is the general preferred choice for proxmox as its more integrated. On dedicated systems you might run into buggy proxmox installers, and under extreme circumstances even rescue systems that are incredibly limited and dont support the necessary os features to setup zfs.
+
+The absolute minimum setup every dedicated hosting provider should provide is a debian installer you can run through. In this case you can setup a btrfs raid 1/10 for your os and vm disks. 
+
+## Btrfs
+
+If you choose btrfs for your os and vm disks, be it for performance reasons or limitations in your installer you need to enable degraded boot, especially on a dedicated server, where you dont have access to the grub boot command line.
+
+Add `rootflags=degraded` to `GRUB_CMDLINE_LINUX_DEFAULT="... rootflags=degraded"` in `/etc/default/grub` and run `update-grub`, enable monitoring by setting `install_btrfs_root_prom_exporter` in your [pve cloud inventory host vars](schemas/pve_cloud_inv_schema.md).
+
+To recover after a disk outage run `btrfs scrub start /`, this also cleans up errors from monitoring. To see live stats run `btrfs device stats /`.
+
+### Consumer SSDs
+
+The big problem with consumer ssds and ceph is that fsync calls only return once data is written through the cache of the ssd, since it has no PLP (Powerloss prevention).
+
+To still get somewhat useful performance out of your disks you need to use the qemu `cache=unsafe` option. This option doesn't exist for LXCs, as a workaround use a dedicated local lvm-thin disk and rely on proxmox backup server and even distribution accross nodes for failover.
+
+For kubernetes csi there is rbd-nbd, wich also supports unsafe caching and [client caching options](https://docs.ceph.com/en/squid/rbd/rbd-config-ref/). Rbd-nbd is in alpha.
+
+## Kubespray certificates
+
+Newest proxmox cloud versions deploy kubernetes clusters with automatic cert renewal jobs turned on (control plane). If you use the `pvcli print-kubeconfig ...` you will receive a kubeconfig that uses expiring certificates. You would have to run the command again if it expires.
+
+To get a non expiring access to your cluster you have to create a dedicated service account and fetch an access token from that, using that to authenticate.
+
+Older versions / to manually refresh you need to login to each master node and run the following commands:
+
+```bash
+/usr/local/bin/k8s-certs-renew.sh
+# then run the `pvcli print-kubeconfig ...` command again
+```
+
+## VM communication problems
+
+If communication between or to your virtual machines is incosistent (slow, lots of interrupts), you might have issues with certain network offloading features. use `ethtool -K NIC_IFACE FEAT_X off FEAT_Y off` (features like tso, gso, gro).
+
+To make them persistent checkout the [pve cloud inventory schema](schemas/pve_cloud_inv_schema.md#pve_clusters_pattern1_pve_host_vars_net_offloading_fixxes).

@@ -1,10 +1,8 @@
 # Test Driven Development
 
-For development you will need a dedicated proxmox cluster (a small one will suffice), and another dedicated vlan. The testing suite deploys and configures a proxmox cloud with locally build artifacts.
+For development you will need a dedicated proxmox cluster with one or more hosts. The testing suite deploys and configures a proxmox cloud with locally build artifacts.
 
-## Avahi mdns
-
-Make you test proxmox cluster also discoverable via avahi as described in the [bootstrap section](bootstrap.md) and setup reflector/repeaters as required.
+The proxmox cluster you use for testing, needs to be accessible directly and not via jump hosts. Although the testing config supports setting a jump host this is strictly for testing the functions, the tests themselfes still need direct access and dont support proxying.
 
 ## E2E Architecture
 
@@ -53,16 +51,15 @@ test-env-conf.yaml
 ```
 
 1. install build essentails `sudo apt install build-essential python3-dev` (or your distros equivalent)
-2. install a fitting kubespray version `ansible-galaxy collection install git+https://github.com/kubernetes-sigs/kubespray.git,vFROM-VERSION-TABLE`
-3. install ansible as described in the [bootstrap section](bootstrap.md) and also run the control node setup
-4. launch local registries for watchdog rebuilds and fast deployment
+2. install ansible as described in the [bootstrap section](bootstrap.md) and also run the control node setup
+3. launch local registries for watchdog rebuilds and fast deployment
 ```bash
-docker run -d -p 5000:5000 --name pxc-local-registry registry:3 # local docker registry
+docker run -d -p 5000:5000 --name pxc-local-registry -e REGISTRY_STORAGE_DELETE_ENABLED=true registry:3 # local docker registry
 docker run -d -p 8088:8080 --name pxc-local-pypi pypiserver/pypiserver:latest run -P . -a . # local pypi registry without auth
 docker run -d --name pxc-local-redis -p 6379:6379 redis:latest # redis broker for triggering dependent builds
 ```
-5. run `tddog --recursive` from your top level created `pve-cloud` folder. This will monitor src folders, rebuild artifacts and their dependants and also run `pip install -e .` on libraries that are needed locally.
-6. run the e2e tests:
+4. run `tddog --recursive` from your top level created `pve-cloud` folder. This will monitor src folders, rebuild artifacts and their dependants and also run `pip install -e .` on libraries that are needed locally.
+5. run the e2e tests:
 ```bash
 pytest -s tests/e2e/ --skip-cleanup 
 

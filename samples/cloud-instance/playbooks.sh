@@ -8,13 +8,13 @@ ansible-playbook pxc.cloud.setup_control_node
 # requires that you made one proxmox host discoverable via avahi first
 ansible-playbook -i cloud-inv.yaml pxc.cloud.setup_pve_clusters
 
-# create dhcp lxcs and setup
-ansible-playbook -i dhcp-inv.yaml pxc.cloud.sync_lxcs
-ansible-playbook -i dhcp-inv.yaml pxc.cloud.setup_kea
-
 # bind cloud nameservers
 ansible-playbook -i bind-inv.yaml pxc.cloud.sync_lxcs
 ansible-playbook -i bind-inv.yaml pxc.cloud.setup_bind
+
+# create dhcp lxcs and setup
+ansible-playbook -i dhcp-inv.yaml pxc.cloud.sync_lxcs
+ansible-playbook -i dhcp-inv.yaml pxc.cloud.setup_kea
 
 # postgres for storing cloud configs and secrets used by ansible and terraform states
 ansible-playbook -i postgres-inv.yaml pxc.cloud.sync_lxcs
