@@ -3,6 +3,12 @@
   roles:
     - slurp_cluster_secrets
 
+- name: Create tls px_cloud_secrets
+  hosts: pxc-executor-host
+  roles:
+    - parse_cluster_secrets
+    - bdd_server_tls_certs
+
 - name: Install requirements on debian 12 lxc/vm
   hosts: lxcs:qemus
   vars:
@@ -11,11 +17,6 @@
   roles:
     - parse_cluster_secrets
   tasks:
-    - name: run bdd tls cert gen
-      include_role:
-        name: bdd_server_tls_certs
-      delegate_to: "pxc-executor-host"
-      
     - name: install core apt packages
       ansible.builtin.apt:
         name: 
