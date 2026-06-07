@@ -5,6 +5,7 @@ from ansible_collections.pxc.cloud.plugins.module_utils.identity import \
     stack_vm_get_blake
 from ansible_collections.pxc.cloud.plugins.module_utils.inventory import (
     add_qemu_to_inv, init_plugin)
+from pve_cloud.lib.ssh import get_ssh_asyncio_loop
 
 
 class InventoryModule(BaseInventoryPlugin):
@@ -33,21 +34,26 @@ class InventoryModule(BaseInventoryPlugin):
         super(InventoryModule, self).parse(inventory, loader, path, cache)
         yaml_data = loader.load_from_file(path)
 
-        vm_vars_blake, stack_vms, online_pve_hosts, cluster_map = asyncio.run(
-            init_plugin(
-                loader,
-                inventory,
-                yaml_data,
+        with get_ssh_asyncio_loop() as loop:
+            vm_vars_blake, stack_vms, online_pve_hosts, cluster_map = (
+                loop.run_until_complete(
+                    init_plugin(
+                        loader,
+                        inventory,
+                        yaml_data,
+                    )
+                )
             )
-        )
 
-        target_cluster = cluster_map[yaml_data["target_pve"]]
+            target_cluster = cluster_map[yaml_data["target_pve"]]
 
-        self.set_global_vars(yaml_data, inventory)
+            self.set_global_vars(yaml_data, inventory)
 
-        inventory.add_group("qemus")
+            inventory.add_group("qemus")
 
-        asyncio.run(self.stack_qemus(inventory, stack_vms, target_cluster))
+            loop.run_until_complete(
+                self.stack_qemus(inventory, stack_vms, target_cluster)
+            )
 
         # set / overwrite kubespray specific vars for host
         for vm in stack_vms:

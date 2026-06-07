@@ -6,6 +6,7 @@ from ansible_collections.pxc.cloud.plugins.module_utils.identity import \
     stack_vm_get_blake
 from ansible_collections.pxc.cloud.plugins.module_utils.inventory import (
     add_lxc_to_inv, init_plugin)
+from pve_cloud.lib.ssh import get_ssh_asyncio_loop
 
 display = Display()
 
@@ -39,22 +40,23 @@ class InventoryModule(BaseInventoryPlugin):
         super(InventoryModule, self).parse(inventory, loader, path, cache)
         yaml_data = loader.load_from_file(path)
 
-        vm_vars_blake, stack_vms, online_pve_hosts, cluster_map = asyncio.run(
-            init_plugin(loader, inventory, yaml_data)
-        )
-        display.v("vm_vars_blake", vm_vars_blake)
-        self.set_global_vars(yaml_data, inventory)
-
-        # build lxcs inventory
-        inventory.add_group("lxcs")
-
-        display.v("running stack includes")
-        asyncio.run(
-            self.stack_lxcs(
-                inventory, online_pve_hosts, stack_vms, yaml_data["target_pve"]
+        with get_ssh_asyncio_loop() as loop:
+            vm_vars_blake, stack_vms, online_pve_hosts, cluster_map = (
+                loop.run_until_complete(init_plugin(loader, inventory, yaml_data))
             )
-        )
-        display.v("done running stack includes")
+            display.v("vm_vars_blake", vm_vars_blake)
+            self.set_global_vars(yaml_data, inventory)
+
+            # build lxcs inventory
+            inventory.add_group("lxcs")
+
+            display.v("running stack includes")
+            loop.run_until_complete(
+                self.stack_lxcs(
+                    inventory, online_pve_hosts, stack_vms, yaml_data["target_pve"]
+                )
+            )
+            display.v("done running stack includes")
 
         # set host specific vars
         for vm in stack_vms:
