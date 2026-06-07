@@ -7,7 +7,7 @@ from ansible_collections.pxc.cloud.plugins.module_utils.identity import \
     stack_vm_get_blake
 from ansible_collections.pxc.cloud.plugins.module_utils.inventory import (
     add_qemu_to_inv, init_plugin)
-from pve_cloud.lib.ssh import connect_host
+from pve_cloud.lib.ssh import connect_host, get_ssh_asyncio_loop
 
 
 class InventoryModule(BaseInventoryPlugin):
@@ -65,46 +65,47 @@ class InventoryModule(BaseInventoryPlugin):
         super(InventoryModule, self).parse(inventory, loader, path, cache)
         yaml_data = loader.load_from_file(path)
 
-        # generic init function
-        vm_vars_blake, stack_vms, _, cluster_map = asyncio.run(
-            init_plugin(loader, inventory, yaml_data)
-        )
+        with get_ssh_asyncio_loop() as loop:
+            # generic init function
+            vm_vars_blake, stack_vms, _, cluster_map = loop.run_until_complete(
+                init_plugin(loader, inventory, yaml_data)
+            )
 
-        target_cluster = cluster_map[yaml_data["target_pve"]]
+            target_cluster = cluster_map[yaml_data["target_pve"]]
 
-        stack_fqdn = f"{yaml_data['stack_name']}.{target_cluster.cluster_vars['pve_cloud_domain']}"
+            stack_fqdn = f"{yaml_data['stack_name']}.{target_cluster.cluster_vars['pve_cloud_domain']}"
 
-        self.set_global_vars(yaml_data, inventory)
+            self.set_global_vars(yaml_data, inventory)
 
-        # kubespray groups
-        inventory.add_group("kube_control_plane")
-        inventory.add_group("etcd")
-        inventory.add_group("kube_node")
-        inventory.add_group("calico_rr")
-        inventory.add_group("k8s_cluster")
-        inventory.add_child("k8s_cluster", "kube_control_plane")
-        inventory.add_child("k8s_cluster", "kube_node")
-        inventory.add_child("k8s_cluster", "calico_rr")
+            # kubespray groups
+            inventory.add_group("kube_control_plane")
+            inventory.add_group("etcd")
+            inventory.add_group("kube_node")
+            inventory.add_group("calico_rr")
+            inventory.add_group("k8s_cluster")
+            inventory.add_child("k8s_cluster", "kube_control_plane")
+            inventory.add_child("k8s_cluster", "kube_node")
+            inventory.add_child("k8s_cluster", "calico_rr")
 
-        # genereate or get cert key for kubeadm cluster bootstrap
-        inventory.set_variable(
-            "k8s_cluster",
-            "kubeadm_certificate_key",
-            self.get_or_create_kubeadm_cert_key(target_cluster, stack_fqdn),
-        )
+            # genereate or get cert key for kubeadm cluster bootstrap
+            inventory.set_variable(
+                "k8s_cluster",
+                "kubeadm_certificate_key",
+                self.get_or_create_kubeadm_cert_key(target_cluster, stack_fqdn),
+            )
 
-        # set additional san for control plane, direct access via dns master record set and control plane record via haproxy
-        extra_sans = [f"masters-{stack_fqdn}", "control-plane-" + stack_fqdn]
+            # set additional san for control plane, direct access via dns master record set and control plane record via haproxy
+            extra_sans = [f"masters-{stack_fqdn}", "control-plane-" + stack_fqdn]
 
-        # controlplane can be optionally exposed externally under special san
-        if "extra_control_plane_sans" in yaml_data:
-            extra_sans.extend(yaml_data["extra_control_plane_sans"])
+            # controlplane can be optionally exposed externally under special san
+            if "extra_control_plane_sans" in yaml_data:
+                extra_sans.extend(yaml_data["extra_control_plane_sans"])
 
-        inventory.set_variable(
-            "k8s_cluster", "supplementary_addresses_in_ssl_keys", extra_sans
-        )
+            inventory.set_variable(
+                "k8s_cluster", "supplementary_addresses_in_ssl_keys", extra_sans
+            )
 
-        asyncio.run(self.stack_qemus(inventory, stack_vms, target_cluster))
+            loop.run_until_complete(self.stack_qemus(inventory, stack_vms, target_cluster))
 
         # set / overwrite kubespray specific vars for host
         for vm in stack_vms:
