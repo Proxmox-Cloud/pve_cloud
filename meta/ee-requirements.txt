@@ -1,4 +1,4 @@
-py-pve-cloud==3.1.4rc3
+py-pve-cloud==3.1.4rc4
 pve-cloud-schemas==3.1.4
 
 petname==2.6
