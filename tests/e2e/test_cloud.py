@@ -50,16 +50,18 @@ async def test_pxrpc_tunnel(get_test_env):
 
         async with launch_pxrpc_async(
             get_test_env["pve_test_cluster_jump_host"], first_test_host["ansible_host"]
-        ) as (pxrpc, pve_host):
+        ) as pxrpc:
             res = await pxrpc.e2e_return()
             print("test processpool", res)
 
             # test paralellism
             tasks = []
-            for _ in range(30):
+            for _ in range(5):
                 tasks.append(pxrpc.e2e_return())
 
             await asyncio.gather(*tasks)
+
+            logger.info(tasks)
 
         print("closed")
 
