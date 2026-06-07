@@ -1,16 +1,9 @@
 - name: Setup node running ansible (local machine)
   hosts: localhost
-  tasks:
-    - set_fact:
-        pip_extra_args: "{{ '--index-url http://' ~ test_repos_ip ~ ':8088/simple --trusted-host ' ~ test_repos_ip if test_repos_ip is defined else '' }}"
-    
-    - debug:
-        var: pip_extra_args
-      
+  tasks:     
     - name: Install pve cloud collection requirements
       ansible.builtin.pip:
         requirements: "{{ playbook_dir | dirname }}/meta/ee-requirements.txt"
-        extra_args: "{{ pip_extra_args }}"
 
     - name: install packages for caching
       become: true

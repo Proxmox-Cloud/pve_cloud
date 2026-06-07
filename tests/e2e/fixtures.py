@@ -84,19 +84,9 @@ def setup_control_node(request, get_test_env):
 
         extra_vars = {}
         tdd_ip = get_tdd_ip()
-        if tdd_ip:
-            extra_vars["test_repos_ip"] = tdd_ip
 
-        # run the main playbook
-        logger.info("run control node setup")
-        setup_run = ansible_runner.run(
-            project_dir=os.getcwd(),
-            playbook="playbooks/setup_control_node.yaml",
-            verbosity=request.config.getoption("--ansible-verbosity"),
-            extravars=extra_vars,
-        )
+        # we dont call the setup_control_node playbook as this will break tdd packages
 
-        assert setup_run.rc == 0
         first_test_host = get_test_env["pve_test_cluster_hosts"][
             next(iter(get_test_env["pve_test_cluster_hosts"]))
         ]
@@ -140,7 +130,7 @@ def setup_control_node(request, get_test_env):
 
 
 @cloud_fixture("hosts")
-def setup_pve_hosts(request, get_test_env, setup_control_node):
+def setup_pve_hosts(request, get_test_env):
     logger.info("setup cloud")
 
     # run the pve cluster setup on the test environment
