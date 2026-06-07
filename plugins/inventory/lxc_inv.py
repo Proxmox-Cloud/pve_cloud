@@ -41,8 +41,8 @@ class InventoryModule(BaseInventoryPlugin):
         yaml_data = loader.load_from_file(path)
 
         with get_ssh_asyncio_loop() as loop:
-            vm_vars_blake, stack_vms, online_pve_hosts, cluster_map = loop.run_until_complete(
-                init_plugin(loader, inventory, yaml_data)
+            vm_vars_blake, stack_vms, online_pve_hosts, cluster_map = (
+                loop.run_until_complete(init_plugin(loader, inventory, yaml_data))
             )
             display.v("vm_vars_blake", vm_vars_blake)
             self.set_global_vars(yaml_data, inventory)

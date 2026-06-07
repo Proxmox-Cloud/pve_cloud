@@ -105,7 +105,9 @@ class InventoryModule(BaseInventoryPlugin):
                 "k8s_cluster", "supplementary_addresses_in_ssl_keys", extra_sans
             )
 
-            loop.run_until_complete(self.stack_qemus(inventory, stack_vms, target_cluster))
+            loop.run_until_complete(
+                self.stack_qemus(inventory, stack_vms, target_cluster)
+            )
 
         # set / overwrite kubespray specific vars for host
         for vm in stack_vms:

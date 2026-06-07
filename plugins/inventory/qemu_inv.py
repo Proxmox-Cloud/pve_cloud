@@ -35,11 +35,13 @@ class InventoryModule(BaseInventoryPlugin):
         yaml_data = loader.load_from_file(path)
 
         with get_ssh_asyncio_loop() as loop:
-            vm_vars_blake, stack_vms, online_pve_hosts, cluster_map = loop.run_until_complete(
-                init_plugin(
-                    loader,
-                    inventory,
-                    yaml_data,
+            vm_vars_blake, stack_vms, online_pve_hosts, cluster_map = (
+                loop.run_until_complete(
+                    init_plugin(
+                        loader,
+                        inventory,
+                        yaml_data,
+                    )
                 )
             )
 
@@ -49,7 +51,9 @@ class InventoryModule(BaseInventoryPlugin):
 
             inventory.add_group("qemus")
 
-            loop.run_until_complete(self.stack_qemus(inventory, stack_vms, target_cluster))
+            loop.run_until_complete(
+                self.stack_qemus(inventory, stack_vms, target_cluster)
+            )
 
         # set / overwrite kubespray specific vars for host
         for vm in stack_vms:
