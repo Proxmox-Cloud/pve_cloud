@@ -42,6 +42,7 @@
         name: 
           - "py-pve-cloud=={{ py_pve_cloud_version }}"
           - "aiofiles==25.1.0" # fast slurp
+          - "kubernetes==34.1.0" # ansible k8s community
         virtualenv: /root/.pxc-venv
         virtualenv_command: python3 -m venv
         extra_args: "{{ pip_extra_args }}"
@@ -49,8 +50,47 @@
     - name: switch to pxc venv
       ansible.builtin.set_fact:
         ansible_python_interpreter: /root/.pxc-venv/bin/python
+  
+    # install helm cli /kubectl for deploying initial charts
+    - name: install check kubectl
+      ansible.builtin.stat:
+        path: "/usr/local/bin/kubectl"
+      register: kubectl_binary
+
+    - name: Download kubectl binary to /usr/local/bin
+      ansible.builtin.get_url:
+        url: https://dl.k8s.io/release/v1.36.0/bin/linux/{{ arch_mapping[ansible_architecture] }}/kubectl
+        dest: /usr/local/bin/kubectl
+        mode: '0755'
+      when: not kubectl_binary.stat.exists
+
+    - name: install check
+      ansible.builtin.stat:
+        path: "/usr/local/bin/helm"
+      register: helm_binary
+
+    - name: download and extract helm
+      ansible.builtin.unarchive:
+        src: "https://get.helm.sh/helm-v4.2.0-linux-{{ arch_mapping[ansible_architecture] }}.tar.gz"
+        dest: "/tmp"
+        remote_src: yes
+        creates: "/tmp/linux-{{ arch_mapping[ansible_architecture] }}/helm"
+      when: not helm_binary.stat.exists
+
+    - name: move to usr bin folder
+      ansible.builtin.copy:
+        src: "/tmp/linux-{{ arch_mapping[ansible_architecture] }}/helm"
+        dest: "/usr/local/bin/helm"
+        mode: '0755'
+        remote_src: true
+      when: not helm_binary.stat.exists
 
   vars:
+    # for selecting helm version to dl
+    arch_mapping:
+      x86_64: "amd64"
+      aarch64: "arm64"
+
     # only monitory systemd services
     systemd_exporter_unit_include: '.*\\.service'
     smartctl_exporter_system_user: root
@@ -339,7 +379,8 @@
         where:
           secret_type: "vlogs-cluster-journald"
       register: vlogs_journald_ds # discovery secrets
-
+      when: postgres_connection_check is succeeded
+      
     - name: install vector journald exporter
       include_role:
         name: vector_journald_exporter

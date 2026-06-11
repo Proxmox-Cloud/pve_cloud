@@ -1,11 +1,9 @@
 # pve cloud custom definitions
 
-# will trigger kubespray caching mechanism as soon as the cache stack is imported
-download_run_once: "{{ 'cache_stack' in groups }}"
-
-download_cache_dir: /mnt/kubespray_cache
+# will trigger kubespray caching mechanism as soon as the mirror vm is deployed
+# download_run_once and download_localhost kubespray cache control vars are set in sync_kubespray playbook
+download_cache_dir: "{{ lookup('env', 'HOME') }}/.cache/kubespray"
 
 # use docker on localhost and containerd on nodes, need to set both vars for it to work ...?
-download_localhost: "{{ 'cache_stack' in groups and lookup('pipe', 'command -v docker >/dev/null && echo yes || echo no') == 'yes' }}"
 container_manager_on_localhost: "docker"
 image_command_tool_on_localhost: "docker"

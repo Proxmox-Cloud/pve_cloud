@@ -38,6 +38,16 @@
     dest: "/opt/images/{{ qemu_image_url.split('/')[-1] }}"
   when: not image_file.stat.exists
 
+- name: Cloud mirror discovery
+  delegate_to: pxc-executor-host
+  alchemy_read:
+    pg_conn_str: "{{ pg_conn_str }}"
+    table: px_cloud_secrets
+    where:
+      cloud_domain: "{{ pve_cloud_domain }}"
+      secret_name: "cloud-mirror-vm"
+  register: mirror_discovery_secret
+
 - name: Create user.yaml snippet
   template:
     src: "user-config.yaml.j2"

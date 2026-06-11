@@ -224,29 +224,39 @@
         name: bind9
         state: restarted 
 
-# kubespray!
-# todo: caching should be replaced by something like rsync or ceph s3 sync instead
-# right now is not compatible with lxcs
-- name: Setup kubespray cache on dev machine
+- name: Rsync cache from mirror-vm if discovered
   hosts: localhost
-  tags:
-    - kubespray
   tasks:
-    # first we need to determine if we are inside an lxc. mounting an nfs can lead to problems.
-    - name: Slurp proc 1 env
-      become: true
-      slurp: 
-        src: /proc/1/environ
-      register: env_1_raw
-    
-    - name: Container env check
-      set_fact:
-        env_1_is_container: "{{ (env_1_raw.content | b64decode).split('\u0000') | select('match', '^container=') | list | length > 0 }}"
+    - name: Cloud mirror discovery
+      delegate_to: pxc-executor-host
+      alchemy_read:
+        pg_conn_str: "{{ pg_conn_str }}"
+        table: px_cloud_secrets
+        where:
+          cloud_domain: "{{ pve_cloud_domain }}"
+          secret_name: "cloud-mirror-vm"
+      register: mirror_discovery_secret
 
-    - name: Mount Cache NFS
-      include_role:
-        name: nfs_cache_mount
-      when: not env_1_is_container
+    - name: setup local cache
+      when: mirror_discovery_secret.rowcount != 0
+      block:
+        - name: create local cache dir
+          ansible.builtin.file:
+            path: "{{ lookup('env', 'HOME') }}/.cache/kubespray"
+            state: directory
+            mode: '0755'
+        
+        - name: rsync cache from mirror vm
+          command: rsync -avz admin@{{ mirror_discovery_secret.query_result[0]['secret_data']['mirror_vm_addr'] }}:/home/admin/.cache/kubespray/ {{ lookup('env', 'HOME') }}/.cache/kubespray/
+        
+        - name: set kubespray cache vars
+          ansible.builtin.set_fact:
+            download_run_once: true
+            # executed pipe always on localhost, if docker installed we use docker caching funcs
+            download_localhost: "{{ lookup('pipe', 'command -v docker >/dev/null && echo yes || echo no') == 'yes' }}"
+          loop: "{{ groups['all'] + ['localhost'] }}"
+          delegate_to: "{{ item }}"
+          delegate_facts: true
 
 # ! warning this is incomplete and does not 100% work like original ansible mechanisms, it assumes
 # the same structure of the sample kubespray inventory vars
@@ -277,33 +287,25 @@
     - kubespray
   ansible.builtin.import_playbook: kubernetes_sigs.kubespray.cluster
 
-- name: Unmount cache dir and kill tunnel 
+- name: Rsync cache from mirror-vm if discovered
   hosts: localhost
-  tags:
-    - kubespray
   tasks:
-    - name: unmount old cache dir if mounted
-      become: true
-      mount:
-        path: /mnt/kubespray_cache
-        src: localhost:/srv/kubespray_cache
-        fstype: nfs4
-        state: unmounted
-      when: "'cache_stack' in groups"
+    - name: Cloud mirror discovery
+      delegate_to: pxc-executor-host
+      pxc.cloud.alchemy_read:
+        pg_conn_str: "{{ pg_conn_str }}"
+        table: px_cloud_secrets
+        where:
+          cloud_domain: "{{ pve_cloud_domain }}"
+          secret_name: "cloud-mirror-vm"
+      register: mirror_discovery_secret
 
-    - name: kill old tunnel if running
-      shell: |
-        if [ -f /tmp/kc_tunnel.pid ]; then
-            kill $(cat /tmp/kc_tunnel.pid) 2>/dev/null || true
-            rm -f /tmp/kc_tunnel.pid
-        fi
-      ignore_errors: yes
-      when: "'cache_stack' in groups"
+    - name: rsync cache back to mirror vm
+      when: mirror_discovery_secret.rowcount != 0
+      command: rsync -avz {{ lookup('env', 'HOME') }}/.cache/kubespray/ admin@{{ mirror_discovery_secret.query_result[0]['secret_data']['mirror_vm_addr'] }}:/home/admin/.cache/kubespray/ 
 
-- name: Allow locally hosted registry
+- name: Allow locally hosted registry tdd
   hosts: k8s_cluster
-  tags:
-    - kubespray
   tasks:
     - name: Create containerd directory
       file:
@@ -331,7 +333,7 @@
 
 # Acme certificates
 - name: Acme 
-  hosts: "pxc-executor-host"
+  hosts: pxc-executor-host
   tags:
     - acme
   roles:
@@ -365,7 +367,7 @@
       run_once: true
 
 - name: Deploy charts
-  hosts: localhost
+  hosts: pxc-executor-host
   tags:
     - deployments
   roles:
@@ -390,6 +392,7 @@
     - name: build volume snapshot crds
       ansible.builtin.shell: "kubectl kustomize {{ playbook_dir }}/snapshot-crd"
       register: snapshot_manifests
+      delegate_to: localhost
 
     - debug:
         var: snapshot_manifests

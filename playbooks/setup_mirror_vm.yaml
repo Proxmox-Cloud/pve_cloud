@@ -1,0 +1,267 @@
+- name: Slurp screts from pve
+  hosts: target_pve
+  roles:
+    - slurp_cluster_secrets
+
+- name: Configure mirror vm
+  hosts: qemus
+  roles:
+    - parse_cluster_secrets
+  become: true
+  vars:
+    # for selecting helm version to dl
+    arch_mapping:
+      x86_64: "amd64"
+      aarch64: "arm64"
+  tasks:
+       
+    # # setup docker
+    # - name: Ensure required packages are installed
+    #   ansible.builtin.apt:
+    #     name:
+    #       - ca-certificates
+    #       - curl
+    #     update_cache: yes
+
+    # - name: Download Docker's official GPG key
+    #   ansible.builtin.get_url:
+    #     url: https://download.docker.com/linux/debian/gpg
+    #     dest: /etc/apt/keyrings/docker.asc
+    #     mode: '0644'
+
+    # - name: Add Docker repository (Deb822 format)
+    #   ansible.builtin.deb822_repository:
+    #     name: docker
+    #     types: [deb]
+    #     uris: [https://download.docker.com/linux/debian]
+    #     suites: ["{{ ansible_facts['distribution_release'] }}"]
+    #     components: [stable]
+    #     architectures: ["{{ arch_mapping[ansible_architecture] }}"]
+    #     signed_by: /etc/apt/keyrings/docker.asc
+    #     state: present
+
+    # - name: Update apt cache
+    #   ansible.builtin.apt:
+    #     name:
+    #       - docker-ce 
+    #       - docker-ce-cli 
+    #       - containerd.io 
+    #       - docker-buildx-plugin 
+    #       - docker-compose-plugin
+    #     update_cache: yes
+
+    - name: Install apt based mirror tools
+      ansible.builtin.apt:
+        name:
+          - nginx
+          - aptly
+        update_cache: yes
+
+    - name: run aptly once to init conf dir
+      command: aptly version
+
+    - name: write aptly conf
+      copy:
+        src: aptly.conf
+        dest: /root/.aptly.conf
+        mode: '0755'
+
+    - name: create aptly pub dir
+      ansible.builtin.file:
+        path: /var/www/aptly
+        state: directory
+        owner: www-data
+        group: www-data
+        mode: '0755'
+            
+    # configure nginx
+    - name: write mirror tmpl site
+      template:
+        src: nginx-aptly-mirror.j2
+        dest: /etc/nginx/sites-enabled/pxc-aptly
+    
+    - name: restart nginx
+      ansible.builtin.service:
+        name: nginx
+        state: restarted
+  
+    - name: Download Debian archive keys
+      ansible.builtin.get_url:
+        url: "{{ item }}"
+        dest: /opt
+        mode: '0644'
+      loop:
+        - https://ftp-master.debian.org/keys/release-13.asc
+        - https://ftp-master.debian.org/keys/archive-key-13.asc
+        - https://ftp-master.debian.org/keys/archive-key-13-security.asc
+        - https://ftp-master.debian.org/keys/archive-key-12.asc
+        - https://ftp-master.debian.org/keys/release-12.asc
+        - https://ftp-master.debian.org/keys/archive-key-12-security.asc
+        - https://keys.datadoghq.com/DATADOG_APT_KEY_CURRENT.public
+
+    - name: Download terraform key
+      ansible.builtin.get_url:
+        url: "https://apt.releases.hashicorp.com/gpg"
+        dest: /opt/terraform.asc
+        mode: '0644'
+    
+    - name: Download docker key
+      ansible.builtin.get_url:
+        url: "https://download.docker.com/linux/debian/gpg"
+        dest: /opt/docker.asc
+        mode: '0644'
+
+    - name: Import ASCII keys into trustedkeys.gpg
+      ansible.builtin.command:
+        cmd: "gpg --no-default-keyring --keyring trustedkeys.gpg --import {{ item }}"
+        chdir: /opt
+      loop:
+        - release-13.asc
+        - archive-key-13.asc
+        - archive-key-13-security.asc
+        - archive-key-12.asc
+        - release-12.asc
+        - archive-key-12-security.asc
+        - terraform.asc
+        - docker.asc
+        - DATADOG_APT_KEY_CURRENT.public
+
+    - name: import ubuntu security keys
+      command: gpg --no-default-keyring --keyring trustedkeys.gpg --keyserver keyserver.ubuntu.com --recv-keys 54404762BBB6E853
+
+    - name: Create a batch file for unattended GPG key generation
+      ansible.builtin.copy:
+        dest: /opt/gpg-batch-params
+        content: |
+          Key-Type: RSA
+          Key-Length: 2048
+          Subkey-Type: RSA
+          Subkey-Length: 2048
+          Name-Real: Aptly Dummy
+          Name-Email: aptly@local.internal
+          Expire-Date: 0
+          %no-protection
+          %commit
+        mode: '0600'
+      register: gpg_batch
+
+    - name: Generate GPG key using the batch file
+      ansible.builtin.command: gpg --batch --generate-key /opt/gpg-batch-params
+      when: gpg_batch.changed
+
+    # write pgp key as pxc secret for usage in later configs
+    - name: Export GPG public key block
+      ansible.builtin.command: gpg --armor --export aptly@local.internal
+      register: gpg_export_output
+
+    - name: write mirror vm discovery secret
+      delegate_to: pxc-executor-host
+      alchemy_upsert:
+        pg_conn_str: "{{ pg_conn_str }}"
+        table: px_cloud_secrets
+        values:
+          cloud_domain: "{{ pve_cloud_domain }}"
+          secret_name: "cloud-mirror-vm"
+          secret_data:
+            pgp_public_key_b64: "{{ gpg_export_output.stdout | b64encode }}"
+            mirror_vm_addr: "{{ ansible_default_ipv4.address }}"
+            aptly_mirror_domain: "{{ aptly_mirror_domain }}"
+        conflict_cols:
+          - secret_name
+          - cloud_domain
+
+    - name: configure bookworm mirror
+      include_role:
+        name: aptly_mirror_repo
+      vars:
+        mirror_url: http://ftp.de.debian.org/debian/
+        mirror_distribution: bookworm
+        mirror_components:
+          - main 
+          - contrib 
+          - non-free-firmware
+        mirror_filter: >-
+          gnupg|qemu-guest-agent|console-setup|keyboard-configuration|git|curl|
+          python3|python3-venv|avahi-utils|direnv|age|rsync|appstream|apt-transport-https|
+          conntrack|ebtables|fuse|gir1.2-glib-2.0|gir1.2-packagekitglib-1.0|gnupg-l10n|
+          ipvsadm|isocodes|libappstream4|libgirepository-1.0-1|libglib2.0-bin|libglib2.0-data|
+          libgstreamer1.0-0|libinih1|libnl-3-200|libnl-genl-3-200|libpackagekit-glib2-18|
+          libstemmer0d|libunwind8|liburcu8|libxmlb2|mergerfs|packagekit-tools|packagekit|
+          python3-distro|python3-gi|python3-httplib2|python3-lazr.restfulclient|python3-lazr.uri|
+          python3-software-properties|python3-urllib3|python3-wadllib|shared-mime-info|
+          software-properties-common|unzip|xfsprogs
+
+    - name: configure bookworm mirror
+      include_role:
+        name: aptly_mirror_repo
+      vars:
+        mirror_url: http://ftp.de.debian.org/debian/
+        mirror_distribution: bookworm-updates
+
+    - name: configure bookworm mirror
+      include_role:
+        name: aptly_mirror_repo
+      vars:
+        mirror_url: http://ftp.de.debian.org/debian/
+        mirror_distribution: bookworm-backports
+
+    - name: configure bookworm mirror
+      include_role:
+        name: aptly_mirror_repo
+      vars:
+        mirror_url: http://ftp.de.debian.org/debian-security/
+        mirror_distribution: bookworm-security
+        mirror_endpoint: debian-security
+
+    - name: configure terraform
+      include_role:
+        name: aptly_mirror_repo
+      vars:
+        mirror_url: https://apt.releases.hashicorp.com
+        mirror_distribution: bookworm
+        mirror_endpoint: terraform
+        mirror_components:
+          - main 
+        mirror_filter: "terraform"
+        mirror_sources: false # tf repo doesnt publish sources
+
+    - name: configure docker
+      include_role:
+        name: aptly_mirror_repo
+      vars:
+        mirror_url: https://download.docker.com/linux/debian
+        mirror_distribution: bookworm
+        mirror_endpoint: docker
+        mirror_components:
+          - stable
+        mirror_filter: "docker-ce|docker-ce-cli|containerd.io|docker-buildx-plugin|docker-compose-plugin"
+        mirror_sources: false 
+
+    - name: configure vector
+      include_role:
+        name: aptly_mirror_repo
+      vars:
+        mirror_url: https://apt.vector.dev/
+        mirror_distribution: stable
+        mirror_endpoint: vector
+        mirror_components:
+          - vector-0
+        mirror_filter: "vector"
+        mirror_sources: false 
+
+
+- name: Configure mirror vm
+  hosts: qemus
+  tasks:
+    - name: create kubespray cache dir for rsync
+      ansible.builtin.file:
+        path: "{{ ansible_user_dir }}/.cache/kubespray"
+        state: directory
+        mode: '0755'
+
+    - name: Install rsync
+      become: true
+      ansible.builtin.apt:
+        name:
+          - rsync
+        update_cache: yes

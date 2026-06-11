@@ -12,8 +12,7 @@ users:
     lock_passwd: false
     passwd: {{ qemu_hashed_pw }}
     shell: /bin/bash
-# todo: better integration with squid? seems to trigger before netplan and avoids squid
-package_upgrade: true
+
 package_update: true
 packages:
   - qemu-guest-agent
@@ -24,3 +23,23 @@ keyboard:
   layout: {{ qemu_keyboard_layout }}
 runcmd:
   - systemctl start qemu-guest-agent
+
+{% if mirror_discovery_secret.rowcount != 0 %}
+write_files:
+  - encoding: b64
+    path: /etc/apt/trusted.gpg.d/pxc-aptly.asc
+    owner: root:root
+    permissions: '0644'
+    content: {{ mirror_discovery_secret.query_result[0]['secret_data']['pgp_public_key_b64'] }}
+
+apt:
+  primary:
+    - arches:
+        - default
+      uri: http://{{ mirror_discovery_secret.query_result[0]['secret_data']['aptly_mirror_domain'] }}/debian
+  security:
+    - arches:
+        - default
+      uri: http://{{ mirror_discovery_secret.query_result[0]['secret_data']['aptly_mirror_domain'] }}/debian-security
+
+{% endif %}

@@ -4,6 +4,9 @@
     vm_type: "qemu"
   tags:
     - qemus
+  roles:
+    - slurp_cluster_secrets
+    - parse_cluster_secrets
   tasks:
     - include_role:
         name: determine_vms_create_delete

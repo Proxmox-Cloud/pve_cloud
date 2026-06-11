@@ -2,4 +2,4 @@
 - hosts: localhost
   remote_user: root
   roles:
-    - nfs_cache_mount
+    - aptly_mirror_repo

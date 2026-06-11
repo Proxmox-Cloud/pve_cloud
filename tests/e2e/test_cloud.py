@@ -90,10 +90,8 @@ def test_haproxy(setup_haproxy_lxcs):
     logger.info("test haproxy")
     # tested via fixture, add more tests here
 
-
-def test_cache(setup_cache_lxcs):
-    logger.info("test cache")
-    # tested via fixture, add more tests here
+def test_mirror_vm(setup_mirror_vm):
+    logger.info("test mirror vm")
 
 
 def test_create_lxc(request, get_proxmoxer, get_test_env, setup_haproxy_lxcs):
@@ -114,7 +112,7 @@ def test_create_lxc(request, get_proxmoxer, get_test_env, setup_haproxy_lxcs):
                         "parameters": {
                             "rootfs": f"volume={get_test_env['pve_vm_storage_id']}:10",
                             "cores": 1,
-                            "memory": 512,
+                            "memory": 256,
                             "net0": f"name=pve,bridge=vmbr0,firewall=1,ip=dhcp"
                             + f"{get_test_env['net0_vlan_tag_rendered'] if 'net0_vlan_tag_rendered' in get_test_env else ''}",
                         }
@@ -123,7 +121,7 @@ def test_create_lxc(request, get_proxmoxer, get_test_env, setup_haproxy_lxcs):
                         "parameters": {
                             "rootfs": f"volume={get_test_env['pve_vm_storage_id']}:10",
                             "cores": 1,
-                            "memory": 512,
+                            "memory": 256,
                             "net0": f"name=pve,bridge=vmbr0,firewall=1,ip=dhcp"
                             + f"{get_test_env['net0_vlan_tag_rendered'] if 'net0_vlan_tag_rendered' in get_test_env else ''}",
                         }
@@ -193,7 +191,7 @@ def test_create_lxc(request, get_proxmoxer, get_test_env, setup_haproxy_lxcs):
                 assert destroy_lxcs_run.rc == 0
 
 
-def test_create_qemu(request, get_test_env, setup_haproxy_lxcs):
+def test_create_qemu(request, get_test_env, setup_mirror_vm):
     logger.info("test create dynamic qemu")
 
     with tempfile.NamedTemporaryFile(
@@ -222,7 +220,7 @@ def test_create_qemu(request, get_test_env, setup_haproxy_lxcs):
                 ],
                 "ingress_domains": [
                     {
-                        "zone": get_test_env["kubernetes"]["deployments_domain"],
+                        "zone": get_test_env["cloud_inventory"]["pve_cloud_domain"],
                         "names": ["mail-example", "other-service-example"],
                         "external": True,
                     }
@@ -299,7 +297,13 @@ def test_create_secondary_kubespray(
     get_test_env,
     get_secondary_kubespray_inv,
     setup_prepare_kubespray,
+    setup_mirror_vm,
 ):
+    extra_vars = {}
+    tdd_ip = get_tdd_ip()
+    if tdd_ip:
+        extra_vars["test_repos_ip"] = tdd_ip
+
     kubespray_run = ansible_runner.run(
         project_dir=os.getcwd(),
         playbook="playbooks/sync_kubespray.yaml",
@@ -310,6 +314,7 @@ def test_create_secondary_kubespray(
             if request.config.getoption("--skip-kubespray")
             else None
         ),
+        extravars=extra_vars
     )
 
     assert kubespray_run.rc == 0
@@ -379,6 +384,11 @@ eviction_hard:
     with open(k8s_cluster_vars_path, "w") as file:
         file.write(yaml_content)
 
+    extra_vars = {}
+    tdd_ip = get_tdd_ip()
+    if tdd_ip:
+        extra_vars["test_repos_ip"] = tdd_ip
+
     kubespray_run = ansible_runner.run(
         project_dir=os.getcwd(),
         playbook="playbooks/sync_kubespray.yaml",
@@ -389,6 +399,7 @@ eviction_hard:
             if request.config.getoption("--skip-kubespray")
             else None
         ),
+        extravars=extra_vars
     )
 
     assert kubespray_run.rc == 0

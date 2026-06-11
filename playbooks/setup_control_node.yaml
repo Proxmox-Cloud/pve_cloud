@@ -1,9 +1,12 @@
 - name: Setup node running ansible (local machine)
   hosts: localhost
-  tasks:     
+  tasks:
+    - set_fact:
+        ee_requirements_path: "{{ custom_ee_reqs_path if custom_ee_reqs_path is defined else (playbook_dir | dirname) ~ '/meta/ee-requirements.txt' }}"
+
     - name: Install pve cloud collection requirements
       ansible.builtin.pip:
-        requirements: "{{ playbook_dir | dirname }}/meta/ee-requirements.txt"
+        requirements: "{{ ee_requirements_path }}"
 
     - name: install packages for caching
       become: true
@@ -12,5 +15,43 @@
         pkg:
           - nfs-common
           - rsync
+    
+    # install kubectl
+    - name: install check kubectl
+      ansible.builtin.stat:
+        path: "/usr/local/bin/kubectl"
+      register: kubectl_binary
+
+    - name: Download kubectl binary to /usr/local/bin
+      ansible.builtin.get_url:
+        url: https://dl.k8s.io/release/v1.36.0/bin/linux/{{ arch_mapping[ansible_architecture] }}/kubectl
+        dest: /usr/local/bin/kubectl
+        mode: '0755'
+      become: true
+      when: not kubectl_binary.stat.exists
+
+    # install helm cli for deploying initial charts
+    - name: install check helm
+      ansible.builtin.stat:
+        path: "/usr/local/bin/helm"
+      register: helm_binary
+
+    - name: download and extract helm
+      ansible.builtin.unarchive:
+        src: "https://get.helm.sh/helm-v4.2.0-linux-{{ arch_mapping[ansible_architecture] }}.tar.gz"
+        dest: "/tmp"
+        remote_src: yes
+        creates: "/tmp/linux-{{ arch_mapping[ansible_architecture] }}/helm"
+      when: not helm_binary.stat.exists
+
+    - name: move to usr bin folder
+      become: true
+      ansible.builtin.copy:
+        src: "/tmp/linux-{{ arch_mapping[ansible_architecture] }}/helm"
+        dest: "/usr/local/bin/helm"
+        mode: '0755'
+        remote_src: true
+      when: not helm_binary.stat.exists
+      
 
     # todo: apt install avahi? / other reqs

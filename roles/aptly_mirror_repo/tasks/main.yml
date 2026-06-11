@@ -1,0 +1,62 @@
+---
+# tasks file for aptly_mirror_repo
+- name: check existing aptly mirrors
+  ansible.builtin.command: aptly mirror list -raw
+  register: aptly_existing_mirrors
+
+- set_fact:
+    distribution_id: "{{ mirror_endpoint }}-{{ mirror_distribution }}"
+
+- name: create mirror
+  when: "'{{ distribution_id }}-mirror' not in aptly_existing_mirrors.stdout_lines"
+  command: "aptly mirror create -filter='{{ mirror_filter }}' -architectures='amd64,arm64,armhf' {{ '-with-sources' if mirror_sources else '' }} -filter-with-deps -force-components {{ distribution_id }}-mirror {{ mirror_url }} {{ mirror_distribution }} {% for cmp in mirror_components %}{{ cmp }} {% endfor %}"
+
+- name: init mirror (might take a long time)
+  when: "'{{ distribution_id }}-mirror' not in aptly_existing_mirrors.stdout_lines"
+  command: "aptly mirror update {{ distribution_id }}-mirror"
+
+- name: create snap
+  when: "'{{ distribution_id }}-mirror' not in aptly_existing_mirrors.stdout_lines"
+  command: "aptly snapshot create {{ distribution_id }}-snap from mirror {{ distribution_id }}-mirror"
+
+- name: publish snap
+  when: "'{{ distribution_id }}-mirror' not in aptly_existing_mirrors.stdout_lines"
+  command: "aptly publish snapshot -distribution={{ mirror_distribution }} -architectures='source,amd64,arm64,armhf' {{ distribution_id }}-snap {{ mirror_endpoint }}"
+
+# update mirror if filter changed
+- name: fetch mirror details
+  ansible.builtin.command: "aptly mirror show {{ distribution_id }}-mirror"
+  register: mirror_details
+
+- name: extract mirror filter
+  ansible.builtin.set_fact:
+    mirror_filter_configured: "{{ mirror_details.stdout | regex_search('^Filter:\\s*(.*)$', '\\1', multiline=True) | first }}"
+
+- debug:
+    var: mirror_filter_configured
+
+- name: edit mirror
+  when: mirror_filter_configured != mirror_filter
+  command: "aptly mirror edit -filter='{{ mirror_filter }}' {{ '-with-sources' if mirror_sources else '' }} -filter-with-deps {{ distribution_id }}-mirror"
+
+- name: update mirror
+  when: mirror_filter_configured != mirror_filter
+  command: "aptly mirror update {{ distribution_id }}-mirror"
+
+- name: remove pub
+  when: mirror_filter_configured != mirror_filter
+  command: "aptly publish drop {{ mirror_distribution }} {{ mirror_endpoint }}"
+
+- name: remove snap
+  when: mirror_filter_configured != mirror_filter
+  command: "aptly snapshot drop {{ distribution_id }}-snap"
+
+- name: recreate snap
+  when: mirror_filter_configured != mirror_filter
+  command: "aptly snapshot create {{ distribution_id }}-snap from mirror {{ distribution_id }}-mirror"
+
+- name: publish again
+  when: mirror_filter_configured != mirror_filter
+  command: "aptly publish snapshot -distribution={{ mirror_distribution }} -architectures='source,amd64,arm64,armhf' {{ distribution_id }}-snap {{ mirror_endpoint }}"
+
+    

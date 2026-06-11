@@ -21,6 +21,7 @@
         hostname: "{{ ansible_fqdn }}"
         stack_fqdn: "{{ stack_name }}.{{ pve_cloud_domain }}"
         machine_type: "{{ cloud_machine_type }}"
-  # reservations only happen for k8s nodes / or lxc/vms that define tcp proxies
+  # reservations only happen for k8s nodes / or lxc/vms that define tcp proxies / ingress domains on qemus
+  # basically anything where we need to tie down a host for proxing in our haproxy
   # todo: add reservation cleanup to qemu / lxc delete playbooks
-  when: cloud_machine_type.startswith('k8s_') or tcp_proxies is defined
+  when: cloud_machine_type.startswith('k8s_') or tcp_proxies is defined or ingress_domains is defined

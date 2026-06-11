@@ -69,9 +69,6 @@ class InventoryModule(BaseInventoryPlugin):
                     else yaml_data["qemu_default_user"]
                 ),
             )
-            inventory.set_variable(
-                hostname, "ansible_become", True
-            )  # needed for kubespray playbook execution
 
             inventory.set_variable(
                 hostname, "cloud_machine_type", "qemu"

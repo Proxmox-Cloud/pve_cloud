@@ -6,6 +6,7 @@ import re
 import sys
 from dataclasses import dataclass
 from typing import Optional
+from pprint import pformat
 
 import asyncssh
 import yaml
@@ -439,6 +440,7 @@ async def include_stack(
 
     add_to_inv_tasks = []
     for vm in include_vms:
+        display.v(pformat(vm, indent=4))
         inventory.add_host(vm["name"], group=host_group)
         if vm["type"] == "lxc":
             inventory.set_variable(vm["name"], "ansible_user", "root")
@@ -551,9 +553,13 @@ async def init_plugin(loader, inventory, yaml_data):
     # extract vms that belong to this stack
     stack_vms = []
     for vm in target_cluster.pvesh_vms:
+        if vm["status"] == "unknown":
+            display.warning(f"vm status unknown! {vm['id']} on node {vm['node']} - perhaps pvestatd problems?")
+            continue
+
         if "tags" in vm and stack_fqdn in vm["tags"].split(";"):
             stack_vms.append(vm)
-
+        
     # generate map, id hash of vm => variables specific for vm
     vm_vars_blake = {
         sort_and_hash(vm, yaml_data["stack_name"]): vm["vars"] if "vars" in vm else {}

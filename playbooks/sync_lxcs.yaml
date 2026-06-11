@@ -140,6 +140,7 @@
       include_role:
         name: prometheus.prometheus.systemd_exporter
       when: install_prom_systemd_exporter is defined and install_prom_systemd_exporter
+    
     - name: install automation pubkey
       lineinfile:
         path: /root/.ssh/authorized_keys
@@ -154,7 +155,8 @@
         where:
           secret_type: "vlogs-cluster-journald"
       register: vlogs_journald_ds # discovery secrets
-
+      when: postgres_connection_check is succeeded
+      
     # todo: also generify this
     # this logic sets up vector log exporter to victoria logs db if that is configured
     # via a discovery sercret

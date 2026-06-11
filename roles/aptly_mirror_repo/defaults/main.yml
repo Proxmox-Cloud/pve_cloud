@@ -1,0 +1,18 @@
+---
+# defaults file for aptly_mirror_repo
+
+# like http://ftp.de.debian.org/debian/
+mirror_url:
+
+# e.g. trixie / trixie-backports
+mirror_distribution:
+
+# e.g. list of main, contrib...
+mirror_components: ["main"]
+
+# aptly package filter like 'git|curl'
+mirror_filter: dummy-mirror-filter
+
+mirror_endpoint: debian # we mostly use debian
+
+mirror_sources: true

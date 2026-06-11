@@ -1,0 +1,17 @@
+
+server {
+        listen 80;
+        listen [::]:80;
+
+        root /var/www/aptly/public;
+
+        index index.html index.htm;
+
+        server_name {{ aptly_mirror_domain }};
+
+        location / {
+                autoindex on;
+        }
+}
+
+
