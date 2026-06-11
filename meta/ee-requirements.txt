@@ -1,6 +1,6 @@
 # PXC E2E EXCLUDE BLOCK START
 py-pve-cloud>=3.1.4,<3.2.0
-pve-cloud-schemas==3.1.4
+pve-cloud-schemas==3.1.5
 # PXC E2E EXCLUDE BLOCK END
 
 petname==2.6
