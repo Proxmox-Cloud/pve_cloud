@@ -75,7 +75,6 @@
 | + [proxy_stack](#static_includes_proxy_stack )       | No      | string | No         | -          | Reloading the proxy.                                                                                                                              |
 | + [postgres_stack](#static_includes_postgres_stack ) | No      | string | No         | -          | The playbook needs the pve cloud postgres stack where state and general configuration is stored.                                                  |
 | + [bind_stack](#static_includes_bind_stack )         | No      | string | No         | -          | The playbook needs the bind stack to register the general masters recordset and for creating authoritative zones defined in cluster_cert_entries. |
-| - [cache_stack](#static_includes_cache_stack )       | No      | string | No         | -          | Cache stack to mount nfs for kubespray cache and apt cache. Assumes the cache lxc to have the hostname "main". WIP!                               |
 
 ### <a name="static_includes_dhcp_stack"></a>80.1. Property `K8s Kubespray Inventory > static_includes > dhcp_stack`
 
@@ -136,15 +135,6 @@
 ```json
 "bind.your-cloud.domain"
 ```
-
-### <a name="static_includes_cache_stack"></a>80.5. Property `K8s Kubespray Inventory > static_includes > cache_stack`
-
-|              |          |
-| ------------ | -------- |
-| **Type**     | `string` |
-| **Required** | No       |
-
-**Description:** Cache stack to mount nfs for kubespray cache and apt cache. Assumes the cache lxc to have the hostname "main". WIP!
 
 ## <a name="include_stacks"></a>81. Property `K8s Kubespray Inventory > include_stacks`
 
