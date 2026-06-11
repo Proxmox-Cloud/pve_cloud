@@ -90,6 +90,7 @@ def test_haproxy(setup_haproxy_lxcs):
     logger.info("test haproxy")
     # tested via fixture, add more tests here
 
+
 def test_mirror_vm(setup_mirror_vm):
     logger.info("test mirror vm")
 
@@ -314,7 +315,7 @@ def test_create_secondary_kubespray(
             if request.config.getoption("--skip-kubespray")
             else None
         ),
-        extravars=extra_vars
+        extravars=extra_vars,
     )
 
     assert kubespray_run.rc == 0
@@ -399,7 +400,7 @@ eviction_hard:
             if request.config.getoption("--skip-kubespray")
             else None
         ),
-        extravars=extra_vars
+        extravars=extra_vars,
     )
 
     assert kubespray_run.rc == 0

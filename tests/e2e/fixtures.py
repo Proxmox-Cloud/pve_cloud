@@ -82,7 +82,9 @@ def setup_control_node(request, get_test_env):
             check=True,
         )
 
-        with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".txt") as tmp_reqs:
+        with tempfile.NamedTemporaryFile(
+            mode="w", delete=False, suffix=".txt"
+        ) as tmp_reqs:
             temp_reqs_path = tmp_reqs.name
 
             # modify ee-requirements.txt which are used as base setup dependencies for the control node
@@ -98,10 +100,9 @@ def setup_control_node(request, get_test_env):
                     if write_toggle:
                         tmp_reqs.write(rl)
 
-
         # control node setup adjustments
         extra_vars = {"custom_ee_reqs_path": temp_reqs_path}
-        
+
         # run the main playbook
         logger.info("run control node setup")
         setup_run = ansible_runner.run(
@@ -829,12 +830,15 @@ def setup_mirror_vm(request, get_test_env, setup_haproxy_lxcs):
                 # "tcp_proxies": [],
                 "ingress_domains": [
                     {
-                        "zone": get_test_env["cloud_inventory"]["pve_cloud_domain"], # we use cloud domain because deployments is not yet initialized
+                        "zone": get_test_env["cloud_inventory"][
+                            "pve_cloud_domain"
+                        ],  # we use cloud domain because deployments is not yet initialized
                         "names": ["pxc-aptly"],
                     }
                 ],
                 "qemu_global_vars": {
-                    "aptly_mirror_domain": f"pxc-aptly." + get_test_env["cloud_inventory"]["pve_cloud_domain"]
+                    "aptly_mirror_domain": f"pxc-aptly."
+                    + get_test_env["cloud_inventory"]["pve_cloud_domain"]
                 },
                 "static_includes": {
                     "dhcp_stack": "ha-dhcp."
@@ -857,7 +861,7 @@ def setup_mirror_vm(request, get_test_env, setup_haproxy_lxcs):
                                 "ssd": "on",
                                 "cache": "unsafe",
                             },
-                            # use ceph storage pool since that is for big 
+                            # use ceph storage pool since that is for big
                             # stuff in e2e
                             "pool": get_test_env["ceph_csi_storage_pool"],
                         },
@@ -867,28 +871,38 @@ def setup_mirror_vm(request, get_test_env, setup_haproxy_lxcs):
                         },
                         # overwrite values for vm interface, to set a static ip instead of default
                         # dhcp4 conf
-                        "network_config" : yaml.safe_dump({
-                            "network": {
-                                "ethernets": {
-                                    "pve": {
-                                        "dhcp4": False,
-                                        "addresses": [get_test_env["pve_test_cloud_mirror_ip"]],
-                                        "routes": [
-                                            {
-                                                "to": "default",
-                                                "via":   get_test_env["cloud_inventory"]["kea_dhcp_routers"]
-                                            }
-                                        ],
-                                        "nameservers": {
+                        "network_config": yaml.safe_dump(
+                            {
+                                "network": {
+                                    "ethernets": {
+                                        "pve": {
+                                            "dhcp4": False,
                                             "addresses": [
-                                                get_test_env["cloud_inventory"]["bind_master_ip"],
-                                                get_test_env["cloud_inventory"]["bind_slave_ip"]
-                                            ]
+                                                get_test_env["pve_test_cloud_mirror_ip"]
+                                            ],
+                                            "routes": [
+                                                {
+                                                    "to": "default",
+                                                    "via": get_test_env[
+                                                        "cloud_inventory"
+                                                    ]["kea_dhcp_routers"],
+                                                }
+                                            ],
+                                            "nameservers": {
+                                                "addresses": [
+                                                    get_test_env["cloud_inventory"][
+                                                        "bind_master_ip"
+                                                    ],
+                                                    get_test_env["cloud_inventory"][
+                                                        "bind_slave_ip"
+                                                    ],
+                                                ]
+                                            },
                                         }
                                     }
                                 }
                             }
-                        })
+                        ),
                     },
                 ],
                 "target_pve_hosts": list(get_test_env["pve_test_cluster_hosts"].keys()),
@@ -897,7 +911,7 @@ def setup_mirror_vm(request, get_test_env, setup_haproxy_lxcs):
             temp_qemu_inv,
         )
         temp_qemu_inv.flush()
-        try:   
+        try:
             qemu_run = ansible_runner.run(
                 project_dir=os.getcwd(),
                 playbook="playbooks/sync_qemus.yaml",

@@ -5,8 +5,8 @@ import os
 import re
 import sys
 from dataclasses import dataclass
-from typing import Optional
 from pprint import pformat
+from typing import Optional
 
 import asyncssh
 import yaml
@@ -554,12 +554,14 @@ async def init_plugin(loader, inventory, yaml_data):
     stack_vms = []
     for vm in target_cluster.pvesh_vms:
         if vm["status"] == "unknown":
-            display.warning(f"vm status unknown! {vm['id']} on node {vm['node']} - perhaps pvestatd problems?")
+            display.warning(
+                f"vm status unknown! {vm['id']} on node {vm['node']} - perhaps pvestatd problems?"
+            )
             continue
 
         if "tags" in vm and stack_fqdn in vm["tags"].split(";"):
             stack_vms.append(vm)
-        
+
     # generate map, id hash of vm => variables specific for vm
     vm_vars_blake = {
         sort_and_hash(vm, yaml_data["stack_name"]): vm["vars"] if "vars" in vm else {}

@@ -1,17 +1,18 @@
 import asyncio
 import secrets
+from pprint import pformat
 
-from ansible.utils.display import Display
 from ansible.errors import AnsibleError
 from ansible.plugins.inventory import BaseInventoryPlugin
+from ansible.utils.display import Display
 from ansible_collections.pxc.cloud.plugins.module_utils.identity import \
     stack_vm_get_blake
 from ansible_collections.pxc.cloud.plugins.module_utils.inventory import (
     add_qemu_to_inv, init_plugin)
 from pve_cloud.lib.ssh import connect_host, get_ssh_asyncio_loop
-from pprint import pformat
 
 display = Display()
+
 
 class InventoryModule(BaseInventoryPlugin):
 
@@ -58,7 +59,7 @@ class InventoryModule(BaseInventoryPlugin):
     # adds qemus (k8s nodes) to the inventory, getting their ip via proxmox api + qemu guest agent
     async def stack_qemus(self, inventory, stack_vms, target_cluster):
         add_tasks = []
-        
+
         for vm in stack_vms:
             display.v(pformat(vm, indent=4))
             inventory.add_host(vm["name"], group="all")
