@@ -20,7 +20,7 @@ from pve_cloud.cli.pvcli import (connect_cluster, connect_remote_cluster,
 from pve_cloud.cli.pxrpc import launch_pxrpc
 from pve_cloud.lib.inventory import (get_cloud_domain, get_online_pve_host,
                                      get_pve_inventory, get_target_cluster)
-from pve_cloud.lib.ssh import connect_host
+
 from pve_cloud.orm.alchemy import AcmeX509
 from pve_cloud_test.cloud_fixtures import *
 from sqlalchemy import create_engine
@@ -29,136 +29,112 @@ from sqlalchemy.orm import Session
 logger = logging.getLogger(__name__)
 
 
-def fetch_default_gw_ns(test_env):
-    client = paramiko.SSHClient()
-    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
-    pve_host = test_env["pve_test_cluster_hosts"][
-        next(iter(test_env["pve_test_cluster_hosts"]))
+
+
+@cloud_fixture("localhost", "control-node")
+def setup_control_node(request, get_test_env):
+    # install galaxy requirements
+
+    # dump them in installable format
+    with open("galaxy.yml") as f:
+        galaxy = yaml.safe_load(f)
+
+    deps = galaxy.get("dependencies", {})
+
+    req = {"collections": []}
+
+    for name, version in deps.items():
+        entry = {}
+        entry["name"] = name
+        entry["version"] = version
+
+        req["collections"].append(entry)
+
+    with open("tdd-requirements.yml", "w") as f:
+        yaml.safe_dump(req, f, sort_keys=False)
+
+    subprocess.run(
+        ["ansible-galaxy", "install", "-r", "tdd-requirements.yml"],
+        check=True,
+    )
+
+    with tempfile.NamedTemporaryFile(
+        mode="w", delete=False, suffix=".txt"
+    ) as tmp_reqs:
+        temp_reqs_path = tmp_reqs.name
+
+        # modify ee-requirements.txt which are used as base setup dependencies for the control node
+        with open("meta/ee-requirements.txt") as ee_reqs:
+
+            write_toggle = True
+            for rl in ee_reqs:
+                if rl.startswith("# PXC E2E EXCLUDE BLOCK START"):
+                    write_toggle = False
+                elif rl.startswith("# PXC E2E EXCLUDE BLOCK END"):
+                    write_toggle = True
+
+                if write_toggle:
+                    tmp_reqs.write(rl)
+
+    # control node setup adjustments
+    extra_vars = {"custom_ee_reqs_path": temp_reqs_path}
+
+    # run the main playbook
+    logger.info("run control node setup")
+    setup_run = ansible_runner.run(
+        project_dir=os.getcwd(),
+        playbook="playbooks/setup_control_node.yaml",
+        verbosity=request.config.getoption("--ansible-verbosity"),
+        extravars=extra_vars,
+    )
+
+    assert setup_run.rc == 0
+
+    # initialize the locally kept inventory for pxc clouds and their pve clusters
+    tdd_ip = get_tdd_ip()
+    first_test_host = get_test_env["pve_test_cluster_hosts"][
+        next(iter(get_test_env["pve_test_cluster_hosts"]))
     ]
 
-    client.connect(pve_host["ansible_host"], username="root")
-
-    _, stdout, _ = client.exec_command(
-        "ip route show default 2>/dev/null | awk '{print $3}'"
-    )
-    gateway = stdout.read().decode("utf-8").strip()
-    logger.info(gateway)
-
-    _, stdout, _ = client.exec_command(
-        "grep -E '^nameserver [0-9]+' /etc/resolv.conf 2>/dev/null | awk '{print $2}'"
-    )
-    nameservers = stdout.read().decode("utf-8").strip().splitlines()
-    logger.info(nameservers)
-
-    return gateway, " ".join(nameservers)
-
-
-@cloud_fixture("localhost")
-def setup_control_node(request, get_test_env):
-    if not request.config.getoption("--skip-fixture-init"):
-        # install galaxy requirements
-
-        # dump them in installable format
-        with open("galaxy.yml") as f:
-            galaxy = yaml.safe_load(f)
-
-        deps = galaxy.get("dependencies", {})
-
-        req = {"collections": []}
-
-        for name, version in deps.items():
-            entry = {}
-            entry["name"] = name
-            entry["version"] = version
-
-            req["collections"].append(entry)
-
-        with open("tdd-requirements.yml", "w") as f:
-            yaml.safe_dump(req, f, sort_keys=False)
-
-        subprocess.run(
-            ["ansible-galaxy", "install", "-r", "tdd-requirements.yml"],
-            check=True,
+    # run the remote connect cluster functionality if jumphost is specified, otherwise normal connect cluster
+    if "pve_test_cluster_jump_host" in get_test_env:
+        logger.info("initializing local ~/.pve-cloud-dyn-inv.yaml with jumphosts")
+        parsed_args = get_parser().parse_args(
+            [
+                "connect-remote-cluster",
+                "--jump-hosts",
+                get_test_env["pve_test_cluster_jump_host"],
+                "--force",
+                "--pve-cloud-domain",
+                get_test_env["cloud_inventory"]["pve_cloud_domain"],
+                "--pve-host",
+                first_test_host["ansible_host"],
+            ]
+            + ["--local-pypi-ip", tdd_ip]
+            if tdd_ip
+            else []
         )
-
-        with tempfile.NamedTemporaryFile(
-            mode="w", delete=False, suffix=".txt"
-        ) as tmp_reqs:
-            temp_reqs_path = tmp_reqs.name
-
-            # modify ee-requirements.txt which are used as base setup dependencies for the control node
-            with open("meta/ee-requirements.txt") as ee_reqs:
-
-                write_toggle = True
-                for rl in ee_reqs:
-                    if rl.startswith("# PXC E2E EXCLUDE BLOCK START"):
-                        write_toggle = False
-                    elif rl.startswith("# PXC E2E EXCLUDE BLOCK END"):
-                        write_toggle = True
-
-                    if write_toggle:
-                        tmp_reqs.write(rl)
-
-        # control node setup adjustments
-        extra_vars = {"custom_ee_reqs_path": temp_reqs_path}
-
-        # run the main playbook
-        logger.info("run control node setup")
-        setup_run = ansible_runner.run(
-            project_dir=os.getcwd(),
-            playbook="playbooks/setup_control_node.yaml",
-            verbosity=request.config.getoption("--ansible-verbosity"),
-            extravars=extra_vars,
+        connect_remote_cluster(parsed_args)
+    else:
+        logger.info(
+            "initializing local ~/.pve-cloud-dyn-inv.yaml with direct access"
         )
-
-        assert setup_run.rc == 0
-
-        # initialize the locally kept inventory for pxc clouds and their pve clusters
-        tdd_ip = get_tdd_ip()
-        first_test_host = get_test_env["pve_test_cluster_hosts"][
-            next(iter(get_test_env["pve_test_cluster_hosts"]))
-        ]
-
-        # run the remote connect cluster functionality if jumphost is specified, otherwise normal connect cluster
-        if "pve_test_cluster_jump_host" in get_test_env:
-            logger.info("initializing local ~/.pve-cloud-dyn-inv.yaml with jumphosts")
-            parsed_args = get_parser().parse_args(
-                [
-                    "connect-remote-cluster",
-                    "--jump-hosts",
-                    get_test_env["pve_test_cluster_jump_host"],
-                    "--force",
-                    "--pve-cloud-domain",
-                    get_test_env["cloud_inventory"]["pve_cloud_domain"],
-                    "--pve-host",
-                    first_test_host["ansible_host"],
-                ]
-                + ["--local-pypi-ip", tdd_ip]
-                if tdd_ip
-                else []
-            )
-            connect_remote_cluster(parsed_args)
-        else:
-            logger.info(
-                "initializing local ~/.pve-cloud-dyn-inv.yaml with direct access"
-            )
-            parsed_args = get_parser().parse_args(
-                [
-                    "connect-cluster",
-                    "--pve-host",
-                    first_test_host["ansible_host"],
-                    "--force",
-                    "--pve-cloud-domain",
-                    get_test_env["cloud_inventory"]["pve_cloud_domain"],
-                ]
-            )
-            connect_cluster(parsed_args)
-
-    yield
+        parsed_args = get_parser().parse_args(
+            [
+                "connect-cluster",
+                "--pve-host",
+                first_test_host["ansible_host"],
+                "--force",
+                "--pve-cloud-domain",
+                get_test_env["cloud_inventory"]["pve_cloud_domain"],
+            ]
+        )
+        connect_cluster(parsed_args)
 
 
-@cloud_fixture("hosts")
+
+@cloud_fixture("hosts", "pve")
 def setup_pve_hosts(request, get_test_env, setup_control_node):
     logger.info("setup cloud")
 
@@ -203,42 +179,28 @@ def setup_pve_hosts(request, get_test_env, setup_control_node):
             extra_vars["test_repos_ip"] = tdd_ip
             extra_vars["py_pve_cloud_version"] = py_pve_cloud_vers
 
-        if not request.config.getoption("--skip-fixture-init"):
-            # run the main playbook
-            logger.info("run pve cluster setup")
-            setup_run = ansible_runner.run(
-                project_dir=os.getcwd(),
-                playbook="playbooks/setup_pve_clusters.yaml",
-                inventory=temp_cloud_inv.name,
-                verbosity=request.config.getoption("--ansible-verbosity"),
-                extravars=extra_vars,
-            )
 
-            assert setup_run.rc == 0
-
-        yield
-
-        if request.config.getoption("--skip-cleanup"):
-            return
-
-        logger.info("uninstall pve hosts")
-
-        uninstall_run = ansible_runner.run(
+        # run the main playbook
+        logger.info("run pve cluster setup")
+        setup_run = ansible_runner.run(
             project_dir=os.getcwd(),
-            playbook="playbooks/uninstall_pve_clusters.yaml",
+            playbook="playbooks/setup_pve_clusters.yaml",
             inventory=temp_cloud_inv.name,
             verbosity=request.config.getoption("--ansible-verbosity"),
+            extravars=extra_vars,
         )
-        assert uninstall_run.rc == 0
+
+        assert setup_run.rc == 0
 
 
-@cloud_fixture("dhcp")
-def setup_dhcp_lxcs(request, get_test_env, setup_bind_lxcs):
+
+@cloud_fixture("dhcp", "kea")
+def setup_dhcp_lxcs(request, get_test_env, fetch_default_gw_ns, setup_bind_lxcs):
     logger.info("setup dhcp")
 
     test_vm_subnet_mask = get_test_env["cloud_inventory"]["pve_vm_subnet"].split("/")[1]
 
-    gateway, nameservers = fetch_default_gw_ns(get_test_env)
+    gateway, nameservers = fetch_default_gw_ns
 
     with tempfile.NamedTemporaryFile(
         "w", suffix=".yaml", delete=False
@@ -286,28 +248,25 @@ def setup_dhcp_lxcs(request, get_test_env, setup_bind_lxcs):
         )
         temp_kea_lxcs_inv.flush()
 
-        if not request.config.getoption("--skip-fixture-init"):
-            sync_lxcs_kea = ansible_runner.run(
-                project_dir=os.getcwd(),
-                playbook="playbooks/sync_lxcs.yaml",
-                inventory=temp_kea_lxcs_inv.name,
-                verbosity=request.config.getoption("--ansible-verbosity"),
-            )
-            assert sync_lxcs_kea.rc == 0
 
-            logger.info("setup kea lxcs")
-            setup_kea_run = ansible_runner.run(
-                project_dir=os.getcwd(),
-                playbook="playbooks/setup_kea.yaml",
-                inventory=temp_kea_lxcs_inv.name,
-                verbosity=request.config.getoption("--ansible-verbosity"),
-            )
-            assert setup_kea_run.rc == 0
+        sync_lxcs_kea = ansible_runner.run(
+            project_dir=os.getcwd(),
+            playbook="playbooks/sync_lxcs.yaml",
+            inventory=temp_kea_lxcs_inv.name,
+            verbosity=request.config.getoption("--ansible-verbosity"),
+        )
+        assert sync_lxcs_kea.rc == 0
+
+        logger.info("setup kea lxcs")
+        setup_kea_run = ansible_runner.run(
+            project_dir=os.getcwd(),
+            playbook="playbooks/setup_kea.yaml",
+            inventory=temp_kea_lxcs_inv.name,
+            verbosity=request.config.getoption("--ansible-verbosity"),
+        )
+        assert setup_kea_run.rc == 0
 
         yield
-
-        if request.config.getoption("--skip-cleanup"):
-            return  # otherwise destroy the dhcp again
 
         logger.info("destroy kea lxcs")
         destroy_kea_lxcs_run = ansible_runner.run(
@@ -319,9 +278,8 @@ def setup_dhcp_lxcs(request, get_test_env, setup_bind_lxcs):
         assert destroy_kea_lxcs_run.rc == 0
 
 
-@cloud_fixture("dhcp")
+@cloud_fixture("dhcp", "ceph", "kea")
 def setup_ceph_dhcp_lxcs(request, get_test_env, setup_dhcp_lxcs):
-
     # conditional ceph dhcp creation
     if "pve_ceph_frontend_dhcp_iface" in get_test_env:
         with tempfile.NamedTemporaryFile(
@@ -366,28 +324,25 @@ def setup_ceph_dhcp_lxcs(request, get_test_env, setup_dhcp_lxcs):
             )
             temp_kea_lxcs_inv.flush()
 
-            if not request.config.getoption("--skip-fixture-init"):
-                sync_lxcs_kea = ansible_runner.run(
-                    project_dir=os.getcwd(),
-                    playbook="playbooks/sync_lxcs.yaml",
-                    inventory=temp_kea_lxcs_inv.name,
-                    verbosity=request.config.getoption("--ansible-verbosity"),
-                )
-                assert sync_lxcs_kea.rc == 0
 
-                logger.info("setup kea lxcs")
-                setup_kea_run = ansible_runner.run(
-                    project_dir=os.getcwd(),
-                    playbook="playbooks/setup_ceph_kea.yaml",
-                    inventory=temp_kea_lxcs_inv.name,
-                    verbosity=request.config.getoption("--ansible-verbosity"),
-                )
-                assert setup_kea_run.rc == 0
+            sync_lxcs_kea = ansible_runner.run(
+                project_dir=os.getcwd(),
+                playbook="playbooks/sync_lxcs.yaml",
+                inventory=temp_kea_lxcs_inv.name,
+                verbosity=request.config.getoption("--ansible-verbosity"),
+            )
+            assert sync_lxcs_kea.rc == 0
+
+            logger.info("setup kea lxcs")
+            setup_kea_run = ansible_runner.run(
+                project_dir=os.getcwd(),
+                playbook="playbooks/setup_ceph_kea.yaml",
+                inventory=temp_kea_lxcs_inv.name,
+                verbosity=request.config.getoption("--ansible-verbosity"),
+            )
+            assert setup_kea_run.rc == 0
 
         yield
-
-        if request.config.getoption("--skip-cleanup"):
-            return  # otherwise destroy the dhcp again
 
         logger.info("destroy ceph kea lxcs")
         destroy_kea_lxcs_run = ansible_runner.run(
@@ -401,13 +356,13 @@ def setup_ceph_dhcp_lxcs(request, get_test_env, setup_dhcp_lxcs):
         yield
 
 
-@cloud_fixture("bind")
-def setup_bind_lxcs(request, get_test_env, setup_pve_hosts):
+@cloud_fixture("bind", "dns")
+def setup_bind_lxcs(request, get_test_env, fetch_default_gw_ns, setup_pve_hosts):
     logger.info("setup bind")
 
     test_vm_subnet_mask = get_test_env["cloud_inventory"]["pve_vm_subnet"].split("/")[1]
 
-    gateway, nameservers = fetch_default_gw_ns(get_test_env)
+    gateway, nameservers = fetch_default_gw_ns
 
     with tempfile.NamedTemporaryFile(
         "w", suffix=".yaml", delete=False
@@ -455,28 +410,26 @@ def setup_bind_lxcs(request, get_test_env, setup_pve_hosts):
         )
         temp_bind_lxcs_inv.flush()
 
-        if not request.config.getoption("--skip-fixture-init"):
-            sync_bind_lxcs_run = ansible_runner.run(
-                project_dir=os.getcwd(),
-                playbook="playbooks/sync_lxcs.yaml",
-                inventory=temp_bind_lxcs_inv.name,
-                verbosity=request.config.getoption("--ansible-verbosity"),
-            )
-            assert sync_bind_lxcs_run.rc == 0
 
-            logger.info("setup bind lxcs")
-            setup_bind_run = ansible_runner.run(
-                project_dir=os.getcwd(),
-                playbook="playbooks/setup_bind.yaml",
-                inventory=temp_bind_lxcs_inv.name,
-                verbosity=request.config.getoption("--ansible-verbosity"),
-            )
-            assert setup_bind_run.rc == 0
+        sync_bind_lxcs_run = ansible_runner.run(
+            project_dir=os.getcwd(),
+            playbook="playbooks/sync_lxcs.yaml",
+            inventory=temp_bind_lxcs_inv.name,
+            verbosity=request.config.getoption("--ansible-verbosity"),
+        )
+        assert sync_bind_lxcs_run.rc == 0
+
+        logger.info("setup bind lxcs")
+        setup_bind_run = ansible_runner.run(
+            project_dir=os.getcwd(),
+            playbook="playbooks/setup_bind.yaml",
+            inventory=temp_bind_lxcs_inv.name,
+            verbosity=request.config.getoption("--ansible-verbosity"),
+        )
+        assert setup_bind_run.rc == 0
 
         yield
 
-        if request.config.getoption("--skip-cleanup"):
-            return
 
         logger.info("destroy bind lxcs")
         destroy_bind_lxcs_run = ansible_runner.run(
@@ -488,7 +441,7 @@ def setup_bind_lxcs(request, get_test_env, setup_pve_hosts):
         assert destroy_bind_lxcs_run.rc == 0
 
 
-@cloud_fixture("postgres")
+@cloud_fixture("patroni", "postgres")
 def setup_patroni_lxcs(request, get_test_env, setup_dhcp_lxcs):
 
     # next we deploy create core lxcs
@@ -541,28 +494,24 @@ def setup_patroni_lxcs(request, get_test_env, setup_dhcp_lxcs):
         )
         temp_postgres_lxcs_inv.flush()
 
-        if not request.config.getoption("--skip-fixture-init"):
-            sync_lxcs_postgres = ansible_runner.run(
-                project_dir=os.getcwd(),
-                playbook="playbooks/sync_lxcs.yaml",
-                inventory=temp_postgres_lxcs_inv.name,
-                verbosity=request.config.getoption("--ansible-verbosity"),
-            )
-            assert sync_lxcs_postgres.rc == 0
+        sync_lxcs_postgres = ansible_runner.run(
+            project_dir=os.getcwd(),
+            playbook="playbooks/sync_lxcs.yaml",
+            inventory=temp_postgres_lxcs_inv.name,
+            verbosity=request.config.getoption("--ansible-verbosity"),
+        )
+        assert sync_lxcs_postgres.rc == 0
 
-            logger.info("setup postgres lxcs")
-            setup_postgres_run = ansible_runner.run(
-                project_dir=os.getcwd(),
-                playbook="playbooks/setup_postgres.yaml",
-                inventory=temp_postgres_lxcs_inv.name,
-                verbosity=request.config.getoption("--ansible-verbosity"),
-            )
-            assert setup_postgres_run.rc == 0
+        logger.info("setup postgres lxcs")
+        setup_postgres_run = ansible_runner.run(
+            project_dir=os.getcwd(),
+            playbook="playbooks/setup_postgres.yaml",
+            inventory=temp_postgres_lxcs_inv.name,
+            verbosity=request.config.getoption("--ansible-verbosity"),
+        )
+        assert setup_postgres_run.rc == 0
 
         yield
-
-        if request.config.getoption("--skip-cleanup"):
-            return
 
         logger.info("destroy postgres lxcs")
         destroy_postgres_lxcs_run = ansible_runner.run(
@@ -574,7 +523,7 @@ def setup_patroni_lxcs(request, get_test_env, setup_dhcp_lxcs):
         assert destroy_postgres_lxcs_run.rc == 0
 
 
-@cloud_fixture("proxy")
+@cloud_fixture("haproxy", "proxy")
 def setup_haproxy_lxcs(request, get_test_env, setup_patroni_lxcs):
 
     # next we deploy create core lxcs
@@ -631,28 +580,24 @@ def setup_haproxy_lxcs(request, get_test_env, setup_patroni_lxcs):
         )
         temp_haproxy_lxcs_inv.flush()
 
-        if not request.config.getoption("--skip-fixture-init"):
-            sync_lxcs_haproxy = ansible_runner.run(
-                project_dir=os.getcwd(),
-                playbook="playbooks/sync_lxcs.yaml",
-                inventory=temp_haproxy_lxcs_inv.name,
-                verbosity=request.config.getoption("--ansible-verbosity"),
-            )
-            assert sync_lxcs_haproxy.rc == 0
+        sync_lxcs_haproxy = ansible_runner.run(
+            project_dir=os.getcwd(),
+            playbook="playbooks/sync_lxcs.yaml",
+            inventory=temp_haproxy_lxcs_inv.name,
+            verbosity=request.config.getoption("--ansible-verbosity"),
+        )
+        assert sync_lxcs_haproxy.rc == 0
 
-            logger.info("setup haproxy lxcs")
-            setup_haproxy_run = ansible_runner.run(
-                project_dir=os.getcwd(),
-                playbook="playbooks/setup_haproxy.yaml",
-                inventory=temp_haproxy_lxcs_inv.name,
-                verbosity=request.config.getoption("--ansible-verbosity"),
-            )
-            assert setup_haproxy_run.rc == 0
+        logger.info("setup haproxy lxcs")
+        setup_haproxy_run = ansible_runner.run(
+            project_dir=os.getcwd(),
+            playbook="playbooks/setup_haproxy.yaml",
+            inventory=temp_haproxy_lxcs_inv.name,
+            verbosity=request.config.getoption("--ansible-verbosity"),
+        )
+        assert setup_haproxy_run.rc == 0
 
         yield
-
-        if request.config.getoption("--skip-cleanup"):
-            return
 
         logger.info("destroy haproxy lxcs")
         destroy_haproxy_lxcs_run = ansible_runner.run(
@@ -664,9 +609,11 @@ def setup_haproxy_lxcs(request, get_test_env, setup_patroni_lxcs):
         assert destroy_haproxy_lxcs_run.rc == 0
 
 
-@pytest.fixture(scope="session")
+@cloud_fixture("kubespray", "k8s")
 def setup_prepare_kubespray(
+    request,
     get_test_env,
+    get_cloud_secrets,
     setup_haproxy_lxcs,
     setup_ceph_dhcp_lxcs,
 ):
@@ -734,20 +681,6 @@ def setup_prepare_kubespray(
         next(iter(get_test_env["pve_test_cluster_hosts"]))
     ]["ansible_host"]
 
-    with connect_host(
-        first_test_host, get_test_env.get("pve_test_cluster_jump_host")
-    ) as ssh:
-        _, stdout, _ = ssh.exec_command("cat /etc/pve/cloud/secrets/internal.key")
-        bind_ns_update_key = re.search(
-            r'secret\s+"([^"]+)";', stdout.read().decode("utf-8")
-        ).group(1)
-
-        logger.info(bind_ns_update_key)
-
-        _, stdout, _ = ssh.exec_command("cat /etc/pve/cloud/secrets/patroni.pass")
-        patroni_pass = stdout.read().decode("utf-8")
-
-    pg_conn_str_orm = f"postgresql+psycopg2://postgres:{patroni_pass}@{get_test_env['pve_test_cluster_floating_internal']}:5000/pve_cloud?sslmode=disable"
 
     # start pxrpc server for injecting
     if "pve_test_cluster_jump_host" in get_test_env:
@@ -760,7 +693,7 @@ def setup_prepare_kubespray(
                 json.dumps(record[0]),
             )
     else:
-        engine = create_engine(pg_conn_str_orm)
+        engine = create_engine(get_cloud_secrets["pg_conn_str_orm"])
 
         # update certs and mirror pull secret
         with Session(engine) as session:
@@ -777,7 +710,7 @@ def setup_prepare_kubespray(
     # set manual cp records (only for testing prod is manually manged)
     dns_update = dns.update.Update(
         get_test_env["kubernetes"]["deployments_domain"],
-        keyring=dns.tsigkeyring.from_text({"internal.": bind_ns_update_key}),
+        keyring=dns.tsigkeyring.from_text({"internal.": get_cloud_secrets["bind_internal_key"]}),
         keyname="internal.",
         keyalgorithm="hmac-sha256",
     )
@@ -806,8 +739,11 @@ def setup_prepare_kubespray(
     )
     logger.info(response.rcode())
 
+    yield
 
-@pytest.fixture(scope="session")
+
+
+@cloud_fixture("mirror")
 def setup_mirror_vm(request, get_test_env, setup_haproxy_lxcs):
     logger.info("test create dynamic qemu")
 
@@ -911,32 +847,32 @@ def setup_mirror_vm(request, get_test_env, setup_haproxy_lxcs):
             temp_qemu_inv,
         )
         temp_qemu_inv.flush()
-        try:
-            qemu_run = ansible_runner.run(
-                project_dir=os.getcwd(),
-                playbook="playbooks/sync_qemus.yaml",
-                inventory=temp_qemu_inv.name,
-                verbosity=request.config.getoption("--ansible-verbosity"),
-            )
 
-            assert qemu_run.rc == 0
+        qemu_run = ansible_runner.run(
+            project_dir=os.getcwd(),
+            playbook="playbooks/sync_qemus.yaml",
+            inventory=temp_qemu_inv.name,
+            verbosity=request.config.getoption("--ansible-verbosity"),
+        )
 
-            # run get blakes on qemus
-            setup_mirror_run = ansible_runner.run(
-                project_dir=os.getcwd(),
-                playbook="playbooks/setup_mirror_vm.yaml",
-                inventory=temp_qemu_inv.name,
-                verbosity=request.config.getoption("--ansible-verbosity"),
-            )
+        assert qemu_run.rc == 0
 
-            assert setup_mirror_run.rc == 0
+        # run get blakes on qemus
+        setup_mirror_run = ansible_runner.run(
+            project_dir=os.getcwd(),
+            playbook="playbooks/setup_mirror_vm.yaml",
+            inventory=temp_qemu_inv.name,
+            verbosity=request.config.getoption("--ansible-verbosity"),
+        )
 
-        finally:
-            if not request.config.getoption("--skip-cleanup"):
-                qemu_destroy_run = ansible_runner.run(
-                    project_dir=os.getcwd(),
-                    playbook="playbooks/destroy_qemus.yaml",
-                    inventory=temp_qemu_inv.name,
-                    verbosity=request.config.getoption("--ansible-verbosity"),
-                )
-                assert qemu_destroy_run.rc == 0
+        assert setup_mirror_run.rc == 0
+
+        yield
+
+        qemu_destroy_run = ansible_runner.run(
+            project_dir=os.getcwd(),
+            playbook="playbooks/destroy_qemus.yaml",
+            inventory=temp_qemu_inv.name,
+            verbosity=request.config.getoption("--ansible-verbosity"),
+        )
+        assert qemu_destroy_run.rc == 0

@@ -15,6 +15,7 @@ import pytest
 import redis
 import yaml
 from fixtures import *
+from pve_cloud_test.k8s_fixtures import get_secondary_kubespray_inv, get_kubespray_inv
 from pve_cloud.cli.pvclu import (get_ssh_master_kubeconfig,
                                  get_ssh_remote_master_kubeconfig)
 from pve_cloud.cli.pxrpc import launch_pxrpc, launch_pxrpc_async
@@ -65,6 +66,10 @@ async def test_pxrpc_tunnel(get_test_env):
 
         print("closed")
 
+
+def test_control_node(setup_control_node):
+    logger.info("test control node")
+    # tested via fixture, add more tests here
 
 def test_pve_host_setup(setup_pve_hosts):
     logger.info("test pve hosts")
@@ -329,6 +334,7 @@ def test_create_secondary_kubespray(
         )
         assert kubespray_destroy_run.rc == 0
     else:
+        # write kubeconfig if cleanup is skipped
         first_test_host = get_test_env["pve_test_cluster_hosts"][
             next(iter(get_test_env["pve_test_cluster_hosts"]))
         ]["ansible_host"]
@@ -418,6 +424,7 @@ eviction_hard:
         )
         assert kubespray_destroy_run.rc == 0
     else:
+        # write kubeconfig if cleanup is skipped
         first_test_host = get_test_env["pve_test_cluster_hosts"][
             next(iter(get_test_env["pve_test_cluster_hosts"]))
         ]["ansible_host"]

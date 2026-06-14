@@ -169,9 +169,17 @@
     },
 
     "ddns-send-updates": true,
-    "ddns-override-no-update": false,
-    "ddns-override-client-update": false,
-    "ddns-replace-client-name": "never",
+    
+    // ddns loss fix try
+    // TODO: REMOVE überflüssige lines
+    "ddns-override-no-update": true,
+    "ddns-override-client-update": true,
+    "ddns-replace-client-name": "always",
+
+    // "ddns-override-no-update": false,
+    // "ddns-override-client-update": false,
+    // "ddns-replace-client-name": "never",
+    
     "ddns-generated-prefix": "",
     // dedicated domain for ddns, cnames are created in cluster domain
     "ddns-qualifying-suffix": "{{ pve_cloud_domain }}",

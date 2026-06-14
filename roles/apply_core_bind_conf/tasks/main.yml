@@ -1,11 +1,13 @@
 ---
 # tasks file for apply_core_bind_conf
-- name: Check if haproxy is already running - wont be on first run
-  wait_for:
+- name: check if postgres is available
+  delegate_to: pxc-executor-host
+  community.postgresql.postgresql_ping:
     host: "{{ pve_haproxy_floating_ip_internal }}"
     port: 5000
-    timeout: 5
-    state: started
+    login_db: postgres
+    login_user: postgres
+    login_password: "{{ postgres_password }}" 
   register: postgres_connection_check
   ignore_errors: yes
 
@@ -15,16 +17,16 @@
     pg_conn_str: "{{ pg_conn_str }}"
     table: bind_domains
   register: bind_domains
-  when: postgres_connection_check is succeeded
+  when: postgres_connection_check.is_available
   
 - name: set empty k8s_ingress_rules on fail or psql not yet up
   set_fact:
     bind_domains: { "query_result": [] }
-  when: postgres_connection_check is not succeeded or bind_domains["failed"]
+  when: not postgres_connection_check.is_available or bind_domains["failed"]
 
 - set_fact:
     mapped_domains: "{{ bind_domains.query_result | map(attribute='domain') | list }}"
-  when: postgres_connection_check is succeeded
+  when: postgres_connection_check.is_available
 
 - name: template out default zone conf
   template:

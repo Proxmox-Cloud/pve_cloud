@@ -113,14 +113,19 @@
     
     # todo: this needs some better implementation, currently it requires reruns after the initial postgres setup
     # in order for this to trigger and write the lxcs vars to the postgres. this is implicit, shadow behaviour and needs an overhaul
-    - name: Check if haproxy + postgres is already running
-      wait_for:
+    - name: check if postgres is available
+      delegate_to: pxc-executor-host
+      community.postgresql.postgresql_ping:
         host: "{{ pve_haproxy_floating_ip_internal }}"
         port: 5000
-        timeout: 5
-        state: started
+        login_db: postgres
+        login_user: postgres
+        login_password: "{{ postgres_password  }}" 
       register: postgres_connection_check
       ignore_errors: yes
+
+    - debug:
+        var: postgres_connection_check
 
     # todo: write delete functionality and implement for qemus
     - name: write vm_vars_blake to patroni
@@ -134,7 +139,7 @@
           vm_vars: "{{ vm_vars_blake | combine(lxc_global_vars | default({}))}}"
         conflict_cols:
           - blake_id
-      when: postgres_connection_check is succeeded # only try to write the vars if the db is created
+      when: postgres_connection_check.is_available # only try to write the vars if the db is created
 
     - name: install systemd prom exporter
       include_role:
@@ -155,7 +160,7 @@
         where:
           secret_type: "vlogs-cluster-journald"
       register: vlogs_journald_ds # discovery secrets
-      when: postgres_connection_check is succeeded
+      when: postgres_connection_check.is_available
       
     # todo: also generify this
     # this logic sets up vector log exporter to victoria logs db if that is configured
@@ -165,4 +170,4 @@
         name: vector_journald_exporter
       vars:
         vlogs_etc_hosts_ip: "{{ pve_haproxy_floating_ip_internal }}" # lxc might not be included in dhcp dns options
-      when: postgres_connection_check is succeeded
+      when: postgres_connection_check.is_available

@@ -80,19 +80,21 @@
   tags:
     - config
   tasks:
-    - name: Check if haproxy is already running
-      wait_for:
+    - name: check if postgres is available
+      delegate_to: pxc-executor-host
+      community.postgresql.postgresql_ping:
         host: "{{ pve_haproxy_floating_ip_internal }}"
         port: 5000
-        timeout: 5
-        state: started
+        login_db: postgres
+        login_user: postgres
+        login_password: "{{ postgres_password  }}" 
       register: postgres_connection_check
       ignore_errors: yes
 
     - name: Try fetch config from postgres (on consecutive applies)
       include_role:
         name: select_kea_conf
-      when: postgres_connection_check is succeeded
+      when: postgres_connection_check.is_available
 
     # this will be later called regulary and dynamically filled with variables
     - include_role:

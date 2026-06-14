@@ -354,22 +354,26 @@
       run_once: true
     
     - set_fact:
-        pg_conn_str: "postgresql+psycopg2://postgres:{{ patroni_pass.content | b64decode | trim }}@{{ cluster_vars['pve_haproxy_floating_ip_internal'] }}:5000/pve_cloud?sslmode=disable"
+        postgres_password: "{{ patroni_pass.content | b64decode | trim }}"
+    
+    - set_fact:
+        pg_conn_str: "postgresql+psycopg2://postgres:{{ postgres_password }}@{{ cluster_vars['pve_haproxy_floating_ip_internal'] }}:5000/pve_cloud?sslmode=disable"
 
     # journald vector log piping
-    - name: Check if haproxy + postgres is already running
-      wait_for:
+    - name: check if postgres is available
+      community.postgresql.postgresql_ping:
         host: "{{ cluster_vars['pve_haproxy_floating_ip_internal'] }}"
         port: 5000
-        timeout: 5
-        state: started
+        login_db: postgres
+        login_user: postgres
+        login_password: "{{ postgres_password  }}" 
       register: postgres_connection_check
       ignore_errors: yes
 
     - name: run albemic migrations
       alchemy_migrate:
         pg_conn_str: "{{ pg_conn_str }}"
-      when: postgres_connection_check is succeeded
+      when: postgres_connection_check.is_available
       run_once: true
 
     - name: select discovery secret log export
@@ -379,7 +383,7 @@
         where:
           secret_type: "vlogs-cluster-journald"
       register: vlogs_journald_ds # discovery secrets
-      when: postgres_connection_check is succeeded
+      when: postgres_connection_check.is_available
       
     - name: install vector journald exporter
       include_role:
@@ -388,7 +392,7 @@
         target_pve: "{{ pve_cluster_name }}.{{ pve_cloud_domain }}"
         stack_name: "{{ inventory_hostname }}" # contains the cluster name
         vlogs_etc_hosts_ip: "{{ cluster_vars['pve_haproxy_floating_ip_internal'] }}" # hosts dont use cloud dns
-      when: postgres_connection_check is succeeded
+      when: postgres_connection_check.is_available
 
 # todo: document that for the initial setup playbooks need to be run twice because of state
 
@@ -405,26 +409,30 @@
       register: patroni_pass
     
     - set_fact:
-        pg_conn_str: "postgresql+psycopg2://postgres:{{ patroni_pass.content | b64decode | trim }}@{{ cluster_vars['pve_haproxy_floating_ip_internal'] }}:5000/pve_cloud?sslmode=disable"
+        postgres_password: "{{ patroni_pass.content | b64decode | trim }}"
     
-    - name: Check if haproxy + postgres is already running
-      wait_for:
+    - set_fact:
+        pg_conn_str: "postgresql+psycopg2://postgres:{{ postgres_password }}@{{ cluster_vars['pve_haproxy_floating_ip_internal'] }}:5000/pve_cloud?sslmode=disable"
+    
+    - name: check if postgres is available
+      community.postgresql.postgresql_ping:
         host: "{{ cluster_vars['pve_haproxy_floating_ip_internal'] }}"
         port: 5000
-        timeout: 5
-        state: started
+        login_db: postgres
+        login_user: postgres
+        login_password: "{{ postgres_password  }}" 
       register: postgres_connection_check
       ignore_errors: yes
 
     - name: run albemic migrations
       alchemy_migrate:
         pg_conn_str: "{{ pg_conn_str }}"
-      when: postgres_connection_check is succeeded
+      when: postgres_connection_check.is_available
       run_once: true
 
     - slurp_cloud_secrets_async:
       register: slurped_secrets
-      when: postgres_connection_check is succeeded
+      when: postgres_connection_check.is_available
 
     - name: create secret map
       set_fact:
@@ -432,7 +440,7 @@
       loop: "{{ slurped_secrets.results }}"    
       loop_control:
         label: "hidden"
-      when: postgres_connection_check is succeeded
+      when: postgres_connection_check.is_available
 
     - name: write cluster vars
       alchemy_upsert:
@@ -446,7 +454,7 @@
         conflict_cols:
           - secret_name
           - cloud_domain
-      when: postgres_connection_check is succeeded
+      when: postgres_connection_check.is_available
 
     - name: write cluster secrets
       alchemy_upsert:
@@ -460,4 +468,4 @@
         conflict_cols:
           - secret_name
           - cloud_domain
-      when: postgres_connection_check is succeeded
+      when: postgres_connection_check.is_available

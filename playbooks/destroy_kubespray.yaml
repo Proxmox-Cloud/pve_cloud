@@ -43,20 +43,6 @@
         where:
           stack_fqdn: "{{ stack_name }}.{{ pve_cloud_domain }}"
 
-    - name: wipe k8s masters
-      alchemy_delete:
-        pg_conn_str: "{{ pg_conn_str }}"
-        table: k8s_masters
-        where:
-          stack_fqdn: "{{ stack_name }}.{{ pve_cloud_domain }}"
-
-    - name: wipe k8s workers
-      alchemy_delete:
-        pg_conn_str: "{{ pg_conn_str }}"
-        table: k8s_workers
-        where:
-          stack_fqdn: "{{ stack_name }}.{{ pve_cloud_domain }}"
-
     - name: wipe bind domains
       alchemy_delete:
         pg_conn_str: "{{ pg_conn_str }}"

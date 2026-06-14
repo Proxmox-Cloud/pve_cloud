@@ -13,7 +13,6 @@
       apt:
         update_cache: yes
         pkg:
-          - nfs-common
           - rsync
     
     # install kubectl

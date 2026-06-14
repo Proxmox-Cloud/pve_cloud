@@ -73,6 +73,20 @@ If you want to develop the terraform provider you need golang installed.
 
 If you passed `--skip-cleanup` to pytest, the kubespray tests will write a `.test-kubeconfig.yaml` file you can use for lens access to the testing cluster.
 
+## Terraform
+
+Terraform is a limited POS, it should only be used to execute simple logic and as a dump api call state management system. The language is much too underdeveloped to be used for anything more!
+
+Any complex logic needs to be offloaded into a custom terraform provider resource written in golang.
+
+When you use the kubernetes provider especially, do not ever use count / for_each to conditionally create resources from any non static definement. If you use kubernetes_manifest ontop of that you will get errors that leave you searching for days!
+
+When you want to create complex kubernetes deployments, package them into helm, use its glorious templating and then use terraform to deploy the chart.
+
+### Debugging/Direct access
+
+The testing suite will write a sourceable `.debug.env` file inside the `test/scenarios/...` folder. With bash `source` function on that env file you can afterwards use the terraform cli for direct apply/plan/destroy operations.
+
 ## VSCode Pytest debug
 
 if you want to attach a debugger to the tests you can use the vscode python debug extension.
