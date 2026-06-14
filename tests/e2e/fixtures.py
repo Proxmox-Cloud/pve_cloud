@@ -1,7 +1,6 @@
 import json
 import logging
 import os
-import re
 import subprocess
 import tempfile
 
@@ -20,16 +19,12 @@ from pve_cloud.cli.pvcli import (connect_cluster, connect_remote_cluster,
 from pve_cloud.cli.pxrpc import launch_pxrpc
 from pve_cloud.lib.inventory import (get_cloud_domain, get_online_pve_host,
                                      get_pve_inventory, get_target_cluster)
-
 from pve_cloud.orm.alchemy import AcmeX509
 from pve_cloud_test.cloud_fixtures import *
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
 logger = logging.getLogger(__name__)
-
-
-
 
 
 @cloud_fixture("localhost", "control-node")
@@ -59,9 +54,7 @@ def setup_control_node(request, get_test_env):
         check=True,
     )
 
-    with tempfile.NamedTemporaryFile(
-        mode="w", delete=False, suffix=".txt"
-    ) as tmp_reqs:
+    with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".txt") as tmp_reqs:
         temp_reqs_path = tmp_reqs.name
 
         # modify ee-requirements.txt which are used as base setup dependencies for the control node
@@ -117,9 +110,7 @@ def setup_control_node(request, get_test_env):
         )
         connect_remote_cluster(parsed_args)
     else:
-        logger.info(
-            "initializing local ~/.pve-cloud-dyn-inv.yaml with direct access"
-        )
+        logger.info("initializing local ~/.pve-cloud-dyn-inv.yaml with direct access")
         parsed_args = get_parser().parse_args(
             [
                 "connect-cluster",
@@ -131,7 +122,6 @@ def setup_control_node(request, get_test_env):
             ]
         )
         connect_cluster(parsed_args)
-
 
 
 @cloud_fixture("hosts", "pve")
@@ -179,7 +169,6 @@ def setup_pve_hosts(request, get_test_env, setup_control_node):
             extra_vars["test_repos_ip"] = tdd_ip
             extra_vars["py_pve_cloud_version"] = py_pve_cloud_vers
 
-
         # run the main playbook
         logger.info("run pve cluster setup")
         setup_run = ansible_runner.run(
@@ -191,7 +180,6 @@ def setup_pve_hosts(request, get_test_env, setup_control_node):
         )
 
         assert setup_run.rc == 0
-
 
 
 @cloud_fixture("dhcp", "kea")
@@ -247,7 +235,6 @@ def setup_dhcp_lxcs(request, get_test_env, fetch_default_gw_ns, setup_bind_lxcs)
             temp_kea_lxcs_inv,
         )
         temp_kea_lxcs_inv.flush()
-
 
         sync_lxcs_kea = ansible_runner.run(
             project_dir=os.getcwd(),
@@ -323,7 +310,6 @@ def setup_ceph_dhcp_lxcs(request, get_test_env, setup_dhcp_lxcs):
                 temp_kea_lxcs_inv,
             )
             temp_kea_lxcs_inv.flush()
-
 
             sync_lxcs_kea = ansible_runner.run(
                 project_dir=os.getcwd(),
@@ -410,7 +396,6 @@ def setup_bind_lxcs(request, get_test_env, fetch_default_gw_ns, setup_pve_hosts)
         )
         temp_bind_lxcs_inv.flush()
 
-
         sync_bind_lxcs_run = ansible_runner.run(
             project_dir=os.getcwd(),
             playbook="playbooks/sync_lxcs.yaml",
@@ -429,7 +414,6 @@ def setup_bind_lxcs(request, get_test_env, fetch_default_gw_ns, setup_pve_hosts)
         assert setup_bind_run.rc == 0
 
         yield
-
 
         logger.info("destroy bind lxcs")
         destroy_bind_lxcs_run = ansible_runner.run(
@@ -681,7 +665,6 @@ def setup_prepare_kubespray(
         next(iter(get_test_env["pve_test_cluster_hosts"]))
     ]["ansible_host"]
 
-
     # start pxrpc server for injecting
     if "pve_test_cluster_jump_host" in get_test_env:
         with launch_pxrpc(
@@ -710,7 +693,9 @@ def setup_prepare_kubespray(
     # set manual cp records (only for testing prod is manually manged)
     dns_update = dns.update.Update(
         get_test_env["kubernetes"]["deployments_domain"],
-        keyring=dns.tsigkeyring.from_text({"internal.": get_cloud_secrets["bind_internal_key"]}),
+        keyring=dns.tsigkeyring.from_text(
+            {"internal.": get_cloud_secrets["bind_internal_key"]}
+        ),
         keyname="internal.",
         keyalgorithm="hmac-sha256",
     )
@@ -740,7 +725,6 @@ def setup_prepare_kubespray(
     logger.info(response.rcode())
 
     yield
-
 
 
 @cloud_fixture("mirror")
