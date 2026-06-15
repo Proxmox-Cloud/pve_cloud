@@ -198,11 +198,12 @@
 
 - name: Cluster reps setup
   hosts: pve_cluster_reps
-  vars:
+  tasks:
     # this has to be set here instead of the inventory because on first runs we use this very playbook
     # to setup the venv. todo: would probably be cleaner if the inventory plugin did the setup in an async fashion
-    ansible_python_interpreter: /root/.pxc-venv/bin/python
-  tasks:
+    - set_fact:
+        ansible_python_interpreter: /root/.pxc-venv/bin/python
+
     # install ssh trusted keys between clusters, needed for rsync
     - name: slurp ssh pub key
       slurp:
@@ -328,9 +329,10 @@
   tags:
     - rsync
   serial: 1
-  vars:
-    ansible_python_interpreter: /root/.pxc-venv/bin/python
   tasks:
+    - set_fact:
+        ansible_python_interpreter: /root/.pxc-venv/bin/python
+
     - name: rsync missing secrets
       ansible.builtin.command: "rsync -avz --inplace --ignore-existing -e 'ssh -o StrictHostKeyChecking=no' root@{{ hostvars[item]['ansible_default_ipv4']['address'] }}:/etc/pve/cloud/secrets/ /etc/pve/cloud/secrets/"
       loop: "{{ groups['pve_cluster_reps'] }}"
@@ -345,9 +347,9 @@
 # this fires only conditionally if the cluster has a monitoring stack configured
 - name: Vector Log setup
   hosts: all_pve_hosts
-  vars:
-    ansible_python_interpreter: /root/.pxc-venv/bin/python
   tasks:
+    - set_fact:
+        ansible_python_interpreter: /root/.pxc-venv/bin/python
     # slurp patroni password
     - name: Slurp file if it exists
       slurp:
@@ -394,9 +396,9 @@
 # this is mainly needed for multi cloud functionality (multi cloud gateway api is using these secrets)
 - name: sync secrets into postgres
   hosts: pve_cluster_reps
-  vars:
-    ansible_python_interpreter: /root/.pxc-venv/bin/python
   tasks:
+    - set_fact:
+        ansible_python_interpreter: /root/.pxc-venv/bin/python
     # slurp patroni password
     - name: Slurp file if it exists
       slurp:
