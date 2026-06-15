@@ -1,38 +1,110 @@
 ---
 # tasks file for vector_journald_exporter
+- name: check if postgres is available
+  delegate_to: pxc-executor-host
+  community.postgresql.postgresql_ping:
+    host: "{{ pve_haproxy_floating_ip_internal }}"
+    port: 5000
+    login_db: postgres
+    login_user: postgres
+    login_password: "{{ postgres_password }}" 
+  register: postgres_connection_check
+  ignore_errors: yes
+
+- name: select vector discovery secret log export
+  delegate_to: pxc-executor-host
+  alchemy_read:
+    pg_conn_str: "{{ pg_conn_str }}"
+    table: px_cloud_secrets
+    where:
+      secret_type: "vlogs-cluster-journald"
+  register: vlogs_journald_ds # discovery secrets
+  when: postgres_connection_check.is_available
+
 - set_fact:
     vlogs_discovery_secret: "{{ vlogs_journald_ds.query_result | selectattr('secret_data.target_pve', 'equalto', target_pve) | first | default({}) }}"
-  # when: vlogs_journald_ds.rowcount > 0
 
-- name: Set vlogs host in hosts file (for pve hosts)
-  ansible.builtin.lineinfile:
-    path: /etc/hosts
-    # ip defaults to the haproxy internal floating ip
-    # todo: this should get a regexpr to update in case of floating ip changes (which changes are currently not supported)
-    line: "{{ vlogs_etc_hosts_ip }} {{ vlogs_discovery_secret.secret_data.host }}"
-    create: yes
-  when: vlogs_discovery_secret | length > 0 and vlogs_etc_hosts_ip is not none
+- name: Cloud mirror discovery
+  delegate_to: pxc-executor-host
+  alchemy_read:
+    pg_conn_str: "{{ pg_conn_str }}"
+    table: px_cloud_secrets
+    where:
+      cloud_domain: "{{ pve_cloud_domain }}"
+      secret_name: "cloud-mirror-vm"
+  register: mirror_discovery_secret
+  when: postgres_connection_check.is_available
 
-# todo: to do this properly convert the curl script into ansible funcs
-- name: Install Vector via official script
-  shell: |
-    apt update && apt install curl -y
-    bash -c "$(curl -L https://setup.vector.dev)"
-    apt install -y vector
-  args:
-    creates: /usr/bin/vector
+- name: install vector when discovered
   when: vlogs_discovery_secret | length > 0
+  block:
+    - name: Set vlogs host in hosts file (for pve hosts)
+      ansible.builtin.lineinfile:
+        path: /etc/hosts
+        # ip defaults to the haproxy internal floating ip
+        # todo: this should get a regexpr to update in case of floating ip changes (which changes are currently not supported)
+        line: "{{ vlogs_etc_hosts_ip }} {{ vlogs_discovery_secret.secret_data.host }}"
+        create: yes
+      when: vlogs_etc_hosts_ip is not none
 
-- name: template vector conf
-  template:
-    src: vector.yaml.j2
-    dest: /etc/vector/vector.yaml
-  when: vlogs_discovery_secret | length > 0
+    # install vector via the mirror if its available
+    - name: mirror vector install
+      when: mirror_discovery_secret.rowcount != 0
+      block:
+        - name: Set aptly mirror host in hosts file
+          when: postgres_connection_check.is_available and mirror_discovery_secret.rowcount != 0
+          ansible.builtin.lineinfile:
+            path: /etc/hosts
+            # ip defaults to the haproxy internal floating ip
+            # todo: this should get a regexpr to update in case of floating ip changes (which changes are currently not supported)
+            line: "{{ mirror_discovery_secret.query_result[0]['secret_data']['mirror_vm_addr'] }} {{ mirror_discovery_secret.query_result[0]['secret_data']['aptly_mirror_domain'] }}"
+            create: yes
 
-- name: start vector service
-  ansible.builtin.service:
-    name: vector
-    enabled: true
-    state: started
-  when: vlogs_discovery_secret | length > 0
+        - name: write mirror pgp key
+          when: postgres_connection_check.is_available and mirror_discovery_secret.rowcount != 0
+          ansible.builtin.copy:
+            content: "{{ mirror_discovery_secret.query_result[0]['secret_data']['pgp_public_key_b64'] | b64decode }}"
+            dest: /etc/apt/trusted.gpg.d/pxc-aptly.asc
+            
+        - name: configure vector repo
+          ansible.builtin.copy:
+            content: |
+              Types: deb
+              URIs: http://{{ mirror_discovery_secret.query_result[0]['secret_data']['aptly_mirror_domain'] }}/vector
+              Suites: stable
+              Components: vector-0
+            dest: /etc/apt/sources.list.d/vector.sources
+        
+        - name: make sure original vector sources are deleted
+          ansible.builtin.file:
+            path: /etc/apt/sources.list.d/vector.list # normal vector script installs in .list format
+            state: absent
+            
+        - name: install vector
+          ansible.builtin.apt:
+            name: vector
+            update_cache: yes
+
+    # else we install it via the offiical script / sources
+    # todo: to do this properly convert the curl script into ansible funcs
+    - name: Install Vector via official script
+      when: mirror_discovery_secret.rowcount == 0
+      shell: |
+        apt update && apt install curl -y
+        bash -c "$(curl -L https://setup.vector.dev)"
+        apt install -y vector
+      args:
+        creates: /usr/bin/vector
+
+    # template out the conf an launch
+    - name: template vector conf
+      template:
+        src: vector.yaml.j2
+        dest: /etc/vector/vector.yaml
+
+    - name: start vector service
+      ansible.builtin.service:
+        name: vector
+        enabled: true
+        state: started
 

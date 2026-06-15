@@ -93,3 +93,8 @@ The collection and projects use certain terms to define scope, which enables a l
 * `target_pve`: this refers to a proxmox cluster within a domain. Its the result of the proxmox cluster name defined in the proxmox ui + `(.)pve_cloud_domain`
 * `stack_name`: each set of vms / lxcs you deploy is referred to as a stack. Each kubespray cluster is its own stack also.
 * `stack_fqdn`: this referes to the `stack_name` + `(.)pve_cloud_domain` and serves to identify the stack uniquely
+* control node: this is the machine that runs ansible and terraform scripts. This is you development/deployment machine and this agent needs to have the main cloud ssh keys loaded in its agent.
+
+## VMs / LXCs
+
+Currently this collection runs on debian 12 bookworm, and heavily prefers lxc templates / vms matching this distribution. Generally it should work with other apt based distros, however not all functions may be supported there.

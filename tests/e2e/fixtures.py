@@ -19,7 +19,7 @@ from pve_cloud.cli.pvcli import (connect_cluster, connect_remote_cluster,
 from pve_cloud.cli.pxrpc import launch_pxrpc
 from pve_cloud.lib.inventory import (get_cloud_domain, get_online_pve_host,
                                      get_pve_inventory, get_target_cluster)
-from pve_cloud.orm.alchemy import AcmeX509
+from pve_cloud.orm.alchemy import AcmeX509, ProxmoxCloudSecrets
 from pve_cloud_test.cloud_fixtures import *
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
@@ -603,13 +603,14 @@ def setup_prepare_kubespray(
 ):
     logger.info("setup environment for kubespray playbooks")
 
+    # copy tls
     copy_cloud_domain = get_cloud_domain(
-        get_test_env["kubernetes"]["k8s_tls_copy_target_pve"]
+        get_test_env["kubernetes"]["copy_target_pve"]
     )
     copy_pve_inventory = get_pve_inventory(copy_cloud_domain)
     copy_target_cluster = get_target_cluster(
         copy_pve_inventory,
-        get_test_env["kubernetes"]["k8s_tls_copy_target_pve"],
+        get_test_env["kubernetes"]["copy_target_pve"],
         copy_cloud_domain,
     )
 
@@ -618,7 +619,7 @@ def setup_prepare_kubespray(
     )
 
     # copy target has to be a directly accessible proxmox cluster (no jump hosts allowed)
-    assert copy_jump_host is None
+    assert copy_jump_host is None, "Copy target pve for tls and harbor creds needs to be directly accessible! Jump host not yet supported."
 
     # we connect to the test host to get the patroni secret of the cluster, aswell as the vars
     ssh = paramiko.SSHClient()
@@ -652,7 +653,7 @@ def setup_prepare_kubespray(
         cur.execute(
             query,
             (
-                f"{get_test_env['kubernetes']['k8s_tls_copy_stack_name']}.{cluster_vars['pve_cloud_domain']}",
+                f"{get_test_env['kubernetes']['tls_copy_stack_name']}.{cluster_vars['pve_cloud_domain']}",
             ),
         )
         record = cur.fetchone()
@@ -690,39 +691,72 @@ def setup_prepare_kubespray(
             session.merge(copy_cert)
             session.commit()
 
-    # set manual cp records (only for testing prod is manually manged)
-    dns_update = dns.update.Update(
-        get_test_env["kubernetes"]["deployments_domain"],
-        keyring=dns.tsigkeyring.from_text(
-            {"internal.": get_cloud_secrets["bind_internal_key"]}
-        ),
-        keyname="internal.",
-        keyalgorithm="hmac-sha256",
-    )
+    # copy harbor mirror credentials iif specified in test env
+    if "harbor_copy_mirror_host" in get_test_env["kubernetes"]:
+        logger.info("copying external harbor mirror credentials")
 
-    # main k8s
-    dns_update.replace(
-        "cp-pytest",
-        300,
-        "A",
-        get_test_env["pve_test_cluster_floating_external"],
-    )
-    response = dns.query.tcp(
-        dns_update, get_test_env["cloud_inventory"]["bind_master_ip"]
-    )
-    logger.info(response.rcode())
+        with conn.cursor() as cur:
+            # query harbor admin creds
+            cur.execute(
+                "SELECT secret_data FROM px_cloud_secrets WHERE secret_name = %s;",
+                (
+                    f"{get_test_env['kubernetes']['harbor_copy_mirror_host']}-admin",
+                ),
+            )
+            admin_secret = cur.fetchone()
 
-    # secondary k8s
-    dns_update.replace(
-        "cp-pytest-secondary",
-        300,
-        "A",
-        get_test_env["pve_test_cluster_floating_external"],
-    )
-    response = dns.query.tcp(
-        dns_update, get_test_env["cloud_inventory"]["bind_master_ip"]
-    )
-    logger.info(response.rcode())
+            assert admin_secret
+            logger.info(admin_secret)
+
+            cur.execute(
+                "SELECT secret_data FROM px_cloud_secrets WHERE secret_name = %s;",
+                (
+                    f"{get_test_env['kubernetes']['harbor_copy_mirror_host']}-mirror",
+                ),
+            )
+            mirror_secret = cur.fetchone()
+
+            assert mirror_secret
+            logger.info(mirror_secret)
+
+        # next we inject the secrets
+        if "pve_test_cluster_jump_host" in get_test_env:
+            with launch_pxrpc(
+                get_test_env["pve_test_cluster_jump_host"],
+                first_test_host,
+            ) as (pxrpc, jump_host):
+                pxrpc.inject_cloud_secret(
+                    get_test_env['cloud_inventory']['pve_cloud_domain'], # fake the cloud domain
+                    f"{get_test_env['kubernetes']['harbor_copy_mirror_host']}-admin",
+                    json.dumps(admin_secret[0]),
+                    ""
+                )
+                pxrpc.inject_cloud_secret(
+                    get_test_env['cloud_inventory']['pve_cloud_domain'], 
+                    f"{get_test_env['kubernetes']['harbor_copy_mirror_host']}-mirror",
+                    json.dumps(mirror_secret[0]),
+                    ""
+                )
+        else:
+            engine = create_engine(get_cloud_secrets["pg_conn_str_orm"])
+
+            # update certs and mirror pull secret
+            with Session(engine) as session:
+                copy_admin = ProxmoxCloudSecrets(
+                    cloud_domain=get_test_env['cloud_inventory']['pve_cloud_domain'],
+                    secret_name=f"{get_test_env['kubernetes']['harbor_copy_mirror_host']}-admin",
+                    secret_data=admin_secret[0]
+                )
+                session.merge(copy_admin)
+
+                copy_mirror = ProxmoxCloudSecrets(
+                    cloud_domain=get_test_env['cloud_inventory']['pve_cloud_domain'],
+                    secret_name=f"{get_test_env['kubernetes']['harbor_copy_mirror_host']}-mirror",
+                    secret_data=mirror_secret[0]
+                )
+                session.merge(copy_mirror)
+
+                session.commit()
 
     yield
 

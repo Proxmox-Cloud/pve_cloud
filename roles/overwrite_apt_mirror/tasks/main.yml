@@ -1,0 +1,70 @@
+---
+# tasks file for overwrite_apt_mirror
+- name: check if postgres is available
+  delegate_to: pxc-executor-host
+  community.postgresql.postgresql_ping:
+    host: "{{ pve_haproxy_floating_ip_internal }}"
+    port: 5000
+    login_db: postgres
+    login_user: postgres
+    login_password: "{{ postgres_password }}" 
+  register: postgres_connection_check
+  ignore_errors: yes
+
+- name: Cloud mirror discovery
+  delegate_to: pxc-executor-host
+  alchemy_read:
+    pg_conn_str: "{{ pg_conn_str }}"
+    table: px_cloud_secrets
+    where:
+      cloud_domain: "{{ pve_cloud_domain }}"
+      secret_name: "cloud-mirror-vm"
+  register: mirror_discovery_secret
+  when: postgres_connection_check.is_available
+
+# when cloud mirror is defined we write out the apt sources and disable the default
+- name: configure bookworm mirror
+  when: 
+    - postgres_connection_check.is_available and mirror_discovery_secret.rowcount != 0
+    - ansible_distribution == "Debian" and ansible_distribution_release == "bookworm"
+  block:
+    - name: overwrite default sources list
+      ansible.builtin.copy:
+        content: |
+          # See /etc/apt/sources.list.d/debian.sources
+        dest: /etc/apt/sources.list
+
+    # is currently the same for debian vms / lxcs
+    - name: create mirror source file
+      ansible.builtin.copy:
+        content: |
+          Types: deb
+          URIs: http://{{ mirror_discovery_secret.query_result[0]['secret_data']['aptly_mirror_domain'] }}/debian
+          Suites: bookworm bookworm-updates bookworm-backports
+          Components: main
+
+          Types: deb
+          URIs: http://{{ mirror_discovery_secret.query_result[0]['secret_data']['aptly_mirror_domain'] }}/debian-security
+          Suites: bookworm-security
+          Components: main
+        dest: /etc/apt/sources.list.d/debian.sources
+
+    # todo: this should only be used for static default service lxcs
+    # not for those that have the cloud dns set via dhcp as they can resolve
+    # the aptly_mirror_domain dynamically
+    - name: Set aptly mirror host in hosts file
+      ansible.builtin.lineinfile:
+        path: /etc/hosts
+        # ip defaults to the haproxy internal floating ip
+        # todo: this should get a regexpr to update in case of floating ip changes (which changes are currently not supported)
+        line: "{{ mirror_discovery_secret.query_result[0]['secret_data']['mirror_vm_addr'] }} {{ mirror_discovery_secret.query_result[0]['secret_data']['aptly_mirror_domain'] }}"
+        create: yes
+
+    - name: write mirror pgp key
+      ansible.builtin.copy:
+        content: "{{ mirror_discovery_secret.query_result[0]['secret_data']['pgp_public_key_b64'] | b64decode }}"
+        dest: /etc/apt/trusted.gpg.d/pxc-aptly.asc
+
+    - name: run apt update
+      ansible.builtin.apt:
+        update_cache: yes

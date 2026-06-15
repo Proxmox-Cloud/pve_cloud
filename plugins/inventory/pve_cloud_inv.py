@@ -1,4 +1,5 @@
 import os
+import sys
 
 from ansible.errors import AnsibleParserError
 from ansible.plugins.inventory import BaseInventoryPlugin
@@ -85,6 +86,7 @@ class InventoryModule(BaseInventoryPlugin):
         inventory.set_variable("all", "py_pve_cloud_version", py_pve_cloud_version)
 
         # load pve clusters and set cluster variables for them
+        executor_set = False
         for pve_cluster in yaml_data["pve_clusters"]:
             # cluster rep group
             first = True
@@ -133,6 +135,33 @@ class InventoryModule(BaseInventoryPlugin):
                     inventory.add_host(fqdn_host, group="pve_cluster_reps")
                     first = False
 
+                if not executor_set and online_jump_hosts:
+                    # first cluster rep also becomes marked as pxc-executor-host
+                    # this is needed to run generic pxc roles that require the executor set
+                    
+                    inventory.add_host("pxc-executor-host")
+
+                    inventory.set_variable("pxc-executor-host", "ansible_user", "root")
+                    inventory.set_variable(
+                        "pxc-executor-host", "ansible_user", params["ansible_user"]
+                    )
+                    inventory.set_variable(
+                        "pxc-executor-host", "ansible_host", params["ansible_host"]
+                    )
+                    inventory.set_variable(
+                        "pxc-executor-host",
+                        "ansible_python_interpreter",
+                        "/root/.pxc-venv/bin/python",
+                    )
+
+                    inventory.set_variable(
+                        "pxc-executor-host",
+                        "ansible_ssh_common_args",
+                        f"-o ProxyJump=root@{online_jump_hosts[0]}",
+                    )
+
+                    executor_set = True
+
                 inventory.set_variable(
                     fqdn_host, "ansible_user", params["ansible_user"]
                 )
@@ -178,3 +207,14 @@ class InventoryModule(BaseInventoryPlugin):
                                 host
                             ][var],
                         )
+
+        
+        # no jump host definitions, we use localhost as central executor
+        if not executor_set:
+            inventory.add_host("pxc-executor-host")
+
+            inventory.set_variable("pxc-executor-host", "ansible_host", "127.0.0.1")
+            inventory.set_variable("pxc-executor-host", "ansible_connection", "local")
+            inventory.set_variable(
+                "pxc-executor-host", "ansible_python_interpreter", sys.executable
+            )

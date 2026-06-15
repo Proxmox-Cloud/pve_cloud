@@ -9,7 +9,7 @@
 
 - name: create mirror
   when: "'{{ distribution_id }}-mirror' not in aptly_existing_mirrors.stdout_lines"
-  command: "aptly mirror create -filter='{{ mirror_filter }}' -architectures='amd64,arm64,armhf' {{ '-with-sources' if mirror_sources else '' }} -filter-with-deps -force-components {{ distribution_id }}-mirror {{ mirror_url }} {{ mirror_distribution }} {% for cmp in mirror_components %}{{ cmp }} {% endfor %}"
+  command: "aptly mirror create -filter='{{ mirror_filter | split('\n') | join }}' -architectures='amd64,arm64,armhf' {{ '-with-sources' if mirror_sources else '' }} -filter-with-deps -force-components {{ distribution_id }}-mirror {{ mirror_url }} {{ mirror_distribution }} {% for cmp in mirror_components %}{{ cmp }} {% endfor %}"
 
 - name: init mirror (might take a long time)
   when: "'{{ distribution_id }}-mirror' not in aptly_existing_mirrors.stdout_lines"
@@ -37,7 +37,7 @@
 
 - name: edit mirror
   when: mirror_filter_configured != mirror_filter
-  command: "aptly mirror edit -filter='{{ mirror_filter }}' {{ '-with-sources' if mirror_sources else '' }} -filter-with-deps {{ distribution_id }}-mirror"
+  command: "aptly mirror edit -filter='{{ mirror_filter | split('\n') | join }}' {{ '-with-sources' if mirror_sources else '' }} -filter-with-deps {{ distribution_id }}-mirror"
 
 - name: update mirror
   when: mirror_filter_configured != mirror_filter

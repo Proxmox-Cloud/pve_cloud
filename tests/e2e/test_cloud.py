@@ -306,6 +306,7 @@ def test_create_secondary_kubespray(
     get_secondary_kubespray_inv,
     setup_prepare_kubespray,
     setup_mirror_vm,
+    get_cloud_secrets
 ):
     extra_vars = {}
     tdd_ip = get_tdd_ip()
@@ -326,6 +327,29 @@ def test_create_secondary_kubespray(
     )
 
     assert kubespray_run.rc == 0
+
+    # set manual cp records (only for testing prod is manually manged)
+    dns_update = dns.update.Update(
+        get_test_env["kubernetes"]["deployments_domain"],
+        keyring=dns.tsigkeyring.from_text(
+            {"internal.": get_cloud_secrets["bind_internal_key"]}
+        ),
+        keyname="internal.",
+        keyalgorithm="hmac-sha256",
+    )
+
+    # secondary k8s
+    dns_update.replace(
+        "cp-pytest-secondary",
+        300,
+        "A",
+        get_test_env["pve_test_cluster_floating_external"],
+    )
+    response = dns.query.tcp(
+        dns_update, get_test_env["cloud_inventory"]["bind_master_ip"]
+    )
+    logger.info(f"response code creating dns secondary {response.rcode()}")
+    assert response.rcode() == 0
 
     if not request.config.getoption("--skip-cleanup"):
         kubespray_destroy_run = ansible_runner.run(
@@ -364,6 +388,7 @@ def test_create_kubespray(
     get_test_env,
     get_kubespray_inv,
     setup_prepare_kubespray,
+    get_cloud_secrets
 ):
     logger.info("create kubespray")
 
@@ -412,6 +437,30 @@ eviction_hard:
     )
 
     assert kubespray_run.rc == 0
+
+    # set manual cp records (only for testing prod is manually manged)
+    dns_update = dns.update.Update(
+        get_test_env["kubernetes"]["deployments_domain"],
+        keyring=dns.tsigkeyring.from_text(
+            {"internal.": get_cloud_secrets["bind_internal_key"]}
+        ),
+        keyname="internal.",
+        keyalgorithm="hmac-sha256",
+    )
+
+    # main k8s
+    dns_update.replace(
+        "cp-pytest",
+        300,
+        "A",
+        get_test_env["pve_test_cluster_floating_external"],
+    )
+    response = dns.query.tcp(
+        dns_update, get_test_env["cloud_inventory"]["bind_master_ip"]
+    )
+    logger.info(f"response code creating dns {response.rcode()}")
+    assert response.rcode() == 0
+
 
     # always cleanup custom vars
     if os.path.exists(k8s_cluster_vars_path):

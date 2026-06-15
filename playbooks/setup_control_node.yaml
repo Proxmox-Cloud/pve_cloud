@@ -14,6 +14,7 @@
         update_cache: yes
         pkg:
           - rsync
+          - skopeo # quering mirror registry
     
     # install kubectl
     - name: install check kubectl

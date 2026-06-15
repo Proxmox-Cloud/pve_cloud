@@ -118,6 +118,20 @@
         line: "{{ cluster_automation_pub_key | b64decode | trim }}"
         state: present
 
+    - name: set pre up cloud mirror
+      include_role:
+        name: overwrite_apt_mirror
+        apply:
+          become: true
+
+    - name: install vector journald exporter
+      include_role:
+        name: vector_journald_exporter
+        apply:
+          become: true
+      vars:
+        vlogs_etc_hosts_ip: "{{ pve_haproxy_floating_ip_internal }}"
+
 # todo: can be factored out if patroni lxcs themselfes get entries in
 # the database (used in haproxy cfg template)
 - name: Fetch ha-postgres
@@ -222,5 +236,4 @@
   tags:
     - config
 
-# todo: prom exporter and vector journald logs exporter needs to be pluggable via schema rules
-# for vms
+# todo: implement same prom systemd exporter functionality as for lxcs

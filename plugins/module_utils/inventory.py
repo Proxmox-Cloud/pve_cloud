@@ -210,6 +210,12 @@ def build_pve_inventory(inventory, yaml_data, online_pve_hosts, cluster_map):
                     "/root/.pxc-venv/bin/python",
                 )
 
+                inventory.set_variable(
+                    "pxc-executor-host",
+                    "ansible_ssh_common_args",
+                    f"-o ProxyJump=root@{pve_host.jump_host}",
+                )
+                
                 pxc_executor_set = True
 
         if pve_host.hostname in cluster.host_ha_groups:

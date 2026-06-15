@@ -111,10 +111,10 @@
         dest: /opt/docker.asc
         mode: '0644'
 
-    # - name: Write kea key
-    #   copy:
-    #     src: kea-2-6.asc
-    #     dest: /opt/kea-2-6.asc
+    - name: Write kea key
+      copy:
+        src: kea-2-6.asc
+        dest: /opt/kea-2-6.asc
 
     - name: Import ASCII keys into trustedkeys.gpg
       ansible.builtin.command:
@@ -130,7 +130,7 @@
         - terraform.asc
         - docker.asc
         - DATADOG_APT_KEY_CURRENT.public
-        # - kea-2-6.asc
+        - kea-2-6.asc
 
     - name: import ubuntu security keys
       command: gpg --no-default-keyring --keyring trustedkeys.gpg --keyserver keyserver.ubuntu.com --recv-keys 54404762BBB6E853
@@ -186,7 +186,7 @@
           - main 
           - contrib 
           - non-free-firmware
-        mirror_filter: >-
+        mirror_filter: |-
           gnupg|qemu-guest-agent|console-setup|keyboard-configuration|git|curl|
           python3|python3-venv|avahi-utils|direnv|age|rsync|appstream|apt-transport-https|
           conntrack|ebtables|fuse|gir1.2-glib-2.0|gir1.2-packagekitglib-1.0|gnupg-l10n|
@@ -196,7 +196,7 @@
           python3-distro|python3-gi|python3-httplib2|python3-lazr.restfulclient|python3-lazr.uri|
           python3-software-properties|python3-urllib3|python3-wadllib|shared-mime-info|
           software-properties-common|unzip|xfsprogs|bind9|bind9utils|prometheus-node-exporter|openssh|
-          etcd-server|pip|postgresql|keepalived|haproxy|borgbackup
+          etcd-server|pip|postgresql|keepalived|haproxy|borgbackup|skopeo
 
     - name: configure bookworm mirror
       include_role:
@@ -220,6 +220,7 @@
         mirror_distribution: bookworm-security
         mirror_endpoint: debian-security
 
+          
     - name: configure terraform
       include_role:
         name: aptly_mirror_repo
@@ -256,20 +257,19 @@
         mirror_filter: "vector"
         mirror_sources: false 
 
-    # - name: configure kea cloudsmith
-    #   include_role:
-    #     name: aptly_mirror_repo
-    #   vars:
-    #     mirror_url: https://dl.cloudsmith.io/public/isc/kea-2-6/deb/debian
-    #     mirror_distribution: bookworm
-    #     mirror_endpoint: kea-2-6
-    #     mirror_components:
-    #       - main
-    #     mirror_filter: >-
-    #       isc-kea|isc-kea-ctrl-agent|isc-kea-hooks|
-    #       isc-kea-common|isc-kea-admin|isc-kea-dhcp-ddns
-
-    #     mirror_sources: true
+    - name: configure kea cloudsmith
+      include_role:
+        name: aptly_mirror_repo
+      vars:
+        mirror_url: https://dl.cloudsmith.io/public/isc/kea-2-6/deb/debian
+        mirror_distribution: bookworm
+        mirror_endpoint: kea-2-6
+        mirror_components:
+          - main
+        mirror_filter: |-
+          isc-kea|isc-kea-ctrl-agent|isc-kea-hooks|
+          isc-kea-common|isc-kea-admin|isc-kea-dhcp-ddns
+        mirror_sources: false
 
 - name: Configure mirror vm
   hosts: qemus

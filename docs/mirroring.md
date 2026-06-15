@@ -28,3 +28,5 @@ qemus:
               - CLOUD_MASTER_DNS_IP
               - CLOUD_SLAVE_DNS_IP
 ```
+
+Running the playbook creates a discovery secret that the collection will pick up on. By simply rerunning all your playbooks the collection will swap out apt repositories etc.

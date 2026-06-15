@@ -38,6 +38,17 @@
     dest: "/opt/images/{{ qemu_image_url.split('/')[-1] }}"
   when: not image_file.stat.exists
 
+- name: check if postgres is available
+  delegate_to: pxc-executor-host
+  community.postgresql.postgresql_ping:
+    host: "{{ pve_haproxy_floating_ip_internal }}"
+    port: 5000
+    login_db: postgres
+    login_user: postgres
+    login_password: "{{ postgres_password }}" 
+  register: postgres_connection_check
+  ignore_errors: yes
+
 - name: Cloud mirror discovery
   delegate_to: pxc-executor-host
   alchemy_read:
@@ -47,6 +58,7 @@
       cloud_domain: "{{ pve_cloud_domain }}"
       secret_name: "cloud-mirror-vm"
   register: mirror_discovery_secret
+  when: postgres_connection_check.is_available
 
 - name: Create user.yaml snippet
   template:

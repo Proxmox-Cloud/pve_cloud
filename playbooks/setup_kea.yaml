@@ -24,7 +24,50 @@
         pkg:
         - curl
 
-    - name: isc sources
+    # configure mirror if available
+    - name: check if postgres is available
+      delegate_to: pxc-executor-host
+      community.postgresql.postgresql_ping:
+        host: "{{ pve_haproxy_floating_ip_internal }}"
+        port: 5000
+        login_db: postgres
+        login_user: postgres
+        login_password: "{{ postgres_password }}" 
+      register: postgres_connection_check
+      ignore_errors: yes
+
+    - name: Cloud mirror discovery
+      delegate_to: pxc-executor-host
+      alchemy_read:
+        pg_conn_str: "{{ pg_conn_str }}"
+        table: px_cloud_secrets
+        where:
+          cloud_domain: "{{ pve_cloud_domain }}"
+          secret_name: "cloud-mirror-vm"
+      register: mirror_discovery_secret
+      when: postgres_connection_check.is_available
+
+    - name: mirror kea install
+      when: postgres_connection_check.is_available and mirror_discovery_secret.rowcount != 0
+      block:
+        # pgp keys already installed from sync_lxcs playbook
+        - name: configure vector repo
+          ansible.builtin.copy:
+            content: |
+              Types: deb
+              URIs: http://{{ mirror_discovery_secret.query_result[0]['secret_data']['aptly_mirror_domain'] }}/kea-2-6
+              Suites: bookworm
+              Components: main
+            dest: /etc/apt/sources.list.d/isc-kea-2-6.sources
+
+        - name: make sure original kea sources are deleted
+          ansible.builtin.file:
+            path: /etc/apt/sources.list.d/isc-kea-2-6.list # normal vector script installs in .list format
+            state: absent
+
+    # install via official sources if mirror not available
+    - name: isc sources default
+      when: not postgres_connection_check.is_available or mirror_discovery_secret.rowcount == 0
       ansible.builtin.shell: |
         curl -1sLf 'https://dl.cloudsmith.io/public/isc/kea-2-6/cfg/setup/bash.deb.sh' | bash
         touch /root/isc.sources

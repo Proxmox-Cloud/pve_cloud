@@ -24,7 +24,10 @@ keyboard:
 runcmd:
   - systemctl start qemu-guest-agent
 
-{% if mirror_discovery_secret.rowcount != 0 %}
+{% if 
+  postgres_connection_check.is_available and mirror_discovery_secret.rowcount != 0 and
+  "bookworm" in qemu_image_url and "debian" in qemu_image_url
+%}
 write_files:
   - encoding: b64
     path: /etc/apt/trusted.gpg.d/pxc-aptly.asc

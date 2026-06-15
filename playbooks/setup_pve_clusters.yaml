@@ -30,7 +30,9 @@
     # then we can set interpreter path globally
     - name: install python venv
       apt:
-        name: python3-venv
+        pkg: 
+          - python3-venv
+          - skopeo # query mirror registries
         state: present
         update_cache: yes
 
@@ -353,20 +355,22 @@
       register: patroni_pass
       run_once: true
     
+    # set vars for vector_journald_exporter role
     - set_fact:
         postgres_password: "{{ patroni_pass.content | b64decode | trim }}"
     
     - set_fact:
         pg_conn_str: "postgresql+psycopg2://postgres:{{ postgres_password }}@{{ cluster_vars['pve_haproxy_floating_ip_internal'] }}:5000/pve_cloud?sslmode=disable"
+        pve_haproxy_floating_ip_internal: "{{ cluster_vars['pve_haproxy_floating_ip_internal'] }}"
 
     # journald vector log piping
     - name: check if postgres is available
       community.postgresql.postgresql_ping:
-        host: "{{ cluster_vars['pve_haproxy_floating_ip_internal'] }}"
+        host: "{{ pve_haproxy_floating_ip_internal }}"
         port: 5000
         login_db: postgres
         login_user: postgres
-        login_password: "{{ postgres_password  }}" 
+        login_password: "{{ postgres_password }}" 
       register: postgres_connection_check
       ignore_errors: yes
 
@@ -376,15 +380,6 @@
       when: postgres_connection_check.is_available
       run_once: true
 
-    - name: select discovery secret log export
-      alchemy_read:
-        pg_conn_str: "{{ pg_conn_str }}"
-        table: px_cloud_secrets
-        where:
-          secret_type: "vlogs-cluster-journald"
-      register: vlogs_journald_ds # discovery secrets
-      when: postgres_connection_check.is_available
-      
     - name: install vector journald exporter
       include_role:
         name: vector_journald_exporter

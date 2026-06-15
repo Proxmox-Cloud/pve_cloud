@@ -75,17 +75,17 @@ If you passed `--skip-cleanup` to pytest, the kubespray tests will write a `.tes
 
 ## Terraform
 
-Terraform is a limited POS, it should only be used to execute simple logic and as a dump api call state management system. The language is much too underdeveloped to be used for anything more!
+Terraform is essential for tracking and managing api calls, but it has a severe limitation that makes it unsuitable for conditional, dynamic creation of resouces. Using count and for_each to conditionally create resources requires the inputs to be statically defined. Using dynamically created values gives you `The "count" value depends on resource attributes that cannot be determined until apply, so Terraform cannot predict how many instances will be created.`.
 
-Any complex logic needs to be offloaded into a custom terraform provider resource written in golang.
+They suggest using the `-target` option to get around this, however this makes the whole configuration messy and can lead to deadlocks when modifiying / deleting resources that are within this dependency chain.
 
-When you use the kubernetes provider especially, do not ever use count / for_each to conditionally create resources from any non static definement. If you use kubernetes_manifest ontop of that you will get errors that leave you searching for days!
-
-When you want to create complex kubernetes deployments, package them into helm, use its glorious templating and then use terraform to deploy the chart.
+To properly work around this, they could either make terraform more sophisticated, or you have to write your own provider resources / move into wrappers that are better suited for handeling this, like helm charts.
 
 ### Debugging/Direct access
 
 The testing suite will write a sourceable `.debug.env` file inside the `test/scenarios/...` folder. With bash `source` function on that env file you can afterwards use the terraform cli for direct apply/plan/destroy operations.
+
+To debug the contents of a module use `terraform console -target=module.XYZ` and then you can directly access resouces without the module prefix.
 
 ## VSCode Pytest debug
 
