@@ -604,9 +604,7 @@ def setup_prepare_kubespray(
     logger.info("setup environment for kubespray playbooks")
 
     # copy tls
-    copy_cloud_domain = get_cloud_domain(
-        get_test_env["kubernetes"]["copy_target_pve"]
-    )
+    copy_cloud_domain = get_cloud_domain(get_test_env["kubernetes"]["copy_target_pve"])
     copy_pve_inventory = get_pve_inventory(copy_cloud_domain)
     copy_target_cluster = get_target_cluster(
         copy_pve_inventory,
@@ -619,7 +617,9 @@ def setup_prepare_kubespray(
     )
 
     # copy target has to be a directly accessible proxmox cluster (no jump hosts allowed)
-    assert copy_jump_host is None, "Copy target pve for tls and harbor creds needs to be directly accessible! Jump host not yet supported."
+    assert (
+        copy_jump_host is None
+    ), "Copy target pve for tls and harbor creds needs to be directly accessible! Jump host not yet supported."
 
     # we connect to the test host to get the patroni secret of the cluster, aswell as the vars
     ssh = paramiko.SSHClient()
@@ -699,9 +699,7 @@ def setup_prepare_kubespray(
             # query harbor admin creds
             cur.execute(
                 "SELECT secret_data FROM px_cloud_secrets WHERE secret_name = %s;",
-                (
-                    f"{get_test_env['kubernetes']['harbor_copy_mirror_host']}-admin",
-                ),
+                (f"{get_test_env['kubernetes']['harbor_copy_mirror_host']}-admin",),
             )
             admin_secret = cur.fetchone()
 
@@ -710,9 +708,7 @@ def setup_prepare_kubespray(
 
             cur.execute(
                 "SELECT secret_data FROM px_cloud_secrets WHERE secret_name = %s;",
-                (
-                    f"{get_test_env['kubernetes']['harbor_copy_mirror_host']}-mirror",
-                ),
+                (f"{get_test_env['kubernetes']['harbor_copy_mirror_host']}-mirror",),
             )
             mirror_secret = cur.fetchone()
 
@@ -726,16 +722,18 @@ def setup_prepare_kubespray(
                 first_test_host,
             ) as (pxrpc, jump_host):
                 pxrpc.inject_cloud_secret(
-                    get_test_env['cloud_inventory']['pve_cloud_domain'], # fake the cloud domain
+                    get_test_env["cloud_inventory"][
+                        "pve_cloud_domain"
+                    ],  # fake the cloud domain
                     f"{get_test_env['kubernetes']['harbor_copy_mirror_host']}-admin",
                     json.dumps(admin_secret[0]),
-                    ""
+                    "",
                 )
                 pxrpc.inject_cloud_secret(
-                    get_test_env['cloud_inventory']['pve_cloud_domain'], 
+                    get_test_env["cloud_inventory"]["pve_cloud_domain"],
                     f"{get_test_env['kubernetes']['harbor_copy_mirror_host']}-mirror",
                     json.dumps(mirror_secret[0]),
-                    ""
+                    "",
                 )
         else:
             engine = create_engine(get_cloud_secrets["pg_conn_str_orm"])
@@ -743,16 +741,16 @@ def setup_prepare_kubespray(
             # update certs and mirror pull secret
             with Session(engine) as session:
                 copy_admin = ProxmoxCloudSecrets(
-                    cloud_domain=get_test_env['cloud_inventory']['pve_cloud_domain'],
+                    cloud_domain=get_test_env["cloud_inventory"]["pve_cloud_domain"],
                     secret_name=f"{get_test_env['kubernetes']['harbor_copy_mirror_host']}-admin",
-                    secret_data=admin_secret[0]
+                    secret_data=admin_secret[0],
                 )
                 session.merge(copy_admin)
 
                 copy_mirror = ProxmoxCloudSecrets(
-                    cloud_domain=get_test_env['cloud_inventory']['pve_cloud_domain'],
+                    cloud_domain=get_test_env["cloud_inventory"]["pve_cloud_domain"],
                     secret_name=f"{get_test_env['kubernetes']['harbor_copy_mirror_host']}-mirror",
-                    secret_data=mirror_secret[0]
+                    secret_data=mirror_secret[0],
                 )
                 session.merge(copy_mirror)
 

@@ -306,7 +306,7 @@ def test_create_secondary_kubespray(
     get_secondary_kubespray_inv,
     setup_prepare_kubespray,
     setup_mirror_vm,
-    get_cloud_secrets
+    get_cloud_secrets,
 ):
     extra_vars = {}
     tdd_ip = get_tdd_ip()
@@ -384,11 +384,7 @@ def test_create_secondary_kubespray(
 
 
 def test_create_kubespray(
-    request,
-    get_test_env,
-    get_kubespray_inv,
-    setup_prepare_kubespray,
-    get_cloud_secrets
+    request, get_test_env, get_kubespray_inv, setup_prepare_kubespray, get_cloud_secrets
 ):
     logger.info("create kubespray")
 
@@ -460,7 +456,6 @@ eviction_hard:
     )
     logger.info(f"response code creating dns {response.rcode()}")
     assert response.rcode() == 0
-
 
     # always cleanup custom vars
     if os.path.exists(k8s_cluster_vars_path):

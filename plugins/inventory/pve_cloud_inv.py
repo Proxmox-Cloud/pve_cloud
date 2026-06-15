@@ -138,7 +138,7 @@ class InventoryModule(BaseInventoryPlugin):
                 if not executor_set and online_jump_hosts:
                     # first cluster rep also becomes marked as pxc-executor-host
                     # this is needed to run generic pxc roles that require the executor set
-                    
+
                     inventory.add_host("pxc-executor-host")
 
                     inventory.set_variable("pxc-executor-host", "ansible_user", "root")
@@ -208,7 +208,6 @@ class InventoryModule(BaseInventoryPlugin):
                             ][var],
                         )
 
-        
         # no jump host definitions, we use localhost as central executor
         if not executor_set:
             inventory.add_host("pxc-executor-host")
