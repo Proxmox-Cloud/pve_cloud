@@ -1,5 +1,10 @@
 - name: Setup node running ansible (local machine)
   hosts: localhost
+  vars:
+    # for selecting helm version to dl
+    arch_mapping:
+      x86_64: "amd64"
+      aarch64: "arm64"
   tasks:
     - set_fact:
         ee_requirements_path: "{{ custom_ee_reqs_path if custom_ee_reqs_path is defined else (playbook_dir | dirname) ~ '/meta/ee-requirements.txt' }}"
