@@ -1,0 +1,42 @@
+---
+# tasks file for mirror_helm_chart
+- name: check if already mirrored
+  ansible.builtin.command: >
+    skopeo inspect --raw
+    --creds '{{ mirror_repo_username }}:{{ mirror_repo_password }}'
+    docker://{{ mirror_repo_host }}/cloud-helm-mirror/{{ helm_repository_name }}/{{ helm_chart_name }}:{{ helm_chart_version }}
+  register: skopeo_check
+  failed_when: false
+
+- debug:
+    var: skopeo_check
+
+- name: upload if not mirrored
+  when: skopeo_check.rc != 0
+  block:
+    - name: download dir
+      ansible.builtin.tempfile:
+        state: directory
+        suffix: helm_skopeo
+      register: temp_dir
+
+    - name: add repo
+      ansible.builtin.command: "helm repo add {{ helm_repository_name }} {{ helm_repository_url }}"
+
+    - name: update repo
+      ansible.builtin.command: "helm repo update {{ helm_repository_name }}"
+      
+    - name: download the chart
+      ansible.builtin.command: >
+        helm pull {{ helm_repository_name }}/{{ helm_chart_name }}
+        --version {{ helm_chart_version }}
+        --destination {{ temp_dir.path }}
+
+    - debug:
+        var: temp_dir.path
+
+    # expects to be authenticated
+    - name: push the chart to oci mirror
+      ansible.builtin.command: >
+        helm push {{ temp_dir.path }}/{{ helm_chart_name }}-{{ helm_chart_version }}.tgz 
+        oci://{{ mirror_repo_host }}/cloud-helm-mirror/{{ helm_repository_name }}

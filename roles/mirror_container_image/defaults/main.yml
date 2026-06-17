@@ -1,0 +1,10 @@
+---
+# defaults file for mirror_container_image
+mirror_repo_username:
+mirror_repo_password:
+
+mirror_repo_host:
+
+image_registry:
+image_name:
+image_version:

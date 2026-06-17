@@ -1,0 +1,18 @@
+---
+# tasks file for mirror_container_image
+- name: check if already mirrored
+  ansible.builtin.command: >
+    skopeo inspect
+    --creds '{{ mirror_repo_username }}:{{ mirror_repo_password }}'
+    docker://{{ mirror_repo_host }}/cloud-mirror/{{ image_registry }}/{{ image_name }}:{{ image_version }}
+  register: skopeo_check
+  failed_when: false
+
+- name: mirror image by tag
+  when: skopeo_check.rc != 0
+  ansible.builtin.command: >
+    skopeo copy
+    --dest-creds '{{ mirror_repo_username }}:{{ mirror_repo_password }}'
+    docker://{{ image_registry }}/{{ image_name }}:{{ image_version }}
+    docker://{{ mirror_repo_host }}/cloud-mirror/{{ image_registry }}/{{ image_name }}:{{ image_version }}
+

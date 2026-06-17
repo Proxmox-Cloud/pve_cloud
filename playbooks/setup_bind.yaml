@@ -102,6 +102,10 @@
       retries: 3
       delay: 5
       
+    - name: wait for bind to sync / become responsive  
+      ansible.builtin.pause:
+        seconds: 10
+
 - name: Slurp secrets 
   hosts: target_pve
   roles:

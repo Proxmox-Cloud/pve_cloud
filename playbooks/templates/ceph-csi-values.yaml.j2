@@ -21,6 +21,29 @@ provisioner:
       operator: "Exists"
       effect: "NoSchedule"
 
+{% if harbor_mirror_secret.rowcount != 0 %}
+
+  imagePullSecrets:
+    - name: mirror-pull-secret
+
+  provisioner:
+    image:
+      repository: {{ mirror_repo_host }}/cloud-mirror/registry.k8s.io/sig-storage/csi-provisioner
+
+  attacher:
+    image:
+      repository: {{ mirror_repo_host }}/cloud-mirror/registry.k8s.io/sig-storage/csi-attacher
+
+  resizer:
+    image:
+      repository: {{ mirror_repo_host }}/cloud-mirror/registry.k8s.io/sig-storage/csi-resizer
+
+  snapshotter:
+    image:
+      repository: {{ mirror_repo_host }}/cloud-mirror/registry.k8s.io/sig-storage/csi-snapshotter
+
+{% endif %}
+
 nodeplugin:
   tolerations:
     # derived from kubespray node_taints of each worker node
@@ -35,6 +58,19 @@ nodeplugin:
       requests:
         memory: "512Mi"
 
+{% if harbor_mirror_secret.rowcount != 0 %}
+  imagePullSecrets:
+    - name: mirror-pull-secret
+
+  registrar:
+    image:
+      repository: {{ mirror_repo_host }}/cloud-mirror/registry.k8s.io/sig-storage/csi-node-driver-registrar
+
+  plugin:
+    image:
+      repository: {{ mirror_repo_host }}/cloud-mirror/quay.io/cephcsi/cephcsi
+
+{% endif %}
 
 CSIDriver:
   fsGroupPolicy: "ReadWriteOnceWithFSType"

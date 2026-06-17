@@ -21,8 +21,10 @@
   register: vlogs_journald_ds # discovery secrets
   when: postgres_connection_check.is_available
 
+# select discovery secret for target pve
 - set_fact:
     vlogs_discovery_secret: "{{ vlogs_journald_ds.query_result | selectattr('secret_data.target_pve', 'equalto', target_pve) | first | default({}) }}"
+  when: postgres_connection_check.is_available
 
 - name: Cloud mirror discovery
   delegate_to: pxc-executor-host
@@ -36,7 +38,7 @@
   when: postgres_connection_check.is_available
 
 - name: install vector when discovered
-  when: vlogs_discovery_secret | length > 0
+  when: postgres_connection_check.is_available and vlogs_discovery_secret | length > 0
   block:
     - name: Set vlogs host in hosts file (for pve hosts)
       ansible.builtin.lineinfile:
@@ -102,9 +104,9 @@
         src: vector.yaml.j2
         dest: /etc/vector/vector.yaml
 
-    - name: start vector service
+    - name: (re)start vector service
       ansible.builtin.service:
         name: vector
         enabled: true
-        state: started
+        state: restarted
 

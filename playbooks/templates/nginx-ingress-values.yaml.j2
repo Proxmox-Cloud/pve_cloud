@@ -19,3 +19,24 @@ controller:
       value: "{{ ((collected_taint | split('='))[1] | split(':'))[0] }}"
       effect: "{{ ((collected_taint | split('='))[1] | split(':'))[1] }}"
 {% endfor %}
+
+{% if harbor_mirror_secret.rowcount != 0 %}
+  image:
+    registry: {{ mirror_repo_host }}
+    image: cloud-mirror/registry.k8s.io/ingress-nginx/controller
+    digest: null
+
+  admissionWebhooks:
+    patch:
+      image:
+        registry: {{ mirror_repo_host }}
+        image: cloud-mirror/registry.k8s.io/ingress-nginx/kube-webhook-certgen
+        digest: null
+        
+{% endif %}
+
+{% if harbor_mirror_secret.rowcount != 0 %}
+imagePullSecrets:
+  - name: mirror-pull-secret
+
+{% endif %}

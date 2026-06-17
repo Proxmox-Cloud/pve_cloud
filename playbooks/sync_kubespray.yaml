@@ -402,22 +402,155 @@
       loop: "{{ groups['kube_node'] }}"
       when: hostvars[item].node_taints is defined
 
+    # harbor mirror discovery
+    - name: harbor cloud mirror discovery
+      delegate_to: pxc-executor-host
+      pxc.cloud.alchemy_read:
+        pg_conn_str: "{{ pg_conn_str }}"
+        table: px_cloud_secrets
+        where:
+          cloud_domain: "{{ pve_cloud_domain }}"
+          secret_type: "harbor-admin-auth"
+      register: harbor_mirror_secret
+
+    - when: harbor_mirror_secret.rowcount != 0
+      set_fact:
+        mirror_repo_host: "{{ harbor_mirror_secret.query_result[0]['secret_data']['harbor_host'] }}"
+        mirror_repo_username: "{{ harbor_mirror_secret.query_result[0]['secret_data']['full_name'] }}"
+        mirror_repo_password: "{{ harbor_mirror_secret.query_result[0]['secret_data']['secret'] }}"
+
+    - name: login to the mirror registry
+      when: harbor_mirror_secret.rowcount != 0
+      ansible.builtin.command: "helm registry login {{ mirror_repo_host }} --username '{{ mirror_repo_username }}' --password '{{ mirror_repo_password }}'"
+
+    # mirror charts and images
+    - name: mirror artifacts
+      when: harbor_mirror_secret.rowcount != 0
+      block:
+        # ceph csi chart + images
+        - name: mirror ceph-csi chart
+          include_role:
+            name: pxc.cloud.mirror_helm_chart
+          vars:
+            helm_repository_url: https://ceph.github.io/csi-charts
+            helm_repository_name: ceph
+            helm_chart_name: ceph-csi-rbd
+            helm_chart_version: 3.14.2
+
+        - name: mirror ceph-csi image
+          include_role:
+            name: pxc.cloud.mirror_container_image
+          vars:
+            image_registry: registry.k8s.io
+            image_name: sig-storage/csi-provisioner
+            image_version: v5.1.0
+
+        - name: mirror ceph-csi image
+          include_role:
+            name: pxc.cloud.mirror_container_image
+          vars:
+            image_registry: registry.k8s.io
+            image_name: sig-storage/csi-resizer
+            image_version: v1.13.1
+
+        - name: mirror ceph-csi image
+          include_role:
+            name: pxc.cloud.mirror_container_image
+          vars:
+            image_registry: registry.k8s.io
+            image_name: sig-storage/csi-attacher
+            image_version: v4.8.0
+
+        - name: mirror ceph-csi image
+          include_role:
+            name: pxc.cloud.mirror_container_image
+          vars:
+            image_registry: registry.k8s.io
+            image_name: sig-storage/csi-snapshotter
+            image_version: v8.2.0
+
+        - name: mirror ceph-csi image
+          include_role:
+            name: pxc.cloud.mirror_container_image
+          vars:
+            image_registry: quay.io
+            image_name: cephcsi/cephcsi
+            image_version: v3.14.2
+          
+        - name: mirror ceph-csi image
+          include_role:
+            name: pxc.cloud.mirror_container_image
+          vars:
+            image_registry: registry.k8s.io
+            image_name: sig-storage/csi-node-driver-registrar
+            image_version: v2.13.0
+
+        # nginx ingress chart + images
+        - name: mirror nginx-ingress chart
+          include_role:
+            name: pxc.cloud.mirror_helm_chart
+          vars:
+            helm_repository_url: https://kubernetes.github.io/ingress-nginx
+            helm_repository_name: nginx
+            helm_chart_name: ingress-nginx
+            helm_chart_version: 4.14.0
+
+        - name: mirror nginx-ingress image
+          include_role:
+            name: pxc.cloud.mirror_container_image
+          vars:
+            image_registry: registry.k8s.io
+            image_name: ingress-nginx/controller
+            image_version: v1.14.0
+
+        - name: mirror nginx-ingress image
+          include_role:
+            name: pxc.cloud.mirror_container_image
+          vars:
+            image_registry: registry.k8s.io
+            image_name: ingress-nginx/kube-webhook-certgen
+            image_version: v1.6.4
+
     # kubernetes.core comes from kubespray collection
     - name: ceph csi repo
       kubernetes.core.helm_repository:
         name: ceph-csi
         repo_url: https://ceph.github.io/csi-charts
-      when: ceph_cluster_fsid is defined and ceph_csi_sc_pools is defined
+      when: 
+        - ceph_cluster_fsid is defined and ceph_csi_sc_pools is defined
+        - harbor_mirror_secret.rowcount == 0
     
+    - name: create ceph csi namespace
+      kubernetes.core.k8s:
+        name: ceph-csi
+        api_version: v1
+        kind: Namespace
+        state: present
+        kubeconfig: "{{ temp_kubeconfig.path }}"
+
+    - name: create mirror pull secret
+      when: harbor_mirror_secret.rowcount != 0
+      kubernetes.core.k8s:
+        kubeconfig: "{{ temp_kubeconfig.path }}"
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: mirror-pull-secret
+            namespace: ceph-csi
+          type: kubernetes.io/dockerconfigjson
+          data:
+            .dockerconfigjson: "{{ harbor_mirror_secret.query_result[0]['secret_data']['dockerconfig'] | b64encode }}"
+
     - name: deploy csi chart
       kubernetes.core.helm:
         name: ceph-csi
-        chart_ref: ceph-csi/ceph-csi-rbd
+        chart_ref: "{{ 'ceph-csi/ceph-csi-rbd' if harbor_mirror_secret.rowcount == 0 else 'oci://' ~ harbor_mirror_secret.query_result[0]['secret_data']['harbor_host'] ~ '/cloud-helm-mirror/ceph/ceph-csi-rbd'}}"
         chart_version: 3.14.2
         values: "{{ lookup('template', 'ceph-csi-values.yaml.j2') | from_yaml }}"
         kubeconfig: "{{ temp_kubeconfig.path }}"
         release_namespace: ceph-csi
-        create_namespace: true
         update_repo_cache: true
       when: ceph_cluster_fsid is defined and ceph_csi_sc_pools is defined
       
@@ -429,18 +562,41 @@
       when: ceph_cluster_fsid is defined and ceph_csi_sc_pools is defined
 
     - name: ingress nginx repo
+      when: harbor_mirror_secret.rowcount == 0
       kubernetes.core.helm_repository:
         name: ingress-nginx
         repo_url: https://kubernetes.github.io/ingress-nginx
 
+    - name: create nginx ingress namespace
+      kubernetes.core.k8s:
+        name: nginx-ingress
+        api_version: v1
+        kind: Namespace
+        state: present
+        kubeconfig: "{{ temp_kubeconfig.path }}"
+
+    - name: create mirror pull secret
+      when: harbor_mirror_secret.rowcount != 0
+      kubernetes.core.k8s:
+        kubeconfig: "{{ temp_kubeconfig.path }}"
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: mirror-pull-secret
+            namespace: nginx-ingress
+          type: kubernetes.io/dockerconfigjson
+          data:
+            .dockerconfigjson: "{{ harbor_mirror_secret.query_result[0]['secret_data']['dockerconfig'] | b64encode }}"
+
     - name: deploy ingress chart
       kubernetes.core.helm:
         name: nginx-ingress
-        chart_ref: ingress-nginx/ingress-nginx
+        chart_ref: "{{ 'ingress-nginx/ingress-nginx' if harbor_mirror_secret.rowcount == 0 else 'oci://' ~ harbor_mirror_secret.query_result[0]['secret_data']['harbor_host'] ~ '/cloud-helm-mirror/nginx/ingress-nginx'}}"
         chart_version: 4.14.0
         values: "{{ lookup('template', 'nginx-ingress-values.yaml.j2') | from_yaml }}"
         kubeconfig: "{{ temp_kubeconfig.path }}"
         release_namespace: nginx-ingress
-        create_namespace: true
         update_repo_cache: true
         timeout: 15m # slow tdd systems

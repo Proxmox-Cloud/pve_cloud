@@ -14,7 +14,6 @@
       x86_64: "amd64"
       aarch64: "arm64"
   tasks:
-       
     # # setup docker
     # - name: Ensure required packages are installed
     #   ansible.builtin.apt:
@@ -277,6 +276,13 @@
     - name: create kubespray cache dir for rsync
       ansible.builtin.file:
         path: "{{ ansible_user_dir }}/.cache/kubespray"
+        state: directory
+        mode: '0755'
+
+    # providers + modules
+    - name: create terraform plugin cache dir for rsync
+      ansible.builtin.file:
+        path: "{{ ansible_user_dir }}/.cache/terraform-plugins"
         state: directory
         mode: '0755'
 
