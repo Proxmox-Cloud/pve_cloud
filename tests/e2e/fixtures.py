@@ -729,7 +729,7 @@ def setup_prepare_kubespray(
                     json.dumps(admin_secret[0]),
                     "harbor-admin-auth",
                 )
-                
+
                 assert pxrpc.merge_cloud_secret(
                     get_test_env["cloud_inventory"]["pve_cloud_domain"],
                     f"{get_test_env['kubernetes']['harbor_copy_mirror_host']}-mirror",
@@ -745,7 +745,7 @@ def setup_prepare_kubespray(
                     cloud_domain=get_test_env["cloud_inventory"]["pve_cloud_domain"],
                     secret_name=f"{get_test_env['kubernetes']['harbor_copy_mirror_host']}-admin",
                     secret_data=admin_secret[0],
-                    secret_type="harbor-admin-auth"
+                    secret_type="harbor-admin-auth",
                 )
                 session.merge(copy_admin)
 
@@ -753,7 +753,7 @@ def setup_prepare_kubespray(
                     cloud_domain=get_test_env["cloud_inventory"]["pve_cloud_domain"],
                     secret_name=f"{get_test_env['kubernetes']['harbor_copy_mirror_host']}-mirror",
                     secret_data=mirror_secret[0],
-                    secret_type="harbor-mirror-auth"
+                    secret_type="harbor-mirror-auth",
                 )
                 session.merge(copy_mirror)
 
