@@ -85,8 +85,6 @@ To properly work around this, they could either make terraform more sophisticate
 
 The testing suite will write a sourceable `.debug.env` file inside the `test/scenarios/...` folder. With bash `source` function on that env file you can afterwards use the terraform cli for direct apply/plan/destroy operations.
 
-To debug the contents of a module use `terraform console -target=module.XYZ` and then you can directly access resouces without the module prefix.
-
 ## VSCode Pytest debug
 
 if you want to attach a debugger to the tests you can use the vscode python debug extension.
