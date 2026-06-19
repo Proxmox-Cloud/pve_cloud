@@ -867,6 +867,11 @@ def setup_mirror_vm(request, get_test_env, setup_haproxy_lxcs):
         )
         temp_qemu_inv.flush()
 
-        with run_playbook(request, temp_qemu_inv.name, "playbooks/sync_qemus.yaml", "playbooks/setup_mirror_vm.yaml", destroy_playbook="playbooks/destroy_qemus.yaml"):
+        with run_playbook(
+            request,
+            temp_qemu_inv.name,
+            "playbooks/sync_qemus.yaml",
+            "playbooks/setup_mirror_vm.yaml",
+            destroy_playbook="playbooks/destroy_qemus.yaml",
+        ):
             yield
-

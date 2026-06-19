@@ -269,7 +269,13 @@ def test_create_qemu(request, get_test_env, setup_mirror_vm):
         )
         temp_qemu_inv.flush()
 
-        with run_playbook(request, temp_qemu_inv.name, "playbooks/sync_qemus.yaml", "playbooks/get_blakes.yaml", destroy_playbook="playbooks/destroy_qemus.yaml"):
+        with run_playbook(
+            request,
+            temp_qemu_inv.name,
+            "playbooks/sync_qemus.yaml",
+            "playbooks/get_blakes.yaml",
+            destroy_playbook="playbooks/destroy_qemus.yaml",
+        ):
             pass
 
 
@@ -286,7 +292,13 @@ def test_create_secondary_kubespray(
     if tdd_ip:
         extra_vars["test_repos_ip"] = tdd_ip
 
-    with run_playbook(request, get_secondary_kubespray_inv, "playbooks/sync_kubespray.yaml", destroy_playbook="playbooks/destroy_kubespray.yaml", extra_vars=extra_vars):
+    with run_playbook(
+        request,
+        get_secondary_kubespray_inv,
+        "playbooks/sync_kubespray.yaml",
+        destroy_playbook="playbooks/destroy_kubespray.yaml",
+        extra_vars=extra_vars,
+    ):
 
         # set manual cp records (only for testing prod is manually manged)
         dns_update = dns.update.Update(
@@ -310,7 +322,6 @@ def test_create_secondary_kubespray(
         )
         logger.info(f"response code creating dns secondary {response.rcode()}")
         assert response.rcode() == 0
-
 
     # write kubeconfig if cleanup is skipped
     if request.config.getoption("--skip-cleanup"):
@@ -374,7 +385,13 @@ eviction_hard:
     if tdd_ip:
         extra_vars["test_repos_ip"] = tdd_ip
 
-    with run_playbook(request, get_kubespray_inv, "playbooks/sync_kubespray.yaml", destroy_playbook="playbooks/destroy_kubespray.yaml", extra_vars=extra_vars):
+    with run_playbook(
+        request,
+        get_kubespray_inv,
+        "playbooks/sync_kubespray.yaml",
+        destroy_playbook="playbooks/destroy_kubespray.yaml",
+        extra_vars=extra_vars,
+    ):
         # set manual cp records (only for testing prod is manually manged)
         dns_update = dns.update.Update(
             get_test_env["kubernetes"]["deployments_domain"],
@@ -401,7 +418,6 @@ eviction_hard:
         # always cleanup custom vars
         if os.path.exists(k8s_cluster_vars_path):
             os.remove(k8s_cluster_vars_path)
-
 
     if request.config.getoption("--skip-cleanup"):
         # write kubeconfig if cleanup is skipped
