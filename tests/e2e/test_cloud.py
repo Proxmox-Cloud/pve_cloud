@@ -268,36 +268,9 @@ def test_create_qemu(request, get_test_env, setup_mirror_vm):
             temp_qemu_inv,
         )
         temp_qemu_inv.flush()
-        try:
 
-            qemu_run = ansible_runner.run(
-                project_dir=os.getcwd(),
-                playbook="playbooks/sync_qemus.yaml",
-                inventory=temp_qemu_inv.name,
-                verbosity=request.config.getoption("--ansible-verbosity"),
-            )
-
-            assert qemu_run.rc == 0
-
-            # run get blakes on qemus
-            get_blakes_qemu_run = ansible_runner.run(
-                project_dir=os.getcwd(),
-                playbook="playbooks/get_blakes.yaml",
-                inventory=temp_qemu_inv.name,
-                verbosity=request.config.getoption("--ansible-verbosity"),
-            )
-
-            assert get_blakes_qemu_run.rc == 0
-
-        finally:
-            if not request.config.getoption("--skip-cleanup"):
-                qemu_destroy_run = ansible_runner.run(
-                    project_dir=os.getcwd(),
-                    playbook="playbooks/destroy_qemus.yaml",
-                    inventory=temp_qemu_inv.name,
-                    verbosity=request.config.getoption("--ansible-verbosity"),
-                )
-                assert qemu_destroy_run.rc == 0
+        with run_playbook(request, temp_qemu_inv.name, "playbooks/sync_qemus.yaml", "playbooks/get_blakes.yaml", destroy_playbook="playbooks/destroy_qemus.yaml"):
+            pass
 
 
 def test_create_secondary_kubespray(
@@ -313,53 +286,35 @@ def test_create_secondary_kubespray(
     if tdd_ip:
         extra_vars["test_repos_ip"] = tdd_ip
 
-    kubespray_run = ansible_runner.run(
-        project_dir=os.getcwd(),
-        playbook="playbooks/sync_kubespray.yaml",
-        inventory=get_secondary_kubespray_inv,
-        verbosity=request.config.getoption("--ansible-verbosity"),
-        cmdline=(
-            "--skip-tags kubespray"
-            if request.config.getoption("--skip-kubespray")
-            else None
-        ),
-        extravars=extra_vars,
-    )
+    with run_playbook(request, get_secondary_kubespray_inv, "playbooks/sync_kubespray.yaml", destroy_playbook="playbooks/destroy_kubespray.yaml", extra_vars=extra_vars):
 
-    assert kubespray_run.rc == 0
-
-    # set manual cp records (only for testing prod is manually manged)
-    dns_update = dns.update.Update(
-        get_test_env["kubernetes"]["deployments_domain"],
-        keyring=dns.tsigkeyring.from_text(
-            {"internal.": get_cloud_secrets["bind_internal_key"]}
-        ),
-        keyname="internal.",
-        keyalgorithm="hmac-sha256",
-    )
-
-    # secondary k8s
-    dns_update.replace(
-        "cp-pytest-secondary",
-        300,
-        "A",
-        get_test_env["pve_test_cluster_floating_external"],
-    )
-    response = dns.query.tcp(
-        dns_update, get_test_env["cloud_inventory"]["bind_master_ip"]
-    )
-    logger.info(f"response code creating dns secondary {response.rcode()}")
-    assert response.rcode() == 0
-
-    if not request.config.getoption("--skip-cleanup"):
-        kubespray_destroy_run = ansible_runner.run(
-            project_dir=os.getcwd(),
-            playbook="playbooks/destroy_kubespray.yaml",
-            inventory=get_secondary_kubespray_inv,
-            verbosity=request.config.getoption("--ansible-verbosity"),
+        # set manual cp records (only for testing prod is manually manged)
+        dns_update = dns.update.Update(
+            get_test_env["kubernetes"]["deployments_domain"],
+            keyring=dns.tsigkeyring.from_text(
+                {"internal.": get_cloud_secrets["bind_internal_key"]}
+            ),
+            keyname="internal.",
+            keyalgorithm="hmac-sha256",
         )
-        assert kubespray_destroy_run.rc == 0
-    else:
+
+        # secondary k8s
+        dns_update.replace(
+            "cp-pytest-secondary",
+            300,
+            "A",
+            get_test_env["pve_test_cluster_floating_external"],
+        )
+        response = dns.query.tcp(
+            dns_update, get_test_env["cloud_inventory"]["bind_master_ip"]
+        )
+        logger.info(f"response code creating dns secondary {response.rcode()}")
+        assert response.rcode() == 0
+
+
+    # write kubeconfig if cleanup is skipped
+    if request.config.getoption("--skip-cleanup"):
+
         # write kubeconfig if cleanup is skipped
         first_test_host = get_test_env["pve_test_cluster_hosts"][
             next(iter(get_test_env["pve_test_cluster_hosts"]))
@@ -419,57 +374,36 @@ eviction_hard:
     if tdd_ip:
         extra_vars["test_repos_ip"] = tdd_ip
 
-    kubespray_run = ansible_runner.run(
-        project_dir=os.getcwd(),
-        playbook="playbooks/sync_kubespray.yaml",
-        inventory=get_kubespray_inv,
-        verbosity=request.config.getoption("--ansible-verbosity"),
-        cmdline=(
-            "--skip-tags kubespray"
-            if request.config.getoption("--skip-kubespray")
-            else None
-        ),
-        extravars=extra_vars,
-    )
-
-    assert kubespray_run.rc == 0
-
-    # set manual cp records (only for testing prod is manually manged)
-    dns_update = dns.update.Update(
-        get_test_env["kubernetes"]["deployments_domain"],
-        keyring=dns.tsigkeyring.from_text(
-            {"internal.": get_cloud_secrets["bind_internal_key"]}
-        ),
-        keyname="internal.",
-        keyalgorithm="hmac-sha256",
-    )
-
-    # main k8s
-    dns_update.replace(
-        "cp-pytest",
-        300,
-        "A",
-        get_test_env["pve_test_cluster_floating_external"],
-    )
-    response = dns.query.tcp(
-        dns_update, get_test_env["cloud_inventory"]["bind_master_ip"]
-    )
-    logger.info(f"response code creating dns {response.rcode()}")
-    assert response.rcode() == 0
-
-    # always cleanup custom vars
-    if os.path.exists(k8s_cluster_vars_path):
-        os.remove(k8s_cluster_vars_path)
-
-    if not request.config.getoption("--skip-cleanup"):
-        kubespray_destroy_run = ansible_runner.run(
-            project_dir=os.getcwd(),
-            playbook="playbooks/destroy_kubespray.yaml",
-            inventory=get_kubespray_inv,
-            verbosity=request.config.getoption("--ansible-verbosity"),
+    with run_playbook(request, get_kubespray_inv, "playbooks/sync_kubespray.yaml", destroy_playbook="playbooks/destroy_kubespray.yaml", extra_vars=extra_vars):
+        # set manual cp records (only for testing prod is manually manged)
+        dns_update = dns.update.Update(
+            get_test_env["kubernetes"]["deployments_domain"],
+            keyring=dns.tsigkeyring.from_text(
+                {"internal.": get_cloud_secrets["bind_internal_key"]}
+            ),
+            keyname="internal.",
+            keyalgorithm="hmac-sha256",
         )
-        assert kubespray_destroy_run.rc == 0
-    else:
+
+        # main k8s
+        dns_update.replace(
+            "cp-pytest",
+            300,
+            "A",
+            get_test_env["pve_test_cluster_floating_external"],
+        )
+        response = dns.query.tcp(
+            dns_update, get_test_env["cloud_inventory"]["bind_master_ip"]
+        )
+        logger.info(f"response code creating dns {response.rcode()}")
+        assert response.rcode() == 0
+
+        # always cleanup custom vars
+        if os.path.exists(k8s_cluster_vars_path):
+            os.remove(k8s_cluster_vars_path)
+
+
+    if request.config.getoption("--skip-cleanup"):
         # write kubeconfig if cleanup is skipped
         first_test_host = get_test_env["pve_test_cluster_hosts"][
             next(iter(get_test_env["pve_test_cluster_hosts"]))

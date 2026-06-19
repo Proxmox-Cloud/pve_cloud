@@ -867,31 +867,6 @@ def setup_mirror_vm(request, get_test_env, setup_haproxy_lxcs):
         )
         temp_qemu_inv.flush()
 
-        qemu_run = ansible_runner.run(
-            project_dir=os.getcwd(),
-            playbook="playbooks/sync_qemus.yaml",
-            inventory=temp_qemu_inv.name,
-            verbosity=request.config.getoption("--ansible-verbosity"),
-        )
+        with run_playbook(request, temp_qemu_inv.name, "playbooks/sync_qemus.yaml", "playbooks/setup_mirror_vm.yaml", destroy_playbook="playbooks/destroy_qemus.yaml"):
+            yield
 
-        assert qemu_run.rc == 0
-
-        # run get blakes on qemus
-        setup_mirror_run = ansible_runner.run(
-            project_dir=os.getcwd(),
-            playbook="playbooks/setup_mirror_vm.yaml",
-            inventory=temp_qemu_inv.name,
-            verbosity=request.config.getoption("--ansible-verbosity"),
-        )
-
-        assert setup_mirror_run.rc == 0
-
-        yield
-
-        qemu_destroy_run = ansible_runner.run(
-            project_dir=os.getcwd(),
-            playbook="playbooks/destroy_qemus.yaml",
-            inventory=temp_qemu_inv.name,
-            verbosity=request.config.getoption("--ansible-verbosity"),
-        )
-        assert qemu_destroy_run.rc == 0
