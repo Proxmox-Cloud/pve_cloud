@@ -1,6 +1,5 @@
 import json
 import logging
-import os
 import subprocess
 import tempfile
 
@@ -73,7 +72,9 @@ def setup_control_node(request, get_test_env):
     extra_vars = {"custom_ee_reqs_path": temp_reqs_path}
 
     # pass none as inventory file
-    with run_playbook(request, None, "playbooks/setup_control_node.yaml", extra_vars=extra_vars):
+    with run_playbook(
+        request, None, "playbooks/setup_control_node.yaml", extra_vars=extra_vars
+    ):
         pass
 
     # initialize the locally kept inventory for pxc clouds and their pve clusters
@@ -161,7 +162,12 @@ def setup_pve_hosts(request, get_test_env, setup_control_node):
             extra_vars["test_repos_ip"] = tdd_ip
             extra_vars["py_pve_cloud_version"] = py_pve_cloud_vers
 
-        with run_playbook(request, temp_cloud_inv.name, "playbooks/setup_pve_clusters.yaml", extra_vars=extra_vars):
+        with run_playbook(
+            request,
+            temp_cloud_inv.name,
+            "playbooks/setup_pve_clusters.yaml",
+            extra_vars=extra_vars,
+        ):
             pass
 
 
