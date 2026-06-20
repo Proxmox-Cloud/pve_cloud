@@ -236,7 +236,13 @@ def setup_dhcp_lxcs(request, get_test_env, fetch_default_gw_ns, setup_bind_lxcs)
         )
         temp_kea_lxcs_inv.flush()
 
-        with run_playbook(request, temp_kea_lxcs_inv.name, "playbooks/sync_lxcs.yaml", "playbooks/setup_kea.yaml", destroy_playbook="playbooks/destroy_lxcs.yaml"):
+        with run_playbook(
+            request,
+            temp_kea_lxcs_inv.name,
+            "playbooks/sync_lxcs.yaml",
+            "playbooks/setup_kea.yaml",
+            destroy_playbook="playbooks/destroy_lxcs.yaml",
+        ):
             yield
 
 
@@ -286,7 +292,13 @@ def setup_ceph_dhcp_lxcs(request, get_test_env, setup_dhcp_lxcs):
             )
             temp_kea_lxcs_inv.flush()
 
-            with run_playbook(request, temp_kea_lxcs_inv.name, "playbooks/sync_lxcs.yaml", "playbooks/setup_ceph_kea.yaml", destroy_playbook="playbooks/destroy_lxcs.yaml"):
+            with run_playbook(
+                request,
+                temp_kea_lxcs_inv.name,
+                "playbooks/sync_lxcs.yaml",
+                "playbooks/setup_ceph_kea.yaml",
+                destroy_playbook="playbooks/destroy_lxcs.yaml",
+            ):
                 yield
     else:
         yield
@@ -346,7 +358,13 @@ def setup_bind_lxcs(request, get_test_env, fetch_default_gw_ns, setup_pve_hosts)
         )
         temp_bind_lxcs_inv.flush()
 
-        with run_playbook(request, temp_bind_lxcs_inv.name, "playbooks/sync_lxcs.yaml", "playbooks/setup_bind.yaml", destroy_playbook="playbooks/destroy_lxcs.yaml"):
+        with run_playbook(
+            request,
+            temp_bind_lxcs_inv.name,
+            "playbooks/sync_lxcs.yaml",
+            "playbooks/setup_bind.yaml",
+            destroy_playbook="playbooks/destroy_lxcs.yaml",
+        ):
             yield
 
 
@@ -403,7 +421,13 @@ def setup_patroni_lxcs(request, get_test_env, setup_dhcp_lxcs):
         )
         temp_postgres_lxcs_inv.flush()
 
-        with run_playbook(request, temp_postgres_lxcs_inv.name, "playbooks/sync_lxcs.yaml", "playbooks/setup_postgres.yaml", destroy_playbook="playbooks/destroy_lxcs.yaml"):
+        with run_playbook(
+            request,
+            temp_postgres_lxcs_inv.name,
+            "playbooks/sync_lxcs.yaml",
+            "playbooks/setup_postgres.yaml",
+            destroy_playbook="playbooks/destroy_lxcs.yaml",
+        ):
             yield
 
 
@@ -464,7 +488,13 @@ def setup_haproxy_lxcs(request, get_test_env, setup_patroni_lxcs):
         )
         temp_haproxy_lxcs_inv.flush()
 
-        with run_playbook(request, temp_haproxy_lxcs_inv.name, "playbooks/sync_lxcs.yaml", "playbooks/setup_haproxy.yaml", destroy_playbook="playbooks/destroy_lxcs.yaml"):
+        with run_playbook(
+            request,
+            temp_haproxy_lxcs_inv.name,
+            "playbooks/sync_lxcs.yaml",
+            "playbooks/setup_haproxy.yaml",
+            destroy_playbook="playbooks/destroy_lxcs.yaml",
+        ):
             yield
 
 

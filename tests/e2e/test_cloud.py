@@ -141,7 +141,13 @@ def test_create_lxc(request, get_proxmoxer, get_test_env, setup_haproxy_lxcs):
         )
         temp_dyn_lxcs_inv.flush()
 
-        with run_playbook(request, temp_dyn_lxcs_inv.name, "playbooks/sync_lxcs.yaml", "playbooks/get_blakes.yaml", destroy_playbook="playbooks/destroy_lxcs.yaml"):
+        with run_playbook(
+            request,
+            temp_dyn_lxcs_inv.name,
+            "playbooks/sync_lxcs.yaml",
+            "playbooks/get_blakes.yaml",
+            destroy_playbook="playbooks/destroy_lxcs.yaml",
+        ):
 
             # assert that the lxc was created and ddns works
 
