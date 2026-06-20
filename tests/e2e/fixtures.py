@@ -4,7 +4,6 @@ import os
 import subprocess
 import tempfile
 
-import ansible_runner
 import dns.query
 import dns.rcode
 import dns.resolver
@@ -73,16 +72,9 @@ def setup_control_node(request, get_test_env):
     # control node setup adjustments
     extra_vars = {"custom_ee_reqs_path": temp_reqs_path}
 
-    # run the main playbook
-    logger.info("run control node setup")
-    setup_run = ansible_runner.run(
-        project_dir=os.getcwd(),
-        playbook="playbooks/setup_control_node.yaml",
-        verbosity=request.config.getoption("--ansible-verbosity"),
-        extravars=extra_vars,
-    )
-
-    assert setup_run.rc == 0
+    # pass none as inventory file
+    with run_playbook(request, None, "playbooks/setup_control_node.yaml", extra_vars=extra_vars):
+        pass
 
     # initialize the locally kept inventory for pxc clouds and their pve clusters
     tdd_ip = get_tdd_ip()
@@ -169,17 +161,8 @@ def setup_pve_hosts(request, get_test_env, setup_control_node):
             extra_vars["test_repos_ip"] = tdd_ip
             extra_vars["py_pve_cloud_version"] = py_pve_cloud_vers
 
-        # run the main playbook
-        logger.info("run pve cluster setup")
-        setup_run = ansible_runner.run(
-            project_dir=os.getcwd(),
-            playbook="playbooks/setup_pve_clusters.yaml",
-            inventory=temp_cloud_inv.name,
-            verbosity=request.config.getoption("--ansible-verbosity"),
-            extravars=extra_vars,
-        )
-
-        assert setup_run.rc == 0
+        with run_playbook(request, temp_cloud_inv.name, "playbooks/setup_pve_clusters.yaml", extra_vars=extra_vars):
+            pass
 
 
 @cloud_fixture("dhcp", "kea")
