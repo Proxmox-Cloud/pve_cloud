@@ -3,7 +3,6 @@ import logging
 import os
 import tempfile
 
-import ansible_runner
 import dns.query
 import dns.rcode
 import dns.resolver
@@ -142,16 +141,7 @@ def test_create_lxc(request, get_proxmoxer, get_test_env, setup_haproxy_lxcs):
         )
         temp_dyn_lxcs_inv.flush()
 
-        try:
-            create_dyn_lxcs_run = ansible_runner.run(
-                project_dir=os.getcwd(),
-                playbook="playbooks/sync_lxcs.yaml",
-                inventory=temp_dyn_lxcs_inv.name,
-                verbosity=request.config.getoption("--ansible-verbosity"),
-            )
-
-            # always run the destroy run
-            assert create_dyn_lxcs_run.rc == 0
+        with run_playbook(request, temp_dyn_lxcs_inv.name, "playbooks/sync_lxcs.yaml", "playbooks/get_blakes.yaml", destroy_playbook="playbooks/destroy_lxcs.yaml"):
 
             # assert that the lxc was created and ddns works
 
@@ -175,28 +165,6 @@ def test_create_lxc(request, get_proxmoxer, get_test_env, setup_haproxy_lxcs):
             ddns_ips = [rdata.to_text() for rdata in ddns_answer]
             logger.info(ddns_ips)
             assert ddns_ips  # assert ddns response
-
-            # run get blakes for lxcs
-            get_blakes_lxcs_run = ansible_runner.run(
-                project_dir=os.getcwd(),
-                playbook="playbooks/get_blakes.yaml",
-                inventory=temp_dyn_lxcs_inv.name,
-                verbosity=request.config.getoption("--ansible-verbosity"),
-            )
-
-            assert get_blakes_lxcs_run.rc == 0
-
-        finally:
-
-            if not request.config.getoption("--skip-cleanup"):
-                # always run the destroy
-                destroy_lxcs_run = ansible_runner.run(
-                    project_dir=os.getcwd(),
-                    playbook="playbooks/destroy_lxcs.yaml",
-                    inventory=temp_dyn_lxcs_inv.name,
-                    verbosity=request.config.getoption("--ansible-verbosity"),
-                )
-                assert destroy_lxcs_run.rc == 0
 
 
 def test_create_qemu(request, get_test_env, setup_mirror_vm):

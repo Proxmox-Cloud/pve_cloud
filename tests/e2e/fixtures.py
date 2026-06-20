@@ -236,33 +236,8 @@ def setup_dhcp_lxcs(request, get_test_env, fetch_default_gw_ns, setup_bind_lxcs)
         )
         temp_kea_lxcs_inv.flush()
 
-        sync_lxcs_kea = ansible_runner.run(
-            project_dir=os.getcwd(),
-            playbook="playbooks/sync_lxcs.yaml",
-            inventory=temp_kea_lxcs_inv.name,
-            verbosity=request.config.getoption("--ansible-verbosity"),
-        )
-        assert sync_lxcs_kea.rc == 0
-
-        logger.info("setup kea lxcs")
-        setup_kea_run = ansible_runner.run(
-            project_dir=os.getcwd(),
-            playbook="playbooks/setup_kea.yaml",
-            inventory=temp_kea_lxcs_inv.name,
-            verbosity=request.config.getoption("--ansible-verbosity"),
-        )
-        assert setup_kea_run.rc == 0
-
-        yield
-
-        logger.info("destroy kea lxcs")
-        destroy_kea_lxcs_run = ansible_runner.run(
-            project_dir=os.getcwd(),
-            playbook="playbooks/destroy_lxcs.yaml",
-            inventory=temp_kea_lxcs_inv.name,
-            verbosity=request.config.getoption("--ansible-verbosity"),
-        )
-        assert destroy_kea_lxcs_run.rc == 0
+        with run_playbook(request, temp_kea_lxcs_inv.name, "playbooks/sync_lxcs.yaml", "playbooks/setup_kea.yaml", destroy_playbook="playbooks/destroy_lxcs.yaml"):
+            yield
 
 
 @cloud_fixture("dhcp", "ceph", "kea")
@@ -311,33 +286,8 @@ def setup_ceph_dhcp_lxcs(request, get_test_env, setup_dhcp_lxcs):
             )
             temp_kea_lxcs_inv.flush()
 
-            sync_lxcs_kea = ansible_runner.run(
-                project_dir=os.getcwd(),
-                playbook="playbooks/sync_lxcs.yaml",
-                inventory=temp_kea_lxcs_inv.name,
-                verbosity=request.config.getoption("--ansible-verbosity"),
-            )
-            assert sync_lxcs_kea.rc == 0
-
-            logger.info("setup kea lxcs")
-            setup_kea_run = ansible_runner.run(
-                project_dir=os.getcwd(),
-                playbook="playbooks/setup_ceph_kea.yaml",
-                inventory=temp_kea_lxcs_inv.name,
-                verbosity=request.config.getoption("--ansible-verbosity"),
-            )
-            assert setup_kea_run.rc == 0
-
-        yield
-
-        logger.info("destroy ceph kea lxcs")
-        destroy_kea_lxcs_run = ansible_runner.run(
-            project_dir=os.getcwd(),
-            playbook="playbooks/destroy_lxcs.yaml",
-            inventory=temp_kea_lxcs_inv.name,
-            verbosity=request.config.getoption("--ansible-verbosity"),
-        )
-        assert destroy_kea_lxcs_run.rc == 0
+            with run_playbook(request, temp_kea_lxcs_inv.name, "playbooks/sync_lxcs.yaml", "playbooks/setup_ceph_kea.yaml", destroy_playbook="playbooks/destroy_lxcs.yaml"):
+                yield
     else:
         yield
 
@@ -396,33 +346,8 @@ def setup_bind_lxcs(request, get_test_env, fetch_default_gw_ns, setup_pve_hosts)
         )
         temp_bind_lxcs_inv.flush()
 
-        sync_bind_lxcs_run = ansible_runner.run(
-            project_dir=os.getcwd(),
-            playbook="playbooks/sync_lxcs.yaml",
-            inventory=temp_bind_lxcs_inv.name,
-            verbosity=request.config.getoption("--ansible-verbosity"),
-        )
-        assert sync_bind_lxcs_run.rc == 0
-
-        logger.info("setup bind lxcs")
-        setup_bind_run = ansible_runner.run(
-            project_dir=os.getcwd(),
-            playbook="playbooks/setup_bind.yaml",
-            inventory=temp_bind_lxcs_inv.name,
-            verbosity=request.config.getoption("--ansible-verbosity"),
-        )
-        assert setup_bind_run.rc == 0
-
-        yield
-
-        logger.info("destroy bind lxcs")
-        destroy_bind_lxcs_run = ansible_runner.run(
-            project_dir=os.getcwd(),
-            playbook="playbooks/destroy_lxcs.yaml",
-            inventory=temp_bind_lxcs_inv.name,
-            verbosity=request.config.getoption("--ansible-verbosity"),
-        )
-        assert destroy_bind_lxcs_run.rc == 0
+        with run_playbook(request, temp_bind_lxcs_inv.name, "playbooks/sync_lxcs.yaml", "playbooks/setup_bind.yaml", destroy_playbook="playbooks/destroy_lxcs.yaml"):
+            yield
 
 
 @cloud_fixture("patroni", "postgres")
@@ -478,33 +403,8 @@ def setup_patroni_lxcs(request, get_test_env, setup_dhcp_lxcs):
         )
         temp_postgres_lxcs_inv.flush()
 
-        sync_lxcs_postgres = ansible_runner.run(
-            project_dir=os.getcwd(),
-            playbook="playbooks/sync_lxcs.yaml",
-            inventory=temp_postgres_lxcs_inv.name,
-            verbosity=request.config.getoption("--ansible-verbosity"),
-        )
-        assert sync_lxcs_postgres.rc == 0
-
-        logger.info("setup postgres lxcs")
-        setup_postgres_run = ansible_runner.run(
-            project_dir=os.getcwd(),
-            playbook="playbooks/setup_postgres.yaml",
-            inventory=temp_postgres_lxcs_inv.name,
-            verbosity=request.config.getoption("--ansible-verbosity"),
-        )
-        assert setup_postgres_run.rc == 0
-
-        yield
-
-        logger.info("destroy postgres lxcs")
-        destroy_postgres_lxcs_run = ansible_runner.run(
-            project_dir=os.getcwd(),
-            playbook="playbooks/destroy_lxcs.yaml",
-            inventory=temp_postgres_lxcs_inv.name,
-            verbosity=request.config.getoption("--ansible-verbosity"),
-        )
-        assert destroy_postgres_lxcs_run.rc == 0
+        with run_playbook(request, temp_postgres_lxcs_inv.name, "playbooks/sync_lxcs.yaml", "playbooks/setup_postgres.yaml", destroy_playbook="playbooks/destroy_lxcs.yaml"):
+            yield
 
 
 @cloud_fixture("haproxy", "proxy")
@@ -564,33 +464,8 @@ def setup_haproxy_lxcs(request, get_test_env, setup_patroni_lxcs):
         )
         temp_haproxy_lxcs_inv.flush()
 
-        sync_lxcs_haproxy = ansible_runner.run(
-            project_dir=os.getcwd(),
-            playbook="playbooks/sync_lxcs.yaml",
-            inventory=temp_haproxy_lxcs_inv.name,
-            verbosity=request.config.getoption("--ansible-verbosity"),
-        )
-        assert sync_lxcs_haproxy.rc == 0
-
-        logger.info("setup haproxy lxcs")
-        setup_haproxy_run = ansible_runner.run(
-            project_dir=os.getcwd(),
-            playbook="playbooks/setup_haproxy.yaml",
-            inventory=temp_haproxy_lxcs_inv.name,
-            verbosity=request.config.getoption("--ansible-verbosity"),
-        )
-        assert setup_haproxy_run.rc == 0
-
-        yield
-
-        logger.info("destroy haproxy lxcs")
-        destroy_haproxy_lxcs_run = ansible_runner.run(
-            project_dir=os.getcwd(),
-            playbook="playbooks/destroy_lxcs.yaml",
-            inventory=temp_haproxy_lxcs_inv.name,
-            verbosity=request.config.getoption("--ansible-verbosity"),
-        )
-        assert destroy_haproxy_lxcs_run.rc == 0
+        with run_playbook(request, temp_haproxy_lxcs_inv.name, "playbooks/sync_lxcs.yaml", "playbooks/setup_haproxy.yaml", destroy_playbook="playbooks/destroy_lxcs.yaml"):
+            yield
 
 
 @cloud_fixture("kubespray", "k8s")
