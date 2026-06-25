@@ -126,3 +126,18 @@ Older versions / to manually refresh you need to login to each master node and r
 If communication between or to your virtual machines is incosistent (slow, lots of interrupts), you might have issues with certain network offloading features. use `ethtool -K NIC_IFACE FEAT_X off FEAT_Y off` (features like tso, gso, gro).
 
 To make them persistent checkout the [pve cloud inventory schema](schemas/pve_cloud_inv_schema.md#pve_clusters_pattern1_pve_host_vars_net_offloading_fixxes).
+
+
+## Autoactivation python venv VSCode
+
+In your local workspace create the `.vscode/settings.json` folder + file.
+
+In that file set your default interpreter path:
+
+```json
+{
+    "python.defaultInterpreterPath": "${env:HOME}/.pve-cloud-venv/bin/python",
+}
+```
+
+To fix the slow activation of the environment set

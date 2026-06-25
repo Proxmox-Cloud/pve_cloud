@@ -93,8 +93,10 @@
       x86_64: "amd64"
       aarch64: "arm64"
 
-    # only monitory systemd services
+    # weird logic for the filters, "Units must both match include and not match exclude to be included."
+    # include seems to filter some units and not all?
     systemd_exporter_unit_include: '.*\\.service'
+    systemd_exporter_unit_exclude: '.*\\.scope'
     smartctl_exporter_system_user: root
     smartctl_exporter_system_group: root
   roles:

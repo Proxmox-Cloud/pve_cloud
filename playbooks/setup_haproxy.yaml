@@ -24,7 +24,7 @@
 
     - name: install haproxy
       ansible.builtin.apt:
-        name: haproxy
+        name: haproxY
         state: present
 
     - name: enable and start proxy
@@ -43,14 +43,14 @@
 
     - name: check if postgres is available
       delegate_to: pxc-executor-host
-      community.postgresql.postgresql_ping:
+      community.postgresql.postgres_ping:
         host: "{{ pve_haproxy_floating_ip_internal }}"
         port: 5000
         login_db: postgres
         login_user: postgres
         login_password: "{{ postgres_password  }}" 
       register: postgres_connection_check
-      ignore_errors: yes
+      ignore_errors: true
 
     - set_fact:
         proxy_stack_fqdn: "{{ stack_name }}.{{ pve_cloud_domain }}"
@@ -108,3 +108,53 @@
         name: keepalived
         state: restarted
         enabled: yes
+
+    - name: create host record for internal floating ip
+      delegate_to: "pxc-executor-host"
+      run_once: true
+      community.general.nsupdate:
+        key_name: "internal."
+        key_algorithm: "hmac-sha256"
+        key_secret: "{{ bind_internal_key }}"
+        server: "{{ bind_master_ip }}"
+        zone: "{{ pve_cloud_domain }}"
+        record: "internal-{{ stack_name }}"
+        value: "{{ pve_haproxy_floating_ip_internal }}"
+
+    - name: create host record for internal floating ip
+      delegate_to: "pxc-executor-host"
+      run_once: true
+      community.general.nsupdate:
+        key_name: "internal."
+        key_algorithm: "hmac-sha256"
+        key_secret: "{{ bind_internal_key }}"
+        server: "{{ bind_master_ip }}"
+        zone: "{{ pve_cloud_domain }}"
+        record: "external-{{ stack_name }}"
+        value: "{{ pve_haproxy_floating_ip_external }}"
+
+    - name: create ptr record internal floating ip
+      run_once: true
+      delegate_to: "pxc-executor-host"
+      community.general.nsupdate:
+        key_name: "internal."
+        key_algorithm: "hmac-sha256"
+        key_secret: "{{ bind_internal_key }}"
+        server: "{{ bind_master_ip }}"
+        zone: "{{ bind_arpa_zone_service_lxcs }}"
+        record: "{{ pve_haproxy_floating_ip_internal.split('.')[3] }}"
+        type: PTR
+        value: "internal-{{ stack_name }}.{{ pve_cloud_domain }}."
+
+    - name: create ptr record external floating ip
+      run_once: true
+      delegate_to: "pxc-executor-host"
+      community.general.nsupdate:
+        key_name: "internal."
+        key_algorithm: "hmac-sha256"
+        key_secret: "{{ bind_internal_key }}"
+        server: "{{ bind_master_ip }}"
+        zone: "{{ bind_arpa_zone_service_lxcs }}"
+        record: "{{ pve_haproxy_floating_ip_external.split('.')[3] }}"
+        type: PTR
+        value: "external-{{ stack_name }}.{{ pve_cloud_domain }}."
