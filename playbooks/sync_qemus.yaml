@@ -111,6 +111,7 @@
     - alternate_ssh_port
     - parse_cluster_secrets
     - set_kea_reservations
+    - ssh_enforce_key_auth
   tasks:
     - name: install automation pubkey
       lineinfile:

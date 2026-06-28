@@ -147,6 +147,7 @@
     - overwrite_apt_mirror
     - set_kea_reservations
     - adjust_networkd_oom_score
+    - ssh_enforce_key_auth
   tasks:
     - name: install automation pubkey
       lineinfile:

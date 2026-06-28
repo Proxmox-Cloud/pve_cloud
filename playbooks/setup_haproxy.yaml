@@ -43,7 +43,7 @@
 
     - name: check if postgres is available
       delegate_to: pxc-executor-host
-      community.postgresql.postgres_ping:
+      community.postgresql.postgresql_ping:
         host: "{{ pve_haproxy_floating_ip_internal }}"
         port: 5000
         login_db: postgres

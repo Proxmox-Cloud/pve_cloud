@@ -102,6 +102,7 @@
     - parse_cluster_secrets
     - alternate_ssh_port
     - overwrite_apt_mirror
+    - ssh_enforce_key_auth
   vars:
     # only monitory systemd services
     systemd_exporter_unit_include: '.*\\.service'
