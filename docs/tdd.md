@@ -30,6 +30,7 @@ Host *
 ```
 * install `direnv` and activate it in your local profile (add `eval "$(direnv hook bash)"` to .bashrc)
 * create a `pve-cloud` folder and checkout all the repositories you want to make changes to, if you checkout the ansible collections they have to be under `ansible_collections/pve/`
+* in the pve-cloud-pipelines project you will find a ws-files folder which contains top level scripts, env files, etc. that are needed / convinient for development
 * create a dedicated venv for pve cloud development `python3 -m venv ~/.pve-cloud-dev-venv` and activate `source ~/.pve-cloud-dev-venv/bin/activate`, install the default ansible dependency from the bootstrap section
 * create a test environment config yaml (you can find the schema definition in the src folder of the [pytest-pve-cloud repository](https://github.com/Proxmox-Cloud/pytest-pve-cloud)) - forward to the test domain your main dns (you can use `bind_forward_zones` in the pve cloud inventory if your main infrastructure already is a pve cloud)
 * create a `.envrc` file with env variables stored for development
