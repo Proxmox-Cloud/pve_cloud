@@ -9,7 +9,7 @@ from ansible_collections.pxc.cloud.plugins.module_utils.inventory import \
 from jsonschema.exceptions import ValidationError
 from pve_cloud.lib.inventory import get_pve_inventory
 from pve_cloud.lib.ssh import check_ssh_open
-from pve_cloud_schemas.validate import validate_inventory
+from pve_cloud_schemas.validate import validate_inventory, validate_cluster_vars
 
 display = Display()
 
@@ -189,6 +189,9 @@ class InventoryModule(BaseInventoryPlugin):
                 cluster_vars["pve_cloud_collection_version"] = manifest_version
                 cluster_vars["py_pve_cloud_version"] = py_pve_cloud_version
                 cluster_vars["pve_cluster_name"] = pve_cluster
+
+                # validate why custom schema func
+                validate_cluster_vars(cluster_vars)
 
                 inventory.set_variable(fqdn_host, "cluster_vars", cluster_vars)
 

@@ -24,7 +24,7 @@
 
     - name: install haproxy
       ansible.builtin.apt:
-        name: haproxY
+        name: haproxy
         state: present
 
     - name: enable and start proxy

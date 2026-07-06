@@ -19,7 +19,7 @@ from pve_cloud.lib.inventory import (get_cloud_domain, get_online_jump_host,
                                      get_pve_inventory)
 from pve_cloud.lib.ssh import (check_ssh_open_async, connect_host_async,
                                wait_for_ssh_open_async)
-from pve_cloud_schemas.validate import validate_inventory
+from pve_cloud_schemas.validate import validate_inventory, validate_cluster_vars
 
 
 # collector class for a proxmox host, its cloud membership and config
@@ -116,6 +116,8 @@ async def fetch_pve_cluster_info(pve_host_of_cluster):
 
         # parse the results of the commands
         cluster_vars = yaml.safe_load(merged["cluster_vars"])
+        validate_cluster_vars(cluster_vars)
+
         pvesh_vms = json.loads(merged["pvesh_vms"])
         ha_groups = yaml.safe_load(merged["ha_groups"])
 

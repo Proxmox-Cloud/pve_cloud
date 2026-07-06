@@ -19,6 +19,7 @@ from pve_cloud.lib.inventory import (get_cloud_domain, get_online_pve_host,
                                      get_pve_inventory, get_target_cluster)
 from pve_cloud.orm.alchemy import AcmeX509, ProxmoxCloudSecrets
 from pve_cloud_test.cloud_fixtures import *
+from pve_cloud_schemas.validate import validate_cluster_vars
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
@@ -527,6 +528,8 @@ def setup_prepare_kubespray(
     _, stdout, _ = ssh.exec_command("cat /etc/pve/cloud/cluster_vars.yaml")
 
     cluster_vars = yaml.safe_load(stdout.read().decode("utf-8"))
+    validate_cluster_vars(cluster_vars)
+
     logger.info(cluster_vars["pve_haproxy_floating_ip_internal"])
     _, stdout, _ = ssh.exec_command("cat /etc/pve/cloud/secrets/patroni.pass")
 

@@ -52,12 +52,14 @@ object "pve_cloud" as cloud_collection {
   * <u>ansible collection</u> (pxc.cloud)
   * bootstrap playbooks
   * pve inventory plugins
+  * uses pve-cloud-schemas for docs
 }
 
 object "pve-cloud-schemas" as cloud_schemas {
   * <u>pypi package</u>
   * json/yaml schema defs
   * general validation logic
+  * mkdocs schema definitions
 }
 
 object "pytest-pve-cloud" as pytest_pve_cloud {
@@ -80,7 +82,7 @@ controller_image --> controller_module
 backup_image --> backup_module
 backup_image --> cloud_collection
 
-cloud_schemas --> cloud_collection
+cloud_schemas --> py_pve_cloud
 
 @enduml
 ```

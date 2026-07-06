@@ -1,6 +1,7 @@
 ---
 # tasks file for ssh_enforce_key_auth
 - name: Disable ssh password authentication
+  become: true
   ansible.builtin.lineinfile:
     path: /etc/ssh/sshd_config
     regexp: '^#?\s*PasswordAuthentication'
@@ -9,6 +10,7 @@
   register: ssh_key_auth_change
 
 - name: Restart sshd
+  become: true
   service:
     name: sshd
     state: restarted
