@@ -18,8 +18,8 @@ from pve_cloud.cli.pxrpc import launch_pxrpc
 from pve_cloud.lib.inventory import (get_cloud_domain, get_online_pve_host,
                                      get_pve_inventory, get_target_cluster)
 from pve_cloud.orm.alchemy import AcmeX509, ProxmoxCloudSecrets
-from pve_cloud_test.cloud_fixtures import *
 from pve_cloud_schemas.validate import validate_cluster_vars
+from pve_cloud_test.cloud_fixtures import *
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 

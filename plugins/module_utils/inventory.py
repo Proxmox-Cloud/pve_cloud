@@ -19,7 +19,8 @@ from pve_cloud.lib.inventory import (get_cloud_domain, get_online_jump_host,
                                      get_pve_inventory)
 from pve_cloud.lib.ssh import (check_ssh_open_async, connect_host_async,
                                wait_for_ssh_open_async)
-from pve_cloud_schemas.validate import validate_inventory, validate_cluster_vars
+from pve_cloud_schemas.validate import (validate_cluster_vars,
+                                        validate_inventory)
 
 
 # collector class for a proxmox host, its cloud membership and config
