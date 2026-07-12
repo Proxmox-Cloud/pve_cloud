@@ -122,7 +122,16 @@
         name: prometheus-node-exporter
         state: restarted
       when: node_exporter_config.changed
-      
+
+    # todo: this is currently not idempotent and should consider removal / setting to true
+    - name: configure corosync optional votes
+      throttle: 1 # consider proxmox shared fs
+      ansible.builtin.replace:
+        path: /etc/pve/corosync.conf
+        regexp: '(name:\s{{ ansible_hostname }}\n\s+nodeid:\s\d+\n\s+quorum_votes:)\s(\d+)'
+        replace: '\1 0'
+      when: pve_corosync_vote is defined and not pve_corosync_vote
+
     # install btrfs prometheus exporter for root filesystem
     - include_role:
         name: btrfs_prom_exporter

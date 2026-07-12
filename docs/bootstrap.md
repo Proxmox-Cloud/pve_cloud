@@ -92,6 +92,12 @@ host_key_checking = False
 # this is needed so that if our custom inventory plugins raise an error
 # playbook execution gets halted
 any_unparsed_is_failed = True
+
+# optionally speed up ansible by enableing multiplexing
+[ssh_connection]
+ssh_args = -o ControlMaster=auto -o ControlPersist=60s
+control_path_dir = ~/.ansible/cp
+control_path = %(directory)s/%%h-%%r-%%p
 ```
 
 ### CLI Manual Approach
