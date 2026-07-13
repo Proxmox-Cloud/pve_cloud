@@ -171,7 +171,11 @@ class InventoryModule(BaseInventoryPlugin):
                 )
 
                 # enable jump host functionality for ansible via ssh
-                if online_jump_hosts:
+                # while avoiding jump host loop error
+                if (
+                    online_jump_hosts
+                    and params["ansible_host"] not in online_jump_hosts
+                ):
                     inventory.set_variable(
                         fqdn_host,
                         "ansible_ssh_common_args",

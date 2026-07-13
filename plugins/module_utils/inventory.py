@@ -213,11 +213,13 @@ def build_pve_inventory(inventory, yaml_data, online_pve_hosts, cluster_map):
                     "/root/.pxc-venv/bin/python",
                 )
 
-                inventory.set_variable(
-                    "pxc-executor-host",
-                    "ansible_ssh_common_args",
-                    f"-o ProxyJump=root@{pve_host.jump_host}",
-                )
+                # only set the jump host if the host itself is not the jump host aswell
+                if pve_host.params["ansible_host"] != pve_host.jump_host:
+                    inventory.set_variable(
+                        "pxc-executor-host",
+                        "ansible_ssh_common_args",
+                        f"-o ProxyJump=root@{pve_host.jump_host}",
+                    )
 
                 pxc_executor_set = True
 
@@ -239,7 +241,8 @@ def build_pve_inventory(inventory, yaml_data, online_pve_hosts, cluster_map):
         )
 
         # set the jump host for connecting to the proxmox host
-        if pve_host.jump_host:
+        # while avoiding jumphost loop error
+        if pve_host.jump_host and pve_host.params["ansible_host"] != pve_host.jump_host:
             inventory.set_variable(
                 host_fqdn,
                 "ansible_ssh_common_args",
