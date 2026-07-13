@@ -104,7 +104,9 @@ def setup_control_node(request, get_test_env):
         )
         connect_remote_cluster(parsed_args)
     else:
-        logger.info("initializing local ~/.pve-cloud-e2e-dyn-inv.yaml with direct access")
+        logger.info(
+            "initializing local ~/.pve-cloud-e2e-dyn-inv.yaml with direct access"
+        )
         parsed_args = get_parser().parse_args(
             [
                 "connect-cluster",
@@ -121,6 +123,7 @@ def setup_control_node(request, get_test_env):
 
     logger.info("deleting pve cloud e2e dyn inv cleanup")
     os.remove(os.path.expanduser("~/.pve-cloud-e2e-dyn-inv.yaml"))
+
 
 @cloud_fixture("hosts", "pve")
 def setup_pve_hosts(request, get_test_env, setup_control_node):
