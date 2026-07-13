@@ -86,7 +86,7 @@ def setup_control_node(request, get_test_env):
 
     # run the remote connect cluster functionality if jumphost is specified, otherwise normal connect cluster
     if "pve_test_cluster_jump_host" in get_test_env:
-        logger.info("initializing local ~/.pve-cloud-dyn-inv.yaml with jumphosts")
+        logger.info("initializing local ~/.pve-cloud-e2e-dyn-inv.yaml with jumphosts")
         parsed_args = get_parser().parse_args(
             [
                 "connect-remote-cluster",
@@ -104,7 +104,7 @@ def setup_control_node(request, get_test_env):
         )
         connect_remote_cluster(parsed_args)
     else:
-        logger.info("initializing local ~/.pve-cloud-dyn-inv.yaml with direct access")
+        logger.info("initializing local ~/.pve-cloud-e2e-dyn-inv.yaml with direct access")
         parsed_args = get_parser().parse_args(
             [
                 "connect-cluster",
@@ -117,6 +117,10 @@ def setup_control_node(request, get_test_env):
         )
         connect_cluster(parsed_args)
 
+    yield
+
+    logger.info("deleting pve cloud e2e dyn inv cleanup")
+    os.remove(os.path.expanduser("~/.pve-cloud-e2e-dyn-inv.yaml"))
 
 @cloud_fixture("hosts", "pve")
 def setup_pve_hosts(request, get_test_env, setup_control_node):

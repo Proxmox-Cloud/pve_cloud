@@ -39,7 +39,7 @@ async def test_pxrpc_tunnel(get_test_env):
     logger.info(first_test_host["ansible_host"])
     # run the remote connect cluster functionality if jumphost is specified, otherwise normal connect cluster
     if "pve_test_cluster_jump_host" in get_test_env:
-        logger.info("initializing local ~/.pve-cloud-dyn-inv.yaml with jumphosts")
+        logger.info("initializing local ~/.pve-cloud-e2e-dyn-inv.yaml with jumphosts")
 
         with launch_pxrpc(
             get_test_env["pve_test_cluster_jump_host"],
