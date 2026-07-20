@@ -148,6 +148,7 @@
     - set_kea_reservations
     - adjust_networkd_oom_score
     - ssh_enforce_key_auth
+    - setup_pxzfs_localpv_zpool
   tasks:
     - name: install automation pubkey
       lineinfile:
@@ -343,6 +344,23 @@
   hosts: kube_node
   tags:
     - deployments
+  tasks:
+    # check if pxzfs tagged disks exist (for openebs zfs localpv setup)
+    - name: List block devices
+      ansible.builtin.command:
+        cmd: lsblk --json -o NAME,PATH,SERIAL,FSTYPE
+      register: lsblk_out
+
+    - set_fact:
+        block_devices: "{{ (lsblk_out.stdout | from_json).blockdevices }}"
+
+    - set_fact:
+        pxzfs_storage_node: >-
+          {{
+            block_devices
+            | selectattr('serial', 'search', 'pxzfs$')
+            | list | length > 0
+          }}
 
 - name: Fetch the kubeconfig from a master node
   hosts: kube_control_plane
@@ -512,6 +530,72 @@
             image_name: ingress-nginx/kube-webhook-certgen
             image_version: v1.6.4
 
+        # mirror openebs
+        - name: mirror openebs chart
+          include_role:
+            name: pxc.cloud.mirror_helm_chart
+          vars:
+            helm_repository_url: "https://openebs.github.io/openebs"
+            helm_repository_name: openebs
+            helm_chart_name: openebs
+            helm_chart_version: 4.4.0
+
+        - name: mirror openebs images
+          include_role:
+            name: pxc.cloud.mirror_container_image
+          vars:
+            image_registry: registry.k8s.io
+            image_name: sig-storage/csi-resizer
+            image_version: v1.13.2
+
+        - name: mirror openebs images
+          include_role:
+            name: pxc.cloud.mirror_container_image
+          vars:
+            image_registry: registry.k8s.io
+            image_name: sig-storage/csi-snapshotter
+            image_version: v8.2.0
+
+        - name: mirror openebs images
+          include_role:
+            name: pxc.cloud.mirror_container_image
+          vars:
+            image_registry: registry.k8s.io
+            image_name: sig-storage/snapshot-controller
+            image_version: v8.2.0
+
+        - name: mirror openebs images
+          include_role:
+            name: pxc.cloud.mirror_container_image
+          vars:
+            image_registry: registry.k8s.io
+            image_name: sig-storage/csi-provisioner
+            image_version: v5.2.0
+
+        - name: mirror openebs images
+          include_role:
+            name: pxc.cloud.mirror_container_image
+          vars:
+            image_registry: docker.io
+            image_name: openebs/zfs-driver
+            image_version: 2.9.0
+
+        - name: mirror openebs images
+          include_role:
+            name: pxc.cloud.mirror_container_image
+          vars:
+            image_registry: registry.k8s.io
+            image_name: sig-storage/csi-node-driver-registrar
+            image_version: v2.13.0
+
+        - name: mirror openebs images
+          include_role:
+            name: pxc.cloud.mirror_container_image
+          vars:
+            image_registry: docker.io
+            image_name: openebs/provisioner-localpv
+            image_version: 4.4.0
+
     # kubernetes.core comes from kubespray collection
     - name: ceph csi repo
       kubernetes.core.helm_repository:
@@ -601,3 +685,46 @@
         release_namespace: nginx-ingress
         update_repo_cache: true
         timeout: 15m # slow tdd systems
+
+    # determine if openebs zfs csi should be deployed
+    - set_fact:
+        pxzfs_storage_hosts: >-
+          {{
+            groups['kube_node']
+            | map('extract', hostvars)
+            | selectattr('pxzfs_storage_node', 'defined')
+            | selectattr('pxzfs_storage_node', 'equalto', true)
+            | map(attribute='ansible_hostname')
+            | list
+          }}
+
+    - debug:
+        var: pxzfs_storage_hosts
+
+    - name: create openebs namespace
+      kubernetes.core.k8s:
+        name: openebs
+        api_version: v1
+        kind: Namespace
+        state: present
+        kubeconfig: "{{ temp_kubeconfig.path }}"
+      when: pxzfs_storage_hosts | length > 0
+
+    - name: deploy openebs localpv zfs chart
+      kubernetes.core.helm:
+        name: openebs
+        chart_ref: "{{ 'openebs/openebs' if harbor_mirror_secret.rowcount == 0 else 'oci://' ~ harbor_mirror_secret.query_result[0]['secret_data']['harbor_host'] ~ '/cloud-helm-mirror/openebs/openebs'}}"
+        chart_version: 4.4.0
+        values: "{{ lookup('template', 'openebs-values.yaml.j2') | from_yaml }}"
+        kubeconfig: "{{ temp_kubeconfig.path }}"
+        release_namespace: openebs
+        update_repo_cache: true
+        timeout: 15m # slow tdd systems
+      when: pxzfs_storage_hosts | length > 0
+
+    - name: create zvol storage class
+      kubernetes.core.k8s:
+        state: present
+        kubeconfig: "{{ temp_kubeconfig.path }}"
+        template: openebs-zfs-localpv-sc.yaml.j2
+      when: pxzfs_storage_hosts | length > 0

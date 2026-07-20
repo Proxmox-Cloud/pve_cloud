@@ -1,5 +1,34 @@
 # Cloud Architecture
 
+This collection is designed to solve the following 3 big usecases.
+
+* large extensible kubernetes production clusters, with state of the art storage and backups
+=> for this case you need a strong network setup, for supporting an ever growing ceph filesystem
+* remote production clusters on possibly limited network capabilities (leveraging almost any provider that rents dedicated systems)
+=> typically you get a 10G Network link which makes ceph usable but requires offloading techniques around this bottleneck
+* isolated edge kubernetes clusters, single node systems / systems with unsuitable network bandwidth for ceph
+=> for this the collection provides an k0s setup wizard with a preconfigured openebs zfs local pv volume driver and a tailored backup tool
+
+To fully live up to production standards, this collection implements a backup tool that integrates deeply with ceph and zfs, creating atomic grouped snapshots of all volumes in a namespace. It also allows for restoring backups backed by zfs volumes into a system with ceph csi and vise versa, making migrations effortless.
+
+The collection also comes with a self discovering monitoring and logging systems for all levels of the stack (proxmox hosts, lxcs/vms, kubernetes workloads).
+
+## Terminology
+
+The collection and projects use certain terms to define scope, which enables a lot of implicit behaviour.
+
+* `pve_cloud_domain`: this is the main domain name you select for your cloud instance. Think of it as having one personal aws per domain.
+* `target_pve`: this refers to a proxmox cluster within a domain. Its the result of the proxmox cluster name defined in the proxmox ui + `(.)pve_cloud_domain`
+* `stack_name`: each set of vms / lxcs you deploy is referred to as a stack. Each kubespray cluster is its own stack also.
+* `stack_fqdn`: this referes to the `stack_name` + `(.)pve_cloud_domain` and serves to identify the stack uniquely
+* control node: this is the machine that runs ansible and terraform scripts. This is you development/deployment machine and this agent needs to have the main cloud ssh keys loaded in its agent.
+
+## VMs / LXCs
+
+Currently this collection runs on debian 12 bookworm, and heavily prefers lxc templates / vms matching this distribution. Generally it should work with other apt based distros, however not all functions may be supported there.
+
+## Internal dependencies
+
 The collection is made of the following artifacts, you can find all the repositories in our github org.
 
 ```puml
@@ -86,17 +115,3 @@ cloud_schemas --> py_pve_cloud
 
 @enduml
 ```
-
-## Terminology
-
-The collection and projects use certain terms to define scope, which enables a lot of implicit behaviour.
-
-* `pve_cloud_domain`: this is the main domain name you select for your cloud instance. Think of it as having one personal aws per domain.
-* `target_pve`: this refers to a proxmox cluster within a domain. Its the result of the proxmox cluster name defined in the proxmox ui + `(.)pve_cloud_domain`
-* `stack_name`: each set of vms / lxcs you deploy is referred to as a stack. Each kubespray cluster is its own stack also.
-* `stack_fqdn`: this referes to the `stack_name` + `(.)pve_cloud_domain` and serves to identify the stack uniquely
-* control node: this is the machine that runs ansible and terraform scripts. This is you development/deployment machine and this agent needs to have the main cloud ssh keys loaded in its agent.
-
-## VMs / LXCs
-
-Currently this collection runs on debian 12 bookworm, and heavily prefers lxc templates / vms matching this distribution. Generally it should work with other apt based distros, however not all functions may be supported there.

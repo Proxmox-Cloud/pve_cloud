@@ -104,6 +104,26 @@
         src: vector.yaml.j2
         dest: /etc/vector/vector.yaml
 
+    # fix vector memory hogging on sink down
+    - name: create systemd override dir
+      ansible.builtin.file:
+        path: /etc/systemd/system/vector.service.d
+        state: directory
+
+    - name: create memory limits
+      ansible.builtin.copy:
+        dest: /etc/systemd/system/vector.service.d/memlimits.conf
+        content: |
+          [Service]
+          MemorySwapMax=0
+          MemoryMax=128M
+      register: limits_configured
+
+    - name: reload daemon on limits conf
+      ansible.builtin.systemd:
+        daemon_reload: true
+      when: limits_configured.changed
+
     - name: (re)start vector service
       ansible.builtin.service:
         name: vector

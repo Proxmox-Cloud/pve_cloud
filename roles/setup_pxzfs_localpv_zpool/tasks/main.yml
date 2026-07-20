@@ -1,0 +1,73 @@
+---
+# tasks file for setup_pxzfs_localpv_zpool
+
+- name: List block devices
+  ansible.builtin.command:
+    cmd: lsblk --json -o NAME,PATH,SERIAL,FSTYPE
+  register: lsblk_out
+
+- set_fact:
+    block_devices: "{{ (lsblk_out.stdout | from_json).blockdevices }}"
+
+- debug:
+    var: block_devices
+
+# todo: here currently is no proper logic to handle changes, this will only work on the initial
+# create and if noone changes anything later on with zfs pxc serial labled disks
+- set_fact:
+    init_zfs_devices: >-
+      {{
+        block_devices
+        | selectattr('serial', 'search', 'pxzfs$')
+        | rejectattr('children', 'defined')
+        | list
+      }}
+
+- debug:
+    var: init_zfs_devices
+
+- name: init zfs kernel module
+  when: init_zfs_devices | length > 0
+  block:
+    - name: update kernel and headers
+      become: true
+      ansible.builtin.apt:
+        update_cache: true
+        name:
+          - "linux-image-{{ arch_mapping[ansible_architecture] }}"
+          - "linux-headers-{{ arch_mapping[ansible_architecture] }}"
+        state: latest
+      register: kernel_update
+
+    - name: reboot after kernel update
+      become: true
+      ansible.builtin.reboot:
+        msg: "Rebooting after kernel update"
+        reboot_timeout: 900
+      when: kernel_update.changed
+
+    - name: install zfs
+      become: true
+      ansible.builtin.apt:
+        name:
+          - zfs-dkms
+          - zfsutils-linux
+        state: present
+      register: zfs_install
+
+    - name: dkms autoconf
+      become: true
+      ansible.builtin.command:
+        cmd: dkms autoinstall
+      when: zfs_install.changed
+
+    - name: load zfs module
+      become: true
+      community.general.modprobe:
+        name: zfs
+        state: present
+
+    - name: create zpool
+      become: true
+      ansible.builtin.command:
+        cmd: "zpool create -o ashift=12 tank-pv {{ init_zfs_devices | map(attribute='path') | join(' ') }}"

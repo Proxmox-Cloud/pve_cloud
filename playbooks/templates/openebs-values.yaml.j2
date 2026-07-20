@@ -1,0 +1,61 @@
+loki:
+  enabled: false
+alloy:
+  enabled: false
+engines:
+  local:
+    zfs:
+      enabled: true # is enabled by default
+    lvm:
+      enabled: false
+    rawfile:
+      enabled: false
+    hostpath:
+      enabled: false
+  replicated:
+    mayastor:
+      enabled: false
+
+localpv-provisioner:
+  hostpathClass:
+    enabled: false
+
+{% if harbor_mirror_secret.rowcount != 0 %}
+  localpv:
+    image:
+      registry: "{{ mirror_repo_host }}/"
+      repository: cloud-mirror/docker.io/openebs/provisioner-localpv
+
+{% endif %}
+
+
+{% if harbor_mirror_secret.rowcount != 0 %}
+zfs-localpv:
+  zfsController:
+    resizer:
+      image:
+        registry: "{{ mirror_repo_host }}/"
+        repository: cloud-mirror/registry.k8s.io/sig-storage/csi-resizer
+    snapshotter:
+      image:
+        registry: "{{ mirror_repo_host }}/"
+        repository: cloud-mirror/registry.k8s.io/sig-storage/csi-snapshotter
+    snapshotController:
+      image:
+        registry: "{{ mirror_repo_host }}/"
+        repository: cloud-mirror/registry.k8s.io/sig-storage/snapshot-controller
+    provisioner:
+      image:
+        registry: "{{ mirror_repo_host }}/"
+        repository: cloud-mirror/registry.k8s.io/sig-storage/csi-provisioner
+  zfsPlugin:
+    image:
+      registry: "{{ mirror_repo_host }}/"
+      repository: cloud-mirror/docker.io/openebs/zfs-driver
+  zfsNode:
+    driverRegistrar:
+      image:
+        registry: "{{ mirror_repo_host }}/"
+        repository: cloud-mirror/registry.k8s.io/sig-storage/csi-node-driver-registrar
+
+{% endif %}

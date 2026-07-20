@@ -100,6 +100,9 @@
 
 - name: Slurp secrets 
   hosts: target_pve
+  tags:
+    - config
+    - setup
   roles:
     - slurp_cluster_secrets
 
@@ -107,6 +110,7 @@
   hosts: qemus
   tags:
     - config
+    - setup
   roles:
     - alternate_ssh_port
     - parse_cluster_secrets
