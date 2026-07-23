@@ -159,7 +159,6 @@ class InventoryModule(BaseInventoryPlugin):
                     for key, var in vm_params_blake[blake]["vars"].items():
                         inventory.set_variable(hostname, key, var)
 
-
             if "master" in tags:
                 inventory.add_host(hostname, group="kube_control_plane")
                 inventory.add_host(hostname, group="etcd")

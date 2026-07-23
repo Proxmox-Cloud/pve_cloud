@@ -1,12 +1,9 @@
-
-import os
-import sys
-
-from ansible.errors import AnsibleParserError, AnsibleError
+from ansible.errors import AnsibleError, AnsibleParserError
 from ansible.plugins.inventory import BaseInventoryPlugin
 from ansible.utils.display import Display
-from ansible_collections.pxc.cloud.plugins.module_utils.inventory import \
-    get_manifest_version, get_online_pve_hosts, get_cluster_map, build_pve_inventory
+from ansible_collections.pxc.cloud.plugins.module_utils.inventory import (
+    build_pve_inventory, get_cluster_map, get_manifest_version,
+    get_online_pve_hosts)
 from jsonschema.exceptions import ValidationError
 from pve_cloud.lib.ssh import get_ssh_asyncio_loop
 from pve_cloud_schemas.validate import (validate_cluster_vars,
@@ -35,16 +32,27 @@ class InventoryModule(BaseInventoryPlugin):
             raise AnsibleParserError(e.message)
 
         # todo: very hacky should be refactored. needed for build_pve_inventory
-        yaml_data["target_pve"] = yaml_data["target_cluster"] + "." + yaml_data["pve_cloud_domain"]
+        yaml_data["target_pve"] = (
+            yaml_data["target_cluster"] + "." + yaml_data["pve_cloud_domain"]
+        )
 
         with get_ssh_asyncio_loop() as loop:
 
             # build nice pve inventory
-            online_pve_hosts = loop.run_until_complete(get_online_pve_hosts(loader, yaml_data["target_cluster"] + "." + yaml_data["pve_cloud_domain"]))
+            online_pve_hosts = loop.run_until_complete(
+                get_online_pve_hosts(
+                    loader,
+                    yaml_data["target_cluster"] + "." + yaml_data["pve_cloud_domain"],
+                )
+            )
 
-            cluster_map = loop.run_until_complete(get_cluster_map(inventory, online_pve_hosts))
+            cluster_map = loop.run_until_complete(
+                get_cluster_map(inventory, online_pve_hosts)
+            )
             display.v("len cluster map", len(cluster_map))
-            target_cluster = cluster_map[yaml_data["target_cluster"] + "." + yaml_data["pve_cloud_domain"]]
+            target_cluster = cluster_map[
+                yaml_data["target_cluster"] + "." + yaml_data["pve_cloud_domain"]
+            ]
 
             installed_pve_cloud_version = target_cluster.cluster_vars[
                 "pve_cloud_collection_version"

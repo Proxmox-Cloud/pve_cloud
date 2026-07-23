@@ -10,6 +10,7 @@ from pve_cloud.lib.ssh import get_ssh_asyncio_loop
 
 display = Display()
 
+
 class InventoryModule(BaseInventoryPlugin):
 
     def verify_file(self, path):

@@ -140,8 +140,8 @@ EXAMPLES = r"""
 import re
 
 from ansible.module_utils.basic import AnsibleModule
-
-from ansible_collections.community.general.plugins.module_utils._cmd_runner import CmdRunner, cmd_runner_fmt
+from ansible_collections.community.general.plugins.module_utils._cmd_runner import (
+    CmdRunner, cmd_runner_fmt)
 
 
 class Zpool:
@@ -181,10 +181,22 @@ class Zpool:
                 force=cmd_runner_fmt.as_bool("-f"),
                 dry_run=cmd_runner_fmt.as_bool("-n"),
                 pool_properties=cmd_runner_fmt.as_func(
-                    lambda props: sum([["-o", f"{prop}={value}"] for prop, value in (props or {}).items()], [])
+                    lambda props: sum(
+                        [
+                            ["-o", f"{prop}={value}"]
+                            for prop, value in (props or {}).items()
+                        ],
+                        [],
+                    )
                 ),
                 filesystem_properties=cmd_runner_fmt.as_func(
-                    lambda props: sum([["-O", f"{prop}={value}"] for prop, value in (props or {}).items()], [])
+                    lambda props: sum(
+                        [
+                            ["-O", f"{prop}={value}"]
+                            for prop, value in (props or {}).items()
+                        ],
+                        [],
+                    )
                 ),
                 mountpoint=cmd_runner_fmt.as_opt_val("-m"),
                 altroot=cmd_runner_fmt.as_opt_val("-R"),
@@ -194,7 +206,11 @@ class Zpool:
                     lambda vdevs: sum(
                         [
                             ([vdev["role"]] if vdev.get("role") else [])
-                            + ([] if vdev.get("type", "stripe") == "stripe" else [vdev["type"]])
+                            + (
+                                []
+                                if vdev.get("type", "stripe") == "stripe"
+                                else [vdev["type"]]
+                            )
                             + vdev.get("disks", [])
                             for vdev in (vdevs or [])
                         ],
@@ -235,7 +251,9 @@ class Zpool:
             "subcommand disable_new_features force dry_run pool_properties filesystem_properties mountpoint altroot temp_name name vdevs",
             check_rc=True,
         ) as ctx:
-            rc, stdout, stderr = ctx.run(subcommand="create", dry_run=self.module.check_mode)
+            rc, stdout, stderr = ctx.run(
+                subcommand="create", dry_run=self.module.check_mode
+            )
         self.changed = True
         if self.module.check_mode:
             return {"prepared": stdout}
@@ -249,7 +267,9 @@ class Zpool:
         self.changed = True
 
     def list_pool_properties(self):
-        with self.zpool_runner("subcommand scripted columns properties name", check_rc=True) as ctx:
+        with self.zpool_runner(
+            "subcommand scripted columns properties name", check_rc=True
+        ) as ctx:
             rc, stdout, stderr = ctx.run(
                 subcommand="get",
                 scripted=True,
@@ -271,14 +291,23 @@ class Zpool:
             if current.get(prop) != str(value):
                 before[prop] = current.get(prop)
                 if not self.module.check_mode:
-                    with self.zpool_runner("subcommand assignment name", check_rc=True) as ctx:
-                        rc, stdout, stderr = ctx.run(subcommand="set", assignment=f"{prop}={value}")
+                    with self.zpool_runner(
+                        "subcommand assignment name", check_rc=True
+                    ) as ctx:
+                        rc, stdout, stderr = ctx.run(
+                            subcommand="set", assignment=f"{prop}={value}"
+                        )
                 after[prop] = str(value)
                 self.changed = True
-        return {"before": {"pool_properties": before}, "after": {"pool_properties": after}}
+        return {
+            "before": {"pool_properties": before},
+            "after": {"pool_properties": after},
+        }
 
     def list_filesystem_properties(self):
-        with self.zfs_runner("subcommand scripted columns properties name", check_rc=True) as ctx:
+        with self.zfs_runner(
+            "subcommand scripted columns properties name", check_rc=True
+        ) as ctx:
             rc, stdout, stderr = ctx.run(
                 subcommand="get",
                 scripted=True,
@@ -300,11 +329,18 @@ class Zpool:
             if current.get(prop) != str(value):
                 before[prop] = current.get(prop)
                 if not self.module.check_mode:
-                    with self.zfs_runner("subcommand assignment name", check_rc=True) as ctx:
-                        rc, stdout, stderr = ctx.run(subcommand="set", assignment=f"{prop}={value}")
+                    with self.zfs_runner(
+                        "subcommand assignment name", check_rc=True
+                    ) as ctx:
+                        rc, stdout, stderr = ctx.run(
+                            subcommand="set", assignment=f"{prop}={value}"
+                        )
                 after[prop] = str(value)
                 self.changed = True
-        return {"before": {"filesystem_properties": before}, "after": {"filesystem_properties": after}}
+        return {
+            "before": {"filesystem_properties": before},
+            "after": {"filesystem_properties": after},
+        }
 
     def base_device(self, device):
         if not device.startswith("/dev/"):
@@ -368,7 +404,11 @@ class Zpool:
                 if current and current.get("type") is not None:
                     current = flush_current(current)
                 kind = match_group.group(1)
-                role = current.get("role") if current and current.get("type") is None else None
+                role = (
+                    current.get("role")
+                    if current and current.get("type") is None
+                    else None
+                )
                 current = {"role": role, "type": kind, "disks": []}
                 continue
 
@@ -392,7 +432,6 @@ class Zpool:
 
         return vdevs
 
-
     def normalize_disk_path(self, disk):
         if disk.startswith("/dev/disk/by-id/"):
             return re.sub(r"-part\d+$", "", disk)
@@ -402,18 +441,22 @@ class Zpool:
         alias = {"raidz": "raidz1"}
         normalized = []
         for vdev in vdevs:
-            normalized_type = alias.get(vdev.get("type", "stripe"), vdev.get("type", "stripe"))
+            normalized_type = alias.get(
+                vdev.get("type", "stripe"), vdev.get("type", "stripe")
+            )
             entry = {
                 "type": normalized_type,
                 "disks": sorted(
-                    self.normalize_disk_path(disk)
-                    for disk in vdev["disks"]), # remove autocreated part1 from the id
+                    self.normalize_disk_path(disk) for disk in vdev["disks"]
+                ),  # remove autocreated part1 from the id
             }
             role = vdev.get("role")
             if role is not None:
                 entry["role"] = role
             normalized.append(entry)
-        return sorted(normalized, key=lambda x: (x.get("role", ""), x["type"], x["disks"]))
+        return sorted(
+            normalized, key=lambda x: (x.get("role", ""), x["type"], x["disks"])
+        )
 
     def diff_layout(self):
         current = self.normalize_vdevs(self.get_current_layout())
@@ -430,7 +473,9 @@ class Zpool:
     def add_vdevs(self):
         invalid_properties = [k for k in self.pool_properties if k != "ashift"]
         if invalid_properties:
-            self.module.warn(f"zpool add only supports 'ashift', ignoring: {invalid_properties}")
+            self.module.warn(
+                f"zpool add only supports 'ashift', ignoring: {invalid_properties}"
+            )
 
         diff = self.diff_layout()
         before_vdevs = diff["before"]["vdevs"]
@@ -440,11 +485,17 @@ class Zpool:
         if not to_add:
             return {}
 
-        with self.zpool_runner("subcommand force dry_run pool_properties name vdevs", check_rc=True) as ctx:
+        with self.zpool_runner(
+            "subcommand force dry_run pool_properties name vdevs", check_rc=True
+        ) as ctx:
             rc, stdout, stderr = ctx.run(
                 subcommand="add",
                 dry_run=self.module.check_mode,
-                pool_properties={"ashift": self.pool_properties["ashift"]} if "ashift" in self.pool_properties else {},
+                pool_properties=(
+                    {"ashift": self.pool_properties["ashift"]}
+                    if "ashift" in self.pool_properties
+                    else {}
+                ),
                 vdevs=to_add,
             )
 
@@ -473,7 +524,11 @@ class Zpool:
                 if device == self.name:
                     saw_pool = True
                 continue
-            if re.match(r"^(mirror|raidz\d?)\-\d+$", device) or device in ("cache", "logs", "spares"):
+            if re.match(r"^(mirror|raidz\d?)\-\d+$", device) or device in (
+                "cache",
+                "logs",
+                "spares",
+            ):
                 if current:
                     vdevs.append(current)
                 vdev_type = (
@@ -488,7 +543,9 @@ class Zpool:
                 continue
             if device.startswith("/"):
                 base_device = self.base_device(device)
-                vdevs.append({"name": base_device, "type": "stripe", "disks": [base_device]})
+                vdevs.append(
+                    {"name": base_device, "type": "stripe", "disks": [base_device]}
+                )
         if current:
             vdevs.append(current)
         return vdevs
@@ -498,11 +555,19 @@ class Zpool:
         current_disks = {disk for vdev in current for disk in vdev["disks"]}
         desired_disks = {disk for vdev in self.vdevs for disk in vdev.get("disks", [])}
         gone = current_disks - desired_disks
-        to_remove = [vdev["name"] for vdev in current if any(disk in gone for disk in vdev["disks"])]
+        to_remove = [
+            vdev["name"]
+            for vdev in current
+            if any(disk in gone for disk in vdev["disks"])
+        ]
         if not to_remove:
             return {}
-        with self.zpool_runner("subcommand dry_run name vdev_name", check_rc=True) as ctx:
-            rc, stdout, stderr = ctx.run(subcommand="remove", dry_run=self.module.check_mode, vdev_name=to_remove)
+        with self.zpool_runner(
+            "subcommand dry_run name vdev_name", check_rc=True
+        ) as ctx:
+            rc, stdout, stderr = ctx.run(
+                subcommand="remove", dry_run=self.module.check_mode, vdev_name=to_remove
+            )
         self.changed = True
         if self.module.check_mode:
             return {"prepared": stdout}
@@ -533,7 +598,14 @@ def main():
                     ),
                     type=dict(
                         type="str",
-                        choices=["stripe", "mirror", "raidz", "raidz1", "raidz2", "raidz3"],
+                        choices=[
+                            "stripe",
+                            "mirror",
+                            "raidz",
+                            "raidz1",
+                            "raidz2",
+                            "raidz3",
+                        ],
                         default="stripe",
                     ),
                     disks=dict(
@@ -568,7 +640,9 @@ def main():
         for idx, vdev in enumerate(vdevs, start=1):
             disks = vdev.get("disks")
             if not isinstance(disks, list) or len(disks) == 0:
-                module.fail_json(msg=f"vdev #{idx}: at least one disk is required (got: {disks!r})")
+                module.fail_json(
+                    msg=f"vdev #{idx}: at least one disk is required (got: {disks!r})"
+                )
 
     result = dict(
         name=name,
@@ -603,7 +677,11 @@ def main():
 
             before = {}
             after = {}
-            for diff in (vdev_layout_diff, pool_properties_diff, filesystem_properties_diff):
+            for diff in (
+                vdev_layout_diff,
+                pool_properties_diff,
+                filesystem_properties_diff,
+            ):
                 before.update(diff.get("before", {}))
                 after.update(diff.get("after", {}))
 
@@ -613,7 +691,11 @@ def main():
                 prepared = ""
                 for diff in (add_vdev_diff, remove_vdev_diff):
                     if "prepared" in diff:
-                        prepared += diff["prepared"] if not prepared else f"\n{diff['prepared']}"
+                        prepared += (
+                            diff["prepared"]
+                            if not prepared
+                            else f"\n{diff['prepared']}"
+                        )
                 result["diff"]["prepared"] = prepared
         else:
             if module.check_mode:
