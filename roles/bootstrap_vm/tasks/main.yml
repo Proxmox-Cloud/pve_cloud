@@ -95,27 +95,44 @@
 
 # based on the serial label set for the disk we will later auto initialize the filesystem
 - name: Create storage backed zfs pv disks
-  when: '"zfs_localpv_csi_disks" in args'
   loop_control:
     index_var: disk_idx
     loop_var: disk
   loop: "{{ args['zfs_localpv_csi_disks'] }}"
-  when: disk.from_storage | default(false)
+  when:
+    - '"zfs_localpv_csi_disks" in args'
+    - disk.from_storage | default(false)
   ansible.builtin.command:
-    cmd: qm set {{ pve_id.stdout }} --scsi{{ disk_idx + 1 }} {{ disk["from_storage"]["pool"] }}:{{ disk["from_storage"]["size"] | regex_replace("G$", "") }},serial=scsi{{ disk_idx +1 }}-pxzfs{% for key, value in disk['from_storage']['options'].items() %},{{ key }}={{ value }}{% endfor %}
+    cmd: qm set {{ pve_id.stdout }} --scsi{{ disk_idx + 1 }} {{ disk["from_storage"]["pool"] }}:{{ disk["from_storage"]["size"] | regex_replace("G$", "") }},serial=scsi{{ disk_idx + 1 }}-pxzfs{% for key, value in disk['from_storage']['options'].items() %},{{ key }}={{ value }}{% endfor %}
 # here we abuse the serial of the disk to later autocreate zfs, other options would include linking qemu inventory creation parameters to the vm that is later
 # dynamically loaded. However this is not recommended, as we want to make vms created by pxc editiable through the proxmox ui without having things go out of sync.
 # a user may have added things in retroactively to the vm and thereby only keeping the link through the initial created id hash. the vm itself should be the state...
 
 - name: Create disk passthrough zfs pv disks
-  when: '"zfs_localpv_csi_disks" in args'
   loop_control:
     index_var: disk_idx
     loop_var: disk
   loop: "{{ args['zfs_localpv_csi_disks'] }}"
-  when: disk.via_passthrough | default(false)
+  when:
+    - '"zfs_localpv_csi_disks" in args'
+    - disk.via_passthrough | default(false)
   ansible.builtin.command:
-    cmd: qm set {{ pve_id.stdout }} --scsi{{ disk_idx + 1 }} /dev/disk/by-id/{{ disk["via_passthrough"]["disk_id"] }},serial=scsi{{ disk_idx +1 }}-pxzfs{% for key, value in disk['via_passthrough']['options'].items() %},{{ key }}={{ value }}{% endfor %}
+    cmd: qm set {{ pve_id.stdout }} --scsi{{ disk_idx + 1 }} /dev/disk/by-id/{{ disk["via_passthrough"]["disk_id"] }},serial=scsi{{ disk_idx + 1 }}-pxzfs{% for key, value in disk['via_passthrough']['options'].items() %},{{ key }}={{ value }}{% endfor %}
+
+# idx counter increment in case additional disks are defined for the vm
+- set_fact:
+    scsi_idx_zfs_base: "{{ 0 if 'zfs_localpv_csi_disks' not in args else (args['zfs_localpv_csi_disks'] | length) }}"
+
+# generic additional disks that should be created, defined in qemu base schema
+# todo: this | int pipe is triggering me
+- name: create additional hard drives if defined
+  when: '"additional_disks" in args'
+  loop_control:
+    index_var: disk_idx
+    loop_var: disk
+  loop: "{{ args['additional_disks'] }}"
+  ansible.builtin.command:
+    cmd: qm set {{ pve_id.stdout }} --scsi{{ disk_idx + (scsi_idx_zfs_base | int) + 1 }} {{ disk["pool"] }}:{{ disk["size"] | regex_replace("G$", "") }}{% for key, value in disk['options'].items() %},{{ key }}={{ value }}{% endfor %}
 
 - name: Start the virtual machine
   ansible.builtin.command:

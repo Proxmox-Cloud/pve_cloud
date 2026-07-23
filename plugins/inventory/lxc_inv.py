@@ -41,10 +41,10 @@ class InventoryModule(BaseInventoryPlugin):
         yaml_data = loader.load_from_file(path)
 
         with get_ssh_asyncio_loop() as loop:
-            vm_vars_blake, stack_vms, online_pve_hosts, cluster_map = (
+            vm_params_blake, stack_vms, online_pve_hosts, cluster_map = (
                 loop.run_until_complete(init_plugin(loader, inventory, yaml_data))
             )
-            display.v("vm_vars_blake", vm_vars_blake)
+            display.v("vm_params_blake", vm_params_blake)
             self.set_global_vars(yaml_data, inventory)
 
             # build lxcs inventory
@@ -72,15 +72,19 @@ class InventoryModule(BaseInventoryPlugin):
             # set the id for use in playbooks
             inventory.set_variable(hostname, "pxc_blake_id", blake)
 
-            # check if we can match the id to our inventory file
-            if blake in vm_vars_blake:
-                # set vars für container specific tasks
-                for key, var in vm_vars_blake[blake].items():
-                    inventory.set_variable(hostname, key, var)
+            if blake in vm_params_blake:
+                # also include self reference to vm creation parameters as variables to use in playbooks
+                inventory.set_variable(
+                    hostname, "vm_params_self", vm_params_blake[blake]
+                )
 
-                # set entire variable dict to seperate variable
-                # will be written out so its there for includes
-                inventory.set_variable(hostname, "vm_vars_blake", vm_vars_blake[blake])
+                # set specialized variables if defined
+                if "vars" in vm_params_blake[blake]:
+                    inventory.set_variable(hostname, "vm_vars_blake", vm_params_blake[blake]["vars"])
+
+                    # set vars für container specific tasks
+                    for key, var in vm_params_blake[blake]["vars"].items():
+                        inventory.set_variable(hostname, key, var)
 
             # set global lxc vars if defined
             if "lxc_global_vars" in yaml_data:

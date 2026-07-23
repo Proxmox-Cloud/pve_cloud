@@ -1,0 +1,19 @@
+---
+# tasks file for get_url_mirrored
+- name: check if file exists
+  delegate_to: localhost
+  ansible.builtin.stat:
+    path: "{{ mirror_local_dir }}/{{ dl_url | basename }}"
+  register: cached
+
+- name: download to mirror dir
+  delegate_to: localhost
+  ansible.builtin.get_url:
+    url: "{{ dl_url }}"
+    dest: "{{ mirror_local_dir }}/{{ dl_url | basename }}"
+  when: not cached.stat.exists
+
+- name: upload from localhost
+  ansible.builtin.copy:
+    src: "{{ mirror_local_dir }}/{{ dl_url | basename }}"
+    dest: "{{ [dest_dir, (dl_url | basename)] | path_join }}"

@@ -22,7 +22,8 @@ from pve_cloud.lib.inventory import (get_cloud_domain, get_cluster_vars,
                                      get_target_cluster)
 from pve_cloud.orm.alchemy import AcmeX509
 from pve_cloud_test.k8s_fixtures import (get_kubespray_inv,
-                                         get_secondary_kubespray_inv)
+                                         get_secondary_kubespray_inv,
+                                         get_e2e_limit_feature)
 from pve_cloud_test.tdd_watchdog import get_ipv4
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session
@@ -413,3 +414,136 @@ eviction_hard:
             cluster_vars = get_cluster_vars(first_test_host)
             with open(".test-kubeconfig.yaml", "w") as tk:
                 tk.write(get_ssh_master_kubeconfig(cluster_vars, "pytest-k8s"))
+
+
+
+def test_create_k0s_edge(request, get_test_env, setup_mirror_vm):
+    logger.info("test create k0s edge")
+
+    with tempfile.NamedTemporaryFile(
+        "w", suffix=".yaml", delete=False
+    ) as temp_qemu_inv:
+        yaml.dump(
+            {
+                "plugin": "pxc.cloud.qemu_inv",
+                "target_pve": get_test_env["pve_test_cluster_name"]
+                + "."
+                + get_test_env["cloud_inventory"]["pve_cloud_domain"],
+                "stack_name": "pytest-k0s-edge",
+                "qemu_base_parameters": {
+                    "cpu": "host",
+                    "net0": "virtio,bridge=vmbr0,firewall=1"
+                    + f"{get_test_env['net0_vlan_tag_rendered'] if 'net0_vlan_tag_rendered' in get_test_env else ''}",
+                    "sockets": 1,
+                },
+                "tcp_proxies": [
+                ],
+                "ingress_domains": [
+                ],
+                "static_includes": {
+                    "dhcp_stack": "ha-dhcp."
+                    + get_test_env["cloud_inventory"]["pve_cloud_domain"],
+                    "proxy_stack": "ha-haproxy."
+                    + get_test_env["cloud_inventory"]["pve_cloud_domain"],
+                    "postgres_stack": "ha-postgres."
+                    + get_test_env["cloud_inventory"]["pve_cloud_domain"],
+                    "bind_stack": "ha-bind."
+                    + get_test_env["cloud_inventory"]["pve_cloud_domain"],
+                },
+                "qemus": [
+                    {
+                        "hostname": "single",
+                        "disk": {
+                            "size": "75G",
+                            "options": {
+                                "discard": "on",
+                                "iothread": "on",
+                                "ssd": "on",
+                                "cache": "unsafe",
+                            },
+                            "pool": get_test_env["pve_vm_storage_id"],
+                        },
+                        "additional_disks": [
+                          {
+                              "size": "50G",
+                              "options": {
+                                  "discard": "on",
+                                  "iothread": "on",
+                                  "ssd": "on",
+                                  "cache": "unsafe"
+                              },
+                              "pool": get_test_env["pve_vm_storage_id"]
+                          }
+                        ],
+                        "parameters": {
+                            "cores": 2,
+                            "memory": 2048,
+                        },
+                    },
+                ],
+                "target_pve_hosts": list(get_test_env["pve_test_cluster_hosts"].keys()),
+                "root_ssh_pub_key": get_test_env["ssh_pub_key"],
+            },
+            temp_qemu_inv,
+        )
+        temp_qemu_inv.flush()
+
+        with run_playbook(
+            request,
+            temp_qemu_inv.name,
+            "playbooks/sync_qemus.yaml",
+            destroy_playbook="playbooks/destroy_qemus.yaml",
+        ):
+            # get ip of the vm and build static inventory
+            resolver = dns.resolver.Resolver()
+            resolver.nameservers = [get_test_env["cloud_inventory"]["bind_master_ip"]]
+
+            ddns_answer = resolver.resolve(
+                f"single-pytest-k0s-edge.{get_test_env['cloud_inventory']['pve_cloud_domain']}"
+            )
+            ddns_ips = [rdata.to_text() for rdata in ddns_answer]
+            logger.info(ddns_ips)
+            assert ddns_ips  # assert ddns response
+
+            with tempfile.NamedTemporaryFile(
+                "w", suffix=".yaml", delete=False
+            ) as temp_k0s_inv:
+                yaml.dump(
+                    {
+                        "plugin": "pxc.cloud.ext_hosts_inv",
+                        "pve_cloud_domain": get_test_env["cloud_inventory"]["pve_cloud_domain"],
+                        "target_cluster": get_test_env["pve_test_cluster_name"],
+                        "host_groups": {
+                            "ungrouped": {
+                                "k0s_single": {
+                                    "ansible_user": "admin",
+                                    "ansible_host": ddns_ips[0],
+                                    "k0s_conf_local_path": f"{os.getenv('ANSIBLE_COLLECTIONS_PATH')}/ansible_collections/pxc/cloud/tests/files/k0s.yaml",
+                                    "zfs_containerd_dataset": True,
+                                    "zpool_csi_parameters": {
+                                        "pool_properties": {
+                                            "ashift": "12"
+                                        },
+                                        "vdevs": [
+                                            {
+                                                "disks" : [
+                                                    "/dev/disk/by-id/scsi-0QEMU_QEMU_HARDDISK_drive-scsi1"
+                                                ]
+                                            },
+                                        ]
+                                    },
+                                    "e2e_limit_containerd_downloads": get_e2e_limit_feature(get_test_env, "limit_containerd_downloads")
+                                }
+                            }
+                        }
+                    },
+                    temp_k0s_inv,
+                )
+                temp_k0s_inv.flush()
+                logger.info(f"ext hosts inv {temp_k0s_inv.name}")
+                with run_playbook(
+                    request,
+                    temp_k0s_inv.name,
+                    "playbooks/install_k0s_edge.yaml",
+                ):
+                    pass

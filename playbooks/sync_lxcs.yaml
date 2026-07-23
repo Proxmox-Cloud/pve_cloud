@@ -109,6 +109,7 @@
   tasks:
     # todo: implement unified functionality for qemus, kubespray nodes.
     - name: write vm_vars_blake for include stacks
+      when: vm_vars_blake is defined
       copy:
         content: "{{ vm_vars_blake | combine(lxc_global_vars | default({})) | to_nice_yaml }}"
         dest: /etc/pve-cloud-vars.yaml
@@ -138,7 +139,9 @@
           vm_vars: "{{ vm_vars_blake | combine(lxc_global_vars | default({}))}}"
         conflict_cols:
           - blake_id
-      when: postgres_connection_check.is_available # only try to write the vars if the db is created
+      when:
+        - postgres_connection_check.is_available # only try to write the vars if the db is created
+        - vm_vars_blake is defined
 
     - name: install systemd prom exporter
       include_role:

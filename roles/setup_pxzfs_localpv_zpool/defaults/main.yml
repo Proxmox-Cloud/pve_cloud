@@ -1,2 +1,7 @@
 ---
 # defaults file for setup_pxzfs_localpv_zpool
+
+zpool_vdevs:
+zpool_properties:
+# e2e tests set this to true to allow reuse of unclean by id passthrough disks
+zpool_create_force: false

@@ -73,7 +73,7 @@ class InventoryModule(BaseInventoryPlugin):
 
         with get_ssh_asyncio_loop() as loop:
             # generic init function
-            vm_vars_blake, stack_vms, _, cluster_map = loop.run_until_complete(
+            vm_params_blake, stack_vms, _, cluster_map = loop.run_until_complete(
                 init_plugin(loader, inventory, yaml_data)
             )
 
@@ -144,13 +144,21 @@ class InventoryModule(BaseInventoryPlugin):
             else:
                 raise AnsibleError(f"Could determine machine type from tags {tags}")
 
+            # todo: this block can probably be refactored for qemu inv and lxc inv aswell, almost identical
             blake = stack_vm_get_blake(vm)
 
-            # check if we can match the id to our inventory file
-            if blake in vm_vars_blake:
-                # set vars für container specific tasks
-                for key, var in vm_vars_blake[blake].items():
-                    inventory.set_variable(hostname, key, var)
+            if blake in vm_params_blake:
+                # also include self reference to vm creation parameters as variables to use in playbooks
+                inventory.set_variable(
+                    hostname, "vm_params_self", vm_params_blake[blake]
+                )
+
+                # set specialized variables if defined
+                if "vars" in vm_params_blake:
+                    # set vars für container specific tasks
+                    for key, var in vm_params_blake[blake]["vars"].items():
+                        inventory.set_variable(hostname, key, var)
+
 
             if "master" in tags:
                 inventory.add_host(hostname, group="kube_control_plane")

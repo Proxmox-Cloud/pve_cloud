@@ -219,7 +219,7 @@
         mirror_distribution: bookworm-security
         mirror_endpoint: debian-security
 
-          
+
     - name: configure terraform
       include_role:
         name: aptly_mirror_repo
@@ -283,6 +283,12 @@
     - name: create terraform plugin cache dir for rsync
       ansible.builtin.file:
         path: "{{ ansible_user_dir }}/.cache/terraform-plugins"
+        state: directory
+        mode: '0755'
+
+    - name: create k0s edge cache dir for rsync
+      ansible.builtin.file:
+        path: "{{ ansible_user_dir }}/.cache/k0s_edge"
         state: directory
         mode: '0755'
 

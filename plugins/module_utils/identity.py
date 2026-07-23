@@ -20,6 +20,11 @@ def sort_and_hash(vm_params, stack_name):
     if "vars" in hash_core:
         del hash_core["vars"]
 
+    # we also dont want to consider the zpool parameters (only disks are considered), as the user
+    # might make adjustments later on through the community.general.zpool module
+    if "zpool_csi_parameters" in hash_core:
+        del hash_core["zpool_csi_parameters"]
+
     # this gives uniqueness to vms with the same parameters in different stacks
     if stack_name:  # none logic for update playbook
         hash_core["stack_name"] = stack_name

@@ -1,0 +1,353 @@
+- name: Rsync cache from mirror-vm if discovered
+  tags:
+    - k0s_install
+  hosts: localhost
+  tasks:
+    # slurp patroni password
+    - name: Slurp file if it exists
+      delegate_to: "{{ groups['target_pve'][0] }}"
+      slurp:
+        src: /etc/pve/cloud/secrets/patroni.pass
+      register: patroni_pass
+
+    - set_fact:
+        postgres_password: "{{ patroni_pass.content | b64decode | trim }}"
+
+    - set_fact:
+        pg_conn_str: "postgresql+psycopg2://postgres:{{ postgres_password }}@{{ pve_haproxy_floating_ip_internal }}:5000/pve_cloud?sslmode=disable"
+
+    - name: Cloud mirror discovery
+      delegate_to: pxc-executor-host
+      alchemy_read:
+        pg_conn_str: "{{ pg_conn_str }}"
+        table: px_cloud_secrets
+        where:
+          cloud_domain: "{{ pve_cloud_domain }}"
+          secret_name: "cloud-mirror-vm"
+      register: mirror_discovery_secret
+
+    - name: setup local cache
+      when: mirror_discovery_secret.rowcount != 0
+      block:
+        - name: create local cache dir
+          ansible.builtin.file:
+            path: "{{ lookup('env', 'HOME') }}/.cache/k0s_edge"
+            state: directory
+            mode: '0755'
+
+        - name: rsync cache from mirror vm
+          command: rsync -avz admin@{{ mirror_discovery_secret.query_result[0]['secret_data']['mirror_vm_addr'] }}:/home/admin/.cache/k0s_edge/ {{ lookup('env', 'HOME') }}/.cache/k0s_edge/
+
+
+- name: Setup k0s
+  hosts: k0s_single
+  tags:
+    - k0s_install
+  tasks:
+    - name: validate schema k0s setup hostvars
+      ansible.utils.validate:
+        criteria: "{{ lookup('ansible.builtin.file', 'files/k0s_hostvars_schema.yaml') | from_yaml }}"
+        data: "{{ hostvars[inventory_hostname] }}"
+
+    - name: setup zfs + k8s pools
+      include_role:
+        name: pxc.cloud.setup_pxzfs_localpv_zpool
+      vars:
+        zpool_vdevs: "{{ zpool_csi_parameters['vdevs'] }}"
+        zpool_properties: "{{ zpool_csi_parameters['pool_properties'] }}"
+
+    # custom logic based on zfs_containerd_dataset flag
+    # todo: the same should be implemented for kubespray
+    - name: move containerd to zfs dataset on flag set
+      when: zfs_containerd_dataset is defined and zfs_containerd_dataset
+      block:
+        - name: check if containderd directory already exists => retroactive create
+          ansible.builtin.stat:
+            path: /var/lib/k0s/containerd
+          register: containerd_check
+
+        - name: check if containerd dataset exists
+          become: true
+          community.general.zfs_facts:
+            name: tank-pv/containerd
+          ignore_errors: true
+          register: ds_check
+
+        - name: k0s not yet initialized, first run
+          when: not containerd_check.stat.exists and ds_check.failed
+          block:
+            - name: create k0s directory
+              become: true
+              ansible.builtin.file:
+                path: /var/lib/k0s
+                state: directory
+                mode: "0755"
+
+            - name: create containerd dataset
+              become: true
+              community.general.zfs:
+                name: tank-pv/containerd
+                state: present
+                extra_zfs_properties:
+                  mountpoint: /var/lib/k0s/containerd
+
+        - name: move containerd folder to zfs dataset, retroactive flag set_fact
+          when: containerd_check.stat.exists and ds_check.failed
+          block:
+            - name: stop k0s
+              become: true
+              ansible.builtin.command:
+                cmd: k0s stop
+
+            - name: give some time to finish
+              ansible.builtin.wait_for:
+                timeout: 20
+
+            - name: create containerd dataset
+              become: true
+              community.general.zfs:
+                name: tank-pv/containerd
+                state: present
+                extra_zfs_properties:
+                  mountpoint: /mnt/containerd-mig
+
+            - name: migrate data to zfs
+              become: true
+              ansible.builtin.command:
+                cmd: cp -a /var/lib/k0s/containerd/. /mnt/containerd-mig/
+
+            - name: backup old containerd
+              become: true
+              ansible.builtin.command:
+                cmd: mv /var/lib/k0s/containerd /var/lib/k0s/containerd-bak
+
+            - name: create containerd dataset
+              become: true
+              community.general.zfs:
+                name: tank-pv/containerd
+                state: present
+                extra_zfs_properties:
+                  mountpoint: /var/lib/k0s/containerd
+
+            - name: start k0s again
+              become: true
+              ansible.builtin.command:
+                cmd: k0s start
+
+    - name: download k0s files
+      include_role:
+        name: get_url_mirrored
+      loop:
+        - https://github.com/k0sproject/k0s/releases/download/v1.36.2%2Bk0s.0/k0s-v1.36.2+k0s.0-amd64
+        - https://github.com/k0sproject/k0s/releases/download/v1.36.2%2Bk0s.0/k0s-airgap-bundle-v1.36.2+k0s.0-linux-amd64.tar
+      vars:
+        dl_url: "{{ item }}"
+        dest_dir: "/home/{{ ansible_user }}"
+
+    - name: install k0s binary
+      become: true
+      ansible.builtin.copy:
+        src: "/home/{{ ansible_user }}/k0s-v1.36.2+k0s.0-amd64"
+        dest: "/usr/local/bin/k0s"
+        mode: "0755"
+        remote_src: true
+
+    - name: create k0s image directory
+      become: true
+      ansible.builtin.file:
+        path: /var/lib/k0s/images
+        state: directory
+        mode: "0755"
+
+    - name: copy k0s airgap bundle
+      become: true
+      ansible.builtin.copy:
+        src: "/home/{{ ansible_user }}/k0s-airgap-bundle-v1.36.2+k0s.0-linux-amd64.tar"
+        dest: "/var/lib/k0s/images/image-bundle.tar"
+        mode: "0644"
+        remote_src: true
+
+    - name: upload k0s init config if defined
+      when: k0s_conf_local_path is defined
+      ansible.builtin.copy:
+        src: "{{ k0s_conf_local_path }}"
+        dest: "/home/{{ ansible_user }}/k0s.yaml"
+      register: k0s_config_copy
+
+    - set_fact:
+        k0s_install_command: >-
+          k0s install controller --single
+          {{ '--config /home/' ~ ansible_user ~ '/k0s.yaml' if k0s_conf_local_path is defined else '' }}
+          {% for key, value in (k0s_install_args.items() if k0s_install_args is defined else []) %}--{{ key }}='{{ value }}' {% endfor %}
+
+    - debug:
+        var: k0s_install_command
+
+    - name: run init k0s init command
+      become: true
+      ansible.builtin.command:
+        cmd: "{{ k0s_install_command }}"
+      args:
+        creates: /etc/systemd/system/k0scontroller.service
+      register: k0s_install_task
+
+    - name: boot k0s
+      become: true
+      ansible.builtin.command:
+        cmd: k0s start
+      when: k0s_install_task.changed # run only on init
+
+    - name: reload service on conf change
+      become: true
+      ansible.builtin.systemd:
+        name: k0scontroller
+        state: restarted
+      # restart on consequtive runs only
+      when: not k0s_install_task.changed and k0s_config_copy.changed
+
+    - name: wait for k0s to finish setup
+      become: true
+      ansible.builtin.command:
+        cmd: k0s kubectl get --raw=/readyz
+      register: api_ready
+      retries: 60
+      delay: 5
+      until: api_ready.rc == 0 and api_ready.stdout == "ok"
+
+    - name: get admin kubeconfig
+      become: true
+      ansible.builtin.command:
+        cmd: k0s kubeconfig admin
+      register: admin_kubeconfig
+
+    - name: limit e2e downloads containerd
+      when: e2e_limit_containerd_downloads is defined and e2e_limit_containerd_downloads
+      block:
+        # to validate the changes run `/var/lib/k0s/bin/containerd --config=/etc/k0s/containerd.toml config dump | grep -A5 -B2 max_concurrent_downloads`
+        - name: create limit toml
+          register: e2e_containerd_limit
+          become: true
+          ansible.builtin.copy:
+            dest: /etc/k0s/containerd.d/99-e2e-limits.toml
+            content: |
+              [plugins."io.containerd.cri.v1.images"]
+                max_concurrent_downloads = 1
+
+              [plugins."io.containerd.transfer.v1.local"]
+                max_concurrent_downloads = 1
+
+        - name: reload service on conf change
+          become: true
+          ansible.builtin.systemd:
+            name: k0scontroller
+            state: restarted
+          # restart on consequtive runs only
+          when: e2e_containerd_limit.changed
+
+        - name: wait for k0s to be up again
+          become: true
+          ansible.builtin.command:
+            cmd: k0s kubectl get --raw=/readyz
+          register: api_ready
+          retries: 60
+          delay: 5
+          until: api_ready.rc == 0 and api_ready.stdout == "ok"
+
+
+- name: Rsync cache back
+  hosts: localhost
+  tags:
+    - k0s_install
+  tasks:
+    - name: rsync cache back to mirror vm
+      when: mirror_discovery_secret.rowcount != 0
+      command: rsync -avz {{ lookup('env', 'HOME') }}/.cache/k0s_edge/ admin@{{ mirror_discovery_secret.query_result[0]['secret_data']['mirror_vm_addr'] }}:/home/admin/.cache/k0s_edge/
+
+- name: Configure from control node
+  tags:
+    - k0s_install
+  hosts: pxc-executor-host
+  tasks:
+    - name: create temp path kubeconfig
+      tempfile:
+        state: file
+        suffix: .yaml
+      register: temp_kubeconfig
+
+    - name: write kubeconf to temp file for following tasks
+      copy:
+        content: "{{ hostvars['k0s_single'].admin_kubeconfig.stdout }}"
+        dest: "{{ temp_kubeconfig.path }}"
+
+    # todo: replace with generic slurp/parse roles?
+    - name: Slurp file if it exists
+      delegate_to: "{{ groups['target_pve'][0] }}"
+      slurp:
+        src: /etc/pve/cloud/secrets/patroni.pass
+      register: patroni_pass
+
+    - set_fact:
+        postgres_password: "{{ patroni_pass.content | b64decode | trim }}"
+
+    - set_fact:
+        pg_conn_str: "postgresql+psycopg2://postgres:{{ postgres_password }}@{{ pve_haproxy_floating_ip_internal }}:5000/pve_cloud?sslmode=disable"
+
+    - name: harbor cloud mirror discovery
+      delegate_to: pxc-executor-host
+      pxc.cloud.alchemy_read:
+        pg_conn_str: "{{ pg_conn_str }}"
+        table: px_cloud_secrets
+        where:
+          cloud_domain: "{{ pve_cloud_domain }}"
+          secret_type: "harbor-admin-auth"
+      register: harbor_mirror_secret
+
+    - when: harbor_mirror_secret.rowcount != 0
+      set_fact:
+        mirror_repo_host: "{{ harbor_mirror_secret.query_result[0]['secret_data']['harbor_host'] }}"
+        mirror_repo_username: "{{ harbor_mirror_secret.query_result[0]['secret_data']['full_name'] }}"
+        mirror_repo_password: "{{ harbor_mirror_secret.query_result[0]['secret_data']['secret'] }}"
+
+    - name: create openebs namespace
+      kubernetes.core.k8s:
+        name: openebs
+        api_version: v1
+        kind: Namespace
+        state: present
+        kubeconfig: "{{ temp_kubeconfig.path }}"
+
+    - name: create mirror pull secret
+      when: harbor_mirror_secret.rowcount != 0
+      kubernetes.core.k8s:
+        kubeconfig: "{{ temp_kubeconfig.path }}"
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: mirror-pull-secret
+            namespace: openebs
+          type: kubernetes.io/dockerconfigjson
+          data:
+            .dockerconfigjson: "{{ harbor_mirror_secret.query_result[0]['secret_data']['dockerconfig'] | b64encode }}"
+
+    - set_fact:
+        pxzfs_storage_hosts:
+          - "{{ ansible_hostname }}"
+
+    - name: deploy openebs localpv zfs chart
+      kubernetes.core.helm:
+        name: openebs
+        chart_ref: "{{ 'openebs/openebs' if harbor_mirror_secret.rowcount == 0 else 'oci://' ~ harbor_mirror_secret.query_result[0]['secret_data']['harbor_host'] ~ '/cloud-helm-mirror/openebs/openebs'}}"
+        chart_version: 4.4.0
+        values: "{{ lookup('template', 'openebs-values.yaml.j2') | from_yaml }}"
+        kubeconfig: "{{ temp_kubeconfig.path }}"
+        release_namespace: openebs
+        update_repo_cache: true
+        timeout: 15m # slow tdd systems
+
+    - name: create zvol storage class
+      kubernetes.core.k8s:
+        state: present
+        kubeconfig: "{{ temp_kubeconfig.path }}"
+        template: openebs-zfs-localpv-sc.yaml.j2

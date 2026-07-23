@@ -1,0 +1,42 @@
+type: object
+description: "K0s pxc hostvars schema"
+additionalProperties: true
+required:
+  - zpool_csi_parameters
+properties:
+  k0s_conf_local_path:
+    type: string
+    description: "Local path on the control node for k0s.yaml config that should be used for the install process."
+  k0s_install_args:
+    type: object
+    description: "Additional args in key value format that will be rendered as --$KEY='$VALUE' and passed to the k0s install command."
+  # todo: the same should be implemented for kubespray
+  zfs_containerd_dataset:
+    type: boolean
+    description: "When set to true will create / move existing containerd directory of /var/lib/k0s/containerd to a zfs dataset. Setting this retroactively will stop and restart all containers."
+  zpool_csi_parameters:
+    type: object
+    description: "Check pxc.cloud.kubespray_inv schema for detailed descriptions of these parameters."
+    additionalProperties: false
+    required:
+      - pool_properties
+      - vdevs
+    properties:
+      pool_properties:
+        type: object
+      vdevs:
+        type: array
+        items:
+          type: object
+          additionalProperties: false
+          required:
+            - disks
+          properties:
+            disks:
+              type: array
+              items:
+                type: string
+            role:
+              type: string
+            type:
+              type: string

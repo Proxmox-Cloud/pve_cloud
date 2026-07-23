@@ -48,8 +48,8 @@ class ClusterInformation:
 display = Display()
 
 
-async def get_online_pve_hosts(loader, yaml_data):
-    pve_cloud_domain = get_cloud_domain(yaml_data["target_pve"])
+async def get_online_pve_hosts(loader, target_pve):
+    pve_cloud_domain = get_cloud_domain(target_pve)
     pve_inventory = get_pve_inventory(pve_cloud_domain)
 
     # determine online hosts async
@@ -498,7 +498,7 @@ async def init_plugin(loader, inventory, yaml_data):
         raise AnsibleParserError(e.message)
 
     # get pve hosts that are online
-    online_pve_hosts = await get_online_pve_hosts(loader, yaml_data)
+    online_pve_hosts = await get_online_pve_hosts(loader, yaml_data["target_pve"])
     display.v("num online_pve_hosts", len(online_pve_hosts))
 
     cluster_map = await get_cluster_map(inventory, online_pve_hosts)
@@ -574,10 +574,10 @@ async def init_plugin(loader, inventory, yaml_data):
         if "tags" in vm and stack_fqdn in vm["tags"].split(";"):
             stack_vms.append(vm)
 
-    # generate map, id hash of vm => variables specific for vm
-    vm_vars_blake = {
-        sort_and_hash(vm, yaml_data["stack_name"]): vm["vars"] if "vars" in vm else {}
+    # for self referencing of parameters and host specific vars
+    vm_params_blake = {
+        sort_and_hash(vm, yaml_data["stack_name"]): vm
         for vm in yaml_data["lxcs" if "lxcs" in yaml_data else "qemus"]
     }
 
-    return vm_vars_blake, stack_vms, online_pve_hosts, cluster_map
+    return vm_params_blake, stack_vms, online_pve_hosts, cluster_map

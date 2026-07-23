@@ -126,57 +126,23 @@ def setup_control_node(request, get_test_env):
 
 
 @cloud_fixture("hosts", "pve")
-def setup_pve_hosts(request, get_test_env, setup_control_node):
+def setup_pve_hosts(request, get_test_env, get_pve_hosts_inv, setup_control_node):
     logger.info("setup cloud")
+    logger.info(f"pve cloud inventory tmp path: {get_pve_hosts_inv}")
 
-    # run the pve cluster setup on the test environment
-    with tempfile.NamedTemporaryFile(
-        "w", suffix=".yaml", delete=False
-    ) as temp_cloud_inv:
-        # write pve cloud inventory file for main pve cluster setup playbook
-        pve_clusters = {
-            get_test_env["pve_test_cluster_name"]: {
-                "pve_unique_cloud_services": ["dns", "dhcp", "psql-state"],
-                "pve_host_vars": (
-                    get_test_env["pve_test_cluster_host_vars"]
-                    if "pve_test_cluster_host_vars" in get_test_env
-                    else {}
-                ),
-                "pve_haproxy_floating_ip_external": get_test_env[
-                    "pve_test_cluster_floating_external"
-                ],
-                "pve_haproxy_floating_ip_internal": get_test_env[
-                    "pve_test_cluster_floating_internal"
-                ],
-            }
-        }
+    extra_vars = {}
+    py_pve_cloud_vers, tdd_ip = get_tdd_version("py-pve-cloud")
+    if py_pve_cloud_vers:
+        extra_vars["test_repos_ip"] = tdd_ip
+        extra_vars["py_pve_cloud_version"] = py_pve_cloud_vers
 
-        yaml.dump(
-            {
-                "plugin": "pxc.cloud.pve_cloud_inv",
-                "pve_cloud_domain": get_test_env["cloud_inventory"]["pve_cloud_domain"],
-                "pve_clusters": pve_clusters,
-            }
-            | get_test_env["cloud_inventory"],
-            temp_cloud_inv,
-        )
-        temp_cloud_inv.flush()
-
-        logger.info(f"pve cloud inventory tmp path: {temp_cloud_inv.name}")
-
-        extra_vars = {}
-        py_pve_cloud_vers, tdd_ip = get_tdd_version("py-pve-cloud")
-        if py_pve_cloud_vers:
-            extra_vars["test_repos_ip"] = tdd_ip
-            extra_vars["py_pve_cloud_version"] = py_pve_cloud_vers
-
-        with run_playbook(
-            request,
-            temp_cloud_inv.name,
-            "playbooks/setup_pve_clusters.yaml",
-            extra_vars=extra_vars,
-        ):
-            pass
+    with run_playbook(
+        request,
+        get_pve_hosts_inv,
+        "playbooks/setup_pve_clusters.yaml",
+        extra_vars=extra_vars,
+    ):
+        pass
 
 
 @cloud_fixture("dhcp", "kea")

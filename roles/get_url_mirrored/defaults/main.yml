@@ -1,0 +1,9 @@
+---
+# defaults file for get_url_mirrored
+mirror_local_dir: "{{ lookup('env', 'HOME') }}/.cache/k0s_edge"
+
+# http / https url of file to download
+dl_url:
+
+# directory on the host the file will be uploaded from localhost to
+dest_dir:

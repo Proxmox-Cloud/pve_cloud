@@ -21,6 +21,8 @@ localpv-provisioner:
     enabled: false
 
 {% if harbor_mirror_secret.rowcount != 0 %}
+  imagePullSecrets:
+    - name: mirror-pull-secret
   localpv:
     image:
       registry: "{{ mirror_repo_host }}/"
@@ -31,6 +33,8 @@ localpv-provisioner:
 
 {% if harbor_mirror_secret.rowcount != 0 %}
 zfs-localpv:
+  imagePullSecrets:
+    - name: mirror-pull-secret
   zfsController:
     resizer:
       image:

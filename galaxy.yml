@@ -38,8 +38,8 @@ tags:
 # L(specifiers,https://python-semanticversion.readthedocs.io/en/latest/#requirement-specification). Multiple version
 # range specifiers can be set and are separated by ','
 dependencies:
-  # sadly git+ssh is not supported
-  'community.general': 10.6.0
+  # todo: updates here should consider the for debugging purposed forked zpool module
+  'community.general': 13.2.0
   # todo: only used to create the initial dbs, 
   'community.postgresql': 3.14.2
   # todo: refactor this out? todo: dynamic workflow, only keep letsencrypt, let the user specify dynamic role names to set records for dns01

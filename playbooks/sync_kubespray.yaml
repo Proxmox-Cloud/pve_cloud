@@ -123,6 +123,7 @@
     - config
     - acme
     - deployments
+    - zfs
   roles:
     - slurp_cluster_secrets
 
@@ -142,19 +143,27 @@
   hosts: k8s_cluster
   tags:
     - config
+    - zfs
   roles:
     - parse_cluster_secrets
     - overwrite_apt_mirror
     - set_kea_reservations
     - adjust_networkd_oom_score
     - ssh_enforce_key_auth
-    - setup_pxzfs_localpv_zpool
   tasks:
     - name: install automation pubkey
       lineinfile:
         path: /home/{{ "admin" if qemu_default_user is undefined else qemu_default_user }}/.ssh/authorized_keys
         line: "{{ cluster_automation_pub_key | b64decode | trim }}"
         state: present
+
+    - name: setup zfs csi if specifid in qemu params
+      when: '"zpool_csi_parameters" in vm_params_self'
+      include_role:
+        name: pxc.cloud.setup_pxzfs_localpv_zpool
+      vars:
+        zpool_vdevs: "{{ vm_params_self['zpool_csi_parameters']['vdevs'] }}"
+        zpool_properties: "{{ vm_params_self['zpool_csi_parameters']['pool_properties'] }}"
 
     # dynamically set file inotify watches and instances
     # needed for any kind of logging driver, prevents too many files open error
@@ -274,7 +283,31 @@
         dir: "{{ playbook_dir }}/kubespray/group_vars/k8s_cluster"
     - include_vars:
         dir: "{{ inventory_dir }}/group_vars/k8s_cluster" 
-      ignore_errors: true 
+      ignore_errors: true
+
+    - name: limit e2e downloads containerd
+      when: e2e_limit_containerd_downloads is defined and e2e_limit_containerd_downloads
+      block:
+        - name: create containerd conf.d
+          ansible.builtin.file:
+            path: /etc/containerd/conf.d
+            state: directory
+
+        - name: slow down pulls e2e systems
+          ansible.builtin.set_fact:
+            containerd_extra_args: |
+              imports = ["/etc/containerd/conf.d/*.toml"]
+
+        # validate with `containerd config dump | grep -A5 -B2 max_concurrent_downloads`
+        - name: e2e dl limit conf.d file
+          ansible.builtin.copy:
+            dest: /etc/containerd/conf.d/99-e2e-limits.toml
+            content: |
+              [plugins."io.containerd.cri.v1.images"]
+                max_concurrent_downloads = 1
+
+              [plugins."io.containerd.transfer.v1.local"]
+                max_concurrent_downloads = 1
 
 - name: Kubespray
   tags:
@@ -709,6 +742,23 @@
         state: present
         kubeconfig: "{{ temp_kubeconfig.path }}"
       when: pxzfs_storage_hosts | length > 0
+
+    - name: create mirror pull secret
+      when:
+        - pxzfs_storage_hosts | length > 0
+        - harbor_mirror_secret.rowcount != 0
+      kubernetes.core.k8s:
+        kubeconfig: "{{ temp_kubeconfig.path }}"
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: mirror-pull-secret
+            namespace: openebs
+          type: kubernetes.io/dockerconfigjson
+          data:
+            .dockerconfigjson: "{{ harbor_mirror_secret.query_result[0]['secret_data']['dockerconfig'] | b64encode }}"
 
     - name: deploy openebs localpv zfs chart
       kubernetes.core.helm:

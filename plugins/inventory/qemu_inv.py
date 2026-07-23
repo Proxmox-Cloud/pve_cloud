@@ -1,12 +1,14 @@
 import asyncio
 
 from ansible.plugins.inventory import BaseInventoryPlugin
+from ansible.utils.display import Display
 from ansible_collections.pxc.cloud.plugins.module_utils.identity import \
     stack_vm_get_blake
 from ansible_collections.pxc.cloud.plugins.module_utils.inventory import (
     add_qemu_to_inv, init_plugin)
 from pve_cloud.lib.ssh import get_ssh_asyncio_loop
 
+display = Display()
 
 class InventoryModule(BaseInventoryPlugin):
 
@@ -35,7 +37,7 @@ class InventoryModule(BaseInventoryPlugin):
         yaml_data = loader.load_from_file(path)
 
         with get_ssh_asyncio_loop() as loop:
-            vm_vars_blake, stack_vms, online_pve_hosts, cluster_map = (
+            vm_params_blake, stack_vms, online_pve_hosts, cluster_map = (
                 loop.run_until_complete(
                     init_plugin(
                         loader,
@@ -45,6 +47,7 @@ class InventoryModule(BaseInventoryPlugin):
                 )
             )
 
+            display.v("vm_params_blake", vm_params_blake)
             target_cluster = cluster_map[yaml_data["target_pve"]]
 
             self.set_global_vars(yaml_data, inventory)
@@ -75,11 +78,19 @@ class InventoryModule(BaseInventoryPlugin):
             )  # machine type for cloud logic
 
             blake = stack_vm_get_blake(vm)
+
             # check if we can match the id to our inventory file
-            if blake in vm_vars_blake:
-                # set vars für container specific tasks
-                for key, var in vm_vars_blake[blake].items():
-                    inventory.set_variable(hostname, key, var)
+            if blake in vm_params_blake:
+                # also include self reference to vm creation parameters as variables to use in playbooks
+                inventory.set_variable(
+                    hostname, "vm_params_self", vm_params_blake[blake]
+                )
+
+                # set specialized variables if defined
+                if "vars" in vm_params_blake:
+                    # set vars für container specific tasks
+                    for key, var in vm_params_blake[blake]["vars"].items():
+                        inventory.set_variable(hostname, key, var)
 
             # set global qemu vars if defined
             if "qemu_global_vars" in yaml_data:
