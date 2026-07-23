@@ -328,8 +328,8 @@ class Zpool:
         return device
 
     def get_current_layout(self):
-        with self.zpool_runner("subcommand full_paths real_paths name", check_rc=True) as ctx:
-            rc, stdout, stderr = ctx.run(subcommand="status", full_paths=True, real_paths=True)
+        with self.zpool_runner("subcommand full_paths name", check_rc=True) as ctx:
+            rc, stdout, stderr = ctx.run(subcommand="status", full_paths=True)
 
         vdevs = []
         current = None
@@ -392,6 +392,12 @@ class Zpool:
 
         return vdevs
 
+
+    def normalize_disk_path(self, disk):
+        if disk.startswith("/dev/disk/by-id/"):
+            return re.sub(r"-part\d+$", "", disk)
+        return disk
+
     def normalize_vdevs(self, vdevs):
         alias = {"raidz": "raidz1"}
         normalized = []
@@ -399,7 +405,9 @@ class Zpool:
             normalized_type = alias.get(vdev.get("type", "stripe"), vdev.get("type", "stripe"))
             entry = {
                 "type": normalized_type,
-                "disks": sorted(vdev["disks"]),
+                "disks": sorted(
+                    self.normalize_disk_path(disk)
+                    for disk in vdev["disks"]), # remove autocreated part1 from the id
             }
             role = vdev.get("role")
             if role is not None:
@@ -445,13 +453,14 @@ class Zpool:
             return {"prepared": stdout}
 
     def list_vdevs_with_names(self):
-        with self.zpool_runner("subcommand full_paths real_paths name", check_rc=True) as ctx:
-            rc, stdout, stderr = ctx.run(subcommand="status", full_paths=True, real_paths=True)
+        with self.zpool_runner("subcommand full_paths name", check_rc=True) as ctx:
+            rc, stdout, stderr = ctx.run(subcommand="status", full_paths=True)
         in_cfg = False
         saw_pool = False
         vdevs = []
         current = None
         for line in stdout.splitlines():
+
             if not in_cfg:
                 if line.strip().startswith("config:"):
                     in_cfg = True
@@ -459,7 +468,7 @@ class Zpool:
             if not line.strip() or line.strip().startswith("NAME"):
                 continue
             partitions = line.strip().split()
-            device = partitions[0]
+            device = self.normalize_disk_path(partitions[0])
             if not saw_pool:
                 if device == self.name:
                     saw_pool = True
@@ -584,8 +593,8 @@ def main():
             vdev_layout_diff = zpool.diff_layout()
 
             # debug suboptimal layout / normalization of the module
-            result["layout"] = vdev_layout_diff
-            module.fail_json(**result, msg="debug fail")
+            # result["layout"] = vdev_layout_diff
+            # module.fail_json(**result, msg="debug fail")
 
             add_vdev_diff = zpool.add_vdevs() or {}
             remove_vdev_diff = zpool.remove_vdevs() or {}
