@@ -155,6 +155,33 @@
         masked: yes
       when: disable_ipmi is defined and disable_ipmi
 
+    # treat zfs scan imports as warnings
+    - name: zfs scan error as warn override dir
+      when: zfs_scan_error_as_warn is defined and zfs_scan_error_as_warn
+      ansible.builtin.file:
+        path: /etc/systemd/system/zfs-import-scan.service.d
+        state: directory
+
+    - name: zfs scan error as warn override conf
+      when: zfs_scan_error_as_warn is defined and zfs_scan_error_as_warn
+      ansible.builtin.copy:
+        dest: /etc/systemd/system/zfs-import-scan.service.d/override.conf
+        content: |
+          [Service]
+          SuccessExitStatus=1
+      register: zfs_error_as_warn_conf
+
+    - name: reload daemon
+      ansible.builtin.systemd:
+        daemon_reload: true
+      when: zfs_error_as_warn_conf.changed
+
+    - name: restart scan service
+      ansible.builtin.systemd:
+        name: zfs-import-scan.service
+        state: restarted
+      when: zfs_error_as_warn_conf.changed
+
     # wake on lan
     - name: Add post-up ethtool wol enable if defined
       blockinfile:
