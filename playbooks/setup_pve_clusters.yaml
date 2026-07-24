@@ -218,6 +218,7 @@
 - name: Jump host config
   hosts: jump_hosts:all_pve_hosts
   tasks:
+    # todo: this is maybe solved through ssh connection multiplexing?
     - name: increase sshd max startups for excessive tunneling
       ansible.builtin.lineinfile:
         path: /etc/ssh/sshd_config
