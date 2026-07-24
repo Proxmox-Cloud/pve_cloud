@@ -37,7 +37,7 @@
 | + [py_pve_cloud_version](#py_pve_cloud_version )                         | No      | string                    | No         | -          | Dynamic property for validation of the core python pve cloud library in use.                                                                                                                                                                                                                                               |
 | + [pve_cluster_name](#pve_cluster_name )                                 | No      | string                    | No         | -          | Self reference of the cluster name for convinient access.                                                                                                                                                                                                                                                                  |
 
-## <a name="pve_vm_subnet"></a>103. Property `Cluster vars extension. > pve_vm_subnet`
+## <a name="pve_vm_subnet"></a>107. Property `Cluster vars extension. > pve_vm_subnet`
 
 |              |          |
 | ------------ | -------- |
@@ -52,7 +52,7 @@
 "192.168.10.0/24"
 ```
 
-## <a name="pve_cloud_domain"></a>104. Property `Cluster vars extension. > pve_cloud_domain`
+## <a name="pve_cloud_domain"></a>108. Property `Cluster vars extension. > pve_cloud_domain`
 
 |              |          |
 | ------------ | -------- |
@@ -67,7 +67,7 @@
 "your-cloud.example.com"
 ```
 
-## <a name="kea_dhcp_main_ip"></a>105. Property `Cluster vars extension. > kea_dhcp_main_ip`
+## <a name="kea_dhcp_main_ip"></a>109. Property `Cluster vars extension. > kea_dhcp_main_ip`
 
 |              |          |
 | ------------ | -------- |
@@ -82,7 +82,7 @@
 "192.168.1.2"
 ```
 
-## <a name="kea_dhcp_failover_ip"></a>106. Property `Cluster vars extension. > kea_dhcp_failover_ip`
+## <a name="kea_dhcp_failover_ip"></a>110. Property `Cluster vars extension. > kea_dhcp_failover_ip`
 
 |              |          |
 | ------------ | -------- |
@@ -97,7 +97,7 @@
 "192.168.1.3"
 ```
 
-## <a name="kea_dhcp_routers"></a>107. Property `Cluster vars extension. > kea_dhcp_routers`
+## <a name="kea_dhcp_routers"></a>111. Property `Cluster vars extension. > kea_dhcp_routers`
 
 |              |          |
 | ------------ | -------- |
@@ -106,7 +106,7 @@
 
 **Description:** option-data for kea dhcp routers. The default route router that the dhcp will communicate.
 
-## <a name="kea_dhcp_pools"></a>108. Property `Cluster vars extension. > kea_dhcp_pools`
+## <a name="kea_dhcp_pools"></a>112. Property `Cluster vars extension. > kea_dhcp_pools`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -127,7 +127,7 @@
 | --------------------------------------------- | ---------------------------------- |
 | [kea_dhcp_pools items](#kea_dhcp_pools_items) | IPV4 Address range in keas format. |
 
-### <a name="kea_dhcp_pools_items"></a>108.1. Cluster vars extension. > kea_dhcp_pools > kea_dhcp_pools items
+### <a name="kea_dhcp_pools_items"></a>112.1. Cluster vars extension. > kea_dhcp_pools > kea_dhcp_pools items
 
 |              |          |
 | ------------ | -------- |
@@ -142,7 +142,7 @@
 "192.168.1.30 - 192.168.1.254"
 ```
 
-## <a name="kea_dhcp_static_routes"></a>109. Property `Cluster vars extension. > kea_dhcp_static_routes`
+## <a name="kea_dhcp_static_routes"></a>113. Property `Cluster vars extension. > kea_dhcp_static_routes`
 
 |              |          |
 | ------------ | -------- |
@@ -157,7 +157,7 @@
 "0.0.0.0/0 - 192.168.1.1, 10.0.0.1/24 - 192.168.1.20"
 ```
 
-## <a name="bind_master_ip"></a>110. Property `Cluster vars extension. > bind_master_ip`
+## <a name="bind_master_ip"></a>114. Property `Cluster vars extension. > bind_master_ip`
 
 |              |          |
 | ------------ | -------- |
@@ -172,7 +172,7 @@
 "192.168.1.4"
 ```
 
-## <a name="bind_slave_ip"></a>111. Property `Cluster vars extension. > bind_slave_ip`
+## <a name="bind_slave_ip"></a>115. Property `Cluster vars extension. > bind_slave_ip`
 
 |              |          |
 | ------------ | -------- |
@@ -187,7 +187,7 @@
 "192.168.1.5"
 ```
 
-## <a name="bind_arpa_zone_service_lxcs"></a>112. Property `Cluster vars extension. > bind_arpa_zone_service_lxcs`
+## <a name="bind_arpa_zone_service_lxcs"></a>116. Property `Cluster vars extension. > bind_arpa_zone_service_lxcs`
 
 |              |          |
 | ------------ | -------- |
@@ -202,7 +202,7 @@
 "1.168.192.in-addr.arpa"
 ```
 
-## <a name="bind_additional_arpa_zones"></a>113. Property `Cluster vars extension. > bind_additional_arpa_zones`
+## <a name="bind_additional_arpa_zones"></a>117. Property `Cluster vars extension. > bind_additional_arpa_zones`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -237,14 +237,14 @@
 | --------------------------------------------------------------------- | ----------- |
 | [bind_additional_arpa_zones items](#bind_additional_arpa_zones_items) | -           |
 
-### <a name="bind_additional_arpa_zones_items"></a>113.1. Cluster vars extension. > bind_additional_arpa_zones > bind_additional_arpa_zones items
+### <a name="bind_additional_arpa_zones_items"></a>117.1. Cluster vars extension. > bind_additional_arpa_zones > bind_additional_arpa_zones items
 
 |              |          |
 | ------------ | -------- |
 | **Type**     | `string` |
 | **Required** | No       |
 
-## <a name="pve_clusters"></a>114. Property `Cluster vars extension. > pve_clusters`
+## <a name="pve_clusters"></a>118. Property `Cluster vars extension. > pve_clusters`
 
 |                           |             |
 | ------------------------- | ----------- |
@@ -258,7 +258,7 @@
 | ---------------------------------------------------------------------------------------------------------------------------------------- | ------- | ------ | ---------- | ---------- | ------------------------------------------- |
 | - [^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)(?:\.(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?))*$](#pve_clusters_pattern1 ) | Yes     | object | No         | -          | Cloud config for specific proxmox clusters. |
 
-### <a name="pve_clusters_pattern1"></a>114.1. Pattern Property `Cluster vars extension. > pve_clusters > Cloud config for specific proxmox clusters.`
+### <a name="pve_clusters_pattern1"></a>118.1. Pattern Property `Cluster vars extension. > pve_clusters > Cloud config for specific proxmox clusters.`
 > All properties whose name matches the regular expression
 ```^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)(?:\.(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?))*$``` ([Test](https://regex101.com/?regex=%5E%28%3F%3A%5Ba-zA-Z0-9%5D%28%3F%3A%5Ba-zA-Z0-9-%5D%7B0%2C61%7D%5Ba-zA-Z0-9%5D%29%3F%29%28%3F%3A%5C.%28%3F%3A%5Ba-zA-Z0-9%5D%28%3F%3A%5Ba-zA-Z0-9-%5D%7B0%2C61%7D%5Ba-zA-Z0-9%5D%29%3F%29%29%2A%24))
 must respect the following conditions
@@ -280,7 +280,7 @@ must respect the following conditions
 | + [pve_unique_cloud_services](#pve_clusters_pattern1_pve_unique_cloud_services )               | No      | array of enum (of string) | No         | -          | Unique service the cluster provides for its cloud. Unique in the sense that only one cluster may provide each of the services for the entire cloud.<br />Services like haproxy and backup servers can and should be provided by multiple clusters. <br />                                                                  |
 | - [pve_host_vars](#pve_clusters_pattern1_pve_host_vars )                                       | No      | object                    | No         | -          | Optional variables that will be specifically set for a pve host. Key is the simple host name.<br />                                                                                                                                                                                                                        |
 
-#### <a name="pve_clusters_pattern1_pve_haproxy_floating_ip_internal"></a>114.1.1. Property `Cluster vars extension. > pve_clusters > Cloud config for specific proxmox clusters. > pve_haproxy_floating_ip_internal`
+#### <a name="pve_clusters_pattern1_pve_haproxy_floating_ip_internal"></a>118.1.1. Property `Cluster vars extension. > pve_clusters > Cloud config for specific proxmox clusters. > pve_haproxy_floating_ip_internal`
 
 |              |          |
 | ------------ | -------- |
@@ -296,7 +296,7 @@ Inside the cloud if you define a certificate entry, some nodeport forward or def
 "192.168.10.6"
 ```
 
-#### <a name="pve_clusters_pattern1_pve_haproxy_floating_ip_external"></a>114.1.2. Property `Cluster vars extension. > pve_clusters > Cloud config for specific proxmox clusters. > pve_haproxy_floating_ip_external`
+#### <a name="pve_clusters_pattern1_pve_haproxy_floating_ip_external"></a>118.1.2. Property `Cluster vars extension. > pve_clusters > Cloud config for specific proxmox clusters. > pve_haproxy_floating_ip_external`
 
 |              |          |
 | ------------ | -------- |
@@ -311,7 +311,7 @@ Inside the cloud if you define a certificate entry, some nodeport forward or def
 "192.168.10.7"
 ```
 
-#### <a name="pve_clusters_pattern1_pve_unique_cloud_services"></a>114.1.3. Property `Cluster vars extension. > pve_clusters > Cloud config for specific proxmox clusters. > pve_unique_cloud_services`
+#### <a name="pve_clusters_pattern1_pve_unique_cloud_services"></a>118.1.3. Property `Cluster vars extension. > pve_clusters > Cloud config for specific proxmox clusters. > pve_unique_cloud_services`
 
 |              |                             |
 | ------------ | --------------------------- |
@@ -333,7 +333,7 @@ Services like haproxy and backup servers can and should be provided by multiple 
 | ----------------------------------------------------------------------------------------- | ----------- |
 | [pve_unique_cloud_services items](#pve_clusters_pattern1_pve_unique_cloud_services_items) | -           |
 
-##### <a name="pve_clusters_pattern1_pve_unique_cloud_services_items"></a>114.1.3.1. Cluster vars extension. > pve_clusters > Cloud config for specific proxmox clusters. > pve_unique_cloud_services > pve_unique_cloud_services items
+##### <a name="pve_clusters_pattern1_pve_unique_cloud_services_items"></a>118.1.3.1. Cluster vars extension. > pve_clusters > Cloud config for specific proxmox clusters. > pve_unique_cloud_services > pve_unique_cloud_services items
 
 |              |                    |
 | ------------ | ------------------ |
@@ -346,7 +346,7 @@ Must be one of:
 * "dhcp"
 * "psql-state"
 
-#### <a name="pve_clusters_pattern1_pve_host_vars"></a>114.1.4. Property `Cluster vars extension. > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars`
+#### <a name="pve_clusters_pattern1_pve_host_vars"></a>118.1.4. Property `Cluster vars extension. > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars`
 
 |                           |             |
 | ------------------------- | ----------- |
@@ -360,7 +360,7 @@ Must be one of:
 | ------------------------------------------------------------------------------------------------------- | ------- | ------ | ---------- | ---------- | ----------------- |
 | - [^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)$](#pve_clusters_pattern1_pve_host_vars_pattern1 ) | Yes     | object | No         | -          | Proxmox hostname  |
 
-##### <a name="pve_clusters_pattern1_pve_host_vars_pattern1"></a>114.1.4.1. Pattern Property `Cluster vars extension. > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > Proxmox hostname`
+##### <a name="pve_clusters_pattern1_pve_host_vars_pattern1"></a>118.1.4.1. Pattern Property `Cluster vars extension. > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > Proxmox hostname`
 > All properties whose name matches the regular expression
 ```^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)$``` ([Test](https://regex101.com/?regex=%5E%28%3F%3A%5Ba-zA-Z0-9%5D%28%3F%3A%5Ba-zA-Z0-9-%5D%7B0%2C61%7D%5Ba-zA-Z0-9%5D%29%3F%29%24))
 must respect the following conditions
@@ -382,7 +382,7 @@ must respect the following conditions
 | - [wol](#pve_clusters_pattern1_pve_host_vars_pattern1_wol )                                                           | No      | object          | No         | -          | Definition for wakeonlan network interface. Will use ethtool and post-up commands to keep it enabled on the nic.<br />You also might have to adjust settings in the bios, enable WoL there and also tune the power options for receiving the<br />magic package. Turn off settings like low power soft off, then you can use \`wakeonlan MAC_ADDR\` to boot your host.<br /> |
 | - [net_offloading_fixxes](#pve_clusters_pattern1_pve_host_vars_pattern1_net_offloading_fixxes )                       | No      | array of object | No         | -          | Disable pesky network offloaing features that break upon virtualization.                                                                                                                                                                                                                                                                                                     |
 
-###### <a name="pve_clusters_pattern1_pve_host_vars_pattern1_pve_corosync_vote"></a>114.1.4.1.1. Property `Cluster vars extension. > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > Proxmox hostname > pve_corosync_vote`
+###### <a name="pve_clusters_pattern1_pve_host_vars_pattern1_pve_corosync_vote"></a>118.1.4.1.1. Property `Cluster vars extension. > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > Proxmox hostname > pve_corosync_vote`
 
 |              |           |
 | ------------ | --------- |
@@ -392,7 +392,7 @@ must respect the following conditions
 **Description:** Set this to false to remove the corosync vote of this proxmox host, this ideal for hosts
 that get booted up conditionally. Defaults to true.
 
-###### <a name="pve_clusters_pattern1_pve_host_vars_pattern1_install_btrfs_root_prom_exporter"></a>114.1.4.1.2. Property `Cluster vars extension. > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > Proxmox hostname > install_btrfs_root_prom_exporter`
+###### <a name="pve_clusters_pattern1_pve_host_vars_pattern1_install_btrfs_root_prom_exporter"></a>118.1.4.1.2. Property `Cluster vars extension. > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > Proxmox hostname > install_btrfs_root_prom_exporter`
 
 |              |           |
 | ------------ | --------- |
@@ -401,7 +401,7 @@ that get booted up conditionally. Defaults to true.
 
 **Description:** Set this to true if you installed the os on btrfs. This will install a prometheus exporter for btrfs aswell as enable degraded booting.
 
-###### <a name="pve_clusters_pattern1_pve_host_vars_pattern1_install_log2ram"></a>114.1.4.1.3. Property `Cluster vars extension. > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > Proxmox hostname > install_log2ram`
+###### <a name="pve_clusters_pattern1_pve_host_vars_pattern1_install_log2ram"></a>118.1.4.1.3. Property `Cluster vars extension. > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > Proxmox hostname > install_log2ram`
 
 |              |           |
 | ------------ | --------- |
@@ -411,7 +411,7 @@ that get booted up conditionally. Defaults to true.
 **Description:** This will install log2ram, moving logs to ram. If you are using the same disks for the os aswell as virtual machines, you should enable it,
 to ensure proxmox doesnt freeze up because of vm disk usage.
 
-###### <a name="pve_clusters_pattern1_pve_host_vars_pattern1_disable_ipmi"></a>114.1.4.1.4. Property `Cluster vars extension. > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > Proxmox hostname > disable_ipmi`
+###### <a name="pve_clusters_pattern1_pve_host_vars_pattern1_disable_ipmi"></a>118.1.4.1.4. Property `Cluster vars extension. > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > Proxmox hostname > disable_ipmi`
 
 |              |           |
 | ------------ | --------- |
@@ -421,7 +421,7 @@ to ensure proxmox doesnt freeze up because of vm disk usage.
 **Description:** If specified will disable the openipmi power managemend systemd service. This might fail on proxmox
 hosts that dont support it and clutters up monitoring.
 
-###### <a name="pve_clusters_pattern1_pve_host_vars_pattern1_wol"></a>114.1.4.1.5. Property `Cluster vars extension. > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > Proxmox hostname > wol`
+###### <a name="pve_clusters_pattern1_pve_host_vars_pattern1_wol"></a>118.1.4.1.5. Property `Cluster vars extension. > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > Proxmox hostname > wol`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -438,7 +438,7 @@ magic package. Turn off settings like low power soft off, then you can use `wake
 | - [iface](#pve_clusters_pattern1_pve_host_vars_pattern1_wol_iface )   | No      | string | No         | -          | The interface for which wakeonlan should be activated. |
 | - [bridge](#pve_clusters_pattern1_pve_host_vars_pattern1_wol_bridge ) | No      | string | No         | -          | The bridge that gets the post-up definition for wol.   |
 
-###### <a name="pve_clusters_pattern1_pve_host_vars_pattern1_wol_iface"></a>114.1.4.1.5.1. Property `Cluster vars extension. > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > Proxmox hostname > wol > iface`
+###### <a name="pve_clusters_pattern1_pve_host_vars_pattern1_wol_iface"></a>118.1.4.1.5.1. Property `Cluster vars extension. > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > Proxmox hostname > wol > iface`
 
 |              |          |
 | ------------ | -------- |
@@ -447,7 +447,7 @@ magic package. Turn off settings like low power soft off, then you can use `wake
 
 **Description:** The interface for which wakeonlan should be activated.
 
-###### <a name="pve_clusters_pattern1_pve_host_vars_pattern1_wol_bridge"></a>114.1.4.1.5.2. Property `Cluster vars extension. > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > Proxmox hostname > wol > bridge`
+###### <a name="pve_clusters_pattern1_pve_host_vars_pattern1_wol_bridge"></a>118.1.4.1.5.2. Property `Cluster vars extension. > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > Proxmox hostname > wol > bridge`
 
 |              |          |
 | ------------ | -------- |
@@ -456,7 +456,7 @@ magic package. Turn off settings like low power soft off, then you can use `wake
 
 **Description:** The bridge that gets the post-up definition for wol.
 
-###### <a name="pve_clusters_pattern1_pve_host_vars_pattern1_net_offloading_fixxes"></a>114.1.4.1.6. Property `Cluster vars extension. > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > Proxmox hostname > net_offloading_fixxes`
+###### <a name="pve_clusters_pattern1_pve_host_vars_pattern1_net_offloading_fixxes"></a>118.1.4.1.6. Property `Cluster vars extension. > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > Proxmox hostname > net_offloading_fixxes`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -477,7 +477,7 @@ magic package. Turn off settings like low power soft off, then you can use `wake
 | -------------------------------------------------------------------------------------------------------- | ----------- |
 | [net_offloading_fixxes items](#pve_clusters_pattern1_pve_host_vars_pattern1_net_offloading_fixxes_items) | -           |
 
-###### <a name="pve_clusters_pattern1_pve_host_vars_pattern1_net_offloading_fixxes_items"></a>114.1.4.1.6.1. Cluster vars extension. > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > Proxmox hostname > net_offloading_fixxes > net_offloading_fixxes items
+###### <a name="pve_clusters_pattern1_pve_host_vars_pattern1_net_offloading_fixxes_items"></a>118.1.4.1.6.1. Cluster vars extension. > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > Proxmox hostname > net_offloading_fixxes > net_offloading_fixxes items
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -491,7 +491,7 @@ magic package. Turn off settings like low power soft off, then you can use `wake
 | - [bridge](#pve_clusters_pattern1_pve_host_vars_pattern1_net_offloading_fixxes_items_bridge )                     | No      | string          | No         | -          | The bridge that gets the post-up definition for applying the fix that will receive the post-up directive. |
 | - [disable_features](#pve_clusters_pattern1_pve_host_vars_pattern1_net_offloading_fixxes_items_disable_features ) | No      | array of string | No         | -          | List of network features to disable for the interface.                                                    |
 
-###### <a name="pve_clusters_pattern1_pve_host_vars_pattern1_net_offloading_fixxes_items_iface"></a>114.1.4.1.6.1.1. Property `Cluster vars extension. > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > Proxmox hostname > net_offloading_fixxes > net_offloading_fixxes items > iface`
+###### <a name="pve_clusters_pattern1_pve_host_vars_pattern1_net_offloading_fixxes_items_iface"></a>118.1.4.1.6.1.1. Property `Cluster vars extension. > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > Proxmox hostname > net_offloading_fixxes > net_offloading_fixxes items > iface`
 
 |              |          |
 | ------------ | -------- |
@@ -500,7 +500,7 @@ magic package. Turn off settings like low power soft off, then you can use `wake
 
 **Description:** The interface for which to disable specified network offloading features.
 
-###### <a name="pve_clusters_pattern1_pve_host_vars_pattern1_net_offloading_fixxes_items_bridge"></a>114.1.4.1.6.1.2. Property `Cluster vars extension. > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > Proxmox hostname > net_offloading_fixxes > net_offloading_fixxes items > bridge`
+###### <a name="pve_clusters_pattern1_pve_host_vars_pattern1_net_offloading_fixxes_items_bridge"></a>118.1.4.1.6.1.2. Property `Cluster vars extension. > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > Proxmox hostname > net_offloading_fixxes > net_offloading_fixxes items > bridge`
 
 |              |          |
 | ------------ | -------- |
@@ -509,7 +509,7 @@ magic package. Turn off settings like low power soft off, then you can use `wake
 
 **Description:** The bridge that gets the post-up definition for applying the fix that will receive the post-up directive.
 
-###### <a name="pve_clusters_pattern1_pve_host_vars_pattern1_net_offloading_fixxes_items_disable_features"></a>114.1.4.1.6.1.3. Property `Cluster vars extension. > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > Proxmox hostname > net_offloading_fixxes > net_offloading_fixxes items > disable_features`
+###### <a name="pve_clusters_pattern1_pve_host_vars_pattern1_net_offloading_fixxes_items_disable_features"></a>118.1.4.1.6.1.3. Property `Cluster vars extension. > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > Proxmox hostname > net_offloading_fixxes > net_offloading_fixxes items > disable_features`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -530,7 +530,7 @@ magic package. Turn off settings like low power soft off, then you can use `wake
 | -------------------------------------------------------------------------------------------------------------------------- | ----------- |
 | [disable_features items](#pve_clusters_pattern1_pve_host_vars_pattern1_net_offloading_fixxes_items_disable_features_items) | -           |
 
-###### <a name="pve_clusters_pattern1_pve_host_vars_pattern1_net_offloading_fixxes_items_disable_features_items"></a>114.1.4.1.6.1.3.1. Cluster vars extension. > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > Proxmox hostname > net_offloading_fixxes > net_offloading_fixxes items > disable_features > disable_features items
+###### <a name="pve_clusters_pattern1_pve_host_vars_pattern1_net_offloading_fixxes_items_disable_features_items"></a>118.1.4.1.6.1.3.1. Cluster vars extension. > pve_clusters > Cloud config for specific proxmox clusters. > pve_host_vars > Proxmox hostname > net_offloading_fixxes > net_offloading_fixxes items > disable_features > disable_features items
 
 |              |          |
 | ------------ | -------- |
@@ -551,7 +551,7 @@ magic package. Turn off settings like low power soft off, then you can use `wake
 "gro"
 ```
 
-## <a name="bind_zone_admin_email"></a>115. Property `Cluster vars extension. > bind_zone_admin_email`
+## <a name="bind_zone_admin_email"></a>119. Property `Cluster vars extension. > bind_zone_admin_email`
 
 |              |          |
 | ------------ | -------- |
@@ -566,7 +566,7 @@ magic package. Turn off settings like low power soft off, then you can use `wake
 "admin.example.com."
 ```
 
-## <a name="bind_forward_zones"></a>116. Property `Cluster vars extension. > bind_forward_zones`
+## <a name="bind_forward_zones"></a>120. Property `Cluster vars extension. > bind_forward_zones`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -588,7 +588,7 @@ resort to the terraform dns provider alongside the kubernetes cluster that decla
 | ----------------------------------------------------- | ----------- |
 | [bind_forward_zones items](#bind_forward_zones_items) | -           |
 
-### <a name="bind_forward_zones_items"></a>116.1. Cluster vars extension. > bind_forward_zones > bind_forward_zones items
+### <a name="bind_forward_zones_items"></a>120.1. Cluster vars extension. > bind_forward_zones > bind_forward_zones items
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -601,14 +601,14 @@ resort to the terraform dns provider alongside the kubernetes cluster that decla
 | - [zone](#bind_forward_zones_items_zone )               | No      | string          | No         | -          | -                 |
 | - [nameservers](#bind_forward_zones_items_nameservers ) | No      | array of string | No         | -          | -                 |
 
-#### <a name="bind_forward_zones_items_zone"></a>116.1.1. Property `Cluster vars extension. > bind_forward_zones > bind_forward_zones items > zone`
+#### <a name="bind_forward_zones_items_zone"></a>120.1.1. Property `Cluster vars extension. > bind_forward_zones > bind_forward_zones items > zone`
 
 |              |          |
 | ------------ | -------- |
 | **Type**     | `string` |
 | **Required** | No       |
 
-#### <a name="bind_forward_zones_items_nameservers"></a>116.1.2. Property `Cluster vars extension. > bind_forward_zones > bind_forward_zones items > nameservers`
+#### <a name="bind_forward_zones_items_nameservers"></a>120.1.2. Property `Cluster vars extension. > bind_forward_zones > bind_forward_zones items > nameservers`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -627,14 +627,14 @@ resort to the terraform dns provider alongside the kubernetes cluster that decla
 | ---------------------------------------------------------------- | ----------- |
 | [nameservers items](#bind_forward_zones_items_nameservers_items) | -           |
 
-##### <a name="bind_forward_zones_items_nameservers_items"></a>116.1.2.1. Cluster vars extension. > bind_forward_zones > bind_forward_zones items > nameservers > nameservers items
+##### <a name="bind_forward_zones_items_nameservers_items"></a>120.1.2.1. Cluster vars extension. > bind_forward_zones > bind_forward_zones items > nameservers > nameservers items
 
 |              |          |
 | ------------ | -------- |
 | **Type**     | `string` |
 | **Required** | No       |
 
-## <a name="acme_contact"></a>117. Property `Cluster vars extension. > acme_contact`
+## <a name="acme_contact"></a>121. Property `Cluster vars extension. > acme_contact`
 
 |              |          |
 | ------------ | -------- |
@@ -649,7 +649,7 @@ resort to the terraform dns provider alongside the kubernetes cluster that decla
 "acme@example.com"
 ```
 
-## <a name="acme_method"></a>118. Property `Cluster vars extension. > acme_method`
+## <a name="acme_method"></a>122. Property `Cluster vars extension. > acme_method`
 
 |              |                    |
 | ------------ | ------------------ |
@@ -664,7 +664,7 @@ Must be one of:
 * "ionos"
 * "ionos_cloud"
 
-## <a name="plugin"></a>119. Property `Cluster vars extension. > plugin`
+## <a name="plugin"></a>123. Property `Cluster vars extension. > plugin`
 
 |              |                    |
 | ------------ | ------------------ |
@@ -677,7 +677,7 @@ Must be one of:
 
 * "pxc.cloud.pve_cloud_inv"
 
-## <a name="pve_haproxy_floating_ip_internal"></a>120. Property `Cluster vars extension. > pve_haproxy_floating_ip_internal`
+## <a name="pve_haproxy_floating_ip_internal"></a>124. Property `Cluster vars extension. > pve_haproxy_floating_ip_internal`
 
 |              |          |
 | ------------ | -------- |
@@ -693,7 +693,7 @@ Inside the cloud if you define a certificate entry, some nodeport forward or def
 "192.168.10.6"
 ```
 
-## <a name="pve_haproxy_floating_ip_external"></a>121. Property `Cluster vars extension. > pve_haproxy_floating_ip_external`
+## <a name="pve_haproxy_floating_ip_external"></a>125. Property `Cluster vars extension. > pve_haproxy_floating_ip_external`
 
 |              |          |
 | ------------ | -------- |
@@ -708,7 +708,7 @@ Inside the cloud if you define a certificate entry, some nodeport forward or def
 "192.168.10.7"
 ```
 
-## <a name="pve_unique_cloud_services"></a>122. Property `Cluster vars extension. > pve_unique_cloud_services`
+## <a name="pve_unique_cloud_services"></a>126. Property `Cluster vars extension. > pve_unique_cloud_services`
 
 |              |                             |
 | ------------ | --------------------------- |
@@ -730,7 +730,7 @@ Services like haproxy and backup servers can and should be provided by multiple 
 | ------------------------------------------------------------------- | ----------- |
 | [pve_unique_cloud_services items](#pve_unique_cloud_services_items) | -           |
 
-### <a name="pve_unique_cloud_services_items"></a>122.1. Cluster vars extension. > pve_unique_cloud_services > pve_unique_cloud_services items
+### <a name="pve_unique_cloud_services_items"></a>126.1. Cluster vars extension. > pve_unique_cloud_services > pve_unique_cloud_services items
 
 |              |                    |
 | ------------ | ------------------ |
@@ -743,7 +743,7 @@ Must be one of:
 * "dhcp"
 * "psql-state"
 
-## <a name="pve_host_vars"></a>123. Property `Cluster vars extension. > pve_host_vars`
+## <a name="pve_host_vars"></a>127. Property `Cluster vars extension. > pve_host_vars`
 
 |                           |             |
 | ------------------------- | ----------- |
@@ -757,7 +757,7 @@ Must be one of:
 | --------------------------------------------------------------------------------- | ------- | ------ | ---------- | ---------- | ----------------- |
 | - [^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)$](#pve_host_vars_pattern1 ) | Yes     | object | No         | -          | Proxmox hostname  |
 
-### <a name="pve_host_vars_pattern1"></a>123.1. Pattern Property `Cluster vars extension. > pve_host_vars > Proxmox hostname`
+### <a name="pve_host_vars_pattern1"></a>127.1. Pattern Property `Cluster vars extension. > pve_host_vars > Proxmox hostname`
 > All properties whose name matches the regular expression
 ```^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)$``` ([Test](https://regex101.com/?regex=%5E%28%3F%3A%5Ba-zA-Z0-9%5D%28%3F%3A%5Ba-zA-Z0-9-%5D%7B0%2C61%7D%5Ba-zA-Z0-9%5D%29%3F%29%24))
 must respect the following conditions
@@ -779,7 +779,7 @@ must respect the following conditions
 | - [wol](#pve_host_vars_pattern1_wol )                                                           | No      | object          | No         | -          | Definition for wakeonlan network interface. Will use ethtool and post-up commands to keep it enabled on the nic.<br />You also might have to adjust settings in the bios, enable WoL there and also tune the power options for receiving the<br />magic package. Turn off settings like low power soft off, then you can use \`wakeonlan MAC_ADDR\` to boot your host.<br /> |
 | - [net_offloading_fixxes](#pve_host_vars_pattern1_net_offloading_fixxes )                       | No      | array of object | No         | -          | Disable pesky network offloaing features that break upon virtualization.                                                                                                                                                                                                                                                                                                     |
 
-#### <a name="pve_host_vars_pattern1_pve_corosync_vote"></a>123.1.1. Property `Cluster vars extension. > pve_host_vars > Proxmox hostname > pve_corosync_vote`
+#### <a name="pve_host_vars_pattern1_pve_corosync_vote"></a>127.1.1. Property `Cluster vars extension. > pve_host_vars > Proxmox hostname > pve_corosync_vote`
 
 |              |           |
 | ------------ | --------- |
@@ -789,7 +789,7 @@ must respect the following conditions
 **Description:** Set this to false to remove the corosync vote of this proxmox host, this ideal for hosts
 that get booted up conditionally. Defaults to true.
 
-#### <a name="pve_host_vars_pattern1_install_btrfs_root_prom_exporter"></a>123.1.2. Property `Cluster vars extension. > pve_host_vars > Proxmox hostname > install_btrfs_root_prom_exporter`
+#### <a name="pve_host_vars_pattern1_install_btrfs_root_prom_exporter"></a>127.1.2. Property `Cluster vars extension. > pve_host_vars > Proxmox hostname > install_btrfs_root_prom_exporter`
 
 |              |           |
 | ------------ | --------- |
@@ -798,7 +798,7 @@ that get booted up conditionally. Defaults to true.
 
 **Description:** Set this to true if you installed the os on btrfs. This will install a prometheus exporter for btrfs aswell as enable degraded booting.
 
-#### <a name="pve_host_vars_pattern1_install_log2ram"></a>123.1.3. Property `Cluster vars extension. > pve_host_vars > Proxmox hostname > install_log2ram`
+#### <a name="pve_host_vars_pattern1_install_log2ram"></a>127.1.3. Property `Cluster vars extension. > pve_host_vars > Proxmox hostname > install_log2ram`
 
 |              |           |
 | ------------ | --------- |
@@ -808,7 +808,7 @@ that get booted up conditionally. Defaults to true.
 **Description:** This will install log2ram, moving logs to ram. If you are using the same disks for the os aswell as virtual machines, you should enable it,
 to ensure proxmox doesnt freeze up because of vm disk usage.
 
-#### <a name="pve_host_vars_pattern1_disable_ipmi"></a>123.1.4. Property `Cluster vars extension. > pve_host_vars > Proxmox hostname > disable_ipmi`
+#### <a name="pve_host_vars_pattern1_disable_ipmi"></a>127.1.4. Property `Cluster vars extension. > pve_host_vars > Proxmox hostname > disable_ipmi`
 
 |              |           |
 | ------------ | --------- |
@@ -818,7 +818,7 @@ to ensure proxmox doesnt freeze up because of vm disk usage.
 **Description:** If specified will disable the openipmi power managemend systemd service. This might fail on proxmox
 hosts that dont support it and clutters up monitoring.
 
-#### <a name="pve_host_vars_pattern1_wol"></a>123.1.5. Property `Cluster vars extension. > pve_host_vars > Proxmox hostname > wol`
+#### <a name="pve_host_vars_pattern1_wol"></a>127.1.5. Property `Cluster vars extension. > pve_host_vars > Proxmox hostname > wol`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -835,7 +835,7 @@ magic package. Turn off settings like low power soft off, then you can use `wake
 | - [iface](#pve_host_vars_pattern1_wol_iface )   | No      | string | No         | -          | The interface for which wakeonlan should be activated. |
 | - [bridge](#pve_host_vars_pattern1_wol_bridge ) | No      | string | No         | -          | The bridge that gets the post-up definition for wol.   |
 
-##### <a name="pve_host_vars_pattern1_wol_iface"></a>123.1.5.1. Property `Cluster vars extension. > pve_host_vars > Proxmox hostname > wol > iface`
+##### <a name="pve_host_vars_pattern1_wol_iface"></a>127.1.5.1. Property `Cluster vars extension. > pve_host_vars > Proxmox hostname > wol > iface`
 
 |              |          |
 | ------------ | -------- |
@@ -844,7 +844,7 @@ magic package. Turn off settings like low power soft off, then you can use `wake
 
 **Description:** The interface for which wakeonlan should be activated.
 
-##### <a name="pve_host_vars_pattern1_wol_bridge"></a>123.1.5.2. Property `Cluster vars extension. > pve_host_vars > Proxmox hostname > wol > bridge`
+##### <a name="pve_host_vars_pattern1_wol_bridge"></a>127.1.5.2. Property `Cluster vars extension. > pve_host_vars > Proxmox hostname > wol > bridge`
 
 |              |          |
 | ------------ | -------- |
@@ -853,7 +853,7 @@ magic package. Turn off settings like low power soft off, then you can use `wake
 
 **Description:** The bridge that gets the post-up definition for wol.
 
-#### <a name="pve_host_vars_pattern1_net_offloading_fixxes"></a>123.1.6. Property `Cluster vars extension. > pve_host_vars > Proxmox hostname > net_offloading_fixxes`
+#### <a name="pve_host_vars_pattern1_net_offloading_fixxes"></a>127.1.6. Property `Cluster vars extension. > pve_host_vars > Proxmox hostname > net_offloading_fixxes`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -874,7 +874,7 @@ magic package. Turn off settings like low power soft off, then you can use `wake
 | ---------------------------------------------------------------------------------- | ----------- |
 | [net_offloading_fixxes items](#pve_host_vars_pattern1_net_offloading_fixxes_items) | -           |
 
-##### <a name="pve_host_vars_pattern1_net_offloading_fixxes_items"></a>123.1.6.1. Cluster vars extension. > pve_host_vars > Proxmox hostname > net_offloading_fixxes > net_offloading_fixxes items
+##### <a name="pve_host_vars_pattern1_net_offloading_fixxes_items"></a>127.1.6.1. Cluster vars extension. > pve_host_vars > Proxmox hostname > net_offloading_fixxes > net_offloading_fixxes items
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -888,7 +888,7 @@ magic package. Turn off settings like low power soft off, then you can use `wake
 | - [bridge](#pve_host_vars_pattern1_net_offloading_fixxes_items_bridge )                     | No      | string          | No         | -          | The bridge that gets the post-up definition for applying the fix that will receive the post-up directive. |
 | - [disable_features](#pve_host_vars_pattern1_net_offloading_fixxes_items_disable_features ) | No      | array of string | No         | -          | List of network features to disable for the interface.                                                    |
 
-###### <a name="pve_host_vars_pattern1_net_offloading_fixxes_items_iface"></a>123.1.6.1.1. Property `Cluster vars extension. > pve_host_vars > Proxmox hostname > net_offloading_fixxes > net_offloading_fixxes items > iface`
+###### <a name="pve_host_vars_pattern1_net_offloading_fixxes_items_iface"></a>127.1.6.1.1. Property `Cluster vars extension. > pve_host_vars > Proxmox hostname > net_offloading_fixxes > net_offloading_fixxes items > iface`
 
 |              |          |
 | ------------ | -------- |
@@ -897,7 +897,7 @@ magic package. Turn off settings like low power soft off, then you can use `wake
 
 **Description:** The interface for which to disable specified network offloading features.
 
-###### <a name="pve_host_vars_pattern1_net_offloading_fixxes_items_bridge"></a>123.1.6.1.2. Property `Cluster vars extension. > pve_host_vars > Proxmox hostname > net_offloading_fixxes > net_offloading_fixxes items > bridge`
+###### <a name="pve_host_vars_pattern1_net_offloading_fixxes_items_bridge"></a>127.1.6.1.2. Property `Cluster vars extension. > pve_host_vars > Proxmox hostname > net_offloading_fixxes > net_offloading_fixxes items > bridge`
 
 |              |          |
 | ------------ | -------- |
@@ -906,7 +906,7 @@ magic package. Turn off settings like low power soft off, then you can use `wake
 
 **Description:** The bridge that gets the post-up definition for applying the fix that will receive the post-up directive.
 
-###### <a name="pve_host_vars_pattern1_net_offloading_fixxes_items_disable_features"></a>123.1.6.1.3. Property `Cluster vars extension. > pve_host_vars > Proxmox hostname > net_offloading_fixxes > net_offloading_fixxes items > disable_features`
+###### <a name="pve_host_vars_pattern1_net_offloading_fixxes_items_disable_features"></a>127.1.6.1.3. Property `Cluster vars extension. > pve_host_vars > Proxmox hostname > net_offloading_fixxes > net_offloading_fixxes items > disable_features`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -927,7 +927,7 @@ magic package. Turn off settings like low power soft off, then you can use `wake
 | ---------------------------------------------------------------------------------------------------- | ----------- |
 | [disable_features items](#pve_host_vars_pattern1_net_offloading_fixxes_items_disable_features_items) | -           |
 
-###### <a name="pve_host_vars_pattern1_net_offloading_fixxes_items_disable_features_items"></a>123.1.6.1.3.1. Cluster vars extension. > pve_host_vars > Proxmox hostname > net_offloading_fixxes > net_offloading_fixxes items > disable_features > disable_features items
+###### <a name="pve_host_vars_pattern1_net_offloading_fixxes_items_disable_features_items"></a>127.1.6.1.3.1. Cluster vars extension. > pve_host_vars > Proxmox hostname > net_offloading_fixxes > net_offloading_fixxes items > disable_features > disable_features items
 
 |              |          |
 | ------------ | -------- |
@@ -948,7 +948,7 @@ magic package. Turn off settings like low power soft off, then you can use `wake
 "gro"
 ```
 
-## <a name="pve_cloud_collection_version"></a>124. Property `Cluster vars extension. > pve_cloud_collection_version`
+## <a name="pve_cloud_collection_version"></a>128. Property `Cluster vars extension. > pve_cloud_collection_version`
 
 |              |          |
 | ------------ | -------- |
@@ -957,7 +957,7 @@ magic package. Turn off settings like low power soft off, then you can use `wake
 
 **Description:** Dynamic property set by pve_cloud_inv for validation of the collections version.
 
-## <a name="py_pve_cloud_version"></a>125. Property `Cluster vars extension. > py_pve_cloud_version`
+## <a name="py_pve_cloud_version"></a>129. Property `Cluster vars extension. > py_pve_cloud_version`
 
 |              |          |
 | ------------ | -------- |
@@ -966,7 +966,7 @@ magic package. Turn off settings like low power soft off, then you can use `wake
 
 **Description:** Dynamic property for validation of the core python pve cloud library in use.
 
-## <a name="pve_cluster_name"></a>126. Property `Cluster vars extension. > pve_cluster_name`
+## <a name="pve_cluster_name"></a>130. Property `Cluster vars extension. > pve_cluster_name`
 
 |              |          |
 | ------------ | -------- |
