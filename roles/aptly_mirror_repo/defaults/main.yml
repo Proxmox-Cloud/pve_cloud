@@ -16,3 +16,8 @@ mirror_filter: dummy-mirror-filter
 mirror_endpoint: debian # we mostly use debian
 
 mirror_sources: true
+
+mirror_architectures:
+  - amd64
+  - arm64
+  - armhf
