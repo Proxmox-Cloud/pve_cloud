@@ -3,3 +3,4 @@
 
 # /etc/hosts ip to haproxy floating ip for pve host (outside of cloud dns)
 vlogs_etc_hosts_ip: null
+vector_systemd_mem_max: "128M"

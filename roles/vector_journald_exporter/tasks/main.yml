@@ -116,7 +116,7 @@
         content: |
           [Service]
           MemorySwapMax=0
-          MemoryMax=128M
+          MemoryMax={{ vector_systemd_mem_max }}
       register: limits_configured
 
     - name: reload daemon on limits conf
