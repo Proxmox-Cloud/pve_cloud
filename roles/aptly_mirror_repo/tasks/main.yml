@@ -21,7 +21,7 @@
 
 - name: publish snap
   when: "'{{ distribution_id }}-mirror' not in aptly_existing_mirrors.stdout_lines"
-  command: "aptly publish snapshot -distribution={{ mirror_distribution }} -architectures='source,{{ mirror_architectures | join(',') }}' {{ distribution_id }}-snap {{ mirror_endpoint }}"
+  command: "aptly publish snapshot -distribution={{ mirror_distribution }} -architectures='source,{{ mirror_architectures | join(',') }}' -component='{{ mirror_components | join(',') }}' {% for _ in mirror_components %}{{ distribution_id }}-snap {% endfor %}{{ mirror_endpoint }}"
 
 # update mirror if filter changed
 - name: fetch mirror details
@@ -57,6 +57,4 @@
 
 - name: publish again
   when: mirror_filter_configured != mirror_filter
-  command: "aptly publish snapshot -distribution={{ mirror_distribution }} -architectures='source,{{ mirror_architectures | join(',') }}' {{ distribution_id }}-snap {{ mirror_endpoint }}"
-
-    
+  command: "aptly publish snapshot -distribution={{ mirror_distribution }} -architectures='source,{{ mirror_architectures | join(',') }}' -component='{{ mirror_components | join(',') }}' {% for _ in mirror_components %}{{ distribution_id }}-snap {% endfor %}{{ mirror_endpoint }}"
