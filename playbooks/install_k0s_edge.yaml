@@ -26,17 +26,20 @@
           secret_name: "cloud-mirror-vm"
       register: mirror_discovery_secret
 
-    - name: setup local cache
-      when: mirror_discovery_secret.rowcount != 0
-      block:
-        - name: create local cache dir
-          ansible.builtin.file:
-            path: "{{ lookup('env', 'HOME') }}/.cache/k0s_edge"
-            state: directory
-            mode: '0755'
+    # currently this is needed regardless if mirroing was discovered or not
+    # since we download artifacts to localhost first before uploading
+    # it to the machine
+    # todo: this should be done dynamically => download on the host without mirroring
+    # only use localhost if mirroring was discovered
+    - name: create local cache dir
+      ansible.builtin.file:
+        path: "{{ lookup('env', 'HOME') }}/.cache/k0s_edge"
+        state: directory
+        mode: '0755'
 
-        - name: rsync cache from mirror vm
-          command: rsync -avz admin@{{ mirror_discovery_secret.query_result[0]['secret_data']['mirror_vm_addr'] }}:/home/admin/.cache/k0s_edge/ {{ lookup('env', 'HOME') }}/.cache/k0s_edge/
+    - name: rsync cache from mirror vm
+      when: mirror_discovery_secret.rowcount != 0
+      command: rsync -avz admin@{{ mirror_discovery_secret.query_result[0]['secret_data']['mirror_vm_addr'] }}:/home/admin/.cache/k0s_edge/ {{ lookup('env', 'HOME') }}/.cache/k0s_edge/
 
 
 - name: Setup k0s
@@ -48,6 +51,17 @@
       ansible.utils.validate:
         criteria: "{{ lookup('ansible.builtin.file', 'files/k0s_hostvars_schema.yaml') | from_yaml }}"
         data: "{{ hostvars[inventory_hostname] }}"
+
+    - name: enable passwordless sudo for user (later needed for tf k0s fetch)
+      become: true
+      copy:
+        dest: /etc/sudoers.d/{{ ansible_user }}
+        content: |
+          {{ ansible_user }} ALL=(ALL) NOPASSWD:ALL
+        owner: root
+        group: root
+        mode: "0440"
+        validate: "visudo -cf %s"
 
     - name: setup zfs + k8s pools
       include_role:
@@ -220,6 +234,53 @@
         cmd: k0s kubeconfig admin
       register: admin_kubeconfig
 
+    - name: allow e2e unsafe registry
+      when: test_repos_ip is defined
+      block:
+        - name: create config certs.d ext
+          become: true
+          ansible.builtin.copy:
+            dest: /etc/k0s/containerd.d/98-e2e-registry.toml
+            content: |
+              [plugins."io.containerd.cri.v1.images".registry]
+                config_path = "/etc/k0s/containerd-certs.d"
+
+        - name: create certs.d host dir
+          become: true
+          ansible.builtin.file:
+            path: /etc/k0s/containerd-certs.d/{{ test_repos_ip }}:5000
+            state: directory
+
+        - name: Create hosts.toml for the repo
+          become: true
+          copy:
+            dest: "/etc/k0s/containerd-certs.d/{{ test_repos_ip }}:5000/hosts.toml"
+            content: |
+              server = "http://{{ test_repos_ip }}:5000"
+
+              [host."http://{{ test_repos_ip }}:5000"]
+                skip_verify = true
+
+          register: create_hosts_toml
+
+        - name: reload service on conf change
+          become: true
+          ansible.builtin.systemd:
+            name: k0scontroller
+            state: restarted
+          # restart on consequtive runs only
+          when: create_hosts_toml.changed
+
+        - name: wait for k0s to be up again
+          become: true
+          ansible.builtin.command:
+            cmd: k0s kubectl get --raw=/readyz
+          register: api_ready
+          retries: 60
+          delay: 5
+          until: api_ready.rc == 0 and api_ready.stdout == "ok"
+
+
     - name: limit e2e downloads containerd
       when: e2e_limit_containerd_downloads is defined and e2e_limit_containerd_downloads
       block:
@@ -252,6 +313,7 @@
           retries: 60
           delay: 5
           until: api_ready.rc == 0 and api_ready.stdout == "ok"
+
 
 
 - name: Rsync cache back

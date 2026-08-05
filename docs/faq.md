@@ -108,6 +108,8 @@ To still get somewhat useful performance out of your disks you need to use the q
 
 For kubernetes csi there is rbd-nbd, wich also supports unsafe caching and [client caching options](https://docs.ceph.com/en/squid/rbd/rbd-config-ref/). Rbd-nbd is in alpha.
 
+To efficiently use zfs you should set `sync=disabled` on your root zpool, this enables native performance at the risk of dataloss on power outages.
+
 ## Kubespray certificates
 
 Newest proxmox cloud versions deploy kubernetes clusters with automatic cert renewal jobs turned on (control plane). If you use the `pvcli print-kubeconfig ...` you will receive a kubeconfig that uses expiring certificates. You would have to run the command again if it expires.

@@ -197,7 +197,11 @@
     - name: Apply wol now
       shell: "ethtool -s {{ wol.iface }} wol g"
       when: wol is defined
-    
+
+    - name: Set pvenode wakeonlan mac
+      shell: "pvenode config set --wakeonlan {{ ansible_facts[wol.iface].macaddress }}"
+      when: wol is defined
+
     - name: Disable network offloading features
       blockinfile:
         path: /etc/network/interfaces
