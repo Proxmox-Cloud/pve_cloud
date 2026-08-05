@@ -20,12 +20,12 @@ from pve_cloud.cli.pxrpc import launch_pxrpc, launch_pxrpc_async
 from pve_cloud.lib.inventory import (get_cloud_domain, get_cluster_vars,
                                      get_online_pve_host, get_pve_inventory,
                                      get_target_cluster)
-from pve_cloud.orm.alchemy import AcmeX509
-from pve_cloud_test.k8s_fixtures import (get_e2e_limit_feature,
-                                         get_kubespray_inv,
-                                         get_secondary_kubespray_inv,
-                                         construct_k0s_ext_hosts_inv)
 from pve_cloud.lib.ssh import connect_host
+from pve_cloud.orm.alchemy import AcmeX509
+from pve_cloud_test.k8s_fixtures import (construct_k0s_ext_hosts_inv,
+                                         get_e2e_limit_feature,
+                                         get_kubespray_inv,
+                                         get_secondary_kubespray_inv)
 from pve_cloud_test.tdd_watchdog import get_ipv4
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session
@@ -503,7 +503,7 @@ def test_create_k0s_edge(request, get_test_env, setup_mirror_vm):
                 request,
                 k0s_inv,
                 "playbooks/install_k0s_edge.yaml",
-                extra_vars=extra_vars
+                extra_vars=extra_vars,
             ):
 
                 if request.config.getoption("--skip-cleanup"):
