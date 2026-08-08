@@ -444,4 +444,3 @@ def test_create_k0s_edge(request, get_test_env, setup_k0s_ext_vm):
 
                 with open(".test-k0s-kubeconfig.yaml", "w") as tk:
                     tk.write(stdout.read().decode("utf-8"))
-

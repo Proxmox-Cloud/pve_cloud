@@ -806,7 +806,6 @@ def setup_k0s_ext_vm(request, get_test_env, setup_mirror_vm):
                             },
                             # backup disk for backup daemon deployment test with ext hosts inv
                             {
-
                                 "size": "100G",
                                 "options": {
                                     "discard": "on",
@@ -815,7 +814,7 @@ def setup_k0s_ext_vm(request, get_test_env, setup_mirror_vm):
                                     "cache": "unsafe",
                                 },
                                 "pool": get_test_env["pve_vm_storage_id"],
-                            }
+                            },
                         ],
                         "parameters": {
                             "cores": 2,
