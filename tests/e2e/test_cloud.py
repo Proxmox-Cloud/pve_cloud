@@ -418,97 +418,30 @@ eviction_hard:
                 tk.write(get_ssh_master_kubeconfig(cluster_vars, "pytest-k8s"))
 
 
-def test_create_k0s_edge(request, get_test_env, setup_mirror_vm):
+# this is treated as an external host, we first create the qemu instance and then from
+# it builds an ext hosts inv treating the qemu like a remove non pxc machine
+# with this we test edge k0s, aswell as our backup daemon installation on a remote host
+def test_create_k0s_edge(request, get_test_env, setup_k0s_ext_vm):
     logger.info("test create k0s edge")
 
-    with tempfile.NamedTemporaryFile(
-        "w", suffix=".yaml", delete=False
-    ) as temp_qemu_inv:
-        yaml.dump(
-            {
-                "plugin": "pxc.cloud.qemu_inv",
-                "target_pve": get_test_env["pve_test_cluster_name"]
-                + "."
-                + get_test_env["cloud_inventory"]["pve_cloud_domain"],
-                "stack_name": "pytest-k0s-edge",
-                "qemu_base_parameters": {
-                    "cpu": "host",
-                    "net0": "virtio,bridge=vmbr0,firewall=1"
-                    + f"{get_test_env['net0_vlan_tag_rendered'] if 'net0_vlan_tag_rendered' in get_test_env else ''}",
-                    "sockets": 1,
-                },
-                "tcp_proxies": [],
-                "ingress_domains": [],
-                "static_includes": {
-                    "dhcp_stack": "ha-dhcp."
-                    + get_test_env["cloud_inventory"]["pve_cloud_domain"],
-                    "proxy_stack": "ha-haproxy."
-                    + get_test_env["cloud_inventory"]["pve_cloud_domain"],
-                    "postgres_stack": "ha-postgres."
-                    + get_test_env["cloud_inventory"]["pve_cloud_domain"],
-                    "bind_stack": "ha-bind."
-                    + get_test_env["cloud_inventory"]["pve_cloud_domain"],
-                },
-                "qemus": [
-                    {
-                        "hostname": "single",
-                        "disk": {
-                            "size": "75G",
-                            "options": {
-                                "discard": "on",
-                                "iothread": "on",
-                                "ssd": "on",
-                                "cache": "unsafe",
-                            },
-                            "pool": get_test_env["pve_vm_storage_id"],
-                        },
-                        "additional_disks": [
-                            {
-                                "size": "50G",
-                                "options": {
-                                    "discard": "on",
-                                    "iothread": "on",
-                                    "ssd": "on",
-                                    "cache": "unsafe",
-                                },
-                                "pool": get_test_env["pve_vm_storage_id"],
-                            }
-                        ],
-                        "parameters": {
-                            "cores": 2,
-                            "memory": 2048,
-                        },
-                    },
-                ],
-                "target_pve_hosts": list(get_test_env["pve_test_cluster_hosts"].keys()),
-                "root_ssh_pub_key": get_test_env["ssh_pub_key"],
-            },
-            temp_qemu_inv,
-        )
-        temp_qemu_inv.flush()
+    extra_vars = {}
+    tdd_ip = get_tdd_ip()
+    if tdd_ip:
+        extra_vars["test_repos_ip"] = tdd_ip
 
-        with run_playbook(
-            request,
-            temp_qemu_inv.name,
-            "playbooks/sync_qemus.yaml",
-            destroy_playbook="playbooks/destroy_qemus.yaml",
-        ):
-            extra_vars = {}
-            tdd_ip = get_tdd_ip()
-            if tdd_ip:
-                extra_vars["test_repos_ip"] = tdd_ip
+    # todo: this should probably be moved into the fixture
+    k0s_inv, k0s_host = construct_k0s_ext_hosts_inv(get_test_env)
+    with run_playbook(
+        request,
+        k0s_inv,
+        "playbooks/install_k0s_edge.yaml",
+        extra_vars=extra_vars,
+    ):
 
-            k0s_inv, k0s_host = construct_k0s_ext_hosts_inv(get_test_env)
-            with run_playbook(
-                request,
-                k0s_inv,
-                "playbooks/install_k0s_edge.yaml",
-                extra_vars=extra_vars,
-            ):
+        if request.config.getoption("--skip-cleanup"):
+            with connect_host(k0s_host, user="admin") as ssh:
+                _, stdout, _ = ssh.exec_command("sudo k0s kubeconfig admin")
 
-                if request.config.getoption("--skip-cleanup"):
-                    with connect_host(k0s_host, user="admin") as ssh:
-                        _, stdout, _ = ssh.exec_command("sudo k0s kubeconfig admin")
+                with open(".test-k0s-kubeconfig.yaml", "w") as tk:
+                    tk.write(stdout.read().decode("utf-8"))
 
-                        with open(".test-k0s-kubeconfig.yaml", "w") as tk:
-                            tk.write(stdout.read().decode("utf-8"))

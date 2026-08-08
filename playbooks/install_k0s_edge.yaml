@@ -63,6 +63,70 @@
         mode: "0440"
         validate: "visudo -cf %s"
 
+    - name: Slurp file if it exists
+      delegate_to: "{{ groups['target_pve'][0] }}"
+      slurp:
+        src: /etc/pve/cloud/secrets/patroni.pass
+      register: patroni_pass
+
+    - set_fact:
+        postgres_password: "{{ patroni_pass.content | b64decode | trim }}"
+
+    - set_fact:
+        pg_conn_str: "postgresql+psycopg2://postgres:{{ postgres_password }}@{{ pve_haproxy_floating_ip_internal }}:5000/pve_cloud?sslmode=disable"
+
+    # create ssh key for backup
+    - name: Read initially edge key if not created
+      delegate_to: pxc-executor-host
+      alchemy_read:
+        pg_conn_str: "{{ pg_conn_str }}"
+        table: px_cloud_secrets
+        where:
+          cloud_domain: "{{ pve_cloud_domain }}"
+          secret_name: "{{ stack_name }}.{{ pve_cloud_domain }}-k0s-edge-key"
+      register: k0s_edge_key
+
+    - name: create ssh backup access key
+      when: k0s_edge_key.rowcount == 0
+      block:
+        - name: Generate ed25519 SSH key
+          community.crypto.openssh_keypair:
+            path: "/home/{{ ansible_user }}/.ssh/id_ed25519"
+            type: ed25519
+            owner: "{{ ansible_user }}"
+            group: "{{ ansible_user }}"
+            mode: "0600"
+
+        - name: read the public key
+          ansible.builtin.slurp:
+            src: "/home/{{ ansible_user }}/.ssh/id_ed25519.pub"
+          register: public_key_raw
+
+        - name: trust the key
+          ansible.posix.authorized_key:
+            user: "{{ ansible_user }}"
+            key: "{{ public_key_raw.content | b64decode }}"
+            state: present
+
+        - name: read the private key
+          ansible.builtin.slurp:
+            src: "/home/{{ ansible_user }}/.ssh/id_ed25519"
+          register: private_key_raw
+
+        - name: write the key to pxc secrets
+          delegate_to: pxc-executor-host
+          alchemy_write:
+            pg_conn_str: "{{ pg_conn_str }}"
+            table: px_cloud_secrets
+            rows:
+              - cloud_domain: "{{ pve_cloud_domain }}"
+                secret_name: "{{ stack_name }}.{{ pve_cloud_domain }}-k0s-edge-key"
+                secret_type: "k0s-edge-backup-key"
+                secret_data:
+                  ssh_user: "{{ ansible_user }}"
+                  id_ed25519: "{{ private_key_raw.content | b64decode }}"
+                  id_ed25519.pub: "{{ public_key_raw.content | b64decode }}"
+
     - name: setup zfs + k8s pools
       include_role:
         name: pxc.cloud.setup_pxzfs_localpv_zpool
@@ -234,6 +298,12 @@
         cmd: k0s kubeconfig admin
       register: admin_kubeconfig
 
+    - name: wait for containerd to be up
+      ansible.builtin.wait_for:
+        path: /run/k0s/containerd.sock
+        state: present
+        timeout: 300
+
     - name: allow e2e unsafe registry
       when: test_repos_ip is defined
       block:
@@ -394,8 +464,9 @@
             .dockerconfigjson: "{{ harbor_mirror_secret.query_result[0]['secret_data']['dockerconfig'] | b64encode }}"
 
     - set_fact:
+        openebs_zfs_kubelet_dir: "/var/lib/k0s/kubelet/"
         pxzfs_storage_hosts:
-          - "{{ ansible_hostname }}"
+          - "{{ hostvars['k0s_single'].ansible_hostname }}"
 
     - name: deploy openebs localpv zfs chart
       kubernetes.core.helm:

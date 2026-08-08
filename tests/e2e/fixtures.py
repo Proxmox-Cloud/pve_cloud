@@ -745,3 +745,95 @@ def setup_mirror_vm(request, get_test_env, setup_haproxy_lxcs):
             destroy_playbook="playbooks/destroy_qemus.yaml",
         ):
             yield
+
+
+@cloud_fixture("k0s")
+def setup_k0s_ext_vm(request, get_test_env, setup_mirror_vm):
+    logger.info("create k0s edge vm (external)")
+
+    with tempfile.NamedTemporaryFile(
+        "w", suffix=".yaml", delete=False
+    ) as temp_qemu_inv:
+        yaml.dump(
+            {
+                "plugin": "pxc.cloud.qemu_inv",
+                "target_pve": get_test_env["pve_test_cluster_name"]
+                + "."
+                + get_test_env["cloud_inventory"]["pve_cloud_domain"],
+                "stack_name": "pytest-k0s-edge",
+                "qemu_base_parameters": {
+                    "cpu": "host",
+                    "net0": "virtio,bridge=vmbr0,firewall=1"
+                    + f"{get_test_env['net0_vlan_tag_rendered'] if 'net0_vlan_tag_rendered' in get_test_env else ''}",
+                    "sockets": 1,
+                },
+                "tcp_proxies": [],
+                "ingress_domains": [],
+                "static_includes": {
+                    "dhcp_stack": "ha-dhcp."
+                    + get_test_env["cloud_inventory"]["pve_cloud_domain"],
+                    "proxy_stack": "ha-haproxy."
+                    + get_test_env["cloud_inventory"]["pve_cloud_domain"],
+                    "postgres_stack": "ha-postgres."
+                    + get_test_env["cloud_inventory"]["pve_cloud_domain"],
+                    "bind_stack": "ha-bind."
+                    + get_test_env["cloud_inventory"]["pve_cloud_domain"],
+                },
+                "qemus": [
+                    {
+                        "hostname": "single",
+                        "disk": {
+                            "size": "75G",
+                            "options": {
+                                "discard": "on",
+                                "iothread": "on",
+                                "ssd": "on",
+                                "cache": "unsafe",
+                            },
+                            "pool": get_test_env["pve_vm_storage_id"],
+                        },
+                        "additional_disks": [
+                            # disk for local zfs
+                            {
+                                "size": "50G",
+                                "options": {
+                                    "discard": "on",
+                                    "iothread": "on",
+                                    "ssd": "on",
+                                    "cache": "unsafe",
+                                },
+                                "pool": get_test_env["pve_vm_storage_id"],
+                            },
+                            # backup disk for backup daemon deployment test with ext hosts inv
+                            {
+
+                                "size": "100G",
+                                "options": {
+                                    "discard": "on",
+                                    "iothread": "on",
+                                    "ssd": "on",
+                                    "cache": "unsafe",
+                                },
+                                "pool": get_test_env["pve_vm_storage_id"],
+                            }
+                        ],
+                        "parameters": {
+                            "cores": 2,
+                            "memory": 4096,
+                        },
+                    },
+                ],
+                "target_pve_hosts": list(get_test_env["pve_test_cluster_hosts"].keys()),
+                "root_ssh_pub_key": get_test_env["ssh_pub_key"],
+            },
+            temp_qemu_inv,
+        )
+        temp_qemu_inv.flush()
+
+        with run_playbook(
+            request,
+            temp_qemu_inv.name,
+            "playbooks/sync_qemus.yaml",
+            destroy_playbook="playbooks/destroy_qemus.yaml",
+        ):
+            yield

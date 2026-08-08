@@ -11,7 +11,8 @@ from pve_cloud_schemas.validate import (validate_cluster_vars,
 
 display = Display()
 
-
+# this is used to deploy pxc functionality on hosts that have not been initialized by the collection
+# / are outside of a proxmox cluster, for example edge k0s systems / backup servers
 class InventoryModule(BaseInventoryPlugin):
 
     def verify_file(self, path):
@@ -67,6 +68,8 @@ class InventoryModule(BaseInventoryPlugin):
                 )
 
             build_pve_inventory(inventory, yaml_data, online_pve_hosts, cluster_map)
+
+            inventory.set_variable("all", "stack_name", yaml_data["external_stack_name"])
 
             for host_group, hosts in yaml_data["host_groups"].items():
                 inventory.add_group(host_group)

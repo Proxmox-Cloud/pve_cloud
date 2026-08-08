@@ -80,6 +80,8 @@ class InventoryModule(BaseInventoryPlugin):
 
             blake = stack_vm_get_blake(vm)
 
+            display.v("blake found", blake)
+
             # check if we can match the id to our inventory file
             if blake in vm_params_blake:
                 # also include self reference to vm creation parameters as variables to use in playbooks
@@ -88,7 +90,8 @@ class InventoryModule(BaseInventoryPlugin):
                 )
 
                 # set specialized variables if defined
-                if "vars" in vm_params_blake:
+                if "vars" in vm_params_blake[blake]:
+                    display.v("vm vars found", vm_params_blake[blake]["vars"])
                     # set vars für container specific tasks
                     for key, var in vm_params_blake[blake]["vars"].items():
                         inventory.set_variable(hostname, key, var)

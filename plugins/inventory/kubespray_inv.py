@@ -154,7 +154,7 @@ class InventoryModule(BaseInventoryPlugin):
                 )
 
                 # set specialized variables if defined
-                if "vars" in vm_params_blake:
+                if "vars" in vm_params_blake[blake]:
                     # set vars für container specific tasks
                     for key, var in vm_params_blake[blake]["vars"].items():
                         inventory.set_variable(hostname, key, var)

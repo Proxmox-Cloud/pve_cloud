@@ -3,14 +3,17 @@
   roles:
     - slurp_cluster_secrets
 
+- name: Gather server facts
+  hosts: qemus:bdd_server
+
 - name: Create tls px_cloud_secrets
   hosts: pxc-executor-host
   roles:
     - parse_cluster_secrets
     - bdd_server_tls_certs
 
-- name: Install requirements on debian 12 lxc/vm
-  hosts: lxcs:qemus
+- name: Install requirements on vm / ext host
+  hosts: qemus:bdd_server
   become: true
   vars:
     # increment this on releasing a new pve-cloud-backup version
@@ -18,6 +21,11 @@
   roles:
     - parse_cluster_secrets
   tasks:
+    - name: validate schema bdd setup hostvars
+      ansible.utils.validate:
+        criteria: "{{ lookup('ansible.builtin.file', 'files/bdd_server_hostvars_schema.yaml') | from_yaml }}"
+        data: "{{ hostvars[inventory_hostname] }}"
+
     - name: install core apt packages
       ansible.builtin.apt:
         name: 
@@ -25,7 +33,25 @@
           - borgbackup
         state: present
         update_cache: yes
-        
+
+    - name: setup backup zfs pool
+      when: zpool_backup_parameters is defined
+      include_role:
+        name: pxc.cloud.setup_pxzfs_localpv_zpool
+      vars:
+        zpool_vdevs: "{{ zpool_backup_parameters['vdevs'] }}"
+        zpool_properties: "{{ zpool_backup_parameters['pool_properties'] }}"
+        zpool_name: "tank-bdd"
+
+    - name: generify root backup pool mount
+      when: zpool_backup_parameters is defined
+      become: true
+      community.general.zfs:
+        name: "tank-bdd"
+        state: present
+        extra_zfs_properties:
+          mountpoint: "/mnt/bdd-zfs-data"
+
     - name: install systemd prom exporter
       include_role:
         name: prometheus.prometheus.systemd_exporter
@@ -48,7 +74,7 @@
         table: px_cloud_secrets
         where:
           cloud_domain: "{{ pve_cloud_domain }}"
-          secret_name: "{{ stack_name }}-bdd-tls-certs"
+          secret_name: "{{ stack_name }}-bdd-tls-discovery"
       delegate_to: "pxc-executor-host"
       register: fetched_bdd_tls
 
@@ -60,14 +86,6 @@
       loop: "{{ fetched_bdd_tls.query_result[0].secret_data | dict2items }}"
       loop_control:
         label: "{{ item.key }}"
-
-    - name: Create borg home for backup user
-      file:
-        path: /srv/backup/borg
-        state: directory
-        owner: backup
-        group: backup
-      when: PXC_REMOVABLE_DATASTORES is defined # bdd is running on pbs
 
     - name: Create Python virtual environment in /opt/bdd/.venv
       ansible.builtin.command:
@@ -89,10 +107,21 @@
         cmd: /opt/bdd/.venv/bin/pip install --index-url http://{{ tdd_local_pypi_host }}:8088/simple --trusted-host {{ tdd_local_pypi_host }} py-pve-cloud-backup=={{ py_pve_cloud_backup_version }}
       when: tdd_local_pypi_host is defined
 
+    - name: create sub pool on use existing
+      when: use_existing_zpool is defined
+      become: true
+      community.general.zfs:
+        name: "{{ use_existing_zpool['pool_name'] }}/sub-bdd"
+        state: present
+        extra_zfs_properties:
+          mountpoint: "/mnt/bdd-zfs-data"
+
     - name: Create a systemd service file
       template:
         dest: "/etc/systemd/system/bdd.service"
         src: ./bdd.service.j2
+      vars:
+        zfs_pool_base: "{{ use_existing_zpool['pool_name'] ~ '/sub-bdd' if use_existing_zpool is defined else 'tank-bdd' }}"
 
     - name: Reload systemd daemon
       command: systemctl daemon-reload
@@ -116,7 +145,7 @@
         src: ./bdd-cron.service.j2
       vars:
         verify_data: false
-    
+
     - name: create bdd weekly timer
       template:
         dest: "/etc/systemd/system/bdd-cron.timer"
@@ -132,7 +161,7 @@
         src: ./bdd-cron.service.j2
       vars:
         verify_data: true
-    
+
     - name: create bdd monthly timer
       template:
         dest: "/etc/systemd/system/bdd-cron-monthly.timer"
@@ -140,7 +169,7 @@
       vars:
         verify_data: true
         # run on the first tuesday of the month
-        # this includes borg --verify-data option 
+        # this includes borg --verify-data option
         # which will result in longer runtime
         timer_pattern: "Mon *-*-01..07 03:00:00"
 

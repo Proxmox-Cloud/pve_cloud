@@ -1,0 +1,44 @@
+type: object
+description: "Bdd server hostvars schema"
+additionalProperties: true
+properties:
+  # todo: make required one of them and not more
+  use_existing_zpool:
+    type: object
+    description: |
+      When this is specified the backup server will use the existing pool and create its own sub dataset for storing backups at
+      $EXISTING_POOL/sub-bdd.
+    required:
+      - pool_name
+    properties:
+      pool_name:
+        type: string
+        description: "Name of the existing zpool to use."
+  zpool_backup_parameters:
+    type: object
+    description: |
+      Check pxc.cloud.kubespray_inv schema for detailed descriptions of these parameters. The playbook will create the core
+      pool named tank-bdd and will create a sub dataset for any stack that send backups to it.
+    additionalProperties: false
+    required:
+      - pool_properties
+      - vdevs
+    properties:
+      pool_properties:
+        type: object
+      vdevs:
+        type: array
+        items:
+          type: object
+          additionalProperties: false
+          required:
+            - disks
+          properties:
+            disks:
+              type: array
+              items:
+                type: string
+            role:
+              type: string
+            type:
+              type: string

@@ -57,6 +57,7 @@ zfs-localpv:
       registry: "{{ mirror_repo_host }}/"
       repository: cloud-mirror/docker.io/openebs/zfs-driver
   zfsNode:
+    kubeletDir: "{{ openebs_zfs_kubelet_dir }}"
     driverRegistrar:
       image:
         registry: "{{ mirror_repo_host }}/"

@@ -44,7 +44,7 @@
   # experimental fork of community.general.zpool with fixxed for /dev/disk/by-id definition
   # of disks
   pxc.cloud.zpool:
-    name: tank-pv
+    name: "{{ zpool_name }}"
     vdevs: "{{ zpool_vdevs }}"
     pool_properties: "{{ zpool_properties }}"
     force: "{{ zpool_create_force }}"

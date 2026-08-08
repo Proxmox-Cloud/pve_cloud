@@ -6,7 +6,7 @@
     table: px_cloud_secrets
     where:
       cloud_domain: "{{ pve_cloud_domain }}"
-      secret_name: "{{ stack_name }}-bdd-tls-certs"
+      secret_name: "{{ stack_name }}-bdd-tls-discovery"
   register: fetched_bdd_tls
 
 - debug:
@@ -51,9 +51,10 @@
       common_name: "{{ ansible_hostname }}.{{ pve_cloud_domain }}"
       use_common_name_for_san: false
       subject_alt_name:
-        - "DNS:{{ ansible_hostname }}.{{ pve_cloud_domain }}"
+        - "DNS:{{ hostvars[(groups['qemus'][0] if 'qemus' in groups else 'bdd_server')].ansible_hostname }}.{{ pve_cloud_domain }}"
+        - "DNS:{{ hostvars[(groups['qemus'][0] if 'qemus' in groups else 'bdd_server')].ansible_hostname }}"
         - "DNS:*.{{ pve_cloud_domain }}"
-        - "DNS:{{ ansible_default_ipv4.address }}"
+        - "IP:{{ hostvars[(groups['qemus'][0] if 'qemus' in groups else 'bdd_server')].ansible_default_ipv4.address }}"
     register: server_csr
 
   - name: sign server certificate with ca
@@ -69,8 +70,12 @@
     set_fact:
       bdd_tls_row:
         cloud_domain: "{{ pve_cloud_domain }}"
-        secret_name: "{{ stack_name }}-bdd-tls-certs"
+        secret_name: "{{ stack_name }}-bdd-tls-discovery"
+        secret_type: "bdd-discovery"
         secret_data:
+          server_int_ip: "{{ hostvars[(groups['qemus'][0] if 'qemus' in groups else 'bdd_server')].ansible_default_ipv4.address }}"
+          # discovery via ddns
+          server_hostname: "{{ hostvars[(groups['qemus'][0] if 'qemus' in groups else 'bdd_server')].ansible_hostname }}"
           ca_cert.crt: "{{ ca_cert.certificate }}"
           ca_private_key.key: "{{ ca_privatekey.privatekey }}"
           server_cert.crt: "{{ server_cert.certificate }}"

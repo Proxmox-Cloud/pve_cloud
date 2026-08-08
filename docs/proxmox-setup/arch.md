@@ -62,6 +62,16 @@ Additionally you can create seperate networks for corosync and vm migration.
 
 ## Backups
 
-For backups of vms use the normal proxmox backup server, for kuberentes there is a custom [proxmox cloud backup solution](https://registry.terraform.io/modules/Proxmox-Cloud/backup/pxc/latest). 
+For backups of vms use the normal proxmox backup server, for kuberentes there is a custom [proxmox cloud backup solution](https://registry.terraform.io/modules/Proxmox-Cloud/backup/pxc/latest), that works in conjunction with the `pxc.cloud.setup_backup_daemon` playbook. 
 
-With these two backup systems you can also migrate any workload/project accross systems using proxmox cloud.
+For kubernetes we support zfs / ceph csi drivers and currently support the following scenarios:
+
+* Sending backups to proxmox backup server, that has a zfs backing it
+* Using a proxmox vm + dedicated disk(s) passthrough, that will be initialized with zfs
+* Sending backups to any debian / apt based machine with a dedicated disk (zfs) for backup storage
+
+As you can see zfs is the backbone of our backup storage and also extends into kubernetes scenarios where ceph is not available for volumes. Proper backups happen at the block device level, this is why we exclusively built on zfs zvols and ceph rbd images.
+
+Our multicloud gateway also supports sending backups to backup daemon servers in an other cloud using the gateway as a proxy / auth mechanism.
+
+Restoring also works seemless as we backup entire block devices from snapshots only, that can be restored from ceph to zfs and vice versa.
