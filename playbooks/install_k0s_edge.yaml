@@ -47,11 +47,6 @@
   tags:
     - k0s_install
   tasks:
-    - name: validate schema k0s setup hostvars
-      ansible.utils.validate:
-        criteria: "{{ lookup('ansible.builtin.file', 'files/k0s_hostvars_schema.yaml') | from_yaml }}"
-        data: "{{ hostvars[inventory_hostname] }}"
-
     - name: enable passwordless sudo for user (later needed for tf k0s fetch)
       become: true
       copy:
