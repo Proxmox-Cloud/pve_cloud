@@ -16,7 +16,7 @@
 | - [lxcs](#lxcs )                       | No      | array  | No         | -          | List of lxcs that will be created for the stack.                                                                                                        |
 | - [lxc_global_vars](#lxc_global_vars ) | No      | object | No         | -          | -                                                                                                                                                       |
 
-## <a name="static_includes"></a>82. Property `HAProxy Inventory > static_includes`
+## <a name="static_includes"></a>84. Property `HAProxy Inventory > static_includes`
 
 |                           |             |
 | ------------------------- | ----------- |
@@ -30,7 +30,7 @@
 | ---------------------------------------------------- | ------- | ------ | ---------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | + [postgres_stack](#static_includes_postgres_stack ) | No      | string | No         | -          | Stack fqdn for postgres patroni stack. On the presence of the host the playbook will fetch<br />proxy configuration from the database. This is needed so that after the initial setup everything<br />still works.<br /> |
 
-### <a name="static_includes_postgres_stack"></a>82.1. Property `HAProxy Inventory > static_includes > postgres_stack`
+### <a name="static_includes_postgres_stack"></a>84.1. Property `HAProxy Inventory > static_includes > postgres_stack`
 
 |              |          |
 | ------------ | -------- |
@@ -47,7 +47,7 @@ still works.
 "patroni.your-cloud.domain"
 ```
 
-## <a name="lxcs"></a>83. Property `HAProxy Inventory > lxcs`
+## <a name="lxcs"></a>85. Property `HAProxy Inventory > lxcs`
 
 |              |         |
 | ------------ | ------- |
@@ -68,7 +68,7 @@ still works.
 | ------------------------------- | ----------- |
 | [lxcs items](#lxcs_items)       | -           |
 
-### <a name="lxcs_items"></a>83.1. HAProxy Inventory > lxcs > lxcs items
+### <a name="lxcs_items"></a>85.1. HAProxy Inventory > lxcs > lxcs items
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -80,7 +80,7 @@ still works.
 | --------------------------- | ------- | ------ | ---------- | ---------- | ----------------------------------------------------------------------------------------- |
 | + [vars](#lxcs_items_vars ) | No      | object | No         | -          | Our proxy stack needs to know which lxc is the keepalived master and who is the failover. |
 
-#### <a name="lxcs_items_vars"></a>83.1.1. Property `HAProxy Inventory > lxcs > lxcs items > vars`
+#### <a name="lxcs_items_vars"></a>85.1.1. Property `HAProxy Inventory > lxcs > lxcs items > vars`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -94,7 +94,7 @@ still works.
 | ---------------------------------------------------------- | ------- | ------- | ---------- | ---------- | -------------------------------------------------------- |
 | + [keepalived_master](#lxcs_items_vars_keepalived_master ) | No      | boolean | No         | -          | One LXC should have this set to true the other to false. |
 
-##### <a name="lxcs_items_vars_keepalived_master"></a>83.1.1.1. Property `HAProxy Inventory > lxcs > lxcs items > vars > keepalived_master`
+##### <a name="lxcs_items_vars_keepalived_master"></a>85.1.1.1. Property `HAProxy Inventory > lxcs > lxcs items > vars > keepalived_master`
 
 |              |           |
 | ------------ | --------- |
@@ -103,7 +103,7 @@ still works.
 
 **Description:** One LXC should have this set to true the other to false.
 
-## <a name="lxc_global_vars"></a>84. Property `HAProxy Inventory > lxc_global_vars`
+## <a name="lxc_global_vars"></a>86. Property `HAProxy Inventory > lxc_global_vars`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -115,7 +115,7 @@ still works.
 | ------------------------------------------------------------------------ | ------- | ------ | ---------- | ---------- | -------------------------------------------------------------------------------------------------- |
 | - [haproxy_defaults_section](#lxc_global_vars_haproxy_defaults_section ) | No      | string | No         | -          | Multiline default content to append the defauls block. Use this to overwrite timeouts for example. |
 
-### <a name="lxc_global_vars_haproxy_defaults_section"></a>84.1. Property `HAProxy Inventory > lxc_global_vars > haproxy_defaults_section`
+### <a name="lxc_global_vars_haproxy_defaults_section"></a>86.1. Property `HAProxy Inventory > lxc_global_vars > haproxy_defaults_section`
 
 |              |          |
 | ------------ | -------- |

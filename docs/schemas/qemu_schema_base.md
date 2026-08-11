@@ -30,7 +30,7 @@
 | - [qemu_global_vars](#qemu_global_vars )         | No      | object           | No         | -          | Variables that will be applied set for all qemus vms.                                                                                                                                                  |
 | - [plugin](#plugin )                             | No      | enum (of string) | No         | -          | Id of ansible inventory plugin                                                                                                                                                                         |
 
-## <a name="target_pve"></a>22. Property `VM Base Inventory > target_pve`
+## <a name="target_pve"></a>24. Property `VM Base Inventory > target_pve`
 
 |              |          |
 | ------------ | -------- |
@@ -45,7 +45,7 @@
 "proxmox-cluster-a.your-cloud.domain"
 ```
 
-## <a name="stack_name"></a>23. Property `VM Base Inventory > stack_name`
+## <a name="stack_name"></a>25. Property `VM Base Inventory > stack_name`
 
 |              |          |
 | ------------ | -------- |
@@ -54,7 +54,7 @@
 
 **Description:** Your stack name, needs to be unique within the cloud domain.
 
-## <a name="static_includes"></a>24. Property `VM Base Inventory > static_includes`
+## <a name="static_includes"></a>26. Property `VM Base Inventory > static_includes`
 
 |                           |             |
 | ------------------------- | ----------- |
@@ -71,7 +71,7 @@
 | - [postgres_stack](#static_includes_postgres_stack ) | No      | string | No         | -          | The playbook needs the pve cloud postgres stack where state and general configuration is stored.                                                  |
 | - [bind_stack](#static_includes_bind_stack )         | No      | string | No         | -          | The playbook needs the bind stack to register the general masters recordset and for creating authoritative zones defined in cluster_cert_entries. |
 
-### <a name="static_includes_dhcp_stack"></a>24.1. Property `VM Base Inventory > static_includes > dhcp_stack`
+### <a name="static_includes_dhcp_stack"></a>26.1. Property `VM Base Inventory > static_includes > dhcp_stack`
 
 |              |          |
 | ------------ | -------- |
@@ -86,7 +86,7 @@
 "dhcp.your-cloud.domain"
 ```
 
-### <a name="static_includes_proxy_stack"></a>24.2. Property `VM Base Inventory > static_includes > proxy_stack`
+### <a name="static_includes_proxy_stack"></a>26.2. Property `VM Base Inventory > static_includes > proxy_stack`
 
 |              |          |
 | ------------ | -------- |
@@ -101,7 +101,7 @@
 "proxy.your-cloud.domain"
 ```
 
-### <a name="static_includes_postgres_stack"></a>24.3. Property `VM Base Inventory > static_includes > postgres_stack`
+### <a name="static_includes_postgres_stack"></a>26.3. Property `VM Base Inventory > static_includes > postgres_stack`
 
 |              |          |
 | ------------ | -------- |
@@ -116,7 +116,7 @@
 "patroni.your-cloud.domain"
 ```
 
-### <a name="static_includes_bind_stack"></a>24.4. Property `VM Base Inventory > static_includes > bind_stack`
+### <a name="static_includes_bind_stack"></a>26.4. Property `VM Base Inventory > static_includes > bind_stack`
 
 |              |          |
 | ------------ | -------- |
@@ -131,7 +131,7 @@
 "bind.your-cloud.domain"
 ```
 
-## <a name="include_stacks"></a>25. Property `VM Base Inventory > include_stacks`
+## <a name="include_stacks"></a>27. Property `VM Base Inventory > include_stacks`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -152,7 +152,7 @@
 | --------------------------------------------- | ----------- |
 | [include_stacks items](#include_stacks_items) | -           |
 
-### <a name="include_stacks_items"></a>25.1. VM Base Inventory > include_stacks > include_stacks items
+### <a name="include_stacks_items"></a>27.1. VM Base Inventory > include_stacks > include_stacks items
 
 |                           |             |
 | ------------------------- | ----------- |
@@ -166,7 +166,7 @@
 | + [host_group](#include_stacks_items_host_group )               | No      | string | No         | -          | This is the name of the hosts group of our ansible inventory the included vms/lxcs will be available under.                                                                                                                        |
 | - [qemu_ansible_user](#include_stacks_items_qemu_ansible_user ) | No      | string | No         | -          | User ansible will use to connect, defaults to admin. If you dont want to use debian cinit images you might need to set something else than admin.<br />Ubuntu for example wont work if you set the cloud init user to admin.<br /> |
 
-#### <a name="include_stacks_items_stack_fqdn"></a>25.1.1. Property `VM Base Inventory > include_stacks > include_stacks items > stack_fqdn`
+#### <a name="include_stacks_items_stack_fqdn"></a>27.1.1. Property `VM Base Inventory > include_stacks > include_stacks items > stack_fqdn`
 
 |              |          |
 | ------------ | -------- |
@@ -185,7 +185,7 @@
 "other-k8s.your-other-cloud.domain"
 ```
 
-#### <a name="include_stacks_items_host_group"></a>25.1.2. Property `VM Base Inventory > include_stacks > include_stacks items > host_group`
+#### <a name="include_stacks_items_host_group"></a>27.1.2. Property `VM Base Inventory > include_stacks > include_stacks items > host_group`
 
 |              |          |
 | ------------ | -------- |
@@ -194,7 +194,7 @@
 
 **Description:** This is the name of the hosts group of our ansible inventory the included vms/lxcs will be available under.
 
-#### <a name="include_stacks_items_qemu_ansible_user"></a>25.1.3. Property `VM Base Inventory > include_stacks > include_stacks items > qemu_ansible_user`
+#### <a name="include_stacks_items_qemu_ansible_user"></a>27.1.3. Property `VM Base Inventory > include_stacks > include_stacks items > qemu_ansible_user`
 
 |              |          |
 | ------------ | -------- |
@@ -204,7 +204,7 @@
 **Description:** User ansible will use to connect, defaults to admin. If you dont want to use debian cinit images you might need to set something else than admin.
 Ubuntu for example wont work if you set the cloud init user to admin.
 
-## <a name="root_ssh_pub_key"></a>26. Property `VM Base Inventory > root_ssh_pub_key`
+## <a name="root_ssh_pub_key"></a>28. Property `VM Base Inventory > root_ssh_pub_key`
 
 |              |          |
 | ------------ | -------- |
@@ -213,7 +213,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** trusted root key for the cloud init image.
 
-## <a name="pve_ha_group"></a>27. Property `VM Base Inventory > pve_ha_group`
+## <a name="pve_ha_group"></a>29. Property `VM Base Inventory > pve_ha_group`
 
 |              |          |
 | ------------ | -------- |
@@ -222,7 +222,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** PVE HA group this vm should be assigned to (optional).
 
-## <a name="target_pve_hosts"></a>28. Property `VM Base Inventory > target_pve_hosts`
+## <a name="target_pve_hosts"></a>30. Property `VM Base Inventory > target_pve_hosts`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -243,7 +243,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 | ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
 | [target_pve_hosts items](#target_pve_hosts_items) | The hostname of the proxmox host. Just the hostname, no cluster name or cloud domain should be specified, as they are implicit. |
 
-### <a name="target_pve_hosts_items"></a>28.1. VM Base Inventory > target_pve_hosts > target_pve_hosts items
+### <a name="target_pve_hosts_items"></a>30.1. VM Base Inventory > target_pve_hosts > target_pve_hosts items
 
 |              |          |
 | ------------ | -------- |
@@ -258,7 +258,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 "proxmox-host-a"
 ```
 
-## <a name="qemus"></a>29. Property `VM Base Inventory > qemus`
+## <a name="qemus"></a>31. Property `VM Base Inventory > qemus`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -279,7 +279,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 | ------------------------------- | ----------- |
 | [qemus items](#qemus_items)     | -           |
 
-### <a name="qemus_items"></a>29.1. VM Base Inventory > qemus > qemus items
+### <a name="qemus_items"></a>31.1. VM Base Inventory > qemus > qemus items
 
 |                           |             |
 | ------------------------- | ----------- |
@@ -297,7 +297,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 | + [disk](#qemus_items_disk )                         | No      | object          | No         | -          | -                                                                                                                                                                       |
 | - [additional_disks](#qemus_items_additional_disks ) | No      | array of object | No         | -          | Identical schema in array form to the main disk property.                                                                                                               |
 
-#### <a name="qemus_items_hostname"></a>29.1.1. Property `VM Base Inventory > qemus > qemus items > hostname`
+#### <a name="qemus_items_hostname"></a>31.1.1. Property `VM Base Inventory > qemus > qemus items > hostname`
 
 |              |          |
 | ------------ | -------- |
@@ -306,7 +306,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** Optional unique hostname for this node, otherwise pet name random name will be generated.
 
-#### <a name="qemus_items_vars"></a>29.1.2. Property `VM Base Inventory > qemus > qemus items > vars`
+#### <a name="qemus_items_vars"></a>31.1.2. Property `VM Base Inventory > qemus > qemus items > vars`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -316,7 +316,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** Custom variables for this node specifically, might be useful in your own custom playbooks.
 
-#### <a name="qemus_items_target_host"></a>29.1.3. Property `VM Base Inventory > qemus > qemus items > target_host`
+#### <a name="qemus_items_target_host"></a>31.1.3. Property `VM Base Inventory > qemus > qemus items > target_host`
 
 |              |          |
 | ------------ | -------- |
@@ -331,7 +331,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 "proxmox-host-B.proxmox-cluster-A"
 ```
 
-#### <a name="qemus_items_parameters"></a>29.1.4. Property `VM Base Inventory > qemus > qemus items > parameters`
+#### <a name="qemus_items_parameters"></a>31.1.4. Property `VM Base Inventory > qemus > qemus items > parameters`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -350,7 +350,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 }
 ```
 
-#### <a name="qemus_items_network_config"></a>29.1.5. Property `VM Base Inventory > qemus > qemus items > network_config`
+#### <a name="qemus_items_network_config"></a>31.1.5. Property `VM Base Inventory > qemus > qemus items > network_config`
 
 |              |          |
 | ------------ | -------- |
@@ -359,7 +359,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** Cinit network config yaml string. Will be the last cfg piece that gets merged into the final cloudinit network config. Can be used for overrides.
 
-#### <a name="qemus_items_disk"></a>29.1.6. Property `VM Base Inventory > qemus > qemus items > disk`
+#### <a name="qemus_items_disk"></a>31.1.6. Property `VM Base Inventory > qemus > qemus items > disk`
 
 |                           |             |
 | ------------------------- | ----------- |
@@ -373,7 +373,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 | + [options](#qemus_items_disk_options ) | No      | object | No         | -          | Mount options                                         |
 | + [pool](#qemus_items_disk_pool )       | No      | string | No         | -          | Proxmox storage name the vms disk will be created in. |
 
-##### <a name="qemus_items_disk_size"></a>29.1.6.1. Property `VM Base Inventory > qemus > qemus items > disk > size`
+##### <a name="qemus_items_disk_size"></a>31.1.6.1. Property `VM Base Inventory > qemus > qemus items > disk > size`
 
 |              |          |
 | ------------ | -------- |
@@ -388,7 +388,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 "25G"
 ```
 
-##### <a name="qemus_items_disk_options"></a>29.1.6.2. Property `VM Base Inventory > qemus > qemus items > disk > options`
+##### <a name="qemus_items_disk_options"></a>31.1.6.2. Property `VM Base Inventory > qemus > qemus items > disk > options`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -398,7 +398,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** Mount options
 
-##### <a name="qemus_items_disk_pool"></a>29.1.6.3. Property `VM Base Inventory > qemus > qemus items > disk > pool`
+##### <a name="qemus_items_disk_pool"></a>31.1.6.3. Property `VM Base Inventory > qemus > qemus items > disk > pool`
 
 |              |          |
 | ------------ | -------- |
@@ -407,7 +407,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** Proxmox storage name the vms disk will be created in.
 
-#### <a name="qemus_items_additional_disks"></a>29.1.7. Property `VM Base Inventory > qemus > qemus items > additional_disks`
+#### <a name="qemus_items_additional_disks"></a>31.1.7. Property `VM Base Inventory > qemus > qemus items > additional_disks`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -428,7 +428,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 | ------------------------------------------------------------- | ----------- |
 | [additional_disks items](#qemus_items_additional_disks_items) | -           |
 
-##### <a name="qemus_items_additional_disks_items"></a>29.1.7.1. VM Base Inventory > qemus > qemus items > additional_disks > additional_disks items
+##### <a name="qemus_items_additional_disks_items"></a>31.1.7.1. VM Base Inventory > qemus > qemus items > additional_disks > additional_disks items
 
 |                           |             |
 | ------------------------- | ----------- |
@@ -442,7 +442,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 | + [options](#qemus_items_additional_disks_items_options ) | No      | object | No         | -          | -                                                 |
 | + [pool](#qemus_items_additional_disks_items_pool )       | No      | string | No         | -          | -                                                 |
 
-###### <a name="qemus_items_additional_disks_items_size"></a>29.1.7.1.1. Property `VM Base Inventory > qemus > qemus items > additional_disks > additional_disks items > size`
+###### <a name="qemus_items_additional_disks_items_size"></a>31.1.7.1.1. Property `VM Base Inventory > qemus > qemus items > additional_disks > additional_disks items > size`
 
 |              |          |
 | ------------ | -------- |
@@ -461,7 +461,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 | --------------------------------- | ------------------------------------------------------------------------------------ |
 | **Must match regular expression** | ```^\d+G$``` [Test](https://regex101.com/?regex=%5E%5Cd%2BG%24&testString=%2225G%22) |
 
-###### <a name="qemus_items_additional_disks_items_options"></a>29.1.7.1.2. Property `VM Base Inventory > qemus > qemus items > additional_disks > additional_disks items > options`
+###### <a name="qemus_items_additional_disks_items_options"></a>31.1.7.1.2. Property `VM Base Inventory > qemus > qemus items > additional_disks > additional_disks items > options`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -469,14 +469,14 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 | **Required**              | Yes              |
 | **Additional properties** | Any type allowed |
 
-###### <a name="qemus_items_additional_disks_items_pool"></a>29.1.7.1.3. Property `VM Base Inventory > qemus > qemus items > additional_disks > additional_disks items > pool`
+###### <a name="qemus_items_additional_disks_items_pool"></a>31.1.7.1.3. Property `VM Base Inventory > qemus > qemus items > additional_disks > additional_disks items > pool`
 
 |              |          |
 | ------------ | -------- |
 | **Type**     | `string` |
 | **Required** | Yes      |
 
-## <a name="tcp_proxies"></a>30. Property `VM Base Inventory > tcp_proxies`
+## <a name="tcp_proxies"></a>32. Property `VM Base Inventory > tcp_proxies`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -497,7 +497,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 | --------------------------------------- | ----------- |
 | [tcp_proxies items](#tcp_proxies_items) | -           |
 
-### <a name="tcp_proxies_items"></a>30.1. VM Base Inventory > tcp_proxies > tcp_proxies items
+### <a name="tcp_proxies_items"></a>32.1. VM Base Inventory > tcp_proxies > tcp_proxies items
 
 |                           |             |
 | ------------------------- | ----------- |
@@ -513,7 +513,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 | - [proxy_snippet](#tcp_proxies_items_proxy_snippet ) | No      | string  | No         | -          | Additional snippet that will be inserted into the haproxy listen block. Can be used to adjust the forwards settings. |
 | - [external](#tcp_proxies_items_external )           | No      | boolean | No         | -          | Will also create a forward on the external floating ip of the proxy not only the internal.                           |
 
-#### <a name="tcp_proxies_items_proxy_name"></a>30.1.1. Property `VM Base Inventory > tcp_proxies > tcp_proxies items > proxy_name`
+#### <a name="tcp_proxies_items_proxy_name"></a>32.1.1. Property `VM Base Inventory > tcp_proxies > tcp_proxies items > proxy_name`
 
 |              |          |
 | ------------ | -------- |
@@ -532,7 +532,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 "example-postgres"
 ```
 
-#### <a name="tcp_proxies_items_haproxy_port"></a>30.1.2. Property `VM Base Inventory > tcp_proxies > tcp_proxies items > haproxy_port`
+#### <a name="tcp_proxies_items_haproxy_port"></a>32.1.2. Property `VM Base Inventory > tcp_proxies > tcp_proxies items > haproxy_port`
 
 |              |          |
 | ------------ | -------- |
@@ -541,7 +541,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** Frontend port of the proxmox clusters haproxy.
 
-#### <a name="tcp_proxies_items_node_port"></a>30.1.3. Property `VM Base Inventory > tcp_proxies > tcp_proxies items > node_port`
+#### <a name="tcp_proxies_items_node_port"></a>32.1.3. Property `VM Base Inventory > tcp_proxies > tcp_proxies items > node_port`
 
 |              |          |
 | ------------ | -------- |
@@ -550,7 +550,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** Nodeport of the k8s service.
 
-#### <a name="tcp_proxies_items_proxy_snippet"></a>30.1.4. Property `VM Base Inventory > tcp_proxies > tcp_proxies items > proxy_snippet`
+#### <a name="tcp_proxies_items_proxy_snippet"></a>32.1.4. Property `VM Base Inventory > tcp_proxies > tcp_proxies items > proxy_snippet`
 
 |              |          |
 | ------------ | -------- |
@@ -565,7 +565,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 "# long running tcp connections that only rarely transmit data\n# ssh client connection for example\ntimeout client 1h \ntimeout server 1h \n"
 ```
 
-#### <a name="tcp_proxies_items_external"></a>30.1.5. Property `VM Base Inventory > tcp_proxies > tcp_proxies items > external`
+#### <a name="tcp_proxies_items_external"></a>32.1.5. Property `VM Base Inventory > tcp_proxies > tcp_proxies items > external`
 
 |              |           |
 | ------------ | --------- |
@@ -574,7 +574,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** Will also create a forward on the external floating ip of the proxy not only the internal.
 
-## <a name="qemu_default_user"></a>31. Property `VM Base Inventory > qemu_default_user`
+## <a name="qemu_default_user"></a>33. Property `VM Base Inventory > qemu_default_user`
 
 |              |          |
 | ------------ | -------- |
@@ -583,7 +583,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** User for cinit.
 
-## <a name="qemu_hashed_pw"></a>32. Property `VM Base Inventory > qemu_hashed_pw`
+## <a name="qemu_hashed_pw"></a>34. Property `VM Base Inventory > qemu_hashed_pw`
 
 |              |          |
 | ------------ | -------- |
@@ -592,7 +592,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** Pw for default user defaults to hashed 'password' for debian cloud init image. Different cloud init images require different hash methods. You cannot use the same from debian for ubuntu for example.
 
-## <a name="qemu_base_parameters"></a>33. Property `VM Base Inventory > qemu_base_parameters`
+## <a name="qemu_base_parameters"></a>35. Property `VM Base Inventory > qemu_base_parameters`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -602,7 +602,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** Base parameters applied to all qemus. passed to the proxmox qm cli tool for creating vm.
 
-## <a name="qemu_image_url"></a>34. Property `VM Base Inventory > qemu_image_url`
+## <a name="qemu_image_url"></a>36. Property `VM Base Inventory > qemu_image_url`
 
 |              |          |
 | ------------ | -------- |
@@ -611,7 +611,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** http(s) download link for cloud init image.
 
-## <a name="qemu_keyboard_layout"></a>35. Property `VM Base Inventory > qemu_keyboard_layout`
+## <a name="qemu_keyboard_layout"></a>37. Property `VM Base Inventory > qemu_keyboard_layout`
 
 |              |          |
 | ------------ | -------- |
@@ -620,7 +620,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** Keyboard layout for cloudinit.
 
-## <a name="qemu_network_config"></a>36. Property `VM Base Inventory > qemu_network_config`
+## <a name="qemu_network_config"></a>38. Property `VM Base Inventory > qemu_network_config`
 
 |              |          |
 | ------------ | -------- |
@@ -629,7 +629,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** Optional qemu network config as a yaml string that is merged into the cloudinit network config of all qemus.
 
-## <a name="qemu_global_vars"></a>37. Property `VM Base Inventory > qemu_global_vars`
+## <a name="qemu_global_vars"></a>39. Property `VM Base Inventory > qemu_global_vars`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -639,7 +639,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** Variables that will be applied set for all qemus vms.
 
-## <a name="plugin"></a>38. Property `VM Base Inventory > plugin`
+## <a name="plugin"></a>40. Property `VM Base Inventory > plugin`
 
 |              |                    |
 | ------------ | ------------------ |

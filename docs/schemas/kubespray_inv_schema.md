@@ -35,7 +35,7 @@
 | - [ceph_csi_sc_pools](#ceph_csi_sc_pools )               | No      | array of object  | No         | -          | Ceph pools that will be made available to the clusters Ceph CSI driver (optional).                                                                                                                                                                                            |
 | - [acme_staging](#acme_staging )                         | No      | boolean          | No         | -          | If set to true will use acme staging directory for issueing certs.                                                                                                                                                                                                            |
 
-## <a name="target_pve"></a>85. Property `K8s Kubespray Inventory > target_pve`
+## <a name="target_pve"></a>87. Property `K8s Kubespray Inventory > target_pve`
 
 |              |          |
 | ------------ | -------- |
@@ -50,7 +50,7 @@
 "proxmox-cluster-a.your-cloud.domain"
 ```
 
-## <a name="stack_name"></a>86. Property `K8s Kubespray Inventory > stack_name`
+## <a name="stack_name"></a>88. Property `K8s Kubespray Inventory > stack_name`
 
 |              |          |
 | ------------ | -------- |
@@ -59,7 +59,7 @@
 
 **Description:** Your stack name, needs to be unique within the cloud domain.
 
-## <a name="static_includes"></a>87. Property `K8s Kubespray Inventory > static_includes`
+## <a name="static_includes"></a>89. Property `K8s Kubespray Inventory > static_includes`
 
 |                           |             |
 | ------------------------- | ----------- |
@@ -76,7 +76,7 @@
 | + [postgres_stack](#static_includes_postgres_stack ) | No      | string | No         | -          | The playbook needs the pve cloud postgres stack where state and general configuration is stored.                                                  |
 | + [bind_stack](#static_includes_bind_stack )         | No      | string | No         | -          | The playbook needs the bind stack to register the general masters recordset and for creating authoritative zones defined in cluster_cert_entries. |
 
-### <a name="static_includes_dhcp_stack"></a>87.1. Property `K8s Kubespray Inventory > static_includes > dhcp_stack`
+### <a name="static_includes_dhcp_stack"></a>89.1. Property `K8s Kubespray Inventory > static_includes > dhcp_stack`
 
 |              |          |
 | ------------ | -------- |
@@ -91,7 +91,7 @@
 "dhcp.your-cloud.domain"
 ```
 
-### <a name="static_includes_proxy_stack"></a>87.2. Property `K8s Kubespray Inventory > static_includes > proxy_stack`
+### <a name="static_includes_proxy_stack"></a>89.2. Property `K8s Kubespray Inventory > static_includes > proxy_stack`
 
 |              |          |
 | ------------ | -------- |
@@ -106,7 +106,7 @@
 "proxy.your-cloud.domain"
 ```
 
-### <a name="static_includes_postgres_stack"></a>87.3. Property `K8s Kubespray Inventory > static_includes > postgres_stack`
+### <a name="static_includes_postgres_stack"></a>89.3. Property `K8s Kubespray Inventory > static_includes > postgres_stack`
 
 |              |          |
 | ------------ | -------- |
@@ -121,7 +121,7 @@
 "patroni.your-cloud.domain"
 ```
 
-### <a name="static_includes_bind_stack"></a>87.4. Property `K8s Kubespray Inventory > static_includes > bind_stack`
+### <a name="static_includes_bind_stack"></a>89.4. Property `K8s Kubespray Inventory > static_includes > bind_stack`
 
 |              |          |
 | ------------ | -------- |
@@ -136,7 +136,7 @@
 "bind.your-cloud.domain"
 ```
 
-## <a name="include_stacks"></a>88. Property `K8s Kubespray Inventory > include_stacks`
+## <a name="include_stacks"></a>90. Property `K8s Kubespray Inventory > include_stacks`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -157,7 +157,7 @@
 | --------------------------------------------- | ----------- |
 | [include_stacks items](#include_stacks_items) | -           |
 
-### <a name="include_stacks_items"></a>88.1. K8s Kubespray Inventory > include_stacks > include_stacks items
+### <a name="include_stacks_items"></a>90.1. K8s Kubespray Inventory > include_stacks > include_stacks items
 
 |                           |             |
 | ------------------------- | ----------- |
@@ -171,7 +171,7 @@
 | + [host_group](#include_stacks_items_host_group )               | No      | string | No         | -          | This is the name of the hosts group of our ansible inventory the included vms/lxcs will be available under.                                                                                                                        |
 | - [qemu_ansible_user](#include_stacks_items_qemu_ansible_user ) | No      | string | No         | -          | User ansible will use to connect, defaults to admin. If you dont want to use debian cinit images you might need to set something else than admin.<br />Ubuntu for example wont work if you set the cloud init user to admin.<br /> |
 
-#### <a name="include_stacks_items_stack_fqdn"></a>88.1.1. Property `K8s Kubespray Inventory > include_stacks > include_stacks items > stack_fqdn`
+#### <a name="include_stacks_items_stack_fqdn"></a>90.1.1. Property `K8s Kubespray Inventory > include_stacks > include_stacks items > stack_fqdn`
 
 |              |          |
 | ------------ | -------- |
@@ -190,7 +190,7 @@
 "other-k8s.your-other-cloud.domain"
 ```
 
-#### <a name="include_stacks_items_host_group"></a>88.1.2. Property `K8s Kubespray Inventory > include_stacks > include_stacks items > host_group`
+#### <a name="include_stacks_items_host_group"></a>90.1.2. Property `K8s Kubespray Inventory > include_stacks > include_stacks items > host_group`
 
 |              |          |
 | ------------ | -------- |
@@ -199,7 +199,7 @@
 
 **Description:** This is the name of the hosts group of our ansible inventory the included vms/lxcs will be available under.
 
-#### <a name="include_stacks_items_qemu_ansible_user"></a>88.1.3. Property `K8s Kubespray Inventory > include_stacks > include_stacks items > qemu_ansible_user`
+#### <a name="include_stacks_items_qemu_ansible_user"></a>90.1.3. Property `K8s Kubespray Inventory > include_stacks > include_stacks items > qemu_ansible_user`
 
 |              |          |
 | ------------ | -------- |
@@ -209,7 +209,7 @@
 **Description:** User ansible will use to connect, defaults to admin. If you dont want to use debian cinit images you might need to set something else than admin.
 Ubuntu for example wont work if you set the cloud init user to admin.
 
-## <a name="root_ssh_pub_key"></a>89. Property `K8s Kubespray Inventory > root_ssh_pub_key`
+## <a name="root_ssh_pub_key"></a>91. Property `K8s Kubespray Inventory > root_ssh_pub_key`
 
 |              |          |
 | ------------ | -------- |
@@ -218,7 +218,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** trusted root key for the cloud init image.
 
-## <a name="pve_ha_group"></a>90. Property `K8s Kubespray Inventory > pve_ha_group`
+## <a name="pve_ha_group"></a>92. Property `K8s Kubespray Inventory > pve_ha_group`
 
 |              |          |
 | ------------ | -------- |
@@ -227,7 +227,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** PVE HA group this vm should be assigned to (optional).
 
-## <a name="target_pve_hosts"></a>91. Property `K8s Kubespray Inventory > target_pve_hosts`
+## <a name="target_pve_hosts"></a>93. Property `K8s Kubespray Inventory > target_pve_hosts`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -248,7 +248,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 | ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
 | [target_pve_hosts items](#target_pve_hosts_items) | The hostname of the proxmox host. Just the hostname, no cluster name or cloud domain should be specified, as they are implicit. |
 
-### <a name="target_pve_hosts_items"></a>91.1. K8s Kubespray Inventory > target_pve_hosts > target_pve_hosts items
+### <a name="target_pve_hosts_items"></a>93.1. K8s Kubespray Inventory > target_pve_hosts > target_pve_hosts items
 
 |              |          |
 | ------------ | -------- |
@@ -263,7 +263,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 "proxmox-host-a"
 ```
 
-## <a name="qemus"></a>92. Property `K8s Kubespray Inventory > qemus`
+## <a name="qemus"></a>94. Property `K8s Kubespray Inventory > qemus`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -284,7 +284,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 | ------------------------------- | ----------- |
 | [qemus items](#qemus_items)     | -           |
 
-### <a name="qemus_items"></a>92.1. K8s Kubespray Inventory > qemus > qemus items
+### <a name="qemus_items"></a>94.1. K8s Kubespray Inventory > qemus > qemus items
 
 |                           |             |
 | ------------------------- | ----------- |
@@ -310,7 +310,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 | [item 0](#qemus_items_oneOf_i0) |
 | [item 1](#qemus_items_oneOf_i1) |
 
-#### <a name="qemus_items_oneOf_i0"></a>92.1.1. Property `K8s Kubespray Inventory > qemus > qemus items > oneOf > item 0`
+#### <a name="qemus_items_oneOf_i0"></a>94.1.1. Property `K8s Kubespray Inventory > qemus > qemus items > oneOf > item 0`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -318,11 +318,11 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 | **Required**              | No               |
 | **Additional properties** | Any type allowed |
 
-##### <a name="autogenerated_heading_1"></a>92.1.1.1. The following properties are required
+##### <a name="autogenerated_heading_1"></a>94.1.1.1. The following properties are required
 * zpool_csi_parameters
 * zfs_localpv_csi_disks
 
-#### <a name="qemus_items_oneOf_i1"></a>92.1.2. Property `K8s Kubespray Inventory > qemus > qemus items > oneOf > item 1`
+#### <a name="qemus_items_oneOf_i1"></a>94.1.2. Property `K8s Kubespray Inventory > qemus > qemus items > oneOf > item 1`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -330,7 +330,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 | **Required**              | No               |
 | **Additional properties** | Any type allowed |
 
-##### <a name="autogenerated_heading_2"></a>92.1.2.1. Must **not** be
+##### <a name="autogenerated_heading_2"></a>94.1.2.1. Must **not** be
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -343,7 +343,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 | [item 0](#qemus_items_oneOf_i1_not_anyOf_i0) |
 | [item 1](#qemus_items_oneOf_i1_not_anyOf_i1) |
 
-###### <a name="qemus_items_oneOf_i1_not_anyOf_i0"></a>92.1.2.1.1. Property `K8s Kubespray Inventory > qemus > qemus items > oneOf > item 1 > not > anyOf > item 0`
+###### <a name="qemus_items_oneOf_i1_not_anyOf_i0"></a>94.1.2.1.1. Property `K8s Kubespray Inventory > qemus > qemus items > oneOf > item 1 > not > anyOf > item 0`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -351,10 +351,10 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 | **Required**              | No               |
 | **Additional properties** | Any type allowed |
 
-###### <a name="autogenerated_heading_3"></a>92.1.2.1.1.1. The following properties are required
+###### <a name="autogenerated_heading_3"></a>94.1.2.1.1.1. The following properties are required
 * zpool_csi_parameters
 
-###### <a name="qemus_items_oneOf_i1_not_anyOf_i1"></a>92.1.2.1.2. Property `K8s Kubespray Inventory > qemus > qemus items > oneOf > item 1 > not > anyOf > item 1`
+###### <a name="qemus_items_oneOf_i1_not_anyOf_i1"></a>94.1.2.1.2. Property `K8s Kubespray Inventory > qemus > qemus items > oneOf > item 1 > not > anyOf > item 1`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -362,10 +362,10 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 | **Required**              | No               |
 | **Additional properties** | Any type allowed |
 
-###### <a name="autogenerated_heading_4"></a>92.1.2.1.2.1. The following properties are required
+###### <a name="autogenerated_heading_4"></a>94.1.2.1.2.1. The following properties are required
 * zfs_localpv_csi_disks
 
-#### <a name="autogenerated_heading_5"></a>92.1.3. If (zfs_localpv_csi_disks = null)
+#### <a name="autogenerated_heading_5"></a>94.1.3. If (zfs_localpv_csi_disks = null)
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -373,10 +373,10 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 | **Required**              | No               |
 | **Additional properties** | Any type allowed |
 
-##### <a name="autogenerated_heading_6"></a>92.1.3.1. The following properties are required
+##### <a name="autogenerated_heading_6"></a>94.1.3.1. The following properties are required
 * target_host
 
-#### <a name="qemus_items_hostname"></a>92.1.4. Property `K8s Kubespray Inventory > qemus > qemus items > hostname`
+#### <a name="qemus_items_hostname"></a>94.1.4. Property `K8s Kubespray Inventory > qemus > qemus items > hostname`
 
 |              |          |
 | ------------ | -------- |
@@ -385,7 +385,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** Optional unique hostname for this node, otherwise pet name random name will be generated.
 
-#### <a name="qemus_items_vars"></a>92.1.5. Property `K8s Kubespray Inventory > qemus > qemus items > vars`
+#### <a name="qemus_items_vars"></a>94.1.5. Property `K8s Kubespray Inventory > qemus > qemus items > vars`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -395,7 +395,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** Custom variables for this node specifically, might be useful in your own custom playbooks.
 
-#### <a name="qemus_items_target_host"></a>92.1.6. Property `K8s Kubespray Inventory > qemus > qemus items > target_host`
+#### <a name="qemus_items_target_host"></a>94.1.6. Property `K8s Kubespray Inventory > qemus > qemus items > target_host`
 
 |              |          |
 | ------------ | -------- |
@@ -410,7 +410,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 "proxmox-host-B.proxmox-cluster-A"
 ```
 
-#### <a name="qemus_items_parameters"></a>92.1.7. Property `K8s Kubespray Inventory > qemus > qemus items > parameters`
+#### <a name="qemus_items_parameters"></a>94.1.7. Property `K8s Kubespray Inventory > qemus > qemus items > parameters`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -429,7 +429,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 }
 ```
 
-#### <a name="qemus_items_network_config"></a>92.1.8. Property `K8s Kubespray Inventory > qemus > qemus items > network_config`
+#### <a name="qemus_items_network_config"></a>94.1.8. Property `K8s Kubespray Inventory > qemus > qemus items > network_config`
 
 |              |          |
 | ------------ | -------- |
@@ -438,7 +438,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** Cinit network config yaml string. Will be the last cfg piece that gets merged into the final cloudinit network config. Can be used for overrides.
 
-#### <a name="qemus_items_disk"></a>92.1.9. Property `K8s Kubespray Inventory > qemus > qemus items > disk`
+#### <a name="qemus_items_disk"></a>94.1.9. Property `K8s Kubespray Inventory > qemus > qemus items > disk`
 
 |                           |             |
 | ------------------------- | ----------- |
@@ -452,7 +452,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 | + [options](#qemus_items_disk_options ) | No      | object | No         | -          | Mount options                                         |
 | + [pool](#qemus_items_disk_pool )       | No      | string | No         | -          | Proxmox storage name the vms disk will be created in. |
 
-##### <a name="qemus_items_disk_size"></a>92.1.9.1. Property `K8s Kubespray Inventory > qemus > qemus items > disk > size`
+##### <a name="qemus_items_disk_size"></a>94.1.9.1. Property `K8s Kubespray Inventory > qemus > qemus items > disk > size`
 
 |              |          |
 | ------------ | -------- |
@@ -467,7 +467,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 "25G"
 ```
 
-##### <a name="qemus_items_disk_options"></a>92.1.9.2. Property `K8s Kubespray Inventory > qemus > qemus items > disk > options`
+##### <a name="qemus_items_disk_options"></a>94.1.9.2. Property `K8s Kubespray Inventory > qemus > qemus items > disk > options`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -477,7 +477,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** Mount options
 
-##### <a name="qemus_items_disk_pool"></a>92.1.9.3. Property `K8s Kubespray Inventory > qemus > qemus items > disk > pool`
+##### <a name="qemus_items_disk_pool"></a>94.1.9.3. Property `K8s Kubespray Inventory > qemus > qemus items > disk > pool`
 
 |              |          |
 | ------------ | -------- |
@@ -486,7 +486,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** Proxmox storage name the vms disk will be created in.
 
-#### <a name="qemus_items_additional_disks"></a>92.1.10. Property `K8s Kubespray Inventory > qemus > qemus items > additional_disks`
+#### <a name="qemus_items_additional_disks"></a>94.1.10. Property `K8s Kubespray Inventory > qemus > qemus items > additional_disks`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -507,7 +507,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 | ------------------------------------------------------------- | ----------- |
 | [additional_disks items](#qemus_items_additional_disks_items) | -           |
 
-##### <a name="qemus_items_additional_disks_items"></a>92.1.10.1. K8s Kubespray Inventory > qemus > qemus items > additional_disks > additional_disks items
+##### <a name="qemus_items_additional_disks_items"></a>94.1.10.1. K8s Kubespray Inventory > qemus > qemus items > additional_disks > additional_disks items
 
 |                           |             |
 | ------------------------- | ----------- |
@@ -521,7 +521,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 | + [options](#qemus_items_additional_disks_items_options ) | No      | object | No         | -          | -                                                 |
 | + [pool](#qemus_items_additional_disks_items_pool )       | No      | string | No         | -          | -                                                 |
 
-###### <a name="qemus_items_additional_disks_items_size"></a>92.1.10.1.1. Property `K8s Kubespray Inventory > qemus > qemus items > additional_disks > additional_disks items > size`
+###### <a name="qemus_items_additional_disks_items_size"></a>94.1.10.1.1. Property `K8s Kubespray Inventory > qemus > qemus items > additional_disks > additional_disks items > size`
 
 |              |          |
 | ------------ | -------- |
@@ -540,7 +540,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 | --------------------------------- | ------------------------------------------------------------------------------------ |
 | **Must match regular expression** | ```^\d+G$``` [Test](https://regex101.com/?regex=%5E%5Cd%2BG%24&testString=%2225G%22) |
 
-###### <a name="qemus_items_additional_disks_items_options"></a>92.1.10.1.2. Property `K8s Kubespray Inventory > qemus > qemus items > additional_disks > additional_disks items > options`
+###### <a name="qemus_items_additional_disks_items_options"></a>94.1.10.1.2. Property `K8s Kubespray Inventory > qemus > qemus items > additional_disks > additional_disks items > options`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -548,14 +548,14 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 | **Required**              | Yes              |
 | **Additional properties** | Any type allowed |
 
-###### <a name="qemus_items_additional_disks_items_pool"></a>92.1.10.1.3. Property `K8s Kubespray Inventory > qemus > qemus items > additional_disks > additional_disks items > pool`
+###### <a name="qemus_items_additional_disks_items_pool"></a>94.1.10.1.3. Property `K8s Kubespray Inventory > qemus > qemus items > additional_disks > additional_disks items > pool`
 
 |              |          |
 | ------------ | -------- |
 | **Type**     | `string` |
 | **Required** | Yes      |
 
-#### <a name="qemus_items_k8s_roles"></a>92.1.11. Property `K8s Kubespray Inventory > qemus > qemus items > k8s_roles`
+#### <a name="qemus_items_k8s_roles"></a>94.1.11. Property `K8s Kubespray Inventory > qemus > qemus items > k8s_roles`
 
 |              |                             |
 | ------------ | --------------------------- |
@@ -576,7 +576,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 | ----------------------------------------------- | ----------- |
 | [k8s_roles items](#qemus_items_k8s_roles_items) | -           |
 
-##### <a name="qemus_items_k8s_roles_items"></a>92.1.11.1. K8s Kubespray Inventory > qemus > qemus items > k8s_roles > k8s_roles items
+##### <a name="qemus_items_k8s_roles_items"></a>94.1.11.1. K8s Kubespray Inventory > qemus > qemus items > k8s_roles > k8s_roles items
 
 |              |                    |
 | ------------ | ------------------ |
@@ -588,7 +588,7 @@ Must be one of:
 * "master"
 * "worker"
 
-#### <a name="qemus_items_zpool_csi_parameters"></a>92.1.12. Property `K8s Kubespray Inventory > qemus > qemus items > zpool_csi_parameters`
+#### <a name="qemus_items_zpool_csi_parameters"></a>94.1.12. Property `K8s Kubespray Inventory > qemus > qemus items > zpool_csi_parameters`
 
 |                           |             |
 | ------------------------- | ----------- |
@@ -603,7 +603,7 @@ Must be one of:
 | + [pool_properties](#qemus_items_zpool_csi_parameters_pool_properties ) | No      | object          | No         | -          | See the community.general.zpool module.                                                                                                                                                      |
 | + [vdevs](#qemus_items_zpool_csi_parameters_vdevs )                     | No      | array of object | No         | -          | Default type for vdevs is stripe, in this case there should be only passed one disk per vdev and simply create multiple vdevs,<br />otherwise the zpool module will loose idempotency.<br /> |
 
-##### <a name="qemus_items_zpool_csi_parameters_pool_properties"></a>92.1.12.1. Property `K8s Kubespray Inventory > qemus > qemus items > zpool_csi_parameters > pool_properties`
+##### <a name="qemus_items_zpool_csi_parameters_pool_properties"></a>94.1.12.1. Property `K8s Kubespray Inventory > qemus > qemus items > zpool_csi_parameters > pool_properties`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -613,7 +613,7 @@ Must be one of:
 
 **Description:** See the community.general.zpool module.
 
-##### <a name="qemus_items_zpool_csi_parameters_vdevs"></a>92.1.12.2. Property `K8s Kubespray Inventory > qemus > qemus items > zpool_csi_parameters > vdevs`
+##### <a name="qemus_items_zpool_csi_parameters_vdevs"></a>94.1.12.2. Property `K8s Kubespray Inventory > qemus > qemus items > zpool_csi_parameters > vdevs`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -635,7 +635,7 @@ otherwise the zpool module will loose idempotency.
 | ------------------------------------------------------------ | ----------- |
 | [vdevs items](#qemus_items_zpool_csi_parameters_vdevs_items) | -           |
 
-###### <a name="qemus_items_zpool_csi_parameters_vdevs_items"></a>92.1.12.2.1. K8s Kubespray Inventory > qemus > qemus items > zpool_csi_parameters > vdevs > vdevs items
+###### <a name="qemus_items_zpool_csi_parameters_vdevs_items"></a>94.1.12.2.1. K8s Kubespray Inventory > qemus > qemus items > zpool_csi_parameters > vdevs > vdevs items
 
 |                           |             |
 | ------------------------- | ----------- |
@@ -649,7 +649,7 @@ otherwise the zpool module will loose idempotency.
 | - [role](#qemus_items_zpool_csi_parameters_vdevs_items_role )   | No      | string          | No         | -          | -                 |
 | - [type](#qemus_items_zpool_csi_parameters_vdevs_items_type )   | No      | string          | No         | -          | -                 |
 
-###### <a name="qemus_items_zpool_csi_parameters_vdevs_items_disks"></a>92.1.12.2.1.1. Property `K8s Kubespray Inventory > qemus > qemus items > zpool_csi_parameters > vdevs > vdevs items > disks`
+###### <a name="qemus_items_zpool_csi_parameters_vdevs_items_disks"></a>94.1.12.2.1.1. Property `K8s Kubespray Inventory > qemus > qemus items > zpool_csi_parameters > vdevs > vdevs items > disks`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -668,7 +668,7 @@ otherwise the zpool module will loose idempotency.
 | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------- |
 | [disks items](#qemus_items_zpool_csi_parameters_vdevs_items_disks_items) | Here you should ideally pass the disk via /dev/disk/by-id, disks created with zfs_localpv_csi_disks will always ... |
 
-###### <a name="qemus_items_zpool_csi_parameters_vdevs_items_disks_items"></a>92.1.12.2.1.1.1. K8s Kubespray Inventory > qemus > qemus items > zpool_csi_parameters > vdevs > vdevs items > disks > disks items
+###### <a name="qemus_items_zpool_csi_parameters_vdevs_items_disks_items"></a>94.1.12.2.1.1.1. K8s Kubespray Inventory > qemus > qemus items > zpool_csi_parameters > vdevs > vdevs items > disks > disks items
 
 |              |          |
 | ------------ | -------- |
@@ -684,21 +684,21 @@ adhere to the following schema: \"scsi-0QEMU_QEMU_HARDDISK_scsi\" + index number
 "/dev/disk/by-id/scsi-0QEMU_QEMU_HARDDISK_drive-scsi1-pxzfs"
 ```
 
-###### <a name="qemus_items_zpool_csi_parameters_vdevs_items_role"></a>92.1.12.2.1.2. Property `K8s Kubespray Inventory > qemus > qemus items > zpool_csi_parameters > vdevs > vdevs items > role`
+###### <a name="qemus_items_zpool_csi_parameters_vdevs_items_role"></a>94.1.12.2.1.2. Property `K8s Kubespray Inventory > qemus > qemus items > zpool_csi_parameters > vdevs > vdevs items > role`
 
 |              |          |
 | ------------ | -------- |
 | **Type**     | `string` |
 | **Required** | No       |
 
-###### <a name="qemus_items_zpool_csi_parameters_vdevs_items_type"></a>92.1.12.2.1.3. Property `K8s Kubespray Inventory > qemus > qemus items > zpool_csi_parameters > vdevs > vdevs items > type`
+###### <a name="qemus_items_zpool_csi_parameters_vdevs_items_type"></a>94.1.12.2.1.3. Property `K8s Kubespray Inventory > qemus > qemus items > zpool_csi_parameters > vdevs > vdevs items > type`
 
 |              |          |
 | ------------ | -------- |
 | **Type**     | `string` |
 | **Required** | No       |
 
-#### <a name="qemus_items_zfs_localpv_csi_disks"></a>92.1.13. Property `K8s Kubespray Inventory > qemus > qemus items > zfs_localpv_csi_disks`
+#### <a name="qemus_items_zfs_localpv_csi_disks"></a>94.1.13. Property `K8s Kubespray Inventory > qemus > qemus items > zfs_localpv_csi_disks`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -720,7 +720,7 @@ and will be made available for openebs zfs localpv driver for k8s volumes. Curre
 | ----------------------------------------------------------------------- | ----------- |
 | [zfs_localpv_csi_disks items](#qemus_items_zfs_localpv_csi_disks_items) | -           |
 
-##### <a name="qemus_items_zfs_localpv_csi_disks_items"></a>92.1.13.1. K8s Kubespray Inventory > qemus > qemus items > zfs_localpv_csi_disks > zfs_localpv_csi_disks items
+##### <a name="qemus_items_zfs_localpv_csi_disks_items"></a>94.1.13.1. K8s Kubespray Inventory > qemus > qemus items > zfs_localpv_csi_disks > zfs_localpv_csi_disks items
 
 |                           |             |
 | ------------------------- | ----------- |
@@ -738,7 +738,7 @@ and will be made available for openebs zfs localpv driver for k8s volumes. Curre
 | [item 0](#qemus_items_zfs_localpv_csi_disks_items_oneOf_i0) |
 | [item 1](#qemus_items_zfs_localpv_csi_disks_items_oneOf_i1) |
 
-###### <a name="qemus_items_zfs_localpv_csi_disks_items_oneOf_i0"></a>92.1.13.1.1. Property `K8s Kubespray Inventory > qemus > qemus items > zfs_localpv_csi_disks > zfs_localpv_csi_disks items > oneOf > item 0`
+###### <a name="qemus_items_zfs_localpv_csi_disks_items_oneOf_i0"></a>94.1.13.1.1. Property `K8s Kubespray Inventory > qemus > qemus items > zfs_localpv_csi_disks > zfs_localpv_csi_disks items > oneOf > item 0`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -746,10 +746,10 @@ and will be made available for openebs zfs localpv driver for k8s volumes. Curre
 | **Required**              | No               |
 | **Additional properties** | Any type allowed |
 
-###### <a name="autogenerated_heading_7"></a>92.1.13.1.1.1. The following properties are required
+###### <a name="autogenerated_heading_7"></a>94.1.13.1.1.1. The following properties are required
 * via_passthrough
 
-###### <a name="qemus_items_zfs_localpv_csi_disks_items_oneOf_i1"></a>92.1.13.1.2. Property `K8s Kubespray Inventory > qemus > qemus items > zfs_localpv_csi_disks > zfs_localpv_csi_disks items > oneOf > item 1`
+###### <a name="qemus_items_zfs_localpv_csi_disks_items_oneOf_i1"></a>94.1.13.1.2. Property `K8s Kubespray Inventory > qemus > qemus items > zfs_localpv_csi_disks > zfs_localpv_csi_disks items > oneOf > item 1`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -757,10 +757,10 @@ and will be made available for openebs zfs localpv driver for k8s volumes. Curre
 | **Required**              | No               |
 | **Additional properties** | Any type allowed |
 
-###### <a name="autogenerated_heading_8"></a>92.1.13.1.2.1. The following properties are required
+###### <a name="autogenerated_heading_8"></a>94.1.13.1.2.1. The following properties are required
 * from_storage
 
-###### <a name="qemus_items_zfs_localpv_csi_disks_items_via_passthrough"></a>92.1.13.1.3. Property `K8s Kubespray Inventory > qemus > qemus items > zfs_localpv_csi_disks > zfs_localpv_csi_disks items > via_passthrough`
+###### <a name="qemus_items_zfs_localpv_csi_disks_items_via_passthrough"></a>94.1.13.1.3. Property `K8s Kubespray Inventory > qemus > qemus items > zfs_localpv_csi_disks > zfs_localpv_csi_disks items > via_passthrough`
 
 |                           |             |
 | ------------------------- | ----------- |
@@ -773,7 +773,7 @@ and will be made available for openebs zfs localpv driver for k8s volumes. Curre
 | + [disk_id](#qemus_items_zfs_localpv_csi_disks_items_via_passthrough_disk_id ) | No      | string | No         | -          | /dev/disk/by-id of disk on target_host of the vm to passthrough. This is the recommended way for production systems. |
 | + [options](#qemus_items_zfs_localpv_csi_disks_items_via_passthrough_options ) | No      | object | No         | -          | Options passed to the virtio scsi controller.                                                                        |
 
-###### <a name="qemus_items_zfs_localpv_csi_disks_items_via_passthrough_disk_id"></a>92.1.13.1.3.1. Property `K8s Kubespray Inventory > qemus > qemus items > zfs_localpv_csi_disks > zfs_localpv_csi_disks items > via_passthrough > disk_id`
+###### <a name="qemus_items_zfs_localpv_csi_disks_items_via_passthrough_disk_id"></a>94.1.13.1.3.1. Property `K8s Kubespray Inventory > qemus > qemus items > zfs_localpv_csi_disks > zfs_localpv_csi_disks items > via_passthrough > disk_id`
 
 |              |          |
 | ------------ | -------- |
@@ -782,7 +782,7 @@ and will be made available for openebs zfs localpv driver for k8s volumes. Curre
 
 **Description:** /dev/disk/by-id of disk on target_host of the vm to passthrough. This is the recommended way for production systems.
 
-###### <a name="qemus_items_zfs_localpv_csi_disks_items_via_passthrough_options"></a>92.1.13.1.3.2. Property `K8s Kubespray Inventory > qemus > qemus items > zfs_localpv_csi_disks > zfs_localpv_csi_disks items > via_passthrough > options`
+###### <a name="qemus_items_zfs_localpv_csi_disks_items_via_passthrough_options"></a>94.1.13.1.3.2. Property `K8s Kubespray Inventory > qemus > qemus items > zfs_localpv_csi_disks > zfs_localpv_csi_disks items > via_passthrough > options`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -792,7 +792,7 @@ and will be made available for openebs zfs localpv driver for k8s volumes. Curre
 
 **Description:** Options passed to the virtio scsi controller.
 
-###### <a name="qemus_items_zfs_localpv_csi_disks_items_from_storage"></a>92.1.13.1.4. Property `K8s Kubespray Inventory > qemus > qemus items > zfs_localpv_csi_disks > zfs_localpv_csi_disks items > from_storage`
+###### <a name="qemus_items_zfs_localpv_csi_disks_items_from_storage"></a>94.1.13.1.4. Property `K8s Kubespray Inventory > qemus > qemus items > zfs_localpv_csi_disks > zfs_localpv_csi_disks items > from_storage`
 
 |                           |             |
 | ------------------------- | ----------- |
@@ -810,7 +810,7 @@ useful in testing scenarios.
 | + [options](#qemus_items_zfs_localpv_csi_disks_items_from_storage_options ) | No      | object | No         | -          | Mount options                                                  |
 | + [pool](#qemus_items_zfs_localpv_csi_disks_items_from_storage_pool )       | No      | string | No         | -          | Proxmox storage pool name.                                     |
 
-###### <a name="qemus_items_zfs_localpv_csi_disks_items_from_storage_size"></a>92.1.13.1.4.1. Property `K8s Kubespray Inventory > qemus > qemus items > zfs_localpv_csi_disks > zfs_localpv_csi_disks items > from_storage > size`
+###### <a name="qemus_items_zfs_localpv_csi_disks_items_from_storage_size"></a>94.1.13.1.4.1. Property `K8s Kubespray Inventory > qemus > qemus items > zfs_localpv_csi_disks > zfs_localpv_csi_disks items > from_storage > size`
 
 |              |          |
 | ------------ | -------- |
@@ -829,7 +829,7 @@ useful in testing scenarios.
 | --------------------------------- | ------------------------------------------------------------------------------------ |
 | **Must match regular expression** | ```^\d+G$``` [Test](https://regex101.com/?regex=%5E%5Cd%2BG%24&testString=%2225G%22) |
 
-###### <a name="qemus_items_zfs_localpv_csi_disks_items_from_storage_options"></a>92.1.13.1.4.2. Property `K8s Kubespray Inventory > qemus > qemus items > zfs_localpv_csi_disks > zfs_localpv_csi_disks items > from_storage > options`
+###### <a name="qemus_items_zfs_localpv_csi_disks_items_from_storage_options"></a>94.1.13.1.4.2. Property `K8s Kubespray Inventory > qemus > qemus items > zfs_localpv_csi_disks > zfs_localpv_csi_disks items > from_storage > options`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -839,7 +839,7 @@ useful in testing scenarios.
 
 **Description:** Mount options
 
-###### <a name="qemus_items_zfs_localpv_csi_disks_items_from_storage_pool"></a>92.1.13.1.4.3. Property `K8s Kubespray Inventory > qemus > qemus items > zfs_localpv_csi_disks > zfs_localpv_csi_disks items > from_storage > pool`
+###### <a name="qemus_items_zfs_localpv_csi_disks_items_from_storage_pool"></a>94.1.13.1.4.3. Property `K8s Kubespray Inventory > qemus > qemus items > zfs_localpv_csi_disks > zfs_localpv_csi_disks items > from_storage > pool`
 
 |              |          |
 | ------------ | -------- |
@@ -848,7 +848,7 @@ useful in testing scenarios.
 
 **Description:** Proxmox storage pool name.
 
-## <a name="tcp_proxies"></a>93. Property `K8s Kubespray Inventory > tcp_proxies`
+## <a name="tcp_proxies"></a>95. Property `K8s Kubespray Inventory > tcp_proxies`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -869,7 +869,7 @@ useful in testing scenarios.
 | --------------------------------------- | ----------- |
 | [tcp_proxies items](#tcp_proxies_items) | -           |
 
-### <a name="tcp_proxies_items"></a>93.1. K8s Kubespray Inventory > tcp_proxies > tcp_proxies items
+### <a name="tcp_proxies_items"></a>95.1. K8s Kubespray Inventory > tcp_proxies > tcp_proxies items
 
 |                           |             |
 | ------------------------- | ----------- |
@@ -885,7 +885,7 @@ useful in testing scenarios.
 | - [proxy_snippet](#tcp_proxies_items_proxy_snippet ) | No      | string  | No         | -          | Additional snippet that will be inserted into the haproxy listen block. Can be used to adjust the forwards settings. |
 | - [external](#tcp_proxies_items_external )           | No      | boolean | No         | -          | Will also create a forward on the external floating ip of the proxy not only the internal.                           |
 
-#### <a name="tcp_proxies_items_proxy_name"></a>93.1.1. Property `K8s Kubespray Inventory > tcp_proxies > tcp_proxies items > proxy_name`
+#### <a name="tcp_proxies_items_proxy_name"></a>95.1.1. Property `K8s Kubespray Inventory > tcp_proxies > tcp_proxies items > proxy_name`
 
 |              |          |
 | ------------ | -------- |
@@ -904,7 +904,7 @@ useful in testing scenarios.
 "example-postgres"
 ```
 
-#### <a name="tcp_proxies_items_haproxy_port"></a>93.1.2. Property `K8s Kubespray Inventory > tcp_proxies > tcp_proxies items > haproxy_port`
+#### <a name="tcp_proxies_items_haproxy_port"></a>95.1.2. Property `K8s Kubespray Inventory > tcp_proxies > tcp_proxies items > haproxy_port`
 
 |              |          |
 | ------------ | -------- |
@@ -913,7 +913,7 @@ useful in testing scenarios.
 
 **Description:** Frontend port of the proxmox clusters haproxy.
 
-#### <a name="tcp_proxies_items_node_port"></a>93.1.3. Property `K8s Kubespray Inventory > tcp_proxies > tcp_proxies items > node_port`
+#### <a name="tcp_proxies_items_node_port"></a>95.1.3. Property `K8s Kubespray Inventory > tcp_proxies > tcp_proxies items > node_port`
 
 |              |          |
 | ------------ | -------- |
@@ -922,7 +922,7 @@ useful in testing scenarios.
 
 **Description:** Nodeport of the k8s service.
 
-#### <a name="tcp_proxies_items_proxy_snippet"></a>93.1.4. Property `K8s Kubespray Inventory > tcp_proxies > tcp_proxies items > proxy_snippet`
+#### <a name="tcp_proxies_items_proxy_snippet"></a>95.1.4. Property `K8s Kubespray Inventory > tcp_proxies > tcp_proxies items > proxy_snippet`
 
 |              |          |
 | ------------ | -------- |
@@ -937,7 +937,7 @@ useful in testing scenarios.
 "# long running tcp connections that only rarely transmit data\n# ssh client connection for example\ntimeout client 1h \ntimeout server 1h \n"
 ```
 
-#### <a name="tcp_proxies_items_external"></a>93.1.5. Property `K8s Kubespray Inventory > tcp_proxies > tcp_proxies items > external`
+#### <a name="tcp_proxies_items_external"></a>95.1.5. Property `K8s Kubespray Inventory > tcp_proxies > tcp_proxies items > external`
 
 |              |           |
 | ------------ | --------- |
@@ -946,7 +946,7 @@ useful in testing scenarios.
 
 **Description:** Will also create a forward on the external floating ip of the proxy not only the internal.
 
-## <a name="qemu_default_user"></a>94. Property `K8s Kubespray Inventory > qemu_default_user`
+## <a name="qemu_default_user"></a>96. Property `K8s Kubespray Inventory > qemu_default_user`
 
 |              |          |
 | ------------ | -------- |
@@ -955,7 +955,7 @@ useful in testing scenarios.
 
 **Description:** User for cinit.
 
-## <a name="qemu_hashed_pw"></a>95. Property `K8s Kubespray Inventory > qemu_hashed_pw`
+## <a name="qemu_hashed_pw"></a>97. Property `K8s Kubespray Inventory > qemu_hashed_pw`
 
 |              |          |
 | ------------ | -------- |
@@ -964,7 +964,7 @@ useful in testing scenarios.
 
 **Description:** Pw for default user defaults to hashed 'password' for debian cloud init image. Different cloud init images require different hash methods. You cannot use the same from debian for ubuntu for example.
 
-## <a name="qemu_base_parameters"></a>96. Property `K8s Kubespray Inventory > qemu_base_parameters`
+## <a name="qemu_base_parameters"></a>98. Property `K8s Kubespray Inventory > qemu_base_parameters`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -974,7 +974,7 @@ useful in testing scenarios.
 
 **Description:** Base parameters applied to all qemus. passed to the proxmox qm cli tool for creating vm.
 
-## <a name="qemu_image_url"></a>97. Property `K8s Kubespray Inventory > qemu_image_url`
+## <a name="qemu_image_url"></a>99. Property `K8s Kubespray Inventory > qemu_image_url`
 
 |              |          |
 | ------------ | -------- |
@@ -983,7 +983,7 @@ useful in testing scenarios.
 
 **Description:** http(s) download link for cloud init image.
 
-## <a name="qemu_keyboard_layout"></a>98. Property `K8s Kubespray Inventory > qemu_keyboard_layout`
+## <a name="qemu_keyboard_layout"></a>100. Property `K8s Kubespray Inventory > qemu_keyboard_layout`
 
 |              |          |
 | ------------ | -------- |
@@ -992,7 +992,7 @@ useful in testing scenarios.
 
 **Description:** Keyboard layout for cloudinit.
 
-## <a name="qemu_network_config"></a>99. Property `K8s Kubespray Inventory > qemu_network_config`
+## <a name="qemu_network_config"></a>101. Property `K8s Kubespray Inventory > qemu_network_config`
 
 |              |          |
 | ------------ | -------- |
@@ -1001,7 +1001,7 @@ useful in testing scenarios.
 
 **Description:** Optional qemu network config as a yaml string that is merged into the cloudinit network config of all qemus.
 
-## <a name="qemu_global_vars"></a>100. Property `K8s Kubespray Inventory > qemu_global_vars`
+## <a name="qemu_global_vars"></a>102. Property `K8s Kubespray Inventory > qemu_global_vars`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -1011,7 +1011,7 @@ useful in testing scenarios.
 
 **Description:** Variables that will be applied set for all qemus vms.
 
-## <a name="plugin"></a>101. Property `K8s Kubespray Inventory > plugin`
+## <a name="plugin"></a>103. Property `K8s Kubespray Inventory > plugin`
 
 |              |                    |
 | ------------ | ------------------ |
@@ -1025,7 +1025,7 @@ Must be one of:
 * "pxc.cloud.qemu_inv"
 * "pxc.cloud.kubespray_inv"
 
-## <a name="extra_control_plane_sans"></a>102. Property `K8s Kubespray Inventory > extra_control_plane_sans`
+## <a name="extra_control_plane_sans"></a>104. Property `K8s Kubespray Inventory > extra_control_plane_sans`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -1047,14 +1047,14 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 | ----------------------------------------------------------------- | ----------- |
 | [extra_control_plane_sans items](#extra_control_plane_sans_items) | -           |
 
-### <a name="extra_control_plane_sans_items"></a>102.1. K8s Kubespray Inventory > extra_control_plane_sans > extra_control_plane_sans items
+### <a name="extra_control_plane_sans_items"></a>104.1. K8s Kubespray Inventory > extra_control_plane_sans > extra_control_plane_sans items
 
 |              |          |
 | ------------ | -------- |
 | **Type**     | `string` |
 | **Required** | No       |
 
-## <a name="external_domains"></a>103. Property `K8s Kubespray Inventory > external_domains`
+## <a name="external_domains"></a>105. Property `K8s Kubespray Inventory > external_domains`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -1075,7 +1075,7 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 | ------------------------------------------------- | ----------- |
 | [external_domains items](#external_domains_items) | -           |
 
-### <a name="external_domains_items"></a>103.1. K8s Kubespray Inventory > external_domains > external_domains items
+### <a name="external_domains_items"></a>105.1. K8s Kubespray Inventory > external_domains > external_domains items
 
 |                           |             |
 | ------------------------- | ----------- |
@@ -1089,7 +1089,7 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 | - [expose_apex](#external_domains_items_expose_apex ) | No      | boolean         | No         | -          | Expose the apex zone itself. For example if you have zone example.com then example.com will be routed to this cluster. |
 | + [names](#external_domains_items_names )             | No      | array of string | No         | -          | -                                                                                                                      |
 
-#### <a name="external_domains_items_zone"></a>103.1.1. Property `K8s Kubespray Inventory > external_domains > external_domains items > zone`
+#### <a name="external_domains_items_zone"></a>105.1.1. Property `K8s Kubespray Inventory > external_domains > external_domains items > zone`
 
 |              |          |
 | ------------ | -------- |
@@ -1098,7 +1098,7 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 
 **Description:** DNS parent zone, should also be the zone that external records are made under in AWS for example.
 
-#### <a name="external_domains_items_expose_apex"></a>103.1.2. Property `K8s Kubespray Inventory > external_domains > external_domains items > expose_apex`
+#### <a name="external_domains_items_expose_apex"></a>105.1.2. Property `K8s Kubespray Inventory > external_domains > external_domains items > expose_apex`
 
 |              |           |
 | ------------ | --------- |
@@ -1107,7 +1107,7 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 
 **Description:** Expose the apex zone itself. For example if you have zone example.com then example.com will be routed to this cluster.
 
-#### <a name="external_domains_items_names"></a>103.1.3. Property `K8s Kubespray Inventory > external_domains > external_domains items > names`
+#### <a name="external_domains_items_names"></a>105.1.3. Property `K8s Kubespray Inventory > external_domains > external_domains items > names`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -1126,7 +1126,7 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 | -------------------------------------------------- | ----------------------------------------- |
 | [names items](#external_domains_items_names_items) | Names of the zone that should be exposed. |
 
-##### <a name="external_domains_items_names_items"></a>103.1.3.1. K8s Kubespray Inventory > external_domains > external_domains items > names > names items
+##### <a name="external_domains_items_names_items"></a>105.1.3.1. K8s Kubespray Inventory > external_domains > external_domains items > names > names items
 
 |              |          |
 | ------------ | -------- |
@@ -1149,7 +1149,7 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 "*.subzone"
 ```
 
-## <a name="cluster_cert_entries"></a>104. Property `K8s Kubespray Inventory > cluster_cert_entries`
+## <a name="cluster_cert_entries"></a>106. Property `K8s Kubespray Inventory > cluster_cert_entries`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -1170,7 +1170,7 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 | --------------------------------------------------------- | ----------- |
 | [cluster_cert_entries items](#cluster_cert_entries_items) | -           |
 
-### <a name="cluster_cert_entries_items"></a>104.1. K8s Kubespray Inventory > cluster_cert_entries > cluster_cert_entries items
+### <a name="cluster_cert_entries_items"></a>106.1. K8s Kubespray Inventory > cluster_cert_entries > cluster_cert_entries items
 
 |                           |             |
 | ------------------------- | ----------- |
@@ -1185,7 +1185,7 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 | - [authoritative_zone](#cluster_cert_entries_items_authoritative_zone ) | No      | boolean         | No         | -          | This will cause the specified apex zone to be created as an authoritative zone in the proxmox clouds dns server. Ingress dns will only work for authoritative zones. |
 | - [apex_zone_san](#cluster_cert_entries_items_apex_zone_san )           | No      | boolean         | No         | -          | Creates additional SAN for the zone, if you have *.example.com you will also get example.com in your certificate. Defaults to false.                                 |
 
-#### <a name="cluster_cert_entries_items_zone"></a>104.1.1. Property `K8s Kubespray Inventory > cluster_cert_entries > cluster_cert_entries items > zone`
+#### <a name="cluster_cert_entries_items_zone"></a>106.1.1. Property `K8s Kubespray Inventory > cluster_cert_entries > cluster_cert_entries items > zone`
 
 |              |          |
 | ------------ | -------- |
@@ -1194,7 +1194,7 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 
 **Description:** DNS parent zone, should be the apex zone in ionos/route53 for dns01 challenge.
 
-#### <a name="cluster_cert_entries_items_names"></a>104.1.2. Property `K8s Kubespray Inventory > cluster_cert_entries > cluster_cert_entries items > names`
+#### <a name="cluster_cert_entries_items_names"></a>106.1.2. Property `K8s Kubespray Inventory > cluster_cert_entries > cluster_cert_entries items > names`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -1213,7 +1213,7 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 | ------------------------------------------------------ | --------------------------------------------------------------- |
 | [names items](#cluster_cert_entries_items_names_items) | SANs included in the certificate and basis for dns01 challenge. |
 
-##### <a name="cluster_cert_entries_items_names_items"></a>104.1.2.1. K8s Kubespray Inventory > cluster_cert_entries > cluster_cert_entries items > names > names items
+##### <a name="cluster_cert_entries_items_names_items"></a>106.1.2.1. K8s Kubespray Inventory > cluster_cert_entries > cluster_cert_entries items > names > names items
 
 |              |          |
 | ------------ | -------- |
@@ -1236,7 +1236,7 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 "*.subzone"
 ```
 
-#### <a name="cluster_cert_entries_items_authoritative_zone"></a>104.1.3. Property `K8s Kubespray Inventory > cluster_cert_entries > cluster_cert_entries items > authoritative_zone`
+#### <a name="cluster_cert_entries_items_authoritative_zone"></a>106.1.3. Property `K8s Kubespray Inventory > cluster_cert_entries > cluster_cert_entries items > authoritative_zone`
 
 |              |           |
 | ------------ | --------- |
@@ -1245,7 +1245,7 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 
 **Description:** This will cause the specified apex zone to be created as an authoritative zone in the proxmox clouds dns server. Ingress dns will only work for authoritative zones.
 
-#### <a name="cluster_cert_entries_items_apex_zone_san"></a>104.1.4. Property `K8s Kubespray Inventory > cluster_cert_entries > cluster_cert_entries items > apex_zone_san`
+#### <a name="cluster_cert_entries_items_apex_zone_san"></a>106.1.4. Property `K8s Kubespray Inventory > cluster_cert_entries > cluster_cert_entries items > apex_zone_san`
 
 |              |           |
 | ------------ | --------- |
@@ -1254,7 +1254,7 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 
 **Description:** Creates additional SAN for the zone, if you have *.example.com you will also get example.com in your certificate. Defaults to false.
 
-## <a name="ceph_csi_sc_pools"></a>105. Property `K8s Kubespray Inventory > ceph_csi_sc_pools`
+## <a name="ceph_csi_sc_pools"></a>107. Property `K8s Kubespray Inventory > ceph_csi_sc_pools`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -1275,7 +1275,7 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 | --------------------------------------------------- | ----------- |
 | [ceph_csi_sc_pools items](#ceph_csi_sc_pools_items) | -           |
 
-### <a name="ceph_csi_sc_pools_items"></a>105.1. K8s Kubespray Inventory > ceph_csi_sc_pools > ceph_csi_sc_pools items
+### <a name="ceph_csi_sc_pools_items"></a>107.1. K8s Kubespray Inventory > ceph_csi_sc_pools > ceph_csi_sc_pools items
 
 |                           |             |
 | ------------------------- | ----------- |
@@ -1289,7 +1289,7 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 | + [default](#ceph_csi_sc_pools_items_default )             | No      | boolean | No         | -          | Whether or not the pool is the default storage class.                                   |
 | + [mount_options](#ceph_csi_sc_pools_items_mount_options ) | No      | array   | No         | -          | String array of mount options that will be set in the storage class and applied to pvs. |
 
-#### <a name="ceph_csi_sc_pools_items_name"></a>105.1.1. Property `K8s Kubespray Inventory > ceph_csi_sc_pools > ceph_csi_sc_pools items > name`
+#### <a name="ceph_csi_sc_pools_items_name"></a>107.1.1. Property `K8s Kubespray Inventory > ceph_csi_sc_pools > ceph_csi_sc_pools items > name`
 
 |              |          |
 | ------------ | -------- |
@@ -1298,7 +1298,7 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 
 **Description:** Name of the pool in the ceph of our PVE cluster.
 
-#### <a name="ceph_csi_sc_pools_items_default"></a>105.1.2. Property `K8s Kubespray Inventory > ceph_csi_sc_pools > ceph_csi_sc_pools items > default`
+#### <a name="ceph_csi_sc_pools_items_default"></a>107.1.2. Property `K8s Kubespray Inventory > ceph_csi_sc_pools > ceph_csi_sc_pools items > default`
 
 |              |           |
 | ------------ | --------- |
@@ -1307,7 +1307,7 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 
 **Description:** Whether or not the pool is the default storage class.
 
-#### <a name="ceph_csi_sc_pools_items_mount_options"></a>105.1.3. Property `K8s Kubespray Inventory > ceph_csi_sc_pools > ceph_csi_sc_pools items > mount_options`
+#### <a name="ceph_csi_sc_pools_items_mount_options"></a>107.1.3. Property `K8s Kubespray Inventory > ceph_csi_sc_pools > ceph_csi_sc_pools items > mount_options`
 
 |              |         |
 | ------------ | ------- |
@@ -1324,7 +1324,7 @@ but is set via pve cloud kubespray custom inventory. Read the kubernetes page in
 | **Additional items** | False              |
 | **Tuple validation** | N/A                |
 
-## <a name="acme_staging"></a>106. Property `K8s Kubespray Inventory > acme_staging`
+## <a name="acme_staging"></a>108. Property `K8s Kubespray Inventory > acme_staging`
 
 |              |           |
 | ------------ | --------- |

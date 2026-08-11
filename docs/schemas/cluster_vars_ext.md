@@ -16,7 +16,7 @@
 | + [py_pve_cloud_version](#py_pve_cloud_version )                 | No      | string | No         | -          | Dynamic property for validation of the core python pve cloud library in use.     |
 | + [pve_cluster_name](#pve_cluster_name )                         | No      | string | No         | -          | Self reference of the cluster name for convinient access.                        |
 
-## <a name="pve_cloud_collection_version"></a>39. Property `Cluster vars extension. > pve_cloud_collection_version`
+## <a name="pve_cloud_collection_version"></a>41. Property `Cluster vars extension. > pve_cloud_collection_version`
 
 |              |          |
 | ------------ | -------- |
@@ -25,7 +25,7 @@
 
 **Description:** Dynamic property set by pve_cloud_inv for validation of the collections version.
 
-## <a name="py_pve_cloud_version"></a>40. Property `Cluster vars extension. > py_pve_cloud_version`
+## <a name="py_pve_cloud_version"></a>42. Property `Cluster vars extension. > py_pve_cloud_version`
 
 |              |          |
 | ------------ | -------- |
@@ -34,7 +34,7 @@
 
 **Description:** Dynamic property for validation of the core python pve cloud library in use.
 
-## <a name="pve_cluster_name"></a>41. Property `Cluster vars extension. > pve_cluster_name`
+## <a name="pve_cluster_name"></a>43. Property `Cluster vars extension. > pve_cluster_name`
 
 |              |          |
 | ------------ | -------- |

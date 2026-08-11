@@ -14,7 +14,7 @@
 | --------------------------------------------------------------------------------------------------------------------------- | ------- | ------ | ---------- | ---------- | ----------------------- |
 | - [^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)(?:\.(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?))*$](#pattern1 ) | Yes     | object | No         | -          | Inventory cloud domain. |
 
-## <a name="pattern1"></a>131. Pattern Property `Dynamic local pve cloud schema. > Inventory cloud domain.`
+## <a name="pattern1"></a>133. Pattern Property `Dynamic local pve cloud schema. > Inventory cloud domain.`
 > All properties whose name matches the regular expression
 ```^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)(?:\.(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?))*$``` ([Test](https://regex101.com/?regex=%5E%28%3F%3A%5Ba-zA-Z0-9%5D%28%3F%3A%5Ba-zA-Z0-9-%5D%7B0%2C61%7D%5Ba-zA-Z0-9%5D%29%3F%29%28%3F%3A%5C.%28%3F%3A%5Ba-zA-Z0-9%5D%28%3F%3A%5Ba-zA-Z0-9-%5D%7B0%2C61%7D%5Ba-zA-Z0-9%5D%29%3F%29%29%2A%24))
 must respect the following conditions
@@ -33,7 +33,7 @@ must respect the following conditions
 | ---------------------------------------------------------------------------- | ------- | ------ | ---------- | ---------- | --------------------- |
 | - [^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)$](#pattern1_pattern4 ) | Yes     | object | No         | -          | Proxmox cluster name. |
 
-### <a name="pattern1_pattern4"></a>131.1. Pattern Property `Dynamic local pve cloud schema. > Inventory cloud domain. > Proxmox cluster name.`
+### <a name="pattern1_pattern4"></a>133.1. Pattern Property `Dynamic local pve cloud schema. > Inventory cloud domain. > Proxmox cluster name.`
 > All properties whose name matches the regular expression
 ```^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)$``` ([Test](https://regex101.com/?regex=%5E%28%3F%3A%5Ba-zA-Z0-9%5D%28%3F%3A%5Ba-zA-Z0-9-%5D%7B0%2C61%7D%5Ba-zA-Z0-9%5D%29%3F%29%24))
 must respect the following conditions
@@ -53,7 +53,7 @@ must respect the following conditions
 | - [jump_hosts](#pattern1_pattern4_jump_hosts ) | No      | array of string | No         | -          | Optional ip list of root user jump hosts (they will be used cluster wide for accessing other proxmox hosts and vms). Can be a proxmox host itself. |
 | + [pve_hosts](#pattern1_pattern4_pve_hosts )   | No      | object          | No         | -          | Hosts in the cluster, should be added via local ip and the --host-iface parameter in \`pvcli connect...\`                                          |
 
-#### <a name="pattern1_pattern4_jump_hosts"></a>131.1.1. Property `Dynamic local pve cloud schema. > Inventory cloud domain. > Proxmox cluster name. > jump_hosts`
+#### <a name="pattern1_pattern4_jump_hosts"></a>133.1.1. Property `Dynamic local pve cloud schema. > Inventory cloud domain. > Proxmox cluster name. > jump_hosts`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -74,14 +74,14 @@ must respect the following conditions
 | ------------------------------------------------------- | ----------- |
 | [jump_hosts items](#pattern1_pattern4_jump_hosts_items) | -           |
 
-##### <a name="pattern1_pattern4_jump_hosts_items"></a>131.1.1.1. Dynamic local pve cloud schema. > Inventory cloud domain. > Proxmox cluster name. > jump_hosts > jump_hosts items
+##### <a name="pattern1_pattern4_jump_hosts_items"></a>133.1.1.1. Dynamic local pve cloud schema. > Inventory cloud domain. > Proxmox cluster name. > jump_hosts > jump_hosts items
 
 |              |          |
 | ------------ | -------- |
 | **Type**     | `string` |
 | **Required** | No       |
 
-#### <a name="pattern1_pattern4_pve_hosts"></a>131.1.2. Property `Dynamic local pve cloud schema. > Inventory cloud domain. > Proxmox cluster name. > pve_hosts`
+#### <a name="pattern1_pattern4_pve_hosts"></a>133.1.2. Property `Dynamic local pve cloud schema. > Inventory cloud domain. > Proxmox cluster name. > pve_hosts`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -95,7 +95,7 @@ must respect the following conditions
 | ----------------------------------------------------------------------------------------------- | ------- | ------ | ---------- | ---------- | ----------------- |
 | - [^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)$](#pattern1_pattern4_pve_hosts_pattern1 ) | Yes     | object | No         | -          | Proxmox hostname  |
 
-##### <a name="pattern1_pattern4_pve_hosts_pattern1"></a>131.1.2.1. Pattern Property `Dynamic local pve cloud schema. > Inventory cloud domain. > Proxmox cluster name. > pve_hosts > Proxmox hostname`
+##### <a name="pattern1_pattern4_pve_hosts_pattern1"></a>133.1.2.1. Pattern Property `Dynamic local pve cloud schema. > Inventory cloud domain. > Proxmox cluster name. > pve_hosts > Proxmox hostname`
 > All properties whose name matches the regular expression
 ```^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)$``` ([Test](https://regex101.com/?regex=%5E%28%3F%3A%5Ba-zA-Z0-9%5D%28%3F%3A%5Ba-zA-Z0-9-%5D%7B0%2C61%7D%5Ba-zA-Z0-9%5D%29%3F%29%24))
 must respect the following conditions
@@ -113,7 +113,7 @@ must respect the following conditions
 | + [ansible_host](#pattern1_pattern4_pve_hosts_pattern1_ansible_host ) | No      | string | No         | -          | IPv4 Address of the host, should be a private ip. For remote hosts, they should be accessed via jumphosts. |
 | + [ansible_user](#pattern1_pattern4_pve_hosts_pattern1_ansible_user ) | No      | string | No         | -          | Ansible user to connect to the proxmox with, proxmox uses root per default.                                |
 
-###### <a name="pattern1_pattern4_pve_hosts_pattern1_ansible_host"></a>131.1.2.1.1. Property `Dynamic local pve cloud schema. > Inventory cloud domain. > Proxmox cluster name. > pve_hosts > Proxmox hostname > ansible_host`
+###### <a name="pattern1_pattern4_pve_hosts_pattern1_ansible_host"></a>133.1.2.1.1. Property `Dynamic local pve cloud schema. > Inventory cloud domain. > Proxmox cluster name. > pve_hosts > Proxmox hostname > ansible_host`
 
 |              |          |
 | ------------ | -------- |
@@ -122,7 +122,7 @@ must respect the following conditions
 
 **Description:** IPv4 Address of the host, should be a private ip. For remote hosts, they should be accessed via jumphosts.
 
-###### <a name="pattern1_pattern4_pve_hosts_pattern1_ansible_user"></a>131.1.2.1.2. Property `Dynamic local pve cloud schema. > Inventory cloud domain. > Proxmox cluster name. > pve_hosts > Proxmox hostname > ansible_user`
+###### <a name="pattern1_pattern4_pve_hosts_pattern1_ansible_user"></a>133.1.2.1.2. Property `Dynamic local pve cloud schema. > Inventory cloud domain. > Proxmox cluster name. > pve_hosts > Proxmox hostname > ansible_user`
 
 |              |          |
 | ------------ | -------- |
