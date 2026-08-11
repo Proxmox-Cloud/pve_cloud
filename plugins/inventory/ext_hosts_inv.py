@@ -73,12 +73,23 @@ class InventoryModule(BaseInventoryPlugin):
             inventory.set_variable(
                 "all", "stack_name", yaml_data["external_stack_name"]
             )
+            # todo: maybe generify
+            if "host_groups" in yaml_data:
+                for host_group, hosts in yaml_data["host_groups"].items():
+                    inventory.add_group(host_group)
 
-            for host_group, hosts in yaml_data["host_groups"].items():
-                inventory.add_group(host_group)
+                    for host, host_vars in hosts.items():
+                        inventory.add_host(host, group=host_group)
 
-                for host, host_vars in hosts.items():
-                    inventory.add_host(host, group=host_group)
+                        for key, var in host_vars.items():
+                            inventory.set_variable(host, key, var)
 
-                    for key, var in host_vars.items():
-                        inventory.set_variable(host, key, var)
+            if "typed_host_groups" in yaml_data:
+                for host_group, hosts in yaml_data["typed_host_groups"].items():
+                    inventory.add_group(host_group)
+
+                    for host, host_vars in hosts.items():
+                        inventory.add_host(host, group=host_group)
+
+                        for key, var in host_vars.items():
+                            inventory.set_variable(host, key, var)

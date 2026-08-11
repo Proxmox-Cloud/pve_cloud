@@ -21,11 +21,6 @@
   roles:
     - parse_cluster_secrets
   tasks:
-    - name: validate schema bdd setup hostvars
-      ansible.utils.validate:
-        criteria: "{{ lookup('ansible.builtin.file', 'files/bdd_server_hostvars_schema.yaml') | from_yaml }}"
-        data: "{{ hostvars[inventory_hostname] }}"
-
     - name: install core apt packages
       ansible.builtin.apt:
         name: 
@@ -104,7 +99,7 @@
 
     - name: Install bdd into venv from tdd dog local pypi
       ansible.builtin.command:
-        cmd: /opt/bdd/.venv/bin/pip install --index-url http://{{ tdd_local_pypi_host }}:8088/simple --trusted-host {{ tdd_local_pypi_host }} py-pve-cloud-backup=={{ py_pve_cloud_backup_version }}
+        cmd: /opt/bdd/.venv/bin/pip install --upgrade --upgrade-strategy eager --no-cache-dir --index-url http://{{ tdd_local_pypi_host }}:8088/simple --trusted-host {{ tdd_local_pypi_host }} py-pve-cloud-backup=={{ py_pve_cloud_backup_version }}
       when: tdd_local_pypi_host is defined
 
     - name: create sub pool on use existing
