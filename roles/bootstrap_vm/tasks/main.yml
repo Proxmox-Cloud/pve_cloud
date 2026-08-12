@@ -125,14 +125,27 @@
 
 # generic additional disks that should be created, defined in qemu base schema
 # todo: this | int pipe is triggering me
-- name: create additional hard drives if defined
-  when: '"additional_disks" in args'
+- name: create additional from pve storage hard drives if defined
+  when:
+    - '"additional_disks" in args'
+    - disk.from_storage | default(false)
   loop_control:
     index_var: disk_idx
     loop_var: disk
   loop: "{{ args['additional_disks'] }}"
   ansible.builtin.command:
-    cmd: qm set {{ pve_id.stdout }} --scsi{{ disk_idx + (scsi_idx_zfs_base | int) + 1 }} {{ disk["pool"] }}:{{ disk["size"] | regex_replace("G$", "") }}{% for key, value in disk['options'].items() %},{{ key }}={{ value }}{% endfor %}
+    cmd: qm set {{ pve_id.stdout }} --scsi{{ disk_idx + (scsi_idx_zfs_base | int) + 1 }} {{ disk["from_storage"]["pool"] }}:{{ disk["from_storage"]["size"] | regex_replace("G$", "") }}{% for key, value in disk['from_storage']['options'].items() %},{{ key }}={{ value }}{% endfor %}
+
+- name: create additional via passthrough hard drives if defined
+  when:
+    - '"additional_disks" in args'
+    - disk.via_passthrough | default(false)
+  loop_control:
+    index_var: disk_idx
+    loop_var: disk
+  loop: "{{ args['additional_disks'] }}"
+  ansible.builtin.command:
+    cmd: qm set {{ pve_id.stdout }} --scsi{{ disk_idx + (scsi_idx_zfs_base | int) + 1 }} /dev/disk/by-id/{{ disk["via_passthrough"]["disk_id"] }}{% for key, value in disk['via_passthrough']['options'].items() %},{{ key }}={{ value }}{% endfor %}
 
 - name: Start the virtual machine
   ansible.builtin.command:
