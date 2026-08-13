@@ -12,6 +12,7 @@ Environment="ENV=PRODUCTION"
 # todo: this variable is currently unused, in the future it might be nice / useful
 # to have one dataset per backup origin / stack that is sending
 Environment="ZFS_POOL_BASE={{ zfs_pool_base }}"
+Environment="LOG_LEVEL={{ bdd_log_level | default('INFO') }}"
 
 [Install]
 WantedBy=multi-user.target
