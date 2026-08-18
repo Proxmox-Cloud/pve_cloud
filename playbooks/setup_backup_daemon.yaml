@@ -17,7 +17,7 @@
   become: true
   vars:
     # increment this on releasing a new pve-cloud-backup version
-    py_pve_cloud_backup_version: "3.5.15"
+    py_pve_cloud_backup_version: "3.5.16"
   roles:
     - parse_cluster_secrets
   tasks:
