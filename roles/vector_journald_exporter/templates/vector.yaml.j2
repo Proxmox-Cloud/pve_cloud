@@ -6,9 +6,9 @@ transforms:
   add_custom_labels:
     type: "remap"
     inputs: ["journal_source"]
-     # gets remapped in victorialogs to namespace (stack name + pve cloud)
+    # gets remapped in victorialogs to namespace (stack name + pve cloud)
     source: |
-      .pve_stack = "{{ stack_name }}"
+      .pve_stack = "{{ stack_name }}.{{ pve_cloud_domain }}"
 
 sinks:
   vlogs_sink:
@@ -20,7 +20,7 @@ sinks:
     request:
       headers:
         VL-Msg-Field: message,msg,_msg,log.msg,log.message,log
-        VL-Stream-Fields: _TRANSPORT,host,_SYSTEMD_UNIT
+        VL-Stream-Fields: _TRANSPORT,host,_SYSTEMD_UNIT,pve_stack
         VL-Time-Field: timestamp
     compression: "gzip"
     auth:
