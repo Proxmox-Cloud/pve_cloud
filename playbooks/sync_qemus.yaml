@@ -5,6 +5,7 @@
   tags:
     - qemus
   roles:
+    - configure_pxc_ansible_cfg
     - slurp_cluster_secrets
     - parse_cluster_secrets
   tasks:

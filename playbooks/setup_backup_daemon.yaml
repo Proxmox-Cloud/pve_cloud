@@ -1,6 +1,7 @@
 - name: Slurp screts from pve
   hosts: target_pve
   roles:
+    - configure_pxc_ansible_cfg
     - slurp_cluster_secrets
 
 - name: Gather server facts

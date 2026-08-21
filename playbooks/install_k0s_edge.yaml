@@ -2,6 +2,8 @@
   tags:
     - k0s_install
   hosts: localhost
+  roles:
+    - configure_pxc_ansible_cfg
   tasks:
     # slurp patroni password
     - name: Slurp file if it exists

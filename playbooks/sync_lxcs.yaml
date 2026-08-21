@@ -4,6 +4,8 @@
     - create
   vars:
     vm_type: "lxc" # static key for triggering lxc creation logic
+  roles:
+    - configure_pxc_ansible_cfg
   tasks:
     - include_role:
         name: determine_vms_create_delete

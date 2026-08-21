@@ -8,7 +8,7 @@
     name:
       - "linux-image-{{ arch_mapping[ansible_architecture] }}"
       - "linux-headers-{{ arch_mapping[ansible_architecture] }}"
-    state: latest
+    state: present # todo: check if this works or latest once initially is needed
   register: kernel_update
 
 - name: reboot after kernel update

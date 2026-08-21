@@ -4,6 +4,9 @@
   tags:
     - rsync # check version first also for rsync play
   pre_tasks:
+    - include_role:
+        name: pxc.cloud.configure_pxc_ansible_cfg
+
     - name: Check if cluster vars exist
       stat:
         path: "/etc/pve/cloud/cluster_vars.yaml"

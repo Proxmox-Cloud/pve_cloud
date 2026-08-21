@@ -1,0 +1,33 @@
+---
+# tasks file for configure_pxc_ansible_cfg
+- name: configure / create ansible.cfg with pxc opts next to inventory file
+  delegate_to: localhost
+  run_once: true
+  ansible.builtin.ini_file:
+    path: "{{ inventory_dir }}/ansible.cfg"
+    section: "{{ item.section }}"
+    option: "{{ item.option }}"
+    value: "{{ item.value }}"
+    create: true
+  register: pxc_ansible_cfg
+  loop:
+    - section: inventory
+      option: any_unparsed_is_failed
+      value: "True"
+
+    - section: ssh_connection
+      option: ssh_args
+      value: "-o ControlMaster=auto -o ControlPersist=60s"
+
+    - section: ssh_connection
+      option: control_path_dir
+      value: "~/.ansible/cp"
+
+    - section: ssh_connection
+      option: control_path
+      value: "%(directory)s/%%h-%%r-%%p"
+
+- name: fail on create / change
+  ansible.builtin.fail:
+    msg: "ansible.cfg with pxc options created / modified by playbook! Commit and rerun so ansible loads the changes!"
+  when: pxc_ansible_cfg.changed
