@@ -87,7 +87,11 @@ class InventoryModule(BaseInventoryPlugin):
         inventory.set_variable("all", "py_pve_cloud_version", py_pve_cloud_version)
 
         if "additional_root_ssh_pub_keys" in yaml_data:
-            inventory.set_variable("all", "additional_root_ssh_pub_keys", yaml_data["additional_root_ssh_pub_keys"])
+            inventory.set_variable(
+                "all",
+                "additional_root_ssh_pub_keys",
+                yaml_data["additional_root_ssh_pub_keys"],
+            )
 
         # load pve clusters and set cluster variables for them
         executor_set = False
