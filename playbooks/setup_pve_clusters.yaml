@@ -222,8 +222,9 @@
       when: net_offloading_fixxes is defined
       loop: "{{ net_offloading_fixxes }}"
 
-- name: Jump host config
+- name: Jump host config + install additional keys
   hosts: jump_hosts:all_pve_hosts
+  serial: 1 # need to do it sequentially because .ssh/ is pmxcfs shared across hosts
   tasks:
     # todo: this is maybe solved through ssh connection multiplexing?
     - name: increase sshd max startups for excessive tunneling
@@ -235,6 +236,14 @@
       notify: restart-sshd
       # only configure when jump hosts defined
       when: groups['jump_hosts'] | length > 0
+
+    - name: install additional root keys
+      lineinfile:
+        path: /root/.ssh/authorized_keys
+        line: "{{ item }}"
+        state: present
+      loop: "{{ additional_root_ssh_pub_keys }}"
+      when: additional_root_ssh_pub_keys is defined
 
   handlers:
     - name: restart-sshd

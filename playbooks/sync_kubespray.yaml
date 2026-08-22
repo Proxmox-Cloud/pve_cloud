@@ -158,6 +158,14 @@
         line: "{{ cluster_automation_pub_key | b64decode | trim }}"
         state: present
 
+    - name: install additional core user keys
+      lineinfile:
+        path: /home/{{ "admin" if qemu_default_user is undefined else qemu_default_user }}/.ssh/authorized_keys
+        line: "{{ item }}"
+        state: present
+      loop: "{{ additional_root_ssh_pub_keys }}"
+      when: additional_root_ssh_pub_keys is defined
+
     - name: setup zfs csi if specifid in qemu params
       when: '"zpool_csi_parameters" in vm_params_self'
       include_role:

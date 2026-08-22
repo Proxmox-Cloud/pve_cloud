@@ -156,6 +156,14 @@
         line: "{{ cluster_automation_pub_key | b64decode | trim }}"
         state: present
 
+    - name: install additional root keys
+      lineinfile:
+        path: /root/.ssh/authorized_keys
+        line: "{{ item }}"
+        state: present
+      loop: "{{ additional_root_ssh_pub_keys }}"
+      when: additional_root_ssh_pub_keys is defined
+
     # todo: also generify this
     # this logic sets up vector log exporter to victoria logs db if that is configured
     # via a discovery sercret
