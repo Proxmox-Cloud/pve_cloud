@@ -1,0 +1,29 @@
+---
+- name: stat {{ check.name }} binary
+  ansible.builtin.stat:
+    path: "{{ check.path }}"
+  register: binary_stat
+
+- name: get existing {{ check.name }} version
+  ansible.builtin.command: "{{ check.version_command }}"
+  register: binary_version_output
+  changed_when: false
+  ignore_errors: true
+  when: binary_stat.stat.exists
+
+- name: set existing {{ check.name }} version fact
+  ansible.builtin.set_fact:
+    existing_version: "{{ (binary_version_output.stdout | default('') | regex_search(check.version_regex, '\\1', multiline=true) or ['unknown']) | first }}"
+  when: binary_stat.stat.exists
+
+- name: debug existing {{ check.name }} version
+  ansible.builtin.debug:
+    var: existing_version
+  when: binary_stat.stat.exists
+
+- name: fail if existing {{ check.name }} version mismatch
+  ansible.builtin.fail:
+    msg: "Existing {{ check.name }} version {{ existing_version }} does not match required version {{ check.required_version }}. {{ check.failure_hint | default('Please uninstall the existing version and rerun this playbook.') }}"
+  when:
+    - binary_stat.stat.exists
+    - binary_version_output.failed or existing_version != check.required_version

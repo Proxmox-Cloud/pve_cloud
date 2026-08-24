@@ -1,3 +1,9 @@
+- name: Verify control node tool versions
+  hosts: localhost
+  gather_facts: false
+  roles:
+    - check_binary_versions
+
 - name: Sync nodes
   hosts: target_pve
   vars:

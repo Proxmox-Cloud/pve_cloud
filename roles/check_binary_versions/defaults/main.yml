@@ -1,0 +1,20 @@
+---
+# defaults file for check_binary_versions
+
+# required versions for the default checks below, overridable by the caller
+kubectl_version: "v1.36.0"
+helm_version: "v4.2.0"
+
+binary_version_checks:
+  - name: kubectl
+    path: /usr/local/bin/kubectl
+    required_version: "{{ kubectl_version }}"
+    version_command: /usr/local/bin/kubectl version --client
+    version_regex: 'Client Version: (v[0-9.]+)'
+    failure_hint: "Uninstall and rerun the playbook to get the right version installed."
+  - name: helm
+    path: /usr/local/bin/helm
+    required_version: "{{ helm_version }}"
+    version_command: /usr/local/bin/helm version --short
+    version_regex: '(v[0-9.]+)'
+    failure_hint: "Please uninstall the existing version and rerun this playbook."

@@ -1,0 +1,8 @@
+---
+# tasks file for check_binary_versions
+- name: check binary version
+  ansible.builtin.include_tasks: verify_binary.yml
+  loop: "{{ binary_version_checks }}"
+  loop_control:
+    loop_var: check
+    label: "{{ check.name }}"

@@ -1,12 +1,12 @@
 - name: Setup node running ansible (local machine)
   hosts: localhost
   vars:
-    # for selecting helm version to dl
+    # for selecting helm/kubectl version to dl
     arch_mapping:
       x86_64: "amd64"
       aarch64: "arm64"
-    kubectl_version: "v1.36.0"
-    helm_version: "v4.2.0"
+  roles:
+    - check_binary_versions
   tasks:
     - set_fact:
         ee_requirements_path: "{{ custom_ee_reqs_path if custom_ee_reqs_path is defined else (playbook_dir | dirname) ~ '/meta/ee-requirements.txt' }}"
@@ -22,31 +22,12 @@
         pkg:
           - rsync
           - skopeo # quering mirror registry
-    
+
     # install kubectl
     - name: install check kubectl
       ansible.builtin.stat:
         path: "/usr/local/bin/kubectl"
       register: kubectl_binary
-
-    - name: Get existing kubectl version
-      ansible.builtin.command: /usr/local/bin/kubectl version --client
-      register: kubectl_version_output
-      ignore_errors: true
-      when: kubectl_binary.stat.exists
-
-    - name: Set existing kubectl version fact
-      ansible.builtin.set_fact:
-        existing_kubectl_version: "{{ kubectl_version_output.stdout | regex_search('Client Version: (v[0-9.]+)', '\\1', multiline=true) | first }}"
-      when: kubectl_binary.stat.exists and not kubectl_version_output.failed
-
-    - debug:
-        var: existing_kubectl_version
-
-    - name: Fail if existing kubectl version mismatch
-      ansible.builtin.fail:
-        msg: "Existing kubectl version {{ existing_kubectl_version | default('unknown') }} does not match required version {{ kubectl_version }}. Uninstall and rerun the playbook to get the right version installed."
-      when: kubectl_binary.stat.exists and (kubectl_version_output.failed or existing_kubectl_version != kubectl_version)
 
     - name: Download kubectl binary to /usr/local/bin
       ansible.builtin.get_url:
@@ -61,25 +42,6 @@
       ansible.builtin.stat:
         path: "/usr/local/bin/helm"
       register: helm_binary
-
-    - name: Get existing helm version
-      ansible.builtin.command: /usr/local/bin/helm version --short
-      register: helm_version_output
-      ignore_errors: true
-      when: helm_binary.stat.exists
-
-    - name: Set existing helm version fact
-      ansible.builtin.set_fact:
-        existing_helm_version: "{{ helm_version_output.stdout | regex_search('(v[0-9.]+)', '\\1') | first }}"
-      when: helm_binary.stat.exists and not helm_version_output.failed
-
-    - debug:
-        var: existing_helm_version
-
-    - name: Fail if existing helm version mismatch
-      ansible.builtin.fail:
-        msg: "Existing helm version {{ existing_helm_version | default('unknown') }} does not match required version {{ helm_version }}. Please uninstall the existing version and rerun this playbook."
-      when: helm_binary.stat.exists and (helm_version_output.failed or existing_helm_version != helm_version)
 
     - name: download and extract helm
       ansible.builtin.unarchive:
@@ -97,6 +59,5 @@
         mode: '0755'
         remote_src: true
       when: not helm_binary.stat.exists
-      
 
     # todo: apt install avahi? / other reqs
