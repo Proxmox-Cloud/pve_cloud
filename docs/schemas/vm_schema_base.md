@@ -8,17 +8,18 @@
 | **Required**              | No          |
 | **Additional properties** | Not allowed |
 
-| Property                                 | Pattern | Type            | Deprecated | Definition | Title/Description                                                                                                                                                                                                                     |
-| ---------------------------------------- | ------- | --------------- | ---------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| + [target_pve](#target_pve )             | No      | string          | No         | -          | Proxmox cluster name + . + pve cloud domain. This determines the cloud and the proxmox cluster the vms/lxc/k8s luster will be created in.                                                                                             |
-| + [stack_name](#stack_name )             | No      | string          | No         | -          | Your stack name, needs to be unique within the cloud domain.                                                                                                                                                                          |
-| - [static_includes](#static_includes )   | No      | object          | No         | -          | This property contains specific hosts / stacks that need to be included for a schema extension. This way playbooks can statically<br />reference a host group and assume it to be a certain stack (e.g. postgres/haproxy/dhcp).<br /> |
-| - [include_stacks](#include_stacks )     | No      | array of object | No         | -          | Include other stacks into the ansible inventory, from any pve cloud you are connected to. From here you can freely extend and write your own playbooks.                                                                               |
-| + [root_ssh_pub_key](#root_ssh_pub_key ) | No      | string          | No         | -          | trusted root key for the cloud init image.                                                                                                                                                                                            |
-| - [pve_ha_group](#pve_ha_group )         | No      | string          | No         | -          | PVE HA group this vm should be assigned to (optional).                                                                                                                                                                                |
-| - [target_pve_hosts](#target_pve_hosts ) | No      | array of string | No         | -          | Array of proxmox hosts in the target pve that are eligible for scheduling. If not specified all online hosts are considered.                                                                                                          |
+| Property                                                         | Pattern | Type            | Deprecated | Definition | Title/Description                                                                                                                                                                                                                     |
+| ---------------------------------------------------------------- | ------- | --------------- | ---------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| + [target_pve](#target_pve )                                     | No      | string          | No         | -          | Proxmox cluster name + . + pve cloud domain. This determines the cloud and the proxmox cluster the vms/lxc/k8s luster will be created in.                                                                                             |
+| + [stack_name](#stack_name )                                     | No      | string          | No         | -          | Your stack name, needs to be unique within the cloud domain.                                                                                                                                                                          |
+| - [static_includes](#static_includes )                           | No      | object          | No         | -          | This property contains specific hosts / stacks that need to be included for a schema extension. This way playbooks can statically<br />reference a host group and assume it to be a certain stack (e.g. postgres/haproxy/dhcp).<br /> |
+| - [include_stacks](#include_stacks )                             | No      | array of object | No         | -          | Include other stacks into the ansible inventory, from any pve cloud you are connected to. From here you can freely extend and write your own playbooks.                                                                               |
+| + [root_ssh_pub_key](#root_ssh_pub_key )                         | No      | string          | No         | -          | trusted root key for the cloud init image.                                                                                                                                                                                            |
+| - [additional_root_ssh_pub_keys](#additional_root_ssh_pub_keys ) | No      | array of string | No         | -          | Additional public keys that will be added to the hosts trusted ssh keys.                                                                                                                                                              |
+| - [pve_ha_group](#pve_ha_group )                                 | No      | string          | No         | -          | PVE HA group this vm should be assigned to (optional).                                                                                                                                                                                |
+| - [target_pve_hosts](#target_pve_hosts )                         | No      | array of string | No         | -          | Array of proxmox hosts in the target pve that are eligible for scheduling. If not specified all online hosts are considered.                                                                                                          |
 
-## <a name="target_pve"></a>77. Property `VM/LXC Base Schema > target_pve`
+## <a name="target_pve"></a>81. Property `VM/LXC Base Schema > target_pve`
 
 |              |          |
 | ------------ | -------- |
@@ -33,7 +34,7 @@
 "proxmox-cluster-a.your-cloud.domain"
 ```
 
-## <a name="stack_name"></a>78. Property `VM/LXC Base Schema > stack_name`
+## <a name="stack_name"></a>82. Property `VM/LXC Base Schema > stack_name`
 
 |              |          |
 | ------------ | -------- |
@@ -42,7 +43,7 @@
 
 **Description:** Your stack name, needs to be unique within the cloud domain.
 
-## <a name="static_includes"></a>79. Property `VM/LXC Base Schema > static_includes`
+## <a name="static_includes"></a>83. Property `VM/LXC Base Schema > static_includes`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -53,7 +54,7 @@
 **Description:** This property contains specific hosts / stacks that need to be included for a schema extension. This way playbooks can statically
 reference a host group and assume it to be a certain stack (e.g. postgres/haproxy/dhcp).
 
-## <a name="include_stacks"></a>80. Property `VM/LXC Base Schema > include_stacks`
+## <a name="include_stacks"></a>84. Property `VM/LXC Base Schema > include_stacks`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -74,7 +75,7 @@ reference a host group and assume it to be a certain stack (e.g. postgres/haprox
 | --------------------------------------------- | ----------- |
 | [include_stacks items](#include_stacks_items) | -           |
 
-### <a name="include_stacks_items"></a>80.1. VM/LXC Base Schema > include_stacks > include_stacks items
+### <a name="include_stacks_items"></a>84.1. VM/LXC Base Schema > include_stacks > include_stacks items
 
 |                           |             |
 | ------------------------- | ----------- |
@@ -88,7 +89,7 @@ reference a host group and assume it to be a certain stack (e.g. postgres/haprox
 | + [host_group](#include_stacks_items_host_group )               | No      | string | No         | -          | This is the name of the hosts group of our ansible inventory the included vms/lxcs will be available under.                                                                                                                        |
 | - [qemu_ansible_user](#include_stacks_items_qemu_ansible_user ) | No      | string | No         | -          | User ansible will use to connect, defaults to admin. If you dont want to use debian cinit images you might need to set something else than admin.<br />Ubuntu for example wont work if you set the cloud init user to admin.<br /> |
 
-#### <a name="include_stacks_items_stack_fqdn"></a>80.1.1. Property `VM/LXC Base Schema > include_stacks > include_stacks items > stack_fqdn`
+#### <a name="include_stacks_items_stack_fqdn"></a>84.1.1. Property `VM/LXC Base Schema > include_stacks > include_stacks items > stack_fqdn`
 
 |              |          |
 | ------------ | -------- |
@@ -107,7 +108,7 @@ reference a host group and assume it to be a certain stack (e.g. postgres/haprox
 "other-k8s.your-other-cloud.domain"
 ```
 
-#### <a name="include_stacks_items_host_group"></a>80.1.2. Property `VM/LXC Base Schema > include_stacks > include_stacks items > host_group`
+#### <a name="include_stacks_items_host_group"></a>84.1.2. Property `VM/LXC Base Schema > include_stacks > include_stacks items > host_group`
 
 |              |          |
 | ------------ | -------- |
@@ -116,7 +117,7 @@ reference a host group and assume it to be a certain stack (e.g. postgres/haprox
 
 **Description:** This is the name of the hosts group of our ansible inventory the included vms/lxcs will be available under.
 
-#### <a name="include_stacks_items_qemu_ansible_user"></a>80.1.3. Property `VM/LXC Base Schema > include_stacks > include_stacks items > qemu_ansible_user`
+#### <a name="include_stacks_items_qemu_ansible_user"></a>84.1.3. Property `VM/LXC Base Schema > include_stacks > include_stacks items > qemu_ansible_user`
 
 |              |          |
 | ------------ | -------- |
@@ -126,7 +127,7 @@ reference a host group and assume it to be a certain stack (e.g. postgres/haprox
 **Description:** User ansible will use to connect, defaults to admin. If you dont want to use debian cinit images you might need to set something else than admin.
 Ubuntu for example wont work if you set the cloud init user to admin.
 
-## <a name="root_ssh_pub_key"></a>81. Property `VM/LXC Base Schema > root_ssh_pub_key`
+## <a name="root_ssh_pub_key"></a>85. Property `VM/LXC Base Schema > root_ssh_pub_key`
 
 |              |          |
 | ------------ | -------- |
@@ -135,7 +136,35 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** trusted root key for the cloud init image.
 
-## <a name="pve_ha_group"></a>82. Property `VM/LXC Base Schema > pve_ha_group`
+## <a name="additional_root_ssh_pub_keys"></a>86. Property `VM/LXC Base Schema > additional_root_ssh_pub_keys`
+
+|              |                   |
+| ------------ | ----------------- |
+| **Type**     | `array of string` |
+| **Required** | No                |
+
+**Description:** Additional public keys that will be added to the hosts trusted ssh keys.
+
+|                      | Array restrictions |
+| -------------------- | ------------------ |
+| **Min items**        | N/A                |
+| **Max items**        | N/A                |
+| **Items unicity**    | False              |
+| **Additional items** | False              |
+| **Tuple validation** | See below          |
+
+| Each item of this array must be                                           | Description |
+| ------------------------------------------------------------------------- | ----------- |
+| [additional_root_ssh_pub_keys items](#additional_root_ssh_pub_keys_items) | -           |
+
+### <a name="additional_root_ssh_pub_keys_items"></a>86.1. VM/LXC Base Schema > additional_root_ssh_pub_keys > additional_root_ssh_pub_keys items
+
+|              |          |
+| ------------ | -------- |
+| **Type**     | `string` |
+| **Required** | No       |
+
+## <a name="pve_ha_group"></a>87. Property `VM/LXC Base Schema > pve_ha_group`
 
 |              |          |
 | ------------ | -------- |
@@ -144,7 +173,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** PVE HA group this vm should be assigned to (optional).
 
-## <a name="target_pve_hosts"></a>83. Property `VM/LXC Base Schema > target_pve_hosts`
+## <a name="target_pve_hosts"></a>88. Property `VM/LXC Base Schema > target_pve_hosts`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -165,7 +194,7 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 | ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
 | [target_pve_hosts items](#target_pve_hosts_items) | The hostname of the proxmox host. Just the hostname, no cluster name or cloud domain should be specified, as they are implicit. |
 
-### <a name="target_pve_hosts_items"></a>83.1. VM/LXC Base Schema > target_pve_hosts > target_pve_hosts items
+### <a name="target_pve_hosts_items"></a>88.1. VM/LXC Base Schema > target_pve_hosts > target_pve_hosts items
 
 |              |          |
 | ------------ | -------- |

@@ -10,25 +10,26 @@
 
 **Description:** Definitions for a proxmox cloud, setup of proxmox clusters.
 
-| Property                                                       | Pattern | Type             | Deprecated | Definition | Title/Description                                                                                                                                                                                                                                                                         |
-| -------------------------------------------------------------- | ------- | ---------------- | ---------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| + [pve_vm_subnet](#pve_vm_subnet )                             | No      | string           | No         | -          | Subnet this PVE cluster uses for its VMs.                                                                                                                                                                                                                                                 |
-| + [pve_cloud_domain](#pve_cloud_domain )                       | No      | string           | No         | -          | The overarching domain for the cloud. Will also be used for ddns.                                                                                                                                                                                                                         |
-| + [kea_dhcp_main_ip](#kea_dhcp_main_ip )                       | No      | string           | No         | -          | Static assigned ip for the main dhcp server. This has to match your dhcp lxc inventory file!                                                                                                                                                                                              |
-| + [kea_dhcp_failover_ip](#kea_dhcp_failover_ip )               | No      | string           | No         | -          | Static ip for slave dhcp server. This has to match your dhcp lxc inventory file!                                                                                                                                                                                                          |
-| + [kea_dhcp_routers](#kea_dhcp_routers )                       | No      | string           | No         | -          | option-data for kea dhcp routers. The default route router that the dhcp will communicate.                                                                                                                                                                                                |
-| + [kea_dhcp_pools](#kea_dhcp_pools )                           | No      | array of string  | No         | -          | Address pools that the dhcp allocates from. Has to be within pve_vm_subnet cidr.                                                                                                                                                                                                          |
-| + [kea_dhcp_static_routes](#kea_dhcp_static_routes )           | No      | string           | No         | -          | classless-static-routes for kea option-data. You can pass comma seperated extra routes you want the dhcp to communicate, for example to a custom VPN gateway.<br />                                                                                                                       |
-| + [bind_master_ip](#bind_master_ip )                           | No      | string           | No         | -          | IP of the primary bind dns for this cluster, will be statically assigned. Has to match your bind lxc inventory file!                                                                                                                                                                      |
-| + [bind_slave_ip](#bind_slave_ip )                             | No      | string           | No         | -          | IP of the slave bind dns for this cluster. Has to match your bind lxc inventory file!                                                                                                                                                                                                     |
-| + [bind_arpa_zone_service_lxcs](#bind_arpa_zone_service_lxcs ) | No      | string           | No         | -          | Arpa zone in which service lxcs with static ips will manuall get their reverse dns entries.                                                                                                                                                                                               |
-| + [bind_additional_arpa_zones](#bind_additional_arpa_zones )   | No      | array of string  | No         | -          | Additional arpa zones which should be created and managed in the dns / dhcp ddns.                                                                                                                                                                                                         |
-| + [pve_clusters](#pve_clusters )                               | No      | object           | No         | -          | Definitions for specific Proxmox clusters that will be part of the cloud. Keys are hostnames.                                                                                                                                                                                             |
-| + [bind_zone_admin_email](#bind_zone_admin_email )             | No      | string           | No         | -          | Required adminstrator email in bind format for bind zones.                                                                                                                                                                                                                                |
-| - [bind_forward_zones](#bind_forward_zones )                   | No      | array of object  | No         | -          | Allows forwarding of specific zones to specific nameservers. This is useful for domains that are not owned by this cloud. For delegating sub zones <br />resort to the terraform dns provider alongside the kubernetes cluster that declares the parent zone in its inventory file.<br /> |
-| - [acme_contact](#acme_contact )                               | No      | string           | No         | -          | Email address to use for acme account creation.                                                                                                                                                                                                                                           |
-| - [acme_method](#acme_method )                                 | No      | enum (of string) | No         | -          | PVE Cloud included method for solving dns01 challenges. You need to have created the appropriate cloud secrets created.<br />                                                                                                                                                             |
-| - [plugin](#plugin )                                           | No      | enum (of string) | No         | -          | Id of ansible inventory plugin, needs to be set exactly.                                                                                                                                                                                                                                  |
+| Property                                                         | Pattern | Type             | Deprecated | Definition | Title/Description                                                                                                                                                                                                                                                                         |
+| ---------------------------------------------------------------- | ------- | ---------------- | ---------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| + [pve_vm_subnet](#pve_vm_subnet )                               | No      | string           | No         | -          | Subnet this PVE cluster uses for its VMs.                                                                                                                                                                                                                                                 |
+| + [pve_cloud_domain](#pve_cloud_domain )                         | No      | string           | No         | -          | The overarching domain for the cloud. Will also be used for ddns.                                                                                                                                                                                                                         |
+| + [kea_dhcp_main_ip](#kea_dhcp_main_ip )                         | No      | string           | No         | -          | Static assigned ip for the main dhcp server. This has to match your dhcp lxc inventory file!                                                                                                                                                                                              |
+| + [kea_dhcp_failover_ip](#kea_dhcp_failover_ip )                 | No      | string           | No         | -          | Static ip for slave dhcp server. This has to match your dhcp lxc inventory file!                                                                                                                                                                                                          |
+| + [kea_dhcp_routers](#kea_dhcp_routers )                         | No      | string           | No         | -          | option-data for kea dhcp routers. The default route router that the dhcp will communicate.                                                                                                                                                                                                |
+| + [kea_dhcp_pools](#kea_dhcp_pools )                             | No      | array of string  | No         | -          | Address pools that the dhcp allocates from. Has to be within pve_vm_subnet cidr.                                                                                                                                                                                                          |
+| + [kea_dhcp_static_routes](#kea_dhcp_static_routes )             | No      | string           | No         | -          | classless-static-routes for kea option-data. You can pass comma seperated extra routes you want the dhcp to communicate, for example to a custom VPN gateway.<br />                                                                                                                       |
+| + [bind_master_ip](#bind_master_ip )                             | No      | string           | No         | -          | IP of the primary bind dns for this cluster, will be statically assigned. Has to match your bind lxc inventory file!                                                                                                                                                                      |
+| + [bind_slave_ip](#bind_slave_ip )                               | No      | string           | No         | -          | IP of the slave bind dns for this cluster. Has to match your bind lxc inventory file!                                                                                                                                                                                                     |
+| + [bind_arpa_zone_service_lxcs](#bind_arpa_zone_service_lxcs )   | No      | string           | No         | -          | Arpa zone in which service lxcs with static ips will manuall get their reverse dns entries.                                                                                                                                                                                               |
+| + [bind_additional_arpa_zones](#bind_additional_arpa_zones )     | No      | array of string  | No         | -          | Additional arpa zones which should be created and managed in the dns / dhcp ddns.                                                                                                                                                                                                         |
+| + [pve_clusters](#pve_clusters )                                 | No      | object           | No         | -          | Definitions for specific Proxmox clusters that will be part of the cloud. Keys are hostnames.                                                                                                                                                                                             |
+| + [bind_zone_admin_email](#bind_zone_admin_email )               | No      | string           | No         | -          | Required adminstrator email in bind format for bind zones.                                                                                                                                                                                                                                |
+| - [bind_forward_zones](#bind_forward_zones )                     | No      | array of object  | No         | -          | Allows forwarding of specific zones to specific nameservers. This is useful for domains that are not owned by this cloud. For delegating sub zones <br />resort to the terraform dns provider alongside the kubernetes cluster that declares the parent zone in its inventory file.<br /> |
+| - [additional_root_ssh_pub_keys](#additional_root_ssh_pub_keys ) | No      | array of string  | No         | -          | Additional public keys that will be added to the hosts trusted ssh keys (alongside the initial key you configured manually).                                                                                                                                                              |
+| - [acme_contact](#acme_contact )                                 | No      | string           | No         | -          | Email address to use for acme account creation.                                                                                                                                                                                                                                           |
+| - [acme_method](#acme_method )                                   | No      | enum (of string) | No         | -          | PVE Cloud included method for solving dns01 challenges. You need to have created the appropriate cloud secrets created.<br />                                                                                                                                                             |
+| - [plugin](#plugin )                                             | No      | enum (of string) | No         | -          | Id of ansible inventory plugin, needs to be set exactly.                                                                                                                                                                                                                                  |
 
 ## <a name="pve_vm_subnet"></a>7. Property `Cloud Inventory > pve_vm_subnet`
 
@@ -639,7 +640,35 @@ resort to the terraform dns provider alongside the kubernetes cluster that decla
 | **Type**     | `string` |
 | **Required** | No       |
 
-## <a name="acme_contact"></a>21. Property `Cloud Inventory > acme_contact`
+## <a name="additional_root_ssh_pub_keys"></a>21. Property `Cloud Inventory > additional_root_ssh_pub_keys`
+
+|              |                   |
+| ------------ | ----------------- |
+| **Type**     | `array of string` |
+| **Required** | No                |
+
+**Description:** Additional public keys that will be added to the hosts trusted ssh keys (alongside the initial key you configured manually).
+
+|                      | Array restrictions |
+| -------------------- | ------------------ |
+| **Min items**        | N/A                |
+| **Max items**        | N/A                |
+| **Items unicity**    | False              |
+| **Additional items** | False              |
+| **Tuple validation** | See below          |
+
+| Each item of this array must be                                           | Description |
+| ------------------------------------------------------------------------- | ----------- |
+| [additional_root_ssh_pub_keys items](#additional_root_ssh_pub_keys_items) | -           |
+
+### <a name="additional_root_ssh_pub_keys_items"></a>21.1. Cloud Inventory > additional_root_ssh_pub_keys > additional_root_ssh_pub_keys items
+
+|              |          |
+| ------------ | -------- |
+| **Type**     | `string` |
+| **Required** | No       |
+
+## <a name="acme_contact"></a>22. Property `Cloud Inventory > acme_contact`
 
 |              |          |
 | ------------ | -------- |
@@ -654,7 +683,7 @@ resort to the terraform dns provider alongside the kubernetes cluster that decla
 "acme@example.com"
 ```
 
-## <a name="acme_method"></a>22. Property `Cloud Inventory > acme_method`
+## <a name="acme_method"></a>23. Property `Cloud Inventory > acme_method`
 
 |              |                    |
 | ------------ | ------------------ |
@@ -669,7 +698,7 @@ Must be one of:
 * "ionos"
 * "ionos_cloud"
 
-## <a name="plugin"></a>23. Property `Cloud Inventory > plugin`
+## <a name="plugin"></a>24. Property `Cloud Inventory > plugin`
 
 |              |                    |
 | ------------ | ------------------ |
