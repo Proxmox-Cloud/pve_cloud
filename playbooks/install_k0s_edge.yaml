@@ -2,8 +2,6 @@
   tags:
     - k0s_install
   hosts: localhost
-  roles:
-    - configure_pxc_ansible_cfg
   tasks:
     # slurp patroni password
     - name: Slurp file if it exists
@@ -48,6 +46,9 @@
   hosts: k0s_single
   tags:
     - k0s_install
+  roles:
+    # for some reason fails on localhost with inventory_dir magic var not defined
+    - configure_pxc_ansible_cfg
   tasks:
     - name: enable passwordless sudo for user (later needed for tf k0s fetch)
       become: true

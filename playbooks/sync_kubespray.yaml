@@ -373,6 +373,33 @@
         state: restarted
       when: test_repos_ip is defined and create_hosts_toml.changed
 
+    - name: Check if any ceph sc wants to use nbd mounter
+      ansible.builtin.set_fact:
+        nbd_mounter_sc_present: >-
+          {{
+            ceph_csi_sc_pools
+            | selectattr('use_nbd_mounter', 'defined')
+            | selectattr('use_nbd_mounter', 'equalto', true)
+            | list
+            | length > 0
+          }}
+      when: ceph_csi_sc_pools is defined
+
+    - name: Persist nbd module loading
+      ansible.builtin.copy:
+        dest: /etc/modules-load.d/nbd.conf
+        content: "nbd\n"
+        owner: root
+        group: root
+        mode: "0644"
+      when: ceph_csi_sc_pools is defined and nbd_mounter_sc_present
+
+    - name: Load nbd kernel module
+      community.general.modprobe:
+        name: nbd
+        state: present
+      when: ceph_csi_sc_pools is defined and nbd_mounter_sc_present
+
 # Acme certificates
 - name: Acme 
   hosts: pxc-executor-host

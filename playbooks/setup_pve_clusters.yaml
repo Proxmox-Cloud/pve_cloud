@@ -39,8 +39,9 @@
         state: present
         update_cache: yes
 
+    # e2e testing args
     - set_fact:
-        pip_extra_args: "{{ '--index-url http://' ~ test_repos_ip ~ ':8088/simple --trusted-host ' ~ test_repos_ip if test_repos_ip is defined else '' }}"
+        pip_extra_args: "{{ '--index-url http://' ~ test_repos_ip ~ ':8088/simple --trusted-host ' ~ test_repos_ip ~ ' --no-cache-dir --upgrade --upgrade-strategy eager' if test_repos_ip is defined else '' }}"
       
     - name: create pxc venv
       ansible.builtin.pip:

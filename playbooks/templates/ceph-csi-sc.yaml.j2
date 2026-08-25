@@ -3,7 +3,7 @@
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-  name: csi-rbd-sc-{{ csi_pool.name }}
+  name: csi-rbd-sc-{{ csi_pool.name }}{{ '-nbd' if csi_pool.use_nbd_mounter is defined and csi_pool.use_nbd_mounter else '' }}
 {% if csi_pool.default %}
   annotations:
     storageclass.kubernetes.io/is-default-class: 'true'
@@ -24,6 +24,10 @@ parameters:
   csi.storage.k8s.io/provisioner-secret-namespace: ceph-csi
   imageFeatures: layering
   pool: {{ csi_pool.name }}
+{% if csi_pool.use_nbd_mounter is defined and csi_pool.use_nbd_mounter %}
+  mounter: rbd-nbd
+{% endif %}
+
 reclaimPolicy: Delete
 allowVolumeExpansion: true
 volumeBindingMode: Immediate
