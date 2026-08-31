@@ -49,6 +49,7 @@
   roles:
     # for some reason fails on localhost with inventory_dir magic var not defined
     - configure_pxc_ansible_cfg
+    - transparent_hugepage_madvise
   tasks:
     - name: enable passwordless sudo for user (later needed for tf k0s fetch)
       become: true

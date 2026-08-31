@@ -1,0 +1,20 @@
+---
+# tasks file for transparent_hugepage_madvise
+- name: Add transparent_hugepage=madvise to GRUB
+  ansible.builtin.replace:
+    path: /etc/default/grub
+    regexp: '^(GRUB_CMDLINE_LINUX_DEFAULT="[^"]*)(")$'
+    replace: '\1 transparent_hugepage=madvise\2'
+  become: true
+  register: grub_transparent
+
+- name: Set transparent hugepages to madvise immediately
+  ansible.builtin.shell:
+    cmd: echo madvise > /sys/kernel/mm/transparent_hugepage/enabled
+  become: true
+  when: grub_transparent.changed
+
+- name: Update GRUB
+  ansible.builtin.command: update-grub
+  become: true
+  when: grub_transparent.changed
