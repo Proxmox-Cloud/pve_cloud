@@ -2,6 +2,10 @@ apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: openebs-zfspv-zvol
+{% if zfspv_zvol_sc_default | default(false) %}
+  annotations:
+    storageclass.kubernetes.io/is-default-class: 'true'
+{% endif %}
 allowVolumeExpansion: true
 parameters:
   fstype: "ext4"
@@ -14,3 +18,4 @@ allowedTopologies:
 {% for node in pxzfs_storage_hosts %}
       - {{ node }}
 {% endfor %}
+    

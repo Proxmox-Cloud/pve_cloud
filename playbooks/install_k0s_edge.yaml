@@ -482,3 +482,5 @@
         state: present
         kubeconfig: "{{ temp_kubeconfig.path }}"
         template: openebs-zfs-localpv-sc.yaml.j2
+      vars:
+        zfspv_zvol_sc_default: true

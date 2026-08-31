@@ -10,6 +10,52 @@ transforms:
     source: |
       .pve_stack = "{{ stack_name }}.{{ pve_cloud_domain }}"
 
+      # match function needs a hard typed string
+      str_message = to_string(.message) ?? ""
+
+      if str_message == "" {
+        # this should never happen
+        .parsed = { "failed": true}
+        .vparser = "empty"
+      } else if match(str_message, r'^\{') {
+        .parsed = parse_json(str_message) ?? { "failed": true }
+        .vparser = "json"
+      } else if match(str_message, r'^<\d{1,3}>') {
+        # todo: figure out if this actually ever triggers
+        .parsed = parse_syslog(str_message) ?? { "failed": true }
+        .vparser = "syslog"
+      } else if match(str_message, r'^[IWEF]\d{4}') {
+        .parsed = parse_klog(str_message) ?? { "failed": true }
+        .vparser = "klog"
+      } else if match(str_message, r'^[A-Za-z_][A-Za-z0-9_.-]*=') {
+        # the matching regex is very strict but should identify logfmt logs percisely
+        .parsed = parse_logfmt(str_message) ?? { "failed": true }
+        .vparser = "logfmt"
+      } else {
+        .parsed = { "failed": true }
+        .vparser = "none"
+      }
+
+      if exists(.parsed.level) {
+        .level = .parsed.level
+      } else if exists(.parsed.severity) {
+        .level = .parsed.severity
+      } else if exists(.PRIORITY) {
+        # the syslog priority is only a fallback. there are apps that log everything as info
+        # using this logic we assume conscious setting of the log level if its at warning or below
+        priority = to_int(.PRIORITY) ?? 7
+        .level = if priority <= 3 {
+          "error"
+        } else if priority == 4 {
+          "warn"
+        } else {
+          # all trace levels get set as unknown
+          "unknown"
+        }
+      } else {
+        .level = "unknown"
+      }
+
 sinks:
   vlogs_sink:
     type: "elasticsearch"
@@ -19,6 +65,7 @@ sinks:
     mode: "bulk"
     request:
       headers:
+        # same msg field as vector daemon set from helm chart
         VL-Msg-Field: message,msg,_msg,log.msg,log.message,log
         VL-Stream-Fields: _TRANSPORT,host,_SYSTEMD_UNIT,pve_stack
         VL-Time-Field: timestamp
