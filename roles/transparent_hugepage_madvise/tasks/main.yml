@@ -3,8 +3,8 @@
 - name: Add transparent_hugepage=madvise to GRUB
   ansible.builtin.replace:
     path: /etc/default/grub
-    regexp: '^(GRUB_CMDLINE_LINUX_DEFAULT="[^"]*)(")$'
-    replace: '\1 transparent_hugepage=madvise\2'
+    regexp: '^(GRUB_CMDLINE_LINUX_DEFAULT=")(?![^"]*\btransparent_hugepage\b)([^"]*)("$)'
+    replace: '\1\2 transparent_hugepage=madvise\3'
   become: true
   register: grub_transparent
 
