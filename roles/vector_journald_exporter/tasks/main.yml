@@ -117,6 +117,9 @@
           [Service]
           MemorySwapMax=0
           MemoryMax={{ vector_systemd_mem_max }}
+          # tweak jemalloc
+          Environment="MALLOC_CONF=dirty_decay_ms:1000"
+
       register: limits_configured
 
     - name: reload daemon on limits conf

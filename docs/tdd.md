@@ -131,3 +131,21 @@ Open this file via vscode File/Open Workspace from File...
 ```
 
 This loads the e2e tests from both projects via their settings.json file.
+
+## Vector debugging
+
+To debug vector memory usage ssh into a worker node that has high usage and run:
+
+```bash
+# slopped, get pid
+pid=$(crictl inspect "$(crictl ps | awk '/vector/ && /Running/ {print $1; exit}')" | jq -r '.info.pid')
+
+# print real mem usage
+grep -E 'VmRSS|VmHWM|RssAnon|RssFile|RssShmem' /proc/$pid/status
+grep -E 'Rss|Pss|Anonymous|AnonHugePages|Swap' /proc/$pid/smaps_rollup
+
+# add --allocation-tracing to vector daemon set cli commands
+# and api,enabled: true in vector conf yaml
+vector top --url http://$POD_IP:8686
+
+```
