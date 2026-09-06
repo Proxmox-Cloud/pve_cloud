@@ -3,6 +3,10 @@ server {
         listen 80;
         listen [::]:80;
 
+        # listen on 443 without ssl, this is simply for pxc checks to not fail
+        listen 443;
+        listen [::]:443;
+
         root /var/www/aptly/public;
 
         index index.html index.htm;

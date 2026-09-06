@@ -4,7 +4,15 @@ Initially you need to hope that all external dependency and artifactories are up
 
 This strategy doesn't yet contain mirrors for the proxmox / ceph setup, as those repositories are very stable / don't need to be accessed very frequently.
 
-It aims to keep you fully operational even external cloud services like docker, cdns, apt repos etc., go down.
+It aims to keep you fully operational even external cloud services like docker, github, apt repos etc., go down.
+
+## General approach
+
+The mirroring this collection is using aims to be opt-in and dynamic. This means when the necessary mirroring infrastructure has been deployed (via playbooks / terraform modules), the tool chain will discover them and try to pull artifacts from there first, and if not present use pull through / dynamic caching mechanisms to get the artifacts via official sources initially.
+
+However the mirrored artifacts are not a cached / have an expiration date, we aim to build a full permanent offline mirror, trusting that the operators know how to secure their system while giving maximal stability.
+
+This approach is used for images / helm charts and terraform providers. For apt we build a static partial mirror via playbooks.
 
 ## Mirror VM Setup
 
@@ -33,8 +41,11 @@ qemus:
 
 Running the playbook creates a discovery secret that the collection will pick up on. By simply rerunning all your playbooks the collection will swap out apt repositories etc.
 
-## Registry setup
+## OCI Registry setup
 
 For docker images and helm artifacts we implemented harbor as a dynamic cache / mirroring solution. For that deploy you own harbor instance and connect the harbor terraform provider to it. Then deploy the `harbor-mirror-projects` terraform module from our `terraform-pxc-controller` module.
 
 This module will setup all needed caches / repositories and access inside harbor, aswell as create discovery secrets that the collection will pick up on.
+
+Every playbook that is run will now first created mirrored artifacts at the harbor registry and use them instead if present on subsequent runs.
+
