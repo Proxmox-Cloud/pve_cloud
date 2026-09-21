@@ -40,6 +40,109 @@ export PVE_CLOUD_TEST_CONF=$(pwd)/test-env-conf.yaml
 export ANSIBLE_COLLECTIONS_PATH=$(pwd)
 ```
 
+## E2E Test Coverage
+
+The e2e test suite validates critical infrastructure components across multiple repositories:
+
+### pve_cloud Test Coverage
+
+Located in `tests/e2e/test_cloud.py`, the core infrastructure tests validate:
+
+- **PXRPC Tunneling**: Sync and async remote procedure calls through jump hosts or direct connections
+- **Dynamic Resource Creation**: LXC and QEMU VM creation with DNS registration
+- **Kubernetes Deployments**: 
+  - kubespray cluster deployment with memory limits and resource reservations
+  - k0s edge node installation on remote non-PXC machines
+  - Secondary cluster deployment for high availability
+- **Service Validation**:
+  - DHCP (Kea) with failover configuration
+  - BIND DNS with dynamic updates and TSIG authentication
+  - Patroni for PostgreSQL high availability
+  - HAProxy load balancer configuration
+  - Image mirroring via Harbor
+
+Key test patterns:
+```python
+# Dynamic LXC/QEMU creation with DNS validation
+def test_create_lxc(request, get_proxmoxer, get_test_env, setup_haproxy_lxcs):
+    # Creates LXC via dynamic inventory
+    # Validates DDNS registration
+    # Asserts DNS resolution works
+
+# Kubernetes cluster deployment
+def test_create_kubespray(request, get_test_env, get_kubespray_inv, ...):
+    # Deploys kubespray cluster
+    # Updates DNS for control plane
+    # Optionally writes kubeconfig for debugging
+```
+
+### terraform-pxc-controller Test Coverage
+
+Located in `tests/e2e/test_modules.py`, the controller tests validate:
+
+- **Admission Webhook**: Pod creation in namespaces triggers admission controller
+- **Cron Job Execution**: Manual trigger and monitoring of controller cron jobs
+- **Ingress DNS Management**:
+  - Create ingress → DNS record created in BIND and Route53
+  - Update ingress → DNS records updated
+  - Delete ingress → DNS records removed from both internal (BIND) and external (Route53 via moto)
+
+Key test patterns:
+```python
+# Admission controller validation
+def test_adm_pod_creation(get_k8s_api_v1, controller_scenario):
+    # Creates test namespace and pod
+    # Validates admission controller doesn't crash
+    # Checks controller pods have no restarts
+
+# Ingress DNS lifecycle
+def test_delete_ingress(...):
+    # Creates test ingress
+    # Deletes it
+    # Validates DNS cleanup in BIND and Route53
+```
+
+### terraform-pxc-backup Test Coverage
+
+Located in `tests/e2e/test_backup.py`, the backup tests validate:
+
+- **Backup Infrastructure**: QEMU VM creation for backup daemon
+- **K0s BDD Server**: Backup daemon deployment on edge k0s cluster
+- **Backup/Restore Cycle**:
+  - Create random content in Kubernetes pod
+  - Trigger backup via cron job
+  - Validate backup created via BDD RPC
+  - Restore backup to verify data integrity
+- **Ceph Integration**: CSI volume snapshots and RBD volume groups
+
+Key test patterns:
+```python
+# Backup and restore validation
+async def test_backup(...):
+    # Creates random file in test pod
+    # Triggers backup cron
+    # Validates backup exists via BDD RPC
+    # Restores backup and verifies content
+```
+
+### Running Specific Tests
+
+Target specific test functions to focus on particular components:
+
+```bash
+# Test specific infrastructure component
+pytest -s tests/e2e/test_cloud.py::test_bind --skip-cleanup
+pytest -s tests/e2e/test_cloud.py::test_create_kubespray --skip-cleanup
+
+# Test controller functionality
+pytest -s tests/e2e/test_modules.py::test_adm_pod_creation --skip-cleanup
+
+# Test backup operations
+pytest -s tests/e2e/test_backup.py::test_backup --skip-cleanup
+```
+
+The `--skip-cleanup` flag preserves resources for debugging and generates kubeconfig files for cluster access.
+
 the created local dir might look like this:
 
 ```
