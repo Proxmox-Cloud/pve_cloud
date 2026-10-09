@@ -476,6 +476,7 @@
 
     # install volumesnapshot crds - checkout out at 189dfe4c1f307974c72d34d4b2d5c21b5c5c06ba from
     # https://github.com/kubernetes-csi/external-snapshotter/commits/master/
+    # snapshot-controller deployment in kube-system also originates from there
     - name: build volume snapshot crds
       ansible.builtin.shell: "kubectl kustomize {{ playbook_dir }}/snapshot-crd"
       register: snapshot_manifests
@@ -522,6 +523,15 @@
     - name: mirror artifacts
       when: harbor_mirror_secret.rowcount != 0
       block:
+        # mirror kubenretes snapshot-controller
+        - name: mirror snapshot controller
+          include_role:
+            name: pxc.cloud.mirror_container_image
+          vars:
+            image_registry: registry.k8s.io
+            image_name: sig-storage/snapshot-controller
+            image_version: v8.5.0
+
         # ceph csi chart + images
         - name: mirror ceph-csi chart
           include_role:
@@ -530,7 +540,7 @@
             helm_repository_url: https://ceph.github.io/csi-charts
             helm_repository_name: ceph
             helm_chart_name: ceph-csi-rbd
-            helm_chart_version: 3.14.2
+            helm_chart_version: 3.15.1
 
         - name: mirror ceph-csi image
           include_role:
@@ -570,7 +580,7 @@
           vars:
             image_registry: quay.io
             image_name: cephcsi/cephcsi
-            image_version: v3.14.2
+            image_version: v3.15.1
           
         - name: mirror ceph-csi image
           include_role:
@@ -672,6 +682,28 @@
             image_name: openebs/provisioner-localpv
             image_version: 4.4.0
 
+    # deploy volume snapshot controller into kube-system
+    - name: create mirror pull secret
+      when: harbor_mirror_secret.rowcount != 0
+      kubernetes.core.k8s:
+        kubeconfig: "{{ temp_kubeconfig.path }}"
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: mirror-pull-secret
+            namespace: kube-system
+          type: kubernetes.io/dockerconfigjson
+          data:
+            .dockerconfigjson: "{{ harbor_mirror_secret.query_result[0]['secret_data']['dockerconfig'] | b64encode }}"
+
+    - name: create snapshot controller
+      kubernetes.core.k8s:
+        state: present
+        template: snapshot-controller.yaml.j2
+        kubeconfig: "{{ temp_kubeconfig.path }}"
+
     # kubernetes.core comes from kubespray collection
     - name: ceph csi repo
       kubernetes.core.helm_repository:
@@ -708,7 +740,7 @@
       kubernetes.core.helm:
         name: ceph-csi
         chart_ref: "{{ 'ceph-csi/ceph-csi-rbd' if harbor_mirror_secret.rowcount == 0 else 'oci://' ~ harbor_mirror_secret.query_result[0]['secret_data']['harbor_host'] ~ '/cloud-helm-mirror/ceph/ceph-csi-rbd'}}"
-        chart_version: 3.14.2
+        chart_version: 3.15.1
         values: "{{ lookup('template', 'ceph-csi-values.yaml.j2') | from_yaml }}"
         kubeconfig: "{{ temp_kubeconfig.path }}"
         release_namespace: ceph-csi
