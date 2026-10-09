@@ -74,3 +74,8 @@ nodeplugin:
 
 CSIDriver:
   fsGroupPolicy: "ReadWriteOnceWithFSType"
+
+# enable snapshot functionality per default
+volumeSnapshotClass:
+  create: true
+  clusterID: "{{ pve_cloud_secrets_map['ceph_fsid'] }}"
