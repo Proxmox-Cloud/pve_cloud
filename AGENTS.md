@@ -2,6 +2,17 @@
 
 This is the ansible collection at the heart of the Proxmox Cloud project.
 
+## Running Tests
+
+For running tests you should strictly focus on the integration tests located under `tests/integration`. Never execute any e2e tests!
+
+To run tests you have to do the following:
+
+1. Run the `tests/setup-integration-env.sh` bash script. This sets up the python enviroment and any needed dependencies.
+2. Run `source ~/.pxc-integration-venv/bin/activate` to activate the virtual environment.
+3. 
+
+
 ## Creating Ansible Roles
 
 Creating roles should always be done using `ansible-galaxy init ROLE_NAME` inside the `roles/` directory of this collection:
