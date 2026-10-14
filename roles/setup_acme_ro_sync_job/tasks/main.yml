@@ -1,0 +1,46 @@
+---
+# tasks file for setup_acme_ro_sync_job
+
+- name: Try read existing access secret
+  delegate_to: "pxc-executor-host"
+  alchemy_read:
+    pg_conn_str: "{{ pg_conn_str }}"
+    table: px_cloud_secrets
+    where:
+      cloud_domain: "{{ pve_cloud_domain }}"
+      secret_name: "{{ stack_name }}-acme-ro-access"
+  register: fetched_acme_ro_access
+
+- debug:
+    var: fetched_acme_ro_access
+
+- name: Fail when postgres ro user not found
+  when: fetched_acme_ro_access.rowcount != 1
+  ansible.builtin.fail:
+    msg: "Could not find read only acme postgres user!"
+
+- name: install psql cli
+  ansible.builtin.apt:
+    name:
+      - postgresql-client
+      - jq
+    update_cache: yes
+
+- name: Ensure /opt/pxc-acme directory exists
+  ansible.builtin.file:
+    path: /opt/pxc-acme
+    state: directory
+
+- name: copy sync script
+  template:
+    src: pxc-acme-sync.sh.j2
+    dest: /opt/pxc-acme/pxc-acme-sync.sh
+    mode: '0755'
+  vars:
+    postgres_user: "{{ fetched_acme_ro_access['query_result'][0]['secret_data']['username'] }}"
+    postgres_password: "{{ fetched_acme_ro_access['query_result'][0]['secret_data']['password'] }}"
+
+- name: create the sync oneshot service
+  template:
+    dest: "/etc/systemd/system/pxc-acme-sync.service"
+    src: pxc-acme-sync.service.j2

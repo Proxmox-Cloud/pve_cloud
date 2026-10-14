@@ -1,0 +1,6 @@
+---
+# defaults file for setup_acme_ro_sync_job
+postgres_user:
+postgres_host:
+postgres_password:
+postgres_port: 5000

@@ -1,0 +1,19 @@
+#!/bin/bash
+
+export PGHOST="{{ postgres_host }}"
+export PGUSER="{{ postgres_user }}"
+export PGPASSWORD="{{ postgres_password }}"
+export PGPORT="{{ postgres_port }}"
+export PGDATABASE="pve_cloud"
+
+CRT=$(psql -t -A -c "SELECT ec_crt from public.acme_x509 where stack_fqdn = '{{ stack_name }}.{{ pve_cloud_domain }}';" | jq -r '.crt')
+
+# write cert to specified paths
+{% for cert_path in stack_cert_sync_paths %}
+
+printf '%s\n' "$CRT" > '{{ cert_path.path }}'
+
+chown '{{ (cert_path.owner ~ ':' ~ cert_path.group) }}' '{{ cert_path.path }}'
+chmod '{{ cert_path.mode  }}' '{{ cert_path.path }}'
+
+{% endfor %}

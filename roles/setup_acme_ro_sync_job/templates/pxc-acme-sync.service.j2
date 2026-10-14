@@ -1,0 +1,12 @@
+[Unit]
+Description=Proxmox cloud acme sync job
+After=network.target
+
+[Service]
+Type=oneshot
+User=root
+WorkingDirectory=/opt/pxc-acme
+ExecStart=/opt/pxc-acme/pxc-acme-sync.sh
+
+[Install]
+WantedBy=timers.target

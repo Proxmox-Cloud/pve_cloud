@@ -1,0 +1,107 @@
+---
+# tasks file for postgres_acme_ro_access
+
+- name: Try read existing access secret
+  delegate_to: "pxc-executor-host"
+  alchemy_read:
+    pg_conn_str: "{{ pg_conn_str }}"
+    table: px_cloud_secrets
+    where:
+      cloud_domain: "{{ pve_cloud_domain }}"
+      secret_name: "{{ stack_name }}-acme-ro-access"
+  register: fetched_acme_ro_access
+
+- debug:
+    var: fetched_acme_ro_access
+
+
+- name: Create acme readonly access
+  when: fetched_acme_ro_access.rowcount == 0 # only on new
+  block:
+    - name: Generate random password for stack user
+      set_fact:
+        stack_user_pw: "{{ lookup('ansible.builtin.password', '/dev/null length=32') }}"
+
+    - name: Create read only user for stack certs
+      delegate_to: "pxc-executor-host"
+      community.postgresql.postgresql_user:
+        name: "{{ stack_name }}"
+        password: "{{ stack_user_pw }}"
+        login_password: "{{ postgres_password }}"
+        login_host: "{{ postgres_host }}"
+        role_attr_flags: LOGIN
+        login_db: pve_cloud
+        port: 5432
+
+    - name: Grant db connect
+      delegate_to: "pxc-executor-host"
+      community.postgresql.postgresql_privs:
+        login_password: "{{ postgres_password }}"
+        login_host: "{{ postgres_host }}"
+        login_db: pve_cloud
+        type: database
+        objs: pve_cloud
+        roles: "{{ stack_name }}"
+        privs: CONNECT
+
+    - name: Grant schema usage
+      delegate_to: "pxc-executor-host"
+      community.postgresql.postgresql_privs:
+        login_password: "{{ postgres_password }}"
+        login_host: "{{ postgres_host }}"
+        login_db: pve_cloud
+        port: 5432
+        type: schema
+        objs: public
+        roles: "{{ stack_name }}"
+        privs: USAGE
+        state: present
+
+    - name: Grant select
+      delegate_to: "pxc-executor-host"
+      community.postgresql.postgresql_privs:
+        login_password: "{{ postgres_password }}"
+        login_host: "{{ postgres_host }}"
+        login_db: pve_cloud
+        port: 5432
+        type: table
+        schema: public
+        objs: acme_x509
+        roles: "{{ stack_name }}"
+        privs: SELECT
+        state: present
+
+    - name: Enable row level security
+      delegate_to: "pxc-executor-host"
+      community.postgresql.postgresql_query:
+        login_password: "{{ postgres_password }}"
+        login_host: "{{ postgres_host }}"
+        login_db: pve_cloud
+        port: 5432
+        query: |
+          ALTER TABLE public.acme_x509
+          ENABLE ROW LEVEL SECURITY;
+
+          CREATE POLICY {{ stack_name }}_acme_ro
+            ON public.acme_x509
+            FOR SELECT
+            TO "{{ stack_name }}"
+            USING (stack_fqdn = '{{ stack_name }}.{{ pve_cloud_domain }}');
+
+    - name: compile acme ro secrets row
+      set_fact:
+        acme_ro_row:
+          cloud_domain: "{{ pve_cloud_domain }}"
+          secret_name: "{{ stack_name }}-acme-ro-access"
+          secret_type: "acme-ro-access"
+          secret_data:
+            username: "{{ stack_name }}"
+            password: "{{ stack_user_pw }}"
+
+    - name: write ro access user to secrets
+      delegate_to: "pxc-executor-host"
+      alchemy_write:
+        pg_conn_str: "{{ pg_conn_str }}"
+        table: px_cloud_secrets
+        rows:
+          - "{{ acme_ro_row }}"
