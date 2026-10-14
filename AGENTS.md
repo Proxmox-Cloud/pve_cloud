@@ -8,9 +8,8 @@ For running tests you should strictly focus on the integration tests located und
 
 To run tests you have to do the following:
 
-1. Run the `tests/setup-integration-env.sh` bash script. This sets up the python enviroment and any needed dependencies.
-2. Run `source ~/.pxc-integration-venv/bin/activate` to activate the virtual environment.
-3. Run the integration tests:
+1. First always run the setup bash script with `source tests/setup-integration-env.sh`. This sets up the python enviroment and any needed dependencies.
+2. Run the integration tests:
 ```bash
 # run the entire integration testing suite
 pytest -s tests/integration/
