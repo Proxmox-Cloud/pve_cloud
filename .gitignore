@@ -19,3 +19,4 @@ tdd-requirements.yml
 site
 schemas_raw
 pxc-cloud-*.tar.gz
+ansible_collections/

@@ -8,7 +8,7 @@ pip install ansible==9.13.0 distlib==0.4.0
 pip install --upgrade "pytest-pve-cloud>=3.0.0,<4.0.0"
 
 mkdir -p ansible_collections/pxc/
-ln -s "$(pwd)" ansible_collections/pxc/cloud
+ln -s "$(pwd)" ansible_collections/pxc/cloud 2>/dev/null || true
 
 # set needed integration test variables
 export ANSIBLE_COLLECTIONS_PATH=$(pwd)
