@@ -91,7 +91,7 @@ def test_setup_acme_certs(request, integration_config, setup_postgres_container)
 
         with run_integration_playbook(request, sync_job_playbook, sync_job_inventory):
             # manually invoke the sync script
-            stream(
+            sync_result = stream(
                 v1.connect_get_namespaced_pod_exec,
                 name="test",
                 namespace=namespace,
@@ -101,6 +101,9 @@ def test_setup_acme_certs(request, integration_config, setup_postgres_container)
                 stdout=True,
                 tty=False,
             )
+
+            # assert that the sync script printed a success message
+            assert "SUCCESS: ACME certificates synced successfully" in sync_result
 
             # check if crt got synced
             result = stream(

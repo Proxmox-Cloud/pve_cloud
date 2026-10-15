@@ -17,3 +17,5 @@ chown '{{ (cert_path.owner ~ ':' ~ cert_path.group) }}' '{{ cert_path.path }}'
 chmod '{{ cert_path.mode  }}' '{{ cert_path.path }}'
 
 {% endfor %}
+
+echo "SUCCESS: ACME certificates synced successfully"
