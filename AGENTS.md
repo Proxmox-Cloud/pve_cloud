@@ -1,6 +1,6 @@
 # Agent Instructions
 
-You should always write / execute integration tests. For instructions on how to execute them read pxc-integration (Proxmox Cloud Integration Testing) skill.
+For instructions on how to execute integration tests, read the pxc-integration (Proxmox Cloud Integration Testing) skill.
 
 ## Creating Ansible Roles
 
