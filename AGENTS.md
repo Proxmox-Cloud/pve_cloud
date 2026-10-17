@@ -4,7 +4,7 @@ This is the ansible collection at the heart of the Proxmox Cloud project.
 
 ## Running Tests
 
-For running tests you should strictly focus on the integration tests located under `tests/integration`. Never execute any e2e tests!
+For running tests you should strictly focus on the integration tests located under `tests/integration`. Always run tests to validate your changes!
 
 To run tests you have to do the following:
 

@@ -4,6 +4,7 @@ import pytest
 import yaml
 from fixtures import *
 from kubernetes.stream import stream
+from kubernetes import client
 from pve_cloud_test.cloud_fixtures import (run_integration_playbook,
                                            run_playbook)
 from pve_cloud_test.integration import launch_containers
@@ -14,7 +15,7 @@ logger = logging.getLogger(__name__)
 def test_setup_acme_certs(request, integration_config, setup_postgres_container):
     logger.info("test setup acme certs")
 
-    namespace, v1 = integration_config
+    kubeconfig_path, _, v1, namespace = integration_config
 
     postgres_host, pg_conn_str = setup_postgres_container
 
@@ -59,7 +60,7 @@ def test_setup_acme_certs(request, integration_config, setup_postgres_container)
     # write tempfile playbook and execute
     logger.info("launching qemus mock")
     with launch_containers(
-        namespace, v1, {"test": {"image_kind": "qemus", "user": "root"}}
+            namespace, v1, {"test": {"image_kind": "qemus", "user": "root"}}, kubeconfig_path
     ) as inv:
 
         logger.info(inv)
