@@ -20,3 +20,4 @@ site
 schemas_raw
 pxc-cloud-*.tar.gz
 ansible_collections/
+.itgr-test-ns
