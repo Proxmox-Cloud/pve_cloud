@@ -6,7 +6,6 @@ from pve_cloud_test.cloud_fixtures import (run_integration_playbook,
                                            run_playbook)
 from pve_cloud_test.integration import integration_config, launch_containers
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -38,11 +37,15 @@ def setup_postgres_container(request, integration_config):
                         "-p",
                         "5432",
                     ],
-                    "args": {"initial_delay_seconds": 5, "period_seconds": 3, "success_threshold": 2},
+                    "args": {
+                        "initial_delay_seconds": 5,
+                        "period_seconds": 3,
+                        "success_threshold": 2,
+                    },
                 },
             }
         },
-        kubeconfig_path
+        kubeconfig_path,
     ) as postgres_host:
         pg_conn_str = f"postgresql+psycopg2://postgres:integration-test-123@{postgres_host['pxc-postgres']['ansible_host']}:5432/pve_cloud?sslmode=disable"
         logger.info(pg_conn_str)
