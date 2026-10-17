@@ -1,10 +1,6 @@
 # Agent Instructions
 
-This is the ansible collection at the heart of the Proxmox Cloud project.
-
-## Testing
-
-You should write and use existing tests. For this use the pxc-integration (Integration Testing Proxmox Cloud) skill.
+You should always write / execute integration tests. For instructions on how to execute them read pxc-integration (Proxmox Cloud Integration Testing) skill.
 
 ## Creating Ansible Roles
 
