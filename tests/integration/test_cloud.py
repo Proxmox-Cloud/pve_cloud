@@ -94,8 +94,8 @@ def test_setup_acme_certs(request, integration_config, setup_postgres_container)
         sync_job_inventory = {"qemus": {"hosts": inv}}
 
         with run_integration_playbook(request, sync_job_playbook, sync_job_inventory):
-            # manually invoke the sync script
-            stream(
+            # manually invoke the sync script and capture output
+            exec_result = stream(
                 v1.connect_get_namespaced_pod_exec,
                 name="test",
                 namespace=namespace,
@@ -105,6 +105,9 @@ def test_setup_acme_certs(request, integration_config, setup_postgres_container)
                 stdout=True,
                 tty=False,
             )
+            
+            # Assert that the success message is printed
+            assert "SUCCESS: ACME certificate synced successfully for test_setup_acme_certs.pxc.integration.test" in exec_result, f"Expected success message not found in output: {exec_result}"
 
             # check if crt got synced
             result = stream(
