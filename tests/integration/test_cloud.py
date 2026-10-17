@@ -105,10 +105,14 @@ def test_setup_acme_certs(request, integration_config, setup_postgres_container)
                 stdout=True,
                 tty=False,
             )
-            
+
             # Assert success message is printed
-            assert "SUCCESS" in exec_result, f"Expected SUCCESS message in output, got: {exec_result}"
-            assert "ACME certificate synced successfully" in exec_result, f"Expected sync success message, got: {exec_result}"
+            assert (
+                "SUCCESS" in exec_result
+            ), f"Expected SUCCESS message in output, got: {exec_result}"
+            assert (
+                "ACME certificate synced successfully" in exec_result
+            ), f"Expected sync success message, got: {exec_result}"
 
             # check if crt got synced
             result = stream(
