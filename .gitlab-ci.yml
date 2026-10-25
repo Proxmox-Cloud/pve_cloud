@@ -26,3 +26,18 @@ format_source:
         $CI_PIPELINE_SOURCE == 'push'
       when: on_success
     - when: never
+
+source_rag_insert:
+  stage: build
+  image:
+    name: "$PXC_INTEGRATION_REGISTRY/pytest-pve-cloud:pxc-3-stable"
+    pull_policy: always
+  rules:
+    - if: >
+        $PXC_INTEGRATION_REGISTRY != null &&
+        $EMB_MODEL_SERVER_URL != null &&
+        $EMB_MODEL_AUTH_HEADER_VALUE != null &&
+        $EMB_MODEL_NAME != null &&
+        $J2_QUERY_TEMPLATE_B64 != null
+  script:
+    - rag-inserter "$CI_PROJECT_PATH"
