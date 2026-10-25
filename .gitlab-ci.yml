@@ -27,6 +27,7 @@ format_source:
       when: on_success
     - when: never
 
+
 source_rag_insert:
   stage: build
   image:
