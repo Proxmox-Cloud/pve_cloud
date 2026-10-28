@@ -6,7 +6,7 @@ After=network.target
 Type=oneshot
 User=root
 WorkingDirectory=/opt/bdd
-ExecStart=/opt/bdd/cron.sh
+ExecStart=/opt/bdd/.venv/bin/bdd-prune
 Environment="VERIFY_DATA={{ 'true' if verify_data else 'false' }}"
 
 [Install]

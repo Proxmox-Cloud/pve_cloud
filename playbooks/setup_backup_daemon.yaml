@@ -128,13 +128,7 @@
         state: restarted
         enabled: yes
 
-    # install cron cleanup / check jobs
-    - name: copy script
-      copy:
-        src: bdd-cron.sh
-        dest: /opt/bdd/cron.sh
-        mode: '0755'
-
+    # service uses pve-cloud-backup bdd-prune cli
     - name: create bdd cron weekly service
       template:
         dest: "/etc/systemd/system/bdd-cron.service"
@@ -169,6 +163,7 @@
         # which will result in longer runtime
         timer_pattern: "Mon *-*-01..07 03:00:00"
 
+    # todo: there should be a test added for the pruning job
     - name: Reload systemd daemon
       command: systemctl daemon-reload
 
