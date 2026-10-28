@@ -852,7 +852,7 @@ def setup_k0s_ext_vm(request, get_test_env, setup_mirror_vm):
                         ],
                         "parameters": {
                             "cores": 2,
-                            "memory": 4096,
+                            "memory": 5120,
                         },
                     },
                 ],
