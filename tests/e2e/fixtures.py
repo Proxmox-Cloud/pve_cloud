@@ -688,7 +688,27 @@ def setup_mirror_vm(request, get_test_env, setup_haproxy_lxcs):
                 ],
                 "qemu_global_vars": {
                     "aptly_mirror_domain": f"pxc-aptly."
-                    + get_test_env["cloud_inventory"]["pve_cloud_domain"]
+                    + get_test_env["cloud_inventory"]["pve_cloud_domain"],
+                    # todo: this mirror filter was accuired manually by comparing a debian vm fresh after bootstrap vs
+                    # after the kubespray playbook was finished installing everything it needed to.
+                    # this is only relevant for e2e testing as prod mirrors the full repository
+                    # this can be made cleaner / maybe automated completely / use existing mirror instead?
+                    "debian_mirror_filter": (
+                        "Name (~ linux-headers.*) | Name (~ linux-image.*) |zfsutils-linux|zfs-dkms|dkms|"
+                        "gnupg|qemu-guest-agent|console-setup|keyboard-configuration|git|curl|"
+                        "python3|python3-venv|avahi-utils|direnv|age|rsync|appstream|apt-transport-https|"
+                        "conntrack|ebtables|fuse|gir1.2-glib-2.0|gir1.2-packagekitglib-1.0|gnupg-l10n|"
+                        "ipvsadm|isocodes|libappstream4|libgirepository-1.0-1|libglib2.0-bin|libglib2.0-data|"
+                        "libgstreamer1.0-0|libinih1|libnl-3-200|libnl-genl-3-200|libpackagekit-glib2-18|"
+                        "libstemmer0d|libunwind8|liburcu8|libxmlb2|mergerfs|packagekit-tools|packagekit|"
+                        "python3-distro|python3-gi|python3-httplib2|python3-lazr.restfulclient|python3-lazr.uri|"
+                        "python3-software-properties|python3-urllib3|python3-wadllib|shared-mime-info|"
+                        "software-properties-common|unzip|xfsprogs|bind9|bind9utils|prometheus-node-exporter|openssh|"
+                        "etcd-server|pip|postgresql|keepalived|haproxy|borgbackup|skopeo"
+                    ),
+                    "debian_backports_mirror_filter": "dummy-filter", # will match nothing and just copy the repo empty
+                    "debian_security_mirror_filter": "dummy-filter" # will match nothing and just copy the repo empty
+                    # other mirrors are small enough that we dont need to limit it for e2e
                 },
                 "static_includes": {
                     "dhcp_stack": "ha-dhcp."

@@ -1,6 +1,6 @@
 - name: Setup acme sync job
   hosts: qemus
   tasks:
-    - name: test
-      debug:
-        msg: "hello"
+    - name: Create read only access for the stack
+      ansible.builtin.include_role:
+        name: pxc.cloud.postgres_acme_ro_access

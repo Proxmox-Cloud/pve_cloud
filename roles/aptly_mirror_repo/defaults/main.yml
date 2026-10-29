@@ -11,7 +11,7 @@ mirror_distribution:
 mirror_components: ["main"]
 
 # aptly package filter like 'git|curl'
-mirror_filter: dummy-mirror-filter
+mirror_filter: "" # defaults to empty / no filter / mirror everything
 
 mirror_endpoint: debian # we mostly use debian
 

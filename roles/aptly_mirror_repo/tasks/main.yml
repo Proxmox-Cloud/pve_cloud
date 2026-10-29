@@ -30,7 +30,8 @@
 
 - name: extract mirror filter
   ansible.builtin.set_fact:
-    mirror_filter_configured: "{{ mirror_details.stdout | regex_search('^Filter:\\s*(.*)$', '\\1', multiline=True) | first }}"
+    # when the filter config entry cannot be found we default it to and empty string (which means mirror everything)
+    mirror_filter_configured: "{{ mirror_details.stdout | regex_search('^Filter:\\s*(.*)$', '\\1', multiline=True) | default([''], true) | first }}"
 
 - debug:
     var: mirror_filter_configured
