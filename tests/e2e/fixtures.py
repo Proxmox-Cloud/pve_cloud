@@ -706,8 +706,8 @@ def setup_mirror_vm(request, get_test_env, setup_haproxy_lxcs):
                         "software-properties-common|unzip|xfsprogs|bind9|bind9utils|prometheus-node-exporter|openssh|"
                         "etcd-server|pip|postgresql|keepalived|haproxy|borgbackup|skopeo"
                     ),
-                    "debian_backports_mirror_filter": "dummy-filter", # will match nothing and just copy the repo empty
-                    "debian_security_mirror_filter": "dummy-filter" # will match nothing and just copy the repo empty
+                    "debian_backports_mirror_filter": "dummy-filter",  # will match nothing and just copy the repo empty
+                    "debian_security_mirror_filter": "dummy-filter",  # will match nothing and just copy the repo empty
                     # other mirrors are small enough that we dont need to limit it for e2e
                 },
                 "static_includes": {
