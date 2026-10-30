@@ -51,7 +51,9 @@
 
     # install vector via the mirror if its available
     - name: mirror vector install
-      when: mirror_discovery_secret.rowcount != 0
+      when:
+        - mirror_discovery_secret.rowcount != 0
+        - use_pxc_aptly_mirror | default(true)
       block:
         - name: Set aptly mirror host in hosts file
           when: postgres_connection_check.is_available and mirror_discovery_secret.rowcount != 0

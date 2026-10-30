@@ -27,6 +27,7 @@
   when: 
     - postgres_connection_check.is_available and mirror_discovery_secret.rowcount != 0
     - ansible_distribution == "Debian" and ansible_distribution_release == "bookworm"
+    - use_pxc_aptly_mirror | default(true)
   block:
     - name: overwrite default sources list
       ansible.builtin.copy:
