@@ -311,7 +311,26 @@ def test_create_qemu(request, get_test_env, setup_mirror_vm, get_cloud_secrets):
                 temp_qemu_inv.name,
                 "playbooks/setup_acme_certs.yaml",
             ):
-                pass
+                # Validate that /tmp/test.crt was written with the correct content
+                resolver = dns.resolver.Resolver()
+                resolver.nameservers = [get_test_env["cloud_inventory"]["bind_master_ip"]]
+
+                ddns_answer = resolver.resolve(
+                    f"test-vm-pytest-qemu.{get_test_env['cloud_inventory']['pve_cloud_domain']}"
+                )
+                ddns_ips = [rdata.to_text() for rdata in ddns_answer]
+                assert ddns_ips, "Failed to resolve pytest-qemu VM IP via DNS"
+
+                vm_ip = ddns_ips[0]
+                logger.info(f"Connecting to test VM at {vm_ip}")
+
+                with connect_host(vm_ip, user="admin") as ssh:
+                    _, stdout, _ = ssh.exec_command("sudo cat /tmp/test.crt")
+                    cert_content = stdout.read().decode("utf-8")
+
+                expected_cert = "-----BEGIN CERTIFICATE-----\nDUMMY_CERTIFICATE_CONTENT\n-----END CERTIFICATE-----"
+                assert expected_cert in cert_content, f"Cert content mismatch. Expected: {expected_cert}, Got: {cert_content}"
+                logger.info("Successfully validated /tmp/test.crt content on test VM")
 
 
 def test_create_secondary_kubespray(
