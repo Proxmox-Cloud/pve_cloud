@@ -282,23 +282,26 @@ def test_create_qemu(request, get_test_env, setup_mirror_vm, get_cloud_secrets):
                     config={
                         "cn": f"pytest-qemu.{get_test_env['cloud_inventory']['pve_cloud_domain']}",
                         "san": [
-                            "DNS:pytest-qemu." + get_test_env['cloud_inventory']['pve_cloud_domain'],
-                            "DNS:mail-example." + get_test_env['cloud_inventory']['pve_cloud_domain'],
-                            "DNS:other-service-example." + get_test_env['cloud_inventory']['pve_cloud_domain'],
+                            "DNS:pytest-qemu."
+                            + get_test_env["cloud_inventory"]["pve_cloud_domain"],
+                            "DNS:mail-example."
+                            + get_test_env["cloud_inventory"]["pve_cloud_domain"],
+                            "DNS:other-service-example."
+                            + get_test_env["cloud_inventory"]["pve_cloud_domain"],
                         ],
-                        "workflow": "acme"
+                        "workflow": "acme",
                     },
                     ec_csr={
                         "privkey": "-----BEGIN EC PRIVATE KEY-----\nDUMMY_PRIV_KEY\n-----END EC PRIVATE KEY-----",
-                        "csr": "-----BEGIN CERTIFICATE REQUEST-----\nDUMMY_CSR\n-----END CERTIFICATE REQUEST-----"
+                        "csr": "-----BEGIN CERTIFICATE REQUEST-----\nDUMMY_CSR\n-----END CERTIFICATE REQUEST-----",
                     },
                     ec_crt={
                         "crt": "-----BEGIN CERTIFICATE-----\nDUMMY_CERTIFICATE_CONTENT\n-----END CERTIFICATE-----"
                     },
                     k8s={
                         "tls.crt": "-----BEGIN CERTIFICATE-----\nDUMMY_CERTIFICATE_CONTENT\n-----END CERTIFICATE-----",
-                        "tls.key": "-----BEGIN EC PRIVATE KEY-----\nDUMMY_PRIV_KEY\n-----END EC PRIVATE KEY-----"
-                    }
+                        "tls.key": "-----BEGIN EC PRIVATE KEY-----\nDUMMY_PRIV_KEY\n-----END EC PRIVATE KEY-----",
+                    },
                 )
                 session.merge(dummy_cert)
                 session.commit()
@@ -309,6 +312,7 @@ def test_create_qemu(request, get_test_env, setup_mirror_vm, get_cloud_secrets):
                 "playbooks/setup_acme_certs.yaml",
             ):
                 pass
+
 
 def test_create_secondary_kubespray(
     request,
