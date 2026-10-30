@@ -313,7 +313,9 @@ def test_create_qemu(request, get_test_env, setup_mirror_vm, get_cloud_secrets):
             ):
                 # Validate that /tmp/test.crt was written with the correct content
                 resolver = dns.resolver.Resolver()
-                resolver.nameservers = [get_test_env["cloud_inventory"]["bind_master_ip"]]
+                resolver.nameservers = [
+                    get_test_env["cloud_inventory"]["bind_master_ip"]
+                ]
 
                 ddns_answer = resolver.resolve(
                     f"test-vm-pytest-qemu.{get_test_env['cloud_inventory']['pve_cloud_domain']}"
@@ -329,7 +331,9 @@ def test_create_qemu(request, get_test_env, setup_mirror_vm, get_cloud_secrets):
                     cert_content = stdout.read().decode("utf-8")
 
                 expected_cert = "-----BEGIN CERTIFICATE-----\nDUMMY_CERTIFICATE_CONTENT\n-----END CERTIFICATE-----"
-                assert expected_cert in cert_content, f"Cert content mismatch. Expected: {expected_cert}, Got: {cert_content}"
+                assert (
+                    expected_cert in cert_content
+                ), f"Cert content mismatch. Expected: {expected_cert}, Got: {cert_content}"
                 logger.info("Successfully validated /tmp/test.crt content on test VM")
 
 
