@@ -1,6 +1,37 @@
-- name: Setup acme sync job
+- name: Slurp certificates from pve
+  hosts: target_pve
+  roles:
+    - slurp_cluster_secrets
+
+- name: Setup acme ro access
   hosts: qemus
+  roles:
+    - parse_cluster_secrets
   tasks:
     - name: Create read only access for the stack
       ansible.builtin.include_role:
         name: pxc.cloud.postgres_acme_ro_access
+
+- name: Acme
+  hosts: pxc-executor-host
+  tags:
+    - acme
+  roles:
+    - pxc.cloud.parse_cluster_secrets
+  tasks:
+    - debug:
+        var: stack_cert_entries
+
+    - include_role:
+        name: pxc.cloud.apply_acme_certs
+      vars:
+        cluster_cert_entries: "{{ stack_cert_entries }}"
+      when: acme_method is defined and cluster_cert_entries | length > 0
+
+- name: Setup acme sync job
+  hosts: qemus
+  become: true
+  tasks:
+    - name: Execute sync job role
+      ansible.builtin.include_role:
+        name: pxc.cloud.setup_acme_ro_sync_job

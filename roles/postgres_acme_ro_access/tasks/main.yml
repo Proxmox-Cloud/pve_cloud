@@ -31,7 +31,7 @@
         login_host: "{{ postgres_host }}"
         role_attr_flags: LOGIN
         login_db: pve_cloud
-        port: 5432
+        port: "{{ postgres_port }}"
 
     - name: Grant db connect
       delegate_to: "pxc-executor-host"
@@ -43,6 +43,7 @@
         objs: pve_cloud
         roles: "{{ stack_name }}"
         privs: CONNECT
+        port: "{{ postgres_port }}"
 
     - name: Grant schema usage
       delegate_to: "pxc-executor-host"
@@ -50,7 +51,7 @@
         login_password: "{{ postgres_password }}"
         login_host: "{{ postgres_host }}"
         login_db: pve_cloud
-        port: 5432
+        port: "{{ postgres_port }}"
         type: schema
         objs: public
         roles: "{{ stack_name }}"
@@ -63,7 +64,7 @@
         login_password: "{{ postgres_password }}"
         login_host: "{{ postgres_host }}"
         login_db: pve_cloud
-        port: 5432
+        port: "{{ postgres_port }}"
         type: table
         schema: public
         objs: acme_x509
@@ -77,12 +78,15 @@
         login_password: "{{ postgres_password }}"
         login_host: "{{ postgres_host }}"
         login_db: pve_cloud
-        port: 5432
+        port: "{{ postgres_port }}"
         query: |
           ALTER TABLE public.acme_x509
           ENABLE ROW LEVEL SECURITY;
 
-          CREATE POLICY {{ stack_name }}_acme_ro
+          DROP POLICY IF EXISTS "{{ stack_name }}_acme_ro"
+            ON public.acme_x509;
+
+          CREATE POLICY "{{ stack_name }}_acme_ro"
             ON public.acme_x509
             FOR SELECT
             TO "{{ stack_name }}"

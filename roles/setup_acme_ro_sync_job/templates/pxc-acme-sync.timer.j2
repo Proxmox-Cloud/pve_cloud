@@ -1,0 +1,8 @@
+[Unit]
+Description=run pxc acme cron sync job
+
+[Timer]
+OnCalendar={{ sync_timer_pattern }}
+
+[Install]
+WantedBy=timers.target

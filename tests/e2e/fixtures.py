@@ -704,7 +704,7 @@ def setup_mirror_vm(request, get_test_env, setup_haproxy_lxcs):
                         "python3-distro|python3-gi|python3-httplib2|python3-lazr.restfulclient|python3-lazr.uri|"
                         "python3-software-properties|python3-urllib3|python3-wadllib|shared-mime-info|"
                         "software-properties-common|unzip|xfsprogs|bind9|bind9utils|prometheus-node-exporter|openssh|"
-                        "etcd-server|pip|postgresql|keepalived|haproxy|borgbackup|skopeo"
+                        "etcd-server|pip|postgresql|keepalived|haproxy|borgbackup|skopeo|jq"
                     ),
                     "debian_backports_mirror_filter": "dummy-filter",  # will match nothing and just copy the repo empty
                     "debian_security_mirror_filter": "dummy-filter",  # will match nothing and just copy the repo empty

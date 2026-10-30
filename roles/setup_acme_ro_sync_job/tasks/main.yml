@@ -37,10 +37,34 @@
     dest: /opt/pxc-acme/pxc-acme-sync.sh
     mode: '0755'
   vars:
-    postgres_user: "{{ fetched_acme_ro_access['query_result'][0]['secret_data']['username'] }}"
-    postgres_password: "{{ fetched_acme_ro_access['query_result'][0]['secret_data']['password'] }}"
+    sync_postgres_user: "{{ fetched_acme_ro_access['query_result'][0]['secret_data']['username'] }}"
+    sync_postgres_password: "{{ fetched_acme_ro_access['query_result'][0]['secret_data']['password'] }}"
 
 - name: create the sync oneshot service
   template:
     dest: "/etc/systemd/system/pxc-acme-sync.service"
     src: pxc-acme-sync.service.j2
+
+- name: install cron timer and setup service
+  when: setup_systemd_acme_ro
+  block:
+    - name: run acme sync oneshot service
+      ansible.builtin.service:
+        daemon_reload: true
+        name: pxc-acme-sync
+        state: started
+        enabled: yes
+
+    - name: create daily acme sync timer
+      template:
+        dest: "/etc/systemd/system/pxc-acme-sync.timer"
+        src: pxc-acme-sync.timer.j2
+
+    - name: Reload systemd daemon
+      command: systemctl daemon-reload
+
+    - name: enable daily timer
+      systemd:
+        name: "pxc-acme-sync.timer"
+        state: started
+        enabled: yes

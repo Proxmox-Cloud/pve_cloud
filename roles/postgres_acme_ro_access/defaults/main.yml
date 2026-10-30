@@ -1,2 +1,3 @@
 ---
 # defaults file for postgres_acme_ro_access
+postgres_port: 5432

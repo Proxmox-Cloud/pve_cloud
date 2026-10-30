@@ -4,3 +4,6 @@ postgres_user:
 postgres_host:
 postgres_password:
 postgres_port: 5000
+
+setup_systemd_acme_ro: true
+sync_timer_pattern: "*-*-* 03:00:00"

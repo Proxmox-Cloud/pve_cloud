@@ -181,7 +181,7 @@ def test_create_lxc(request, get_proxmoxer, get_test_env, setup_haproxy_lxcs):
             assert ddns_ips  # assert ddns response
 
 
-def test_create_qemu(request, get_test_env, setup_mirror_vm):
+def test_create_qemu(request, get_test_env, setup_mirror_vm, get_cloud_secrets):
     logger.info("test create dynamic qemu")
 
     with tempfile.NamedTemporaryFile(
@@ -215,6 +215,16 @@ def test_create_qemu(request, get_test_env, setup_mirror_vm):
                         "external": True,
                     }
                 ],
+                "qemu_global_vars": {
+                    "stack_cert_sync_paths": [
+                        {
+                            "path": "/tmp/test.crt",
+                            "owner": "root",
+                            "group": "root",
+                            "mode": "0777",
+                        }
+                    ]
+                },
                 "static_includes": {
                     "dhcp_stack": "ha-dhcp."
                     + get_test_env["cloud_inventory"]["pve_cloud_domain"],
@@ -263,8 +273,42 @@ def test_create_qemu(request, get_test_env, setup_mirror_vm):
             "playbooks/get_blakes.yaml",
             destroy_playbook="playbooks/destroy_qemus.yaml",
         ):
-            pass
+            # Inject dummy ACME certificate for later sync testing
+            engine = create_engine(get_cloud_secrets["pg_conn_str_orm"])
 
+            with Session(engine) as session:
+                dummy_cert = AcmeX509(
+                    stack_fqdn=f"pytest-qemu.{get_test_env['cloud_inventory']['pve_cloud_domain']}",
+                    config={
+                        "cn": f"pytest-qemu.{get_test_env['cloud_inventory']['pve_cloud_domain']}",
+                        "san": [
+                            "DNS:pytest-qemu." + get_test_env['cloud_inventory']['pve_cloud_domain'],
+                            "DNS:mail-example." + get_test_env['cloud_inventory']['pve_cloud_domain'],
+                            "DNS:other-service-example." + get_test_env['cloud_inventory']['pve_cloud_domain'],
+                        ],
+                        "workflow": "acme"
+                    },
+                    ec_csr={
+                        "privkey": "-----BEGIN EC PRIVATE KEY-----\nDUMMY_PRIV_KEY\n-----END EC PRIVATE KEY-----",
+                        "csr": "-----BEGIN CERTIFICATE REQUEST-----\nDUMMY_CSR\n-----END CERTIFICATE REQUEST-----"
+                    },
+                    ec_crt={
+                        "crt": "-----BEGIN CERTIFICATE-----\nDUMMY_CERTIFICATE_CONTENT\n-----END CERTIFICATE-----"
+                    },
+                    k8s={
+                        "tls.crt": "-----BEGIN CERTIFICATE-----\nDUMMY_CERTIFICATE_CONTENT\n-----END CERTIFICATE-----",
+                        "tls.key": "-----BEGIN EC PRIVATE KEY-----\nDUMMY_PRIV_KEY\n-----END EC PRIVATE KEY-----"
+                    }
+                )
+                session.merge(dummy_cert)
+                session.commit()
+
+            with run_playbook(
+                request,
+                temp_qemu_inv.name,
+                "playbooks/setup_acme_certs.yaml",
+            ):
+                pass
 
 def test_create_secondary_kubespray(
     request,

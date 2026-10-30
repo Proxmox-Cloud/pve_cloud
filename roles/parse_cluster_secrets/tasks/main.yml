@@ -13,6 +13,8 @@
 - name: set other passwords and shorthands
   set_fact:
     bind_internal_key: "{{ pve_cloud_secrets_map['internal.key'] | b64decode | regex_search('(?<=secret \")[^\"]*') }}"
+    postgres_host: "{{ pve_haproxy_floating_ip_internal }}"
+    postgres_port: 5000
     postgres_password: "{{ pve_cloud_secrets_map['patroni.pass'] | b64decode | trim }}"
     pg_conn_str: "postgresql+psycopg2://postgres:{{ pve_cloud_secrets_map['patroni.pass'] | b64decode | trim }}@{{ pve_haproxy_floating_ip_internal }}:5000/pve_cloud?sslmode=disable"
     haproxy_keepalived_password: "{{ pve_cloud_secrets_map['haproxy-keepalived.pass'] | b64decode | trim }}"
