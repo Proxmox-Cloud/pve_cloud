@@ -227,7 +227,6 @@
   hosts: jump_hosts:all_pve_hosts
   serial: 1 # need to do it sequentially because .ssh/ is pmxcfs shared across hosts
   tasks:
-    # todo: this is maybe solved through ssh connection multiplexing?
     - name: increase sshd max startups for excessive tunneling
       ansible.builtin.lineinfile:
         path: /etc/ssh/sshd_config
@@ -235,8 +234,6 @@
         line: 'MaxStartups 100:30:200'
         state: present
       notify: restart-sshd
-      # only configure when jump hosts defined
-      when: groups['jump_hosts'] | length > 0
 
     - name: install additional root keys
       lineinfile:
