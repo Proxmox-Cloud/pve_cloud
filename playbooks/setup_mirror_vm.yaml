@@ -9,6 +9,7 @@
     - parse_cluster_secrets
   become: true
   vars:
+    mirror_proxmox_repositories: false
     # for selecting helm version to dl
     arch_mapping:
       x86_64: "amd64"
@@ -260,6 +261,32 @@
           isc-kea|isc-kea-ctrl-agent|isc-kea-hooks|
           isc-kea-common|isc-kea-admin|isc-kea-dhcp-ddns
         mirror_sources: false
+
+    - name: configure proxmox pve-no-subscription mirror
+      include_role:
+        name: aptly_mirror_repo
+      vars:
+        mirror_url: http://download.proxmox.com/debian/pve
+        mirror_distribution: bookworm
+        mirror_endpoint: pve
+        mirror_components:
+          - pve-no-subscription
+        mirror_filter: ""
+        mirror_sources: false
+      when: mirror_proxmox_repositories
+
+    - name: configure proxmox ceph-squid mirror
+      include_role:
+        name: aptly_mirror_repo
+      vars:
+        mirror_url: http://download.proxmox.com/debian/ceph-squid
+        mirror_distribution: bookworm
+        mirror_endpoint: ceph-squid
+        mirror_components:
+          - main
+        mirror_filter: ""
+        mirror_sources: false
+      when: mirror_proxmox_repositories
 
 - name: Configure mirror vm
   hosts: qemus
