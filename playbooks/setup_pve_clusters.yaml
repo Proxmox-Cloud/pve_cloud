@@ -227,6 +227,9 @@
   hosts: jump_hosts:all_pve_hosts
   serial: 1 # need to do it sequentially because .ssh/ is pmxcfs shared across hosts
   tasks:
+    # todo: ssh.py lib implements connection throtteling but the ssh multiplexing seems
+    # to tip default ssh settings over the edge resulting in connection terminations.
+    # figure out if this is the appropriate way or if we can pool connections more efficiently
     - name: increase sshd max startups for excessive tunneling
       ansible.builtin.lineinfile:
         path: /etc/ssh/sshd_config
