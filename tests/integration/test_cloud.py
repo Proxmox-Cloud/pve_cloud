@@ -91,7 +91,7 @@ def test_setup_acme_certs(request, integration_config, setup_postgres_container)
                         }
                     ],
                     "setup_systemd_acme_ro": False,
-                    "stack_cert_sync_hook_script": "echo \"TESTTEST\" > /tmp/test.txt"
+                    "stack_cert_sync_hook_script": 'echo "TESTTEST" > /tmp/test.txt',
                 },
                 "roles": ["pxc.cloud.setup_acme_ro_sync_job"],
                 "tasks": [{"name": "test", "debug": {"msg": "test"}}],
