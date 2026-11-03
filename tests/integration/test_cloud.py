@@ -90,7 +90,7 @@ def test_setup_acme_certs(request, integration_config, setup_postgres_container)
                             "mode": "0777",
                         }
                     ],
-                    "setup_systemd_acme_ro": False
+                    "setup_systemd_acme_ro": False,
                 },
                 "roles": ["pxc.cloud.setup_acme_ro_sync_job"],
                 "tasks": [{"name": "test", "debug": {"msg": "test"}}],
