@@ -50,50 +50,60 @@
 
 #### <a name="qemu_global_vars_stack_cert_sync_paths_items"></a>141.1.1. Setup generic acme certs sync job. > qemu_global_vars > stack_cert_sync_paths > stack_cert_sync_paths items
 
-|                           |                  |
-| ------------------------- | ---------------- |
-| **Type**                  | `object`         |
-| **Required**              | No               |
-| **Additional properties** | Any type allowed |
+|                           |             |
+| ------------------------- | ----------- |
+| **Type**                  | `object`    |
+| **Required**              | No          |
+| **Additional properties** | Not allowed |
 
 **Description:** Full filesystem paths, including ownership and permissions.
 
-| Property                                                        | Pattern | Type   | Deprecated | Definition | Title/Description                                                    |
-| --------------------------------------------------------------- | ------- | ------ | ---------- | ---------- | -------------------------------------------------------------------- |
-| - [path](#qemu_global_vars_stack_cert_sync_paths_items_path )   | No      | string | No         | -          | Full path to the public PEM certificate to sync, including filename. |
-| - [owner](#qemu_global_vars_stack_cert_sync_paths_items_owner ) | No      | string | No         | -          | -                                                                    |
-| - [group](#qemu_global_vars_stack_cert_sync_paths_items_group ) | No      | string | No         | -          | -                                                                    |
-| - [mode](#qemu_global_vars_stack_cert_sync_paths_items_mode )   | No      | string | No         | -          | Octal mode file permission.                                          |
+| Property                                                              | Pattern | Type   | Deprecated | Definition | Title/Description                                                              |
+| --------------------------------------------------------------------- | ------- | ------ | ---------- | ---------- | ------------------------------------------------------------------------------ |
+| + [crt_path](#qemu_global_vars_stack_cert_sync_paths_items_crt_path ) | No      | string | No         | -          | Full path to the public PEM certificate to sync, including filename.           |
+| + [key_path](#qemu_global_vars_stack_cert_sync_paths_items_key_path ) | No      | string | No         | -          | Full path where PEM formatted private key will be synced (including filename). |
+| + [owner](#qemu_global_vars_stack_cert_sync_paths_items_owner )       | No      | string | No         | -          | -                                                                              |
+| + [group](#qemu_global_vars_stack_cert_sync_paths_items_group )       | No      | string | No         | -          | -                                                                              |
+| + [mode](#qemu_global_vars_stack_cert_sync_paths_items_mode )         | No      | string | No         | -          | Octal mode file permission.                                                    |
 
-##### <a name="qemu_global_vars_stack_cert_sync_paths_items_path"></a>141.1.1.1. Property `Setup generic acme certs sync job. > qemu_global_vars > stack_cert_sync_paths > stack_cert_sync_paths items > path`
+##### <a name="qemu_global_vars_stack_cert_sync_paths_items_crt_path"></a>141.1.1.1. Property `Setup generic acme certs sync job. > qemu_global_vars > stack_cert_sync_paths > stack_cert_sync_paths items > crt_path`
 
 |              |          |
 | ------------ | -------- |
 | **Type**     | `string` |
-| **Required** | No       |
+| **Required** | Yes      |
 
 **Description:** Full path to the public PEM certificate to sync, including filename.
 
-##### <a name="qemu_global_vars_stack_cert_sync_paths_items_owner"></a>141.1.1.2. Property `Setup generic acme certs sync job. > qemu_global_vars > stack_cert_sync_paths > stack_cert_sync_paths items > owner`
+##### <a name="qemu_global_vars_stack_cert_sync_paths_items_key_path"></a>141.1.1.2. Property `Setup generic acme certs sync job. > qemu_global_vars > stack_cert_sync_paths > stack_cert_sync_paths items > key_path`
 
 |              |          |
 | ------------ | -------- |
 | **Type**     | `string` |
-| **Required** | No       |
+| **Required** | Yes      |
 
-##### <a name="qemu_global_vars_stack_cert_sync_paths_items_group"></a>141.1.1.3. Property `Setup generic acme certs sync job. > qemu_global_vars > stack_cert_sync_paths > stack_cert_sync_paths items > group`
+**Description:** Full path where PEM formatted private key will be synced (including filename).
 
-|              |          |
-| ------------ | -------- |
-| **Type**     | `string` |
-| **Required** | No       |
-
-##### <a name="qemu_global_vars_stack_cert_sync_paths_items_mode"></a>141.1.1.4. Property `Setup generic acme certs sync job. > qemu_global_vars > stack_cert_sync_paths > stack_cert_sync_paths items > mode`
+##### <a name="qemu_global_vars_stack_cert_sync_paths_items_owner"></a>141.1.1.3. Property `Setup generic acme certs sync job. > qemu_global_vars > stack_cert_sync_paths > stack_cert_sync_paths items > owner`
 
 |              |          |
 | ------------ | -------- |
 | **Type**     | `string` |
-| **Required** | No       |
+| **Required** | Yes      |
+
+##### <a name="qemu_global_vars_stack_cert_sync_paths_items_group"></a>141.1.1.4. Property `Setup generic acme certs sync job. > qemu_global_vars > stack_cert_sync_paths > stack_cert_sync_paths items > group`
+
+|              |          |
+| ------------ | -------- |
+| **Type**     | `string` |
+| **Required** | Yes      |
+
+##### <a name="qemu_global_vars_stack_cert_sync_paths_items_mode"></a>141.1.1.5. Property `Setup generic acme certs sync job. > qemu_global_vars > stack_cert_sync_paths > stack_cert_sync_paths items > mode`
+
+|              |          |
+| ------------ | -------- |
+| **Type**     | `string` |
+| **Required** | Yes      |
 
 **Description:** Octal mode file permission.
 
