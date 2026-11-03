@@ -25,3 +25,8 @@ chown '{{ (cert_path.owner ~ ':' ~ cert_path.group) }}' '{{ cert_path.key_path }
 chmod '{{ cert_path.mode  }}' '{{ cert_path.key_path }}'
 
 {% endfor %}
+
+# optional sync hook commands
+{% if stack_cert_sync_hook_script is defined %}
+{{ stack_cert_sync_hook_script }}
+{% endif %}

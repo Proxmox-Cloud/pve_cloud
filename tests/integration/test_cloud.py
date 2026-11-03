@@ -91,6 +91,7 @@ def test_setup_acme_certs(request, integration_config, setup_postgres_container)
                         }
                     ],
                     "setup_systemd_acme_ro": False,
+                    "stack_cert_sync_hook_script": "echo \"TESTTEST\" > /tmp/test.txt"
                 },
                 "roles": ["pxc.cloud.setup_acme_ro_sync_job"],
                 "tasks": [{"name": "test", "debug": {"msg": "test"}}],
@@ -130,6 +131,19 @@ def test_setup_acme_certs(request, integration_config, setup_postgres_container)
                 name="test",
                 namespace=namespace,
                 command=["cat", "/tmp/test.key"],
+                stderr=True,
+                stdin=False,
+                stdout=True,
+                tty=False,
+            )
+
+            assert result.strip()
+
+            result = stream(
+                v1.connect_get_namespaced_pod_exec,
+                name="test",
+                namespace=namespace,
+                command=["cat", "/tmp/test.txt"],
                 stderr=True,
                 stdin=False,
                 stdout=True,
