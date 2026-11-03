@@ -42,6 +42,9 @@ def test_setup_acme_certs(request, integration_config, setup_postgres_container)
                         "rows": [
                             {
                                 "stack_fqdn": "test_setup_acme_certs.pxc.integration.test",
+                                "ec_csr": {
+                                    "privkey": "-----BEGIN EC PRIVATE KEY-----\nTESTTEST\n---END EC PRIVATE KEY-----"
+                                },
                                 "ec_crt": {
                                     "crt": "-----BEGIN CERTIFICATE-----\nTESTTEST\n-----END CERTIFICATE-----"
                                 },
@@ -80,12 +83,14 @@ def test_setup_acme_certs(request, integration_config, setup_postgres_container)
                     "postgres_host": postgres_host["pxc-postgres"]["k8s_pod_ip"],
                     "stack_cert_sync_paths": [
                         {
-                            "path": "/tmp/test.crt",
+                            "crt_path": "/tmp/test.crt",
+                            "key_path": "/tmp/test.key",
                             "owner": "root",
                             "group": "root",
                             "mode": "0777",
                         }
                     ],
+                    "setup_systemd_acme_ro": False
                 },
                 "roles": ["pxc.cloud.setup_acme_ro_sync_job"],
                 "tasks": [{"name": "test", "debug": {"msg": "test"}}],
@@ -106,12 +111,25 @@ def test_setup_acme_certs(request, integration_config, setup_postgres_container)
                 tty=False,
             )
 
-            # check if crt got synced
+            # check if crt/key got synced
             result = stream(
                 v1.connect_get_namespaced_pod_exec,
                 name="test",
                 namespace=namespace,
                 command=["cat", "/tmp/test.crt"],
+                stderr=True,
+                stdin=False,
+                stdout=True,
+                tty=False,
+            )
+
+            assert result.strip()
+
+            result = stream(
+                v1.connect_get_namespaced_pod_exec,
+                name="test",
+                namespace=namespace,
+                command=["cat", "/tmp/test.key"],
                 stderr=True,
                 stdin=False,
                 stdout=True,
