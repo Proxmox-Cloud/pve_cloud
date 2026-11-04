@@ -6,7 +6,7 @@ export PGPASSWORD="{{ sync_postgres_password }}"
 export PGPORT="{{ postgres_port }}"
 export PGDATABASE="pve_cloud"
 
-CRT=$(psql -t -A -c "SELECT ec_crt from public.acme_x509 where stack_fqdn = '{{ stack_name }}.{{ pve_cloud_domain }}';" | jq -r '.crt')
+CRT=$(psql -t -A -c "SELECT ec_crt from public.acme_x509 where stack_fqdn = '{{ stack_name }}.{{ pve_cloud_domain }}';" | jq -r '.fullchain')
 KEY=$(psql -t -A -c "SELECT ec_csr from public.acme_x509 where stack_fqdn = '{{ stack_name }}.{{ pve_cloud_domain }}';" | jq -r '.privkey')
 
 # write cert to specified paths

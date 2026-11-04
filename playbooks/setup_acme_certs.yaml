@@ -25,7 +25,7 @@
     - include_role:
         name: pxc.cloud.apply_acme_certs
       vars:
-        cluster_cert_entries: "{{ stack_cert_entries }}"
+        cluster_cert_entries: "{{ hostvars[groups['qemus'][0]]['stack_cert_entries'] }}"
       when: acme_method is defined and cluster_cert_entries | length > 0
 
 - name: Setup acme sync job
