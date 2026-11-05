@@ -29,6 +29,7 @@
 | - [qemu_keyboard_layout](#qemu_keyboard_layout )                 | No      | string           | No         | -          | Keyboard layout for cloudinit.                                                                                                                                                                         |
 | - [qemu_network_config](#qemu_network_config )                   | No      | string           | No         | -          | Optional qemu network config as a yaml string that is merged into the cloudinit network config of all qemus.                                                                                           |
 | - [qemu_global_vars](#qemu_global_vars )                         | No      | object           | No         | -          | Variables that will be applied set for all qemus vms.                                                                                                                                                  |
+| - [acme_staging](#acme_staging )                                 | No      | boolean          | No         | -          | If set to true will use acme staging directory for issueing certs (needed for setup_acme_certs playbook).                                                                                              |
 | - [plugin](#plugin )                                             | No      | enum (of string) | No         | -          | Id of ansible inventory plugin                                                                                                                                                                         |
 
 ## <a name="target_pve"></a>25. Property `VM Base Inventory > target_pve`
@@ -749,7 +750,30 @@ Ubuntu for example wont work if you set the cloud init user to admin.
 
 **Description:** Variables that will be applied set for all qemus vms.
 
-## <a name="plugin"></a>42. Property `VM Base Inventory > plugin`
+| Property                                                          | Pattern | Type    | Deprecated | Definition | Title/Description                                                                          |
+| ----------------------------------------------------------------- | ------- | ------- | ---------- | ---------- | ------------------------------------------------------------------------------------------ |
+| - [use_pxc_aptly_mirror](#qemu_global_vars_use_pxc_aptly_mirror ) | No      | boolean | No         | -          | Set this to false to disable using the central proxmox cloud apt mirror. Defaults to true. |
+| - [](#qemu_global_vars_additionalProperties )                     | No      | object  | No         | -          | -                                                                                          |
+
+### <a name="qemu_global_vars_use_pxc_aptly_mirror"></a>41.1. Property `VM Base Inventory > qemu_global_vars > use_pxc_aptly_mirror`
+
+|              |           |
+| ------------ | --------- |
+| **Type**     | `boolean` |
+| **Required** | No        |
+
+**Description:** Set this to false to disable using the central proxmox cloud apt mirror. Defaults to true.
+
+## <a name="acme_staging"></a>42. Property `VM Base Inventory > acme_staging`
+
+|              |           |
+| ------------ | --------- |
+| **Type**     | `boolean` |
+| **Required** | No        |
+
+**Description:** If set to true will use acme staging directory for issueing certs (needed for setup_acme_certs playbook).
+
+## <a name="plugin"></a>43. Property `VM Base Inventory > plugin`
 
 |              |                    |
 | ------------ | ------------------ |

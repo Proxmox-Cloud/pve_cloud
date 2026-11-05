@@ -14,7 +14,7 @@
 | ---------------------------------------- | ------- | ------ | ---------- | ---------- | ----------------- |
 | - [qemu_global_vars](#qemu_global_vars ) | No      | object | No         | -          | -                 |
 
-## <a name="qemu_global_vars"></a>141. Property `Setup generic acme certs sync job. > qemu_global_vars`
+## <a name="qemu_global_vars"></a>143. Property `Setup generic acme certs sync job. > qemu_global_vars`
 
 |                           |                  |
 | ------------------------- | ---------------- |
@@ -22,12 +22,22 @@
 | **Required**              | No               |
 | **Additional properties** | Any type allowed |
 
-| Property                                                            | Pattern | Type            | Deprecated | Definition | Title/Description                                                                                                                                 |
-| ------------------------------------------------------------------- | ------- | --------------- | ---------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| + [stack_cert_sync_paths](#qemu_global_vars_stack_cert_sync_paths ) | No      | array of object | No         | -          | Paths where we want the stack acme cert to be synced to, including ownership and permission settings.                                             |
-| + [stack_cert_entries](#qemu_global_vars_stack_cert_entries )       | No      | array of object | No         | -          | Content for the acme certificate we want to generate and link to the stack. This is the certificate that will be synced to stack_cert_sync_paths. |
+| Property                                                                        | Pattern | Type            | Deprecated | Definition | Title/Description                                                                                                                                 |
+| ------------------------------------------------------------------------------- | ------- | --------------- | ---------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| - [stack_cert_sync_hook_script](#qemu_global_vars_stack_cert_sync_hook_script ) | No      | string          | No         | -          | Bash commands to append to the sync job, that will be executed after syncing certificates from the pxc database.                                  |
+| + [stack_cert_sync_paths](#qemu_global_vars_stack_cert_sync_paths )             | No      | array of object | No         | -          | Paths where we want the stack acme cert to be synced to, including ownership and permission settings.                                             |
+| + [stack_cert_entries](#qemu_global_vars_stack_cert_entries )                   | No      | array of object | No         | -          | Content for the acme certificate we want to generate and link to the stack. This is the certificate that will be synced to stack_cert_sync_paths. |
 
-### <a name="qemu_global_vars_stack_cert_sync_paths"></a>141.1. Property `Setup generic acme certs sync job. > qemu_global_vars > stack_cert_sync_paths`
+### <a name="qemu_global_vars_stack_cert_sync_hook_script"></a>143.1. Property `Setup generic acme certs sync job. > qemu_global_vars > stack_cert_sync_hook_script`
+
+|              |          |
+| ------------ | -------- |
+| **Type**     | `string` |
+| **Required** | No       |
+
+**Description:** Bash commands to append to the sync job, that will be executed after syncing certificates from the pxc database.
+
+### <a name="qemu_global_vars_stack_cert_sync_paths"></a>143.2. Property `Setup generic acme certs sync job. > qemu_global_vars > stack_cert_sync_paths`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -48,7 +58,7 @@
 | ---------------------------------------------------------------------------- | ----------------------------------------------------------- |
 | [stack_cert_sync_paths items](#qemu_global_vars_stack_cert_sync_paths_items) | Full filesystem paths, including ownership and permissions. |
 
-#### <a name="qemu_global_vars_stack_cert_sync_paths_items"></a>141.1.1. Setup generic acme certs sync job. > qemu_global_vars > stack_cert_sync_paths > stack_cert_sync_paths items
+#### <a name="qemu_global_vars_stack_cert_sync_paths_items"></a>143.2.1. Setup generic acme certs sync job. > qemu_global_vars > stack_cert_sync_paths > stack_cert_sync_paths items
 
 |                           |             |
 | ------------------------- | ----------- |
@@ -66,7 +76,7 @@
 | + [group](#qemu_global_vars_stack_cert_sync_paths_items_group )       | No      | string | No         | -          | -                                                                              |
 | + [mode](#qemu_global_vars_stack_cert_sync_paths_items_mode )         | No      | string | No         | -          | Octal mode file permission.                                                    |
 
-##### <a name="qemu_global_vars_stack_cert_sync_paths_items_crt_path"></a>141.1.1.1. Property `Setup generic acme certs sync job. > qemu_global_vars > stack_cert_sync_paths > stack_cert_sync_paths items > crt_path`
+##### <a name="qemu_global_vars_stack_cert_sync_paths_items_crt_path"></a>143.2.1.1. Property `Setup generic acme certs sync job. > qemu_global_vars > stack_cert_sync_paths > stack_cert_sync_paths items > crt_path`
 
 |              |          |
 | ------------ | -------- |
@@ -75,7 +85,7 @@
 
 **Description:** Full path to the public PEM certificate to sync, including filename.
 
-##### <a name="qemu_global_vars_stack_cert_sync_paths_items_key_path"></a>141.1.1.2. Property `Setup generic acme certs sync job. > qemu_global_vars > stack_cert_sync_paths > stack_cert_sync_paths items > key_path`
+##### <a name="qemu_global_vars_stack_cert_sync_paths_items_key_path"></a>143.2.1.2. Property `Setup generic acme certs sync job. > qemu_global_vars > stack_cert_sync_paths > stack_cert_sync_paths items > key_path`
 
 |              |          |
 | ------------ | -------- |
@@ -84,21 +94,21 @@
 
 **Description:** Full path where PEM formatted private key will be synced (including filename).
 
-##### <a name="qemu_global_vars_stack_cert_sync_paths_items_owner"></a>141.1.1.3. Property `Setup generic acme certs sync job. > qemu_global_vars > stack_cert_sync_paths > stack_cert_sync_paths items > owner`
+##### <a name="qemu_global_vars_stack_cert_sync_paths_items_owner"></a>143.2.1.3. Property `Setup generic acme certs sync job. > qemu_global_vars > stack_cert_sync_paths > stack_cert_sync_paths items > owner`
 
 |              |          |
 | ------------ | -------- |
 | **Type**     | `string` |
 | **Required** | Yes      |
 
-##### <a name="qemu_global_vars_stack_cert_sync_paths_items_group"></a>141.1.1.4. Property `Setup generic acme certs sync job. > qemu_global_vars > stack_cert_sync_paths > stack_cert_sync_paths items > group`
+##### <a name="qemu_global_vars_stack_cert_sync_paths_items_group"></a>143.2.1.4. Property `Setup generic acme certs sync job. > qemu_global_vars > stack_cert_sync_paths > stack_cert_sync_paths items > group`
 
 |              |          |
 | ------------ | -------- |
 | **Type**     | `string` |
 | **Required** | Yes      |
 
-##### <a name="qemu_global_vars_stack_cert_sync_paths_items_mode"></a>141.1.1.5. Property `Setup generic acme certs sync job. > qemu_global_vars > stack_cert_sync_paths > stack_cert_sync_paths items > mode`
+##### <a name="qemu_global_vars_stack_cert_sync_paths_items_mode"></a>143.2.1.5. Property `Setup generic acme certs sync job. > qemu_global_vars > stack_cert_sync_paths > stack_cert_sync_paths items > mode`
 
 |              |          |
 | ------------ | -------- |
@@ -107,7 +117,7 @@
 
 **Description:** Octal mode file permission.
 
-### <a name="qemu_global_vars_stack_cert_entries"></a>141.2. Property `Setup generic acme certs sync job. > qemu_global_vars > stack_cert_entries`
+### <a name="qemu_global_vars_stack_cert_entries"></a>143.3. Property `Setup generic acme certs sync job. > qemu_global_vars > stack_cert_entries`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -128,7 +138,7 @@
 | ---------------------------------------------------------------------- | ----------- |
 | [stack_cert_entries items](#qemu_global_vars_stack_cert_entries_items) | -           |
 
-#### <a name="qemu_global_vars_stack_cert_entries_items"></a>141.2.1. Setup generic acme certs sync job. > qemu_global_vars > stack_cert_entries > stack_cert_entries items
+#### <a name="qemu_global_vars_stack_cert_entries_items"></a>143.3.1. Setup generic acme certs sync job. > qemu_global_vars > stack_cert_entries > stack_cert_entries items
 
 |                           |             |
 | ------------------------- | ----------- |
@@ -143,7 +153,7 @@
 | - [authoritative_zone](#qemu_global_vars_stack_cert_entries_items_authoritative_zone ) | No      | boolean         | No         | -          | This will cause the specified apex zone to be created as an authoritative zone in the proxmox clouds dns server. Ingress dns will only work for authoritative zones. |
 | - [apex_zone_san](#qemu_global_vars_stack_cert_entries_items_apex_zone_san )           | No      | boolean         | No         | -          | Creates additional SAN for the zone, if you have *.example.com you will also get example.com in your certificate. Defaults to false.                                 |
 
-##### <a name="qemu_global_vars_stack_cert_entries_items_zone"></a>141.2.1.1. Property `Setup generic acme certs sync job. > qemu_global_vars > stack_cert_entries > stack_cert_entries items > zone`
+##### <a name="qemu_global_vars_stack_cert_entries_items_zone"></a>143.3.1.1. Property `Setup generic acme certs sync job. > qemu_global_vars > stack_cert_entries > stack_cert_entries items > zone`
 
 |              |          |
 | ------------ | -------- |
@@ -152,7 +162,7 @@
 
 **Description:** DNS parent zone, should be the apex zone in ionos/route53 for dns01 challenge.
 
-##### <a name="qemu_global_vars_stack_cert_entries_items_names"></a>141.2.1.2. Property `Setup generic acme certs sync job. > qemu_global_vars > stack_cert_entries > stack_cert_entries items > names`
+##### <a name="qemu_global_vars_stack_cert_entries_items_names"></a>143.3.1.2. Property `Setup generic acme certs sync job. > qemu_global_vars > stack_cert_entries > stack_cert_entries items > names`
 
 |              |                   |
 | ------------ | ----------------- |
@@ -171,7 +181,7 @@
 | --------------------------------------------------------------------- | --------------------------------------------------------------- |
 | [names items](#qemu_global_vars_stack_cert_entries_items_names_items) | SANs included in the certificate and basis for dns01 challenge. |
 
-###### <a name="qemu_global_vars_stack_cert_entries_items_names_items"></a>141.2.1.2.1. Setup generic acme certs sync job. > qemu_global_vars > stack_cert_entries > stack_cert_entries items > names > names items
+###### <a name="qemu_global_vars_stack_cert_entries_items_names_items"></a>143.3.1.2.1. Setup generic acme certs sync job. > qemu_global_vars > stack_cert_entries > stack_cert_entries items > names > names items
 
 |              |          |
 | ------------ | -------- |
@@ -194,7 +204,7 @@
 "*.subzone"
 ```
 
-##### <a name="qemu_global_vars_stack_cert_entries_items_authoritative_zone"></a>141.2.1.3. Property `Setup generic acme certs sync job. > qemu_global_vars > stack_cert_entries > stack_cert_entries items > authoritative_zone`
+##### <a name="qemu_global_vars_stack_cert_entries_items_authoritative_zone"></a>143.3.1.3. Property `Setup generic acme certs sync job. > qemu_global_vars > stack_cert_entries > stack_cert_entries items > authoritative_zone`
 
 |              |           |
 | ------------ | --------- |
@@ -203,7 +213,7 @@
 
 **Description:** This will cause the specified apex zone to be created as an authoritative zone in the proxmox clouds dns server. Ingress dns will only work for authoritative zones.
 
-##### <a name="qemu_global_vars_stack_cert_entries_items_apex_zone_san"></a>141.2.1.4. Property `Setup generic acme certs sync job. > qemu_global_vars > stack_cert_entries > stack_cert_entries items > apex_zone_san`
+##### <a name="qemu_global_vars_stack_cert_entries_items_apex_zone_san"></a>143.3.1.4. Property `Setup generic acme certs sync job. > qemu_global_vars > stack_cert_entries > stack_cert_entries items > apex_zone_san`
 
 |              |           |
 | ------------ | --------- |
