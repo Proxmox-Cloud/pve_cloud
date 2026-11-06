@@ -181,6 +181,14 @@
         zpool_vdevs: "{{ vm_params_self['zpool_csi_parameters']['vdevs'] }}"
         zpool_properties: "{{ vm_params_self['zpool_csi_parameters']['pool_properties'] }}"
 
+    # this is set by the kubespray playbook and later then used
+    # by the openebs chart to determine what nodes to deploy the zfs
+    # nodeplugin daemonset to
+    - name: add pxc cloud zfs node label
+      when: '"zpool_csi_parameters" in vm_params_self'
+      ansible.builtin.set_fact:
+        node_labels: "{{ node_labels | default({}) | combine({'pxzfs-storage': 'true'}) }}"
+
     # dynamically set file inotify watches and instances
     # needed for any kind of logging driver, prevents too many files open error
     # caused by lots of pods

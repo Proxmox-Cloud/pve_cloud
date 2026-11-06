@@ -1,3 +1,9 @@
+# we already install the crds seperately
+openebs-crds:
+  csi:
+    volumeSnapshots:
+      enabled: false
+
 loki:
   enabled: false
 alloy:
@@ -31,8 +37,21 @@ localpv-provisioner:
 {% endif %}
 
 
-{% if harbor_mirror_secret.rowcount != 0 %}
+# deploy zfsNode plugin only on nodes that have zfs ready + set the needed tolerations
 zfs-localpv:
+  zfsNode:
+    kubeletDir: "{{ openebs_zfs_kubelet_dir }}"
+    nodeSelector:
+      pxzfs-storage: 'true'
+    tolerations:
+      # derived from kubespray node_taints of each worker node
+{% for collected_taint in (collected_node_taints | flatten) %}
+      - key: "{{ (collected_taint | split('='))[0] }}"
+        value: "{{ ((collected_taint | split('='))[1] | split(':'))[0] }}"
+        effect: "{{ ((collected_taint | split('='))[1] | split(':'))[1] }}"
+{% endfor %}
+
+{% if harbor_mirror_secret.rowcount != 0 %}
   imagePullSecrets:
     - name: mirror-pull-secret
   zfsController:
