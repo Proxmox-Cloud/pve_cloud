@@ -43,6 +43,7 @@ zfs-localpv:
     kubeletDir: "{{ openebs_zfs_kubelet_dir }}"
     nodeSelector:
       pxzfs-storage: 'true'
+{% if collected_node_taints | flatten | length > 0 %}
     tolerations:
       # derived from kubespray node_taints of each worker node
 {% for collected_taint in (collected_node_taints | flatten) %}
@@ -50,8 +51,12 @@ zfs-localpv:
         value: "{{ ((collected_taint | split('='))[1] | split(':'))[0] }}"
         effect: "{{ ((collected_taint | split('='))[1] | split(':'))[1] }}"
 {% endfor %}
-
+{% endif %}
 {% if harbor_mirror_secret.rowcount != 0 %}
+    driverRegistrar:
+      image:
+        registry: "{{ mirror_repo_host }}/"
+        repository: cloud-mirror/registry.k8s.io/sig-storage/csi-node-driver-registrar
   imagePullSecrets:
     - name: mirror-pull-secret
   zfsController:
@@ -75,11 +80,5 @@ zfs-localpv:
     image:
       registry: "{{ mirror_repo_host }}/"
       repository: cloud-mirror/docker.io/openebs/zfs-driver
-  zfsNode:
-    kubeletDir: "{{ openebs_zfs_kubelet_dir }}"
-    driverRegistrar:
-      image:
-        registry: "{{ mirror_repo_host }}/"
-        repository: cloud-mirror/registry.k8s.io/sig-storage/csi-node-driver-registrar
 
 {% endif %}
