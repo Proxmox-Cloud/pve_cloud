@@ -144,6 +144,11 @@
         apply:
           become: true
 
+    - name: install prometheus node exporter
+      include_role:
+        name: prometheus.prometheus.node_exporter
+      when: install_prom_node_exporter is not defined or install_prom_node_exporter
+
     - name: install vector journald exporter
       include_role:
         name: vector_journald_exporter
@@ -151,6 +156,34 @@
           become: true
       vars:
         vlogs_etc_hosts_ip: "{{ pve_haproxy_floating_ip_internal }}"
+
+    - name: check if postgres is available
+      delegate_to: pxc-executor-host
+      community.postgresql.postgresql_ping:
+        host: "{{ pve_haproxy_floating_ip_internal }}"
+        port: 5000
+        login_db: postgres
+        login_user: postgres
+        login_password: "{{ postgres_password }}"
+      register: postgres_connection_check
+      ignore_errors: yes
+
+    - name: write vm_vars_blake to patroni
+      delegate_to: "pxc-executor-host"
+      alchemy_upsert:
+        pg_conn_str: "{{ pg_conn_str }}"
+        table: vm_vars_blake
+        values:
+          cloud_domain: "{{ pve_cloud_domain }}"
+          blake_id: "{{ pxc_blake_id }}"
+          # always write vars even if it has an empty dict
+          vm_vars: "{{ qemu_global_vars | default({}) | combine(vm_vars_blake | default({})) }}"
+          # vm params for backref
+          self_params: "{{ vm_params_self }}"
+        conflict_cols:
+          - blake_id
+      when:
+        - postgres_connection_check.is_available # only try to write the vars if the db is created
 
 # todo: can be factored out if patroni lxcs themselfes get entries in
 # the database (used in haproxy cfg template)
