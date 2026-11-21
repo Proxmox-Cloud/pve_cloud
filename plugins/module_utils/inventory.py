@@ -264,6 +264,9 @@ def build_pve_inventory(inventory, yaml_data, online_pve_hosts, cluster_map):
             "pxc-executor-host", "ansible_python_interpreter", sys.executable
         )
 
+    # set the inventory itself for reflection / reverse lookup via patroni db
+    inventory.set_variable("pxc-executor-host", "pxc_inventory", yaml_data)
+
     # set cluster vars from target cluster
     target_cluster = cluster_map[yaml_data["target_pve"]]
 

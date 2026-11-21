@@ -79,6 +79,7 @@ class InventoryModule(BaseInventoryPlugin):
             )  # machine type for cloud logic
 
             blake = stack_vm_get_blake(vm)
+            inventory.set_variable(hostname, "pxc_blake_id", blake)
 
             display.v("blake found", blake)
 

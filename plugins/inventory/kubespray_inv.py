@@ -146,6 +146,7 @@ class InventoryModule(BaseInventoryPlugin):
 
             # todo: this block can probably be refactored for qemu inv and lxc inv aswell, almost identical
             blake = stack_vm_get_blake(vm)
+            inventory.set_variable(hostname, "pxc_blake_id", blake)
 
             if blake in vm_params_blake:
                 # also include self reference to vm creation parameters as variables to use in playbooks
